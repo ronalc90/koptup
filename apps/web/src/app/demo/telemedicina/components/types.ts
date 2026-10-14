@@ -26,6 +26,7 @@ export interface Payer {
 
 export interface Specialty {
   key: SpecKey;
+  /** Profesional de ejemplo que atiende la especialidad. */
   pro: string;
   /** Registro médico de ejemplo. */
   reg: string;
@@ -68,8 +69,13 @@ export interface Patient {
   payerId: string;
   reason: Txt;
   priority: Priority;
-  waitMin: number;
+  /** Servicio que lo atiende (por su cita o por la orientación de la pre-consulta). */
+  spec: SpecKey;
+  /** Hora del reloj de la demo (HH:MM) en que entró a la sala de espera. */
+  arrivedAt: string;
   status: PatientStatus;
+  /** Cita de la agenda con la que hizo el ingreso (si vino agendado). */
+  appointmentId?: string;
   allergies: { label: Txt; cls?: AllergyClass }[];
   history: Txt[];
   meds: { name: Txt; dose: string; freq: Txt }[];
@@ -85,7 +91,10 @@ export interface Patient {
 export interface ChatMessage {
   id: string;
   from: 'doctor' | 'patient';
-  text: string;
+  /** Texto libre o bilingüe (guion de ejemplo). */
+  text: Txt;
+  /** Mensaje fijo de la demo (se traduce al idioma activo). */
+  key?: 'hello';
   at: string;
 }
 
@@ -155,6 +164,8 @@ export interface Attention {
   date: string;
   time: string;
   durationMin: number;
+  /** Duración exacta en segundos (consultas hechas en la demo). */
+  durationSec?: number;
   dx: { code: string; label: Txt } | null;
   value: number;
   patientShare: number;
@@ -169,6 +180,8 @@ export interface Attention {
   soap: Soap | null;
 }
 
+export type AppointmentStatus = 'booked' | 'checkedIn' | 'attended' | 'referred';
+
 export interface Appointment {
   id: string;
   spec: SpecKey;
@@ -177,7 +190,9 @@ export interface Appointment {
   patient: string;
   phone: string;
   payerId: string;
-  modality: 'video' | 'phone';
+  status: AppointmentStatus;
+  /** Paciente de la sala de espera creado al hacer la pre-consulta de esta cita. */
+  patientId?: string;
 }
 
 /** Entrada de auditoría: se guarda la clave del texto para mostrarla en el idioma activo. */
@@ -185,8 +200,35 @@ export interface AuditEntry {
   id: string;
   at: string;
   actor: 'system' | 'doctor' | 'patient' | 'billing';
+  /** Nombre de quien actuó (p. ej. la profesional de la consulta); si falta, se muestra el rol. */
+  who?: string;
   key: string;
-  params?: Record<string, string | { t: string }>;
+  /** Texto, clave de traducción ({ t }) o fecha ISO para mostrar con formato ({ d }). */
+  params?: Record<string, string | { t: string } | { d: string }>;
+}
+
+/** Diagnóstico, receta y órdenes que se van armando durante la consulta. */
+export interface ConsultDraft {
+  dx: Cie10 | null;
+  meds: RxMed[];
+  orders: string[];
+  rx: Prescription | null;
+  rxSent: boolean;
+}
+
+/** Consulta en curso: se guarda con el resto de la demo para que una recarga no la pierda. */
+export interface ConsultSession {
+  patientId: string;
+  /** Momento real (ms) en que empezó: de aquí sale el cronómetro. */
+  startEpoch: number;
+  /** Hora del reloj de la demo en que empezó (HH:MM). */
+  startedAt: string;
+  chat: ChatMessage[];
+  scriptIdx: number;
+  draft: ConsultDraft;
+  soap: Soap;
+  micOn: boolean;
+  tab: ConsultTab;
 }
 
 export interface TriageResult {

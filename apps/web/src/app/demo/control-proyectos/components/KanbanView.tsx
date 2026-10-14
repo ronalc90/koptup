@@ -99,8 +99,20 @@ function Card({ task, onDragStart, onDragEnd }: { task: Task; onDragStart: () =>
     const close = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenu(false);
     };
+    // Escape cierra el menú y devuelve el foco al botón ⋮.
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      setMenu(false);
+      menuRef.current?.querySelector<HTMLButtonElement>('button')?.focus();
+    };
     document.addEventListener('mousedown', close);
-    return () => document.removeEventListener('mousedown', close);
+    document.addEventListener('keydown', onKey);
+    // El foco pasa a la primera opción para usar el menú con el teclado.
+    menuRef.current?.querySelector<HTMLButtonElement>('[data-gp-menu] button')?.focus();
+    return () => {
+      document.removeEventListener('mousedown', close);
+      document.removeEventListener('keydown', onKey);
+    };
   }, [menu]);
 
   return (
@@ -123,7 +135,7 @@ function Card({ task, onDragStart, onDragEnd }: { task: Task; onDragStart: () =>
             <EllipsisVerticalIcon className="w-5 h-5 text-slate-400" />
           </button>
           {menu && (
-            <div className="absolute right-0 mt-1 w-52 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 z-20 py-1 text-sm">
+            <div data-gp-menu className="absolute right-0 mt-1 w-52 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 z-20 py-1 text-sm">
               <p className="px-3 pt-1 pb-0.5 text-[11px] font-semibold text-slate-500 uppercase">{t('moveTo')}</p>
               {STATUSES.filter((s) => s !== task.status).map((s) => (
                 <button

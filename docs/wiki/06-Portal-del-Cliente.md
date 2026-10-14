@@ -104,7 +104,7 @@ Revisión del código en la rama `main`.
 | Inicio | `/dashboard` | `dashboard/page.tsx` (912) | **Escrito en el código** | Selector "Sin plan / Plan SaaS / Servicio" visible para el cliente (159–175). `PlanView` y `ServiceView` con valores fijos (209–437). Recomendaciones con productos que no existen en el catálogo (667–692) |
 | Proyectos | `/dashboard/projects` | `projects/page.tsx` (421) | API `GET /api/projects` | Las fases se **inventan** a partir de `progress` (51–76). Hitos y entregables siempre vacíos (77–78). El presupuesto sale con `$`, sin moneda (252) |
 | Pedidos | `/dashboard/orders` | `orders/page.tsx` (249) | API `GET /api/orders` | Estados de logística (`shipped`, "Enviado"), montos con `toFixed(2)` |
-| Nuevo pedido | `/dashboard/orders/new` | `orders/new/page.tsx` (384) | `fetch` a una dirección fija de desarrollo (111) | **No funciona en producción.** Pide al cliente el "Precio unitario (USD)" (320). No usa `DashboardLayout` |
+| Nuevo pedido | `/dashboard/orders/new` | `orders/new/page.tsx` | API `POST /api/orders` con la sesión (`authFetch` a la API configurada) | Pide al cliente el "Precio unitario (USD)". No usa `DashboardLayout` |
 | Detalle de pedido | `/dashboard/orders/[id]` | `orders/[id]/page.tsx` (173) | API | No usa `DashboardLayout`: sin menú, sin cabecera |
 | Facturación | `/dashboard/billing` | `billing/page.tsx` (276) | API, y **facturas de ejemplo si la API falla** (33–73) | Lee `amount` y `project`, pero la API entrega `total` y `projectName`. Montos en formato USD (`$5000.00`). "Pagar ahora" no pasa por ninguna pasarela (93–105) |
 | Entregables | `/dashboard/deliverables` | `deliverables/page.tsx` (409) | API, y **7 entregables de ejemplo si falla** (37–141) | Lee `name` y `project`, pero la API entrega `title` y `projectName`. "Ver" y "Descargar" hacen lo mismo (379–382). El rechazo usa `window.prompt` (172) |
@@ -122,7 +122,7 @@ Revisión del código en la rama `main`.
 | Pedidos | `GET/POST /api/orders`, `GET/PUT /api/orders/:id`, `POST /api/orders/:id/cancel` | Al crear un pedido se abre una conversación automática y se avisa al admin por WhatsApp. La moneda queda fija en `USD`. Los adjuntos se guardan en el disco local del contenedor |
 | Facturas | `GET/POST /api/invoices`, `GET /api/invoices/:id`, `/pay`, `/download` | "Descargar" no genera ningún PDF: responde con un enlace a la misma ruta |
 | Entregables | `GET/POST /api/deliverables`, `GET/PUT /:id`, `/approve`, `/reject` | El archivo es un enlace externo (`fileUrl`); no hay almacenamiento propio |
-| Mensajes | `GET/POST /api/messages/conversations`, `GET /:id`, `/read`, `POST /api/messages/send` | Participantes con roles `admin`, `client`, `support` y `project_manager` |
+| Mensajes | `GET/POST /api/messages/conversations`, `GET /:id`, `/read`, `POST /api/messages/send` | Participantes con roles `admin`, `client` y `support` (crear una conversación es solo del equipo) |
 | Notificaciones | `GET/POST /api/notifications`, `/unread-count`, `/read`, `/read-all`, `DELETE /:id` | `utils/notifications.ts` define 15 plantillas (`deliverableUploaded`, `invoiceCreated`, `newMessage`…), pero **ningún controlador las usa**: nadie genera notificaciones cuando pasa algo |
 | Perfil | `GET /api/auth/profile` | No hay endpoint para guardar el perfil ni para cambiar la contraseña. `User` no tiene `phone` ni `company` |
 

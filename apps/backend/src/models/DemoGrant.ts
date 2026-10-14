@@ -35,6 +35,9 @@ export interface IDemoGrant extends Document {
   expiradoEn?: Date;
   /** Recordatorio de vencimiento enviado (una sola vez por vigencia). */
   recordatorioEnviadoEn?: Date | null;
+  /** Conversión a cliente: propuesta que la cerró y cuándo. */
+  convertidoEn?: Date | null;
+  propuesta?: Types.ObjectId | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -67,6 +70,8 @@ const DemoGrantSchema = new Schema<IDemoGrant>(
     motivoRevocacion: { type: String, maxlength: 1000 },
     expiradoEn: { type: Date },
     recordatorioEnviadoEn: { type: Date, default: null },
+    convertidoEn: { type: Date, default: null },
+    propuesta: { type: Schema.Types.ObjectId, ref: 'Proposal', default: null },
   },
   { timestamps: true },
 );

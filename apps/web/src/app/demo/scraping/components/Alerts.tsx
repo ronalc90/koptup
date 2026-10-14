@@ -6,7 +6,7 @@ import { notify } from '../lib/notify';
 import { ClipboardDocumentIcon, PaperAirplaneIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { PRESET_CRON, nextRuns, parseCron, type SchedulePreset } from '../lib/cron';
 import { evaluateRules } from '../lib/engine';
-import { DEMO_NOW, addMinutes, cop, dateTime, dayLabel, time } from '../lib/format';
+import { colombiaNow, cop, dateTime, dayLabel, time } from '../lib/format';
 import { useDemo } from '../lib/store';
 import type { Channel, Rule, RuleType, SourceId } from '../lib/types';
 import { alertText } from './Overview';
@@ -33,15 +33,15 @@ const CHANNELS: Channel[] = ['email', 'teams', 'whatsapp'];
 
 export default function Alerts({ sourceId }: { sourceId: SourceId }) {
   const t = useTranslations('demoScraping');
-  const { s, loc, update } = useDemo();
+  const { s, loc, clock, update } = useDemo();
   const schedule = s.schedules[sourceId];
   const [newType, setNewType] = useState<RuleType>(RULE_TYPES[sourceId][0]);
   const cron = schedule.preset === 'custom' ? schedule.cron : PRESET_CRON[schedule.preset];
   const valid = !!parseCron(cron);
-  const runs = useMemo(() => (valid ? nextRuns(cron, DEMO_NOW, 5) : []), [cron, valid]);
+  const runs = useMemo(() => (valid ? nextRuns(cron, clock.now, 5) : []), [cron, valid, clock.now]);
   const rules = s.rules.filter((r) => r.sourceId === sourceId);
   const r = s.results[sourceId] ?? null;
-  const hits = useMemo(() => evaluateRules(r, s.rules, { corrections: s.corrections }), [r, s.rules, s.corrections]);
+  const hits = useMemo(() => evaluateRules(r, s.rules, { corrections: s.corrections, today: clock.today }), [r, s.rules, s.corrections, clock.today]);
   const paused = s.paused.includes(sourceId);
 
   const setSchedule = (patch: Partial<typeof schedule>) => update((p) => ({ ...p, schedules: { ...p.schedules, [sourceId]: { ...p.schedules[sourceId], ...patch } } }));
@@ -49,7 +49,7 @@ export default function Alerts({ sourceId }: { sourceId: SourceId }) {
 
   const sourceName = t(`sources.${sourceId}.name`);
   const message = [
-    t('alerts.message.header', { source: sourceName, date: dateTime(r?.at ?? DEMO_NOW, loc) }),
+    t('alerts.message.header', { source: sourceName, date: dateTime(r?.at ?? clock.now, loc) }),
     ...(hits.length ? hits.map((h) => `• ${alertText(t, h, loc)}`) : [t('alerts.message.none')]),
     t('alerts.message.footer'),
   ].join('\n');
@@ -98,7 +98,7 @@ export default function Alerts({ sourceId }: { sourceId: SourceId }) {
                 ))}
               </ol>
             )}
-            <p className="mt-2 text-[11px] text-secondary-500">{paused ? t('alerts.pausedNote') : t('alerts.demoClock', { now: dateTime(DEMO_NOW, loc) })}</p>
+            <p className="mt-2 text-[11px] text-secondary-500">{paused ? t('alerts.pausedNote') : t('alerts.demoClock', { now: dateTime(clock.now, loc) })}</p>
           </div>
 
           <div className="border-t border-secondary-800 pt-4">
@@ -191,7 +191,7 @@ export default function Alerts({ sourceId }: { sourceId: SourceId }) {
               onClick={() => {
                 update((p) => ({
                   ...p,
-                  sentAlerts: [...p.sentAlerts, { id: `a${p.sentAlerts.length + 1}`, sourceId, at: addMinutes(DEMO_NOW, p.manualRuns * 2 + p.sentAlerts.length + 1), channels: p.channels, lines: hits.length }].slice(-30),
+                  sentAlerts: [...p.sentAlerts, { id: `a${p.sentAlerts.length + 1}-${Date.now()}`, sourceId, at: colombiaNow(), channels: p.channels, lines: hits.length }].slice(-30),
                 }));
                 notify.success(t('alerts.sentToast', { channels: s.channels.map((c) => t(`alerts.channels.${c}`)).join(', ') }));
               }}

@@ -7,11 +7,11 @@ import { EyeIcon, PaintBrushIcon, PhotoIcon } from '@heroicons/react/24/outline'
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import { DEMO_TODAY, PREFIXES, SAMPLE_ISSUER, type BillingDoc, type Issuer } from './data';
+import { PREFIXES, SAMPLE_ISSUER, type BillingDoc, type Issuer } from './data';
 import { docTotals, formatDate, nextNumber, qrText } from './docs';
 import { draftLines, draftParty } from './draft';
-import { checkNit, computeTotals, formatCOP, formatNit, isEmail, TAX_CATEGORIES, TAX_RATE } from './fiscal';
-import { Field, inputCls, Modal, QrSvg, useMonths } from './ui';
+import { checkNit, computeTotals, formatCOP, formatNit, isEmail, TAX_CATEGORIES } from './fiscal';
+import { Field, focusRing, inputCls, Modal, QrSvg, useMonths } from './ui';
 import type { BillingStore } from './useBillingStore';
 
 const MAX_LOGO_BYTES = 300 * 1024;
@@ -19,7 +19,7 @@ const MAX_LOGO_BYTES = 300 * 1024;
 export function DocPreview({ store }: { store: BillingStore }) {
   const t = useTranslations('demoBilling');
   const months = useMonths();
-  const { state, draft, tab, successId } = store;
+  const { state, today, draft, tab, successId } = store;
   const [editing, setEditing] = useState(false);
   const issuer = state.issuer;
   const emitted = successId ? state.docs.find((d) => d.id === successId) : undefined;
@@ -76,7 +76,7 @@ export function DocPreview({ store }: { store: BillingStore }) {
           <div className="sm:text-right flex-shrink-0">
             <p className="text-[10px] uppercase tracking-wide text-emerald-700 dark:text-emerald-300 sm:max-w-[9rem]">{t(`docTypes.${type}`)}</p>
             <Badge variant="primary" size="sm" className="mt-1 font-mono">{view.number}</Badge>
-            <p className="text-secondary-500 mt-1">{formatDate(emitted ? emitted.issueDate : DEMO_TODAY, months)}</p>
+            <p className="text-secondary-500 mt-1">{formatDate(emitted ? emitted.issueDate : today, months)}</p>
           </div>
         </div>
         <div>
@@ -119,7 +119,7 @@ export function DocPreview({ store }: { store: BillingStore }) {
           </div>
           {TAX_CATEGORIES.filter((k) => view.totals.byTax[k].tax > 0).map((k) => (
             <div key={k} className="flex justify-between">
-              <span className="text-secondary-500">IVA {Math.round(TAX_RATE[k] * 100)} %</span>
+              <span className="text-secondary-500">{t(`taxOptions.${k}`)}</span>
               <span>{formatCOP(view.totals.byTax[k].tax)}</span>
             </div>
           ))}
@@ -230,12 +230,12 @@ function IssuerModal({ onClose, issuer, onSave }: { onClose: () => void; issuer:
                 <PhotoIcon className="w-6 h-6" />
               </span>
             )}
-            <label className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-primary-600 px-3 py-1.5 text-sm text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-950">
+            <label className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-primary-600 px-3 py-1.5 text-sm text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-950 focus-within:ring-2 focus-within:ring-primary-500">
               {t('issuer.logoUpload')}
               <input type="file" accept="image/png,image/jpeg" className="sr-only" onChange={(e) => onLogo(e.target.files?.[0])} />
             </label>
             {form.logo && (
-              <button type="button" className="text-sm text-red-600 hover:underline" onClick={() => set({ logo: null })}>
+              <button type="button" className={'rounded text-sm text-red-600 hover:underline ' + focusRing} onClick={() => set({ logo: null })}>
                 {t('issuer.logoRemove')}
               </button>
             )}

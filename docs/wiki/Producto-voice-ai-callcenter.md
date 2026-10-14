@@ -31,7 +31,7 @@
 | Pantallas | Cabecera con proveedores de telefonía · Llamada activa ("Aurora", onda, silenciar/retener/transferir/colgar/simular) · Sentimiento en vivo · Intención detectada · Transcripción en vivo · Stack de voz (STT, TTS, idioma, barge-in) · Function calling (4 funciones) · Handoff a humano · Agent Assist · Cola de llamadas (entrantes/salientes) · Campaña outbound · Compliance · Analytics | `page.tsx`, `components/parts.tsx` (`TranscriptTurn`, `SentimentGauge`, `ProviderGroup`, `ComplianceRow`, `KpiCard`) |
 | Datos | Fijos: 8 turnos de conversación bancaria, colas con números `+56`, `+51`, `+54` (Chile, Perú, Argentina), saldo en CLP, documento "RUT", idioma "Español (CL)" | `components/types.ts`, `apps/web/messages/demos/voice-ai.es.json` |
 | Onda de voz | Animación CSS (`animate-pulse`), no reacciona a ningún sonido | `components/Waveform.tsx` |
-| Backend | Módulo en memoria `apps/backend/src/modules/voice-ai/` (llamadas, transcripciones, `startCall`; 167 líneas con test) **no montado**; sus datos ya usan `+57` y el agente se llama "Aria" (en el demo es "Aurora") | `voice-ai.service.ts`, `voice-ai.data.ts` |
+| Backend | Módulo en memoria `apps/backend/src/modules/voice-ai/` (retirado del repositorio en octubre de 2026, está en el historial de git; llamadas, transcripciones, `startCall`; 167 líneas con test) **no montado**; sus datos ya usan `+57` y el agente se llama "Aria" (en el demo es "Aurora") | `voice-ai.service.ts`, `voice-ai.data.ts` |
 | Base reutilizable | El backend ya integra Twilio para notificaciones por WhatsApp del formulario de contacto (experiencia con el proveedor) | Ver [Backend y API](09-Backend-y-API.md) |
 | i18n ES/EN | UI en `voice-ai.{es,en}.json` (243 líneas c/u); números de teléfono y datos de tarjeta fijos en código | `types.ts`, `page.tsx` |
 | Tests | 1 smoke test (`__tests__/page.test.tsx`) que hoy no se ejecuta | |
@@ -162,7 +162,7 @@ Sin código, desde **Admin › Solicitudes de demo › Aprobar** (campo `persona
 - **Integraciones típicas en Colombia:** CRM y helpdesk (crear contacto/ticket desde la llamada), Google Calendar o agenda médica, WhatsApp Business (confirmación tras la llamada), Wompi/PayU (link de pago enviado por WhatsApp).
 - **Profesional:** campañas salientes con ventanas horarias de la Ley 2300, lista de exclusión, detección de contestador, IVR multi-línea.
 - **Avanzado:** voz de marca (clonación solo con consentimiento escrito de la persona), análisis de calidad, varios idiomas.
-- **Base técnica:** reutilizar `apps/backend/src/modules/voice-ai/` (Call, Transcript, `startCall`) migrado a Mongoose con autenticación, `tenantId` y webhooks de telefonía protegidos (ver [Seguridad y calidad](10-Seguridad-y-Calidad.md)).
+- **Base técnica:** reutilizar `apps/backend/src/modules/voice-ai/` (retirado del repositorio en octubre de 2026, está en el historial de git; Call, Transcript, `startCall`) migrado a Mongoose con autenticación, `tenantId` y webhooks de telefonía protegidos (ver [Seguridad y calidad](10-Seguridad-y-Calidad.md)).
 
 **SaaS (DECISIÓN 7):** se muestra **"SaaS: lista de espera"**. Requisitos adicionales a los del core multi-tenant y cobro recurrente: medición por minuto con saldo prepagado y recargas (Wompi/PayU), aprovisionamiento de números por cliente, controles antifraude de telefonía (destinos internacionales bloqueados por defecto, topes diarios), almacenamiento de grabaciones con retención por cliente y objetivos de latencia por llamada.
 

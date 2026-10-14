@@ -13,14 +13,13 @@ import {
   Deal,
   Enrollment,
   EnrollmentStatus,
-  REF_DATE,
   SEQUENCE_STEPS,
   SequenceChannel,
   addDays,
   daysBetween,
   isOpen,
 } from './crm';
-import { Note, SectionHeader, inputCls } from './ui';
+import { Note, SectionHeader, selectCls } from './ui';
 import { useCrmText } from './useCrmText';
 
 const CHANNEL_META: Record<SequenceChannel, { icon: typeof EnvelopeIcon; color: string }> = {
@@ -143,7 +142,7 @@ export default function SequencesView({ deals, enrollments, onEnroll, onRunStep,
             <label htmlFor="crm-seq-enroll" className="sr-only">
               {t('sequences.enrollLabel')}
             </label>
-            <select id="crm-seq-enroll" value={toEnroll} onChange={(e) => setToEnroll(e.target.value)} className={inputCls} disabled={candidates.length === 0}>
+            <select id="crm-seq-enroll" value={toEnroll} onChange={(e) => setToEnroll(e.target.value)} className={selectCls} disabled={candidates.length === 0}>
               <option value="">{candidates.length ? t('sequences.enrollPlaceholder') : t('sequences.noneToEnroll')}</option>
               {candidates.map((d) => (
                 <option key={d.id} value={d.id}>
@@ -164,7 +163,7 @@ export default function SequencesView({ deals, enrollments, onEnroll, onRunStep,
                 const { e, deal } = r;
                 const next = SEQUENCE_STEPS[e.stepsDone];
                 const due = next ? addDays(e.start, next.day) : null;
-                const dueDays = due ? daysBetween(REF_DATE, due) : 0;
+                const dueDays = due ? daysBetween(tx.ref, due) : 0;
                 const canRun = e.status === 'active' && Boolean(next);
                 return (
                   <li key={e.dealId} className="rounded-lg border border-secondary-200 dark:border-secondary-800 p-3">
@@ -173,7 +172,8 @@ export default function SequencesView({ deals, enrollments, onEnroll, onRunStep,
                         <button
                           type="button"
                           onClick={() => onOpen(deal.id)}
-                          className="font-medium text-sm text-secondary-900 dark:text-white hover:text-primary-700 dark:hover:text-primary-300 text-left"
+                          className="font-medium text-sm text-secondary-900 dark:text-white hover:text-primary-700 dark:hover:text-primary-300 text-left rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+                          aria-label={t('sequences.openProfile', { company: deal.company })}
                         >
                           {deal.company}
                         </button>

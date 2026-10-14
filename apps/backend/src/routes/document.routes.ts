@@ -15,12 +15,16 @@ import {
 import { upload, handleUploadError } from '../middleware/upload';
 import { uploadRateLimiter } from '../middleware/rateLimiter';
 import { authenticate } from '../middleware/auth';
+import { aiGate } from '../middleware/ai-gate';
 
 const router = Router();
 
 // Política: autenticado + aislamiento por usuario (cada consulta del
 // controlador filtra por el id de la sesión). La sesión se verifica ANTES de
 // aceptar archivos (multer) para no escribir en disco peticiones anónimas.
+// Las rutas que llaman a la IA pasan por aiGate: tope mensual
+// DOCUMENTS_MONTHLY_BUDGET_USD y cupo diario por usuario
+// DOCUMENTS_AI_DAILY_LIMIT_PER_USER (middleware/ai-gate.ts).
 router.use(authenticate as RequestHandler);
 
 /**
@@ -28,7 +32,7 @@ router.use(authenticate as RequestHandler);
  * /api/documents/upload:
  *   post:
  *     tags: [Documents]
- *     summary: Upload a document (Public Demo)
+ *     summary: Upload a document (requires login)
  *     requestBody:
  *       required: true
  *       content:
@@ -50,6 +54,8 @@ router.post(
   uploadRateLimiter,
   upload.single('file'),
   handleUploadError,
+  // Sin cupo de IA el documento se guarda igual, sin análisis (lo dice la respuesta).
+  aiGate('documents', { mode: 'degrade' }),
   uploadDocument as RequestHandler
 );
 
@@ -58,7 +64,7 @@ router.post(
  * /api/documents:
  *   get:
  *     tags: [Documents]
- *     summary: Get all documents (Public Demo)
+ *     summary: Get the documents of the logged-in user
  *     responses:
  *       200:
  *         description: List of documents
@@ -75,7 +81,7 @@ router.get('/', getDocuments as RequestHandler);
  *       200:
  *         description: Similar documents found
  */
-router.post('/search/semantic', searchDocumentsBySemantic as RequestHandler);
+router.post('/search/semantic', aiGate('documents'), searchDocumentsBySemantic as RequestHandler);
 
 /**
  * @swagger
@@ -111,7 +117,7 @@ router.get('/stats', getDocumentStats as RequestHandler);
  *     tags: [Documents]
  *     summary: Explain why a document is similar to a search query
  */
-router.post('/:id/explain-similarity', explainDocumentSimilarity as RequestHandler);
+router.post('/:id/explain-similarity', aiGate('documents'), explainDocumentSimilarity as RequestHandler);
 
 /**
  * @swagger
@@ -120,14 +126,14 @@ router.post('/:id/explain-similarity', explainDocumentSimilarity as RequestHandl
  *     tags: [Documents]
  *     summary: Get AI explanation of a document
  */
-router.get('/:id/explain', explainDocumentById as RequestHandler);
+router.get('/:id/explain', aiGate('documents'), explainDocumentById as RequestHandler);
 
 /**
  * @swagger
  * /api/documents/{id}:
  *   patch:
  *     tags: [Documents]
- *     summary: Update document (rename, move folder, favorite) - Public
+ *     summary: Update document (rename, move folder, favorite). Owner only.
  */
 router.patch('/:id', updateDocument as RequestHandler);
 
@@ -136,7 +142,7 @@ router.patch('/:id', updateDocument as RequestHandler);
  * /api/documents/{id}:
  *   delete:
  *     tags: [Documents]
- *     summary: Delete a document (requires PIN 1010)
+ *     summary: Move a document to the trash (or delete it with permanent=true). Owner only.
  *     parameters:
  *       - in: path
  *         name: id
@@ -147,18 +153,13 @@ router.patch('/:id', updateDocument as RequestHandler);
  *         name: permanent
  *         schema:
  *           type: boolean
- *       - in: query
- *         name: pin
- *         required: true
- *         schema:
- *           type: string
  *     responses:
  *       200:
  *         description: Document deleted
- *       403:
- *         description: Invalid PIN
+ *       401:
+ *         description: Login required
  *       404:
- *         description: Document not found
+ *         description: Document not found (or owned by another account)
  */
 router.delete('/:id', deleteDocument as RequestHandler);
 

@@ -7,7 +7,7 @@ import { ArrowDownTrayIcon, ArrowsRightLeftIcon, ExclamationTriangleIcon } from 
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import { ITEMS, ITEM_BY_SKU, SUPPLIER_BY_ID, WAREHOUSES } from '../lib/catalog';
-import { periodRange, stockOf, valuationAt } from '../lib/engine';
+import { stockOf, valuationAt } from '../lib/engine';
 import { csvMoney, downloadCsv } from '../lib/format';
 import { itemMatches } from '../lib/search';
 import { pad } from '../lib/seed';
@@ -33,7 +33,7 @@ export function useCreateReorderPo() {
     const qty = qtyOverride ?? Math.max(10, Math.ceil((target - have) / 10) * 10);
     const n = state.counters.OC;
     dispatch({ type: 'createPo', supplierId: it.supplierId!, warehouse: wh, lines: [{ sku, qty, price: Math.round(cost), vat: it.vat }], origin });
-    if (ensureOpenPeriod()) toast(t('periodSwitched'));
+    ensureOpenPeriod();
     toast.success(t('toasts.poCreated', { doc: `OC-${pad(n)}`, supplier: SUPPLIER_BY_ID[it.supplierId!].name }));
   };
 }
@@ -41,8 +41,9 @@ export function useCreateReorderPo() {
 export default function InventoryModule() {
   const t = useTranslations('demoErp.inventory');
   const tc = useTranslations('demoErp.common');
+  const tf = useTranslations('demoErp.files');
   const tw = useTranslations('demoErp.warehouses');
-  const { computed, filters, goTo, locale } = useErp();
+  const { computed, filters, goTo, locale, workDate, openMonthLabel } = useErp();
   const f = useFmt();
   const [wh, setWh] = useState<'all' | WarehouseId>('all');
   const [kind, setKind] = useState<'all' | ItemKind>('all');
@@ -51,8 +52,9 @@ export default function InventoryModule() {
   const [transfer, setTransfer] = useState(false);
   const openPoFor = useOpenPoFor();
   const createPo = useCreateReorderPo();
-  const r = periodRange(filters.period);
-  const isCurrent = r.end === '2026-09-30';
+  const r = useErp().range;
+  // Las acciones (comprar, producir, trasladar) solo tienen sentido con el mes abierto a la vista
+  const isCurrent = r.end === workDate;
 
   const val = useMemo(() => valuationAt(computed.movements, r.end), [computed, r.end]);
 
@@ -87,7 +89,7 @@ export default function InventoryModule() {
   const exportCsv = () => {
     const head = [t('cols.sku'), t('cols.item'), t('cols.warehouse'), t('cols.stock'), t('cols.reorder'), t('cols.unitCost'), t('cols.value'), t('cols.status'), tc('currency')];
     const data = rows.map((x) => [x.sku, f.item(x.sku), tw(x.wh), x.qty, x.reorder, csvMoney(x.unit, filters.currency), csvMoney(x.value, filters.currency), t(`status.${x.status}`), filters.currency]);
-    downloadCsv(`inventario-${r.end}-${method}.csv`, [head, ...data], locale);
+    downloadCsv(`${tf('inventory')}-${r.end}-${tf(method === 'avg' ? 'inventoryAvg' : 'inventoryFifo')}.csv`, [head, ...data], locale);
     toast.success(tc('csvDone', { n: data.length }));
   };
 
@@ -187,7 +189,7 @@ export default function InventoryModule() {
             );
           })}
         </div>
-        {!isCurrent && <p className="text-[11px] text-secondary-500 mt-3">{t('alerts.pastPeriod')}</p>}
+        {!isCurrent && <p className="text-[11px] text-secondary-500 mt-3">{t('alerts.pastPeriod', { month: openMonthLabel })}</p>}
       </Card>
 
       {kardex && <KardexModal sku={kardex} onClose={() => setKardex(null)} />}
@@ -250,7 +252,7 @@ function KardexModal({ sku, onClose }: { sku: string; onClose: () => void }) {
   const tw = useTranslations('demoErp.warehouses');
   const { computed, filters } = useErp();
   const f = useFmt();
-  const r = periodRange(filters.period);
+  const r = useErp().range;
   const [wh, setWh] = useState<'all' | WarehouseId>('all');
   const it = ITEM_BY_SKU[sku];
   const rows = useMemo(() => {
@@ -342,7 +344,7 @@ function TransferForm({ onClose }: { onClose: () => void }) {
     if (q > have) return setError(t('transfer.errorStock', { have: f.qty(have) }));
     const n = state.counters.TR;
     dispatch({ type: 'transfer', sku, qty: q, from, to });
-    if (ensureOpenPeriod()) toast(t('periodSwitched'));
+    ensureOpenPeriod();
     toast.success(t('toasts.transferred', { doc: `TR-${pad(n)}`, qty: f.qty(q), item: f.item(sku), from: tw(from), to: tw(to) }));
     onClose();
   };

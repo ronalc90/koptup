@@ -50,16 +50,17 @@ export default function SolucionesIAPage() {
   const locale = useLocale();
   const values = getAiSolutionsPageValues(locale);
 
-  // Plataformas que implementamos (los sistemas RAG ya no van aquí: son la
-  // primera solución de la lista).
+  // Plataformas de IA: OpenAI es la que usa hoy la demo RAG; las demás se
+  // eligen según el proyecto (no son integraciones que ya estén funcionando).
+  const perProject = t('tech.perProject');
   const techStack = [
-    { name: 'GPT-4 / ChatGPT', desc: 'OpenAI' },
-    { name: 'Claude AI', desc: 'Anthropic' },
-    { name: 'Gemini', desc: 'Google' },
-    { name: 'LangChain', desc: t('tech.orchestration') },
-    { name: 'Python ML', desc: 'Machine Learning' },
-    { name: 'TensorFlow', desc: 'Deep Learning' },
-    { name: 'n8n / Make', desc: t('tech.automation') },
+    { name: 'OpenAI', desc: t('tech.inDemo') },
+    { name: 'Anthropic Claude', desc: perProject },
+    { name: 'Google Gemini', desc: perProject },
+    { name: 'LangChain', desc: `${t('tech.orchestration')} · ${perProject}` },
+    { name: 'Python ML', desc: `Machine Learning · ${perProject}` },
+    { name: 'TensorFlow', desc: `Deep Learning · ${perProject}` },
+    { name: 'n8n / Make', desc: `${t('tech.automation')} · ${perProject}` },
   ];
 
   return (

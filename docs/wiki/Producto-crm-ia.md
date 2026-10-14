@@ -30,7 +30,7 @@
 | Demo | Existe. **Maqueta** 100 % en el navegador | `apps/web/src/app/demo/crm-ia/page.tsx` es `'use client'`; no hay `fetch`, `axios` ni llamadas a `/api` en la carpeta |
 | Pantallas | 4 métricas + 6 pestañas (Pipeline, Contactos, Forecast, Asistente IA, Conversaciones, Secuencias) + modal Customer 360 (Timeline, Deals, Tickets, Archivos) | `page.tsx` (`MetricCard`, `PipelineBoard`, `ContactsTable`), `components/ForecastView.tsx`, `AssistantView.tsx`, `ConversationsView.tsx`, `SequencesView.tsx`, `Customer360Modal.tsx` |
 | Datos | Fijos: 12 contactos de empresas de ficción anglosajona (Acme Corp, Globex, Initech, Wayne Enterprises, Stark Industries, Hooli…), valores en USD con formato `$85k`, fechas ISO crudas (`2026-05-12`) | `components/mockData.ts`, `formatCurrency` en `components/types.ts` |
-| Backend | Módulo en memoria `apps/backend/src/modules/crm/` (deals, contactos, forecast ponderado por etapa, 233 líneas con test) **no montado** en `apps/backend/src/index.ts`; el frontend no lo usa | `crm.service.ts`, `crm.data.ts`, `crm.routes.ts` |
+| Backend | Módulo en memoria `apps/backend/src/modules/crm/` (retirado del repositorio en octubre de 2026, está en el historial de git; deals, contactos, forecast ponderado por etapa, 233 líneas con test) **no montado** en `apps/backend/src/index.ts`; el frontend no lo usa | `crm.service.ts`, `crm.data.ts`, `crm.routes.ts` |
 | i18n ES/EN | Textos de UI en `apps/web/messages/demos/crm-ia.{es,en}.json` (248 líneas c/u). Los datos de ejemplo están en español fijo dentro del código (`nextAction`, `topics`, `actionItems`, pasos de secuencia, "Outbound · Fintech Q2") | `mockData.ts`, `SequencesView.tsx` |
 | Tests | 1 smoke test (`__tests__/page.test.tsx`) que hoy no se ejecuta (ver [Seguridad y calidad](10-Seguridad-y-Calidad.md)) | |
 | Tamaño | 1.780 líneas (page 552 + 7 componentes) | `wc -l` |
@@ -151,7 +151,7 @@ Sin código, desde **Admin › Solicitudes de demo › Aprobar** (o Admin › De
 - Reportes: embudo, ganados/perdidos, por vendedor, pronóstico ponderado.
 - **Integraciones típicas en Colombia:** Siigo o Alegra (crear tercero y factura al ganar; la factura electrónica DIAN sale por ese proveedor), Wompi o PayU (link de pago de anticipo), Google Calendar, formularios web y landing pages.
 - Roles y permisos con autorización en servidor, auditoría, registro de la autorización de tratamiento de datos (Ley 1581) y baja de comunicaciones.
-- **Base técnica:** reutilizar tipos y lógica de `apps/backend/src/modules/crm/` (Deal, Contact, forecast por etapa), migrándolos a Mongoose con autenticación, autorización y `tenantId`.
+- **Base técnica:** reutilizar tipos y lógica de `apps/backend/src/modules/crm/` (retirado del repositorio en octubre de 2026, está en el historial de git; Deal, Contact, forecast por etapa), migrándolos a Mongoose con autenticación, autorización y `tenantId`.
 
 **SaaS (DECISIÓN 7):** hoy no hay base multi-tenant ni cobro recurrente, así que se muestra **"SaaS: lista de espera"**. Para habilitarlo (Fase 4): core multi-tenant compartido con el chatbot RAG, cobro recurrente con Wompi/PayU (COP) y Stripe (USD), aprovisionamiento automático de cuentas, medición de contactos y negocios contra los límites del plan, copias de seguridad por cliente y acuerdo de encargo de tratamiento de datos (Koptup como encargado).
 

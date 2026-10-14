@@ -171,7 +171,7 @@ export default function Sources() {
         </div>
       </section>
 
-      <section className={`${card} p-5 sm:p-6`} aria-labelledby="src-upload">
+      <section className={`${card} p-5 sm:p-6 scroll-mt-72 md:scroll-mt-56`} aria-labelledby="src-upload" id="src-upload-section">
         <SectionTitle title={<span id="src-upload">{t('uploadTitle')}</span>} subtitle={t('uploadSubtitle')} />
         {!parsed ? (
           <>

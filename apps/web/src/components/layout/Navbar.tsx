@@ -49,7 +49,10 @@ export default function Navbar() {
  useEffect(() => {
   setMounted(true);
   const handleScroll = () => setScrolled(window.scrollY > 20);
-  window.addEventListener('scroll', handleScroll);
+  // Estado inicial: la página puede abrir ya desplazada (un ancla como
+  // /services#planes-rag o al recargar) y el menú necesita su fondo desde ya.
+  handleScroll();
+  window.addEventListener('scroll', handleScroll, { passive: true });
 
   // Verificar si hay token válido en cookies
   const hasValidToken = document.cookie
@@ -145,17 +148,15 @@ const toggleLanguage = () => {
   const current = document.cookie.split('; ').find(r => r.startsWith('locale='))?.split('=')[1] || 'es';
   const next = current === 'es' ? 'en' : 'es';
 
-  // Set cookie
+  // El idioma va en una cookie que lee el servidor (app/layout.tsx).
   document.cookie = `locale=${next}; path=/; max-age=31536000; SameSite=Lax`;
-
-  // Log actual
-  console.log(`🌐 Cambiando idioma: ${current} → ${next}`);
-
-  // Refrescar UI local
   setCurrentLocale(next);
 
-  // Forzar recarga completa para que el servidor use la cookie
-  window.location.replace(window.location.pathname);
+  // Recarga completa para que el servidor arme la página en el otro idioma.
+  // `reload()` conserva la URL entera (ruta, parámetros y ancla): la demo
+  // elegida en /solicitar-demo, el plan en /contact o ?mode=upload. Navegar a
+  // la misma URL con ancla sería un salto dentro de la página, sin recargar.
+  window.location.reload();
 };
 
 
@@ -166,8 +167,10 @@ const toggleLanguage = () => {
       ref={navRef}
       className={cn(
         'fixed top-0 left-0 right-0 z-[100] transition-all duration-300',
+        // Opacidad 95: está en la escala de Tailwind (98 no existe y dejaba el
+        // menú transparente sobre los encabezados azules al bajar).
         scrolled
-          ? 'bg-white/98 dark:bg-secondary-900/98 backdrop-blur-lg shadow-lg'
+          ? 'bg-white/95 dark:bg-secondary-900/95 backdrop-blur-lg shadow-lg'
           : 'bg-transparent'
       )}
       style={{
@@ -217,8 +220,8 @@ const toggleLanguage = () => {
               onClick={toggleLanguage}
               className="flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-secondary-100 dark:hover:bg-secondary-800 transition-colors"
               style={{ color: textColor }}
-              aria-label="Toggle language"
-              title={currentLocale === 'es' ? 'Cambiar a inglés' : 'Switch to Spanish'}
+              aria-label={t('nav.switchLanguage')}
+              title={t('nav.switchLanguage')}
             >
               <GlobeAltIcon className="h-5 w-5" />
               <span className="text-xs font-semibold uppercase">{currentLocale}</span>
@@ -230,7 +233,8 @@ const toggleLanguage = () => {
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
                 className="p-2 rounded-lg hover:bg-secondary-100 dark:hover:bg-secondary-800 transition-colors"
                 style={{ color: textColor }}
-                aria-label="Toggle theme"
+                aria-label={t('nav.switchTheme')}
+                title={t('nav.switchTheme')}
               >
                 {theme === 'dark' ? (
                   <SunIcon className="h-5 w-5" />
@@ -416,7 +420,8 @@ const toggleLanguage = () => {
                 <button
                   onClick={toggleLanguage}
                   className="flex items-center justify-center gap-1 p-2 rounded-lg text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800"
-                  title={currentLocale === 'es' ? 'Cambiar a inglés' : 'Switch to Spanish'}
+                  aria-label={t('nav.switchLanguage')}
+                  title={t('nav.switchLanguage')}
                 >
                   <GlobeAltIcon className="h-5 w-5" />
                   <span className="text-xs font-semibold uppercase">{currentLocale}</span>
@@ -425,6 +430,8 @@ const toggleLanguage = () => {
                   <button
                     onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
                     className="p-2 rounded-lg text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800"
+                    aria-label={t('nav.switchTheme')}
+                    title={t('nav.switchTheme')}
                   >
                     {theme === 'dark' ? (
                       <SunIcon className="h-5 w-5" />

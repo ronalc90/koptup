@@ -13,7 +13,7 @@ import {
 } from '@heroicons/react/24/outline';
 import Button from '@/components/ui/Button';
 import { downloadBlob } from '@/lib/utils';
-import { ApiError, auditoriaAPI, esErrorDeAcceso } from '../api';
+import { auditoriaAPI, esErrorDeAcceso, tipoDeError } from '../api';
 import type { ResultadoProcesamiento } from '../tipos-auditoria';
 import { formatearCOP } from '../lib/formato';
 import { generarFacturaEjemplo } from '../lib/facturaEjemplo';
@@ -33,7 +33,7 @@ interface Props {
   onCerrar: () => void;
   onAuditada: (resultado: ResultadoProcesamiento) => void;
   onVerDetalle: (facturaId: string) => void;
-  onErrorAcceso: () => void;
+  onErrorAcceso: (error: unknown) => void;
 }
 
 type Estado = 'editando' | 'procesando' | 'listo' | 'error';
@@ -71,20 +71,48 @@ export default function ModalAuditar({ abierto, autoEjemplo, onCerrar, onAuditad
     onCerrar();
   }, [estado, onCerrar, reiniciar]);
 
-  // Bloquea el scroll de la página, enfoca el diálogo y cierra con Escape.
+  // Al abrir: bloquea el scroll de la página y enfoca el diálogo. Al cerrar:
+  // devuelve el foco al botón que lo abrió.
   useEffect(() => {
     if (!abierto) return;
     const anterior = document.body.style.overflow;
+    const enfocadoAntes = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     document.body.style.overflow = 'hidden';
     dialogo.current?.focus();
-    const alTeclear = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') cerrar();
-    };
-    window.addEventListener('keydown', alTeclear);
     return () => {
       document.body.style.overflow = anterior;
-      window.removeEventListener('keydown', alTeclear);
+      if (enfocadoAntes?.isConnected) enfocadoAntes.focus();
     };
+  }, [abierto]);
+
+  // Escape cierra; Tab no sale del diálogo mientras está abierto.
+  useEffect(() => {
+    if (!abierto) return;
+    const alTeclear = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        cerrar();
+        return;
+      }
+      if (e.key !== 'Tab' || !dialogo.current) return;
+      const enfocables = Array.from(
+        dialogo.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      );
+      if (enfocables.length === 0) return;
+      const primero = enfocables[0];
+      const ultimo = enfocables[enfocables.length - 1];
+      const activo = document.activeElement;
+      if (e.shiftKey && (activo === primero || activo === dialogo.current)) {
+        e.preventDefault();
+        ultimo.focus();
+      } else if (!e.shiftKey && (activo === ultimo || !dialogo.current.contains(activo))) {
+        e.preventDefault();
+        primero.focus();
+      }
+    };
+    window.addEventListener('keydown', alTeclear);
+    return () => window.removeEventListener('keydown', alTeclear);
   }, [abierto, cerrar]);
 
   const auditar = useCallback(
@@ -99,12 +127,13 @@ export default function ModalAuditar({ abierto, autoEjemplo, onCerrar, onAuditad
       } catch (e) {
         if (esErrorDeAcceso(e)) {
           reiniciar();
-          onErrorAcceso();
+          onErrorAcceso(e);
           return;
         }
+        const tipo = tipoDeError(e);
         let mensaje = t('upload.errors.server');
-        if (e instanceof ApiError && e.status === 400) mensaje = t('upload.errors.noInvoice');
-        if (e instanceof ApiError && e.status === 0) mensaje = t('errors.network');
+        if (tipo === 'badRequest') mensaje = t('upload.errors.noInvoice');
+        else if (tipo !== 'server' && tipo !== 'notFound') mensaje = t(`errors.${tipo}`);
         setMensajeError(mensaje);
         setEstado('error');
       }
@@ -124,6 +153,11 @@ export default function ModalAuditar({ abierto, autoEjemplo, onCerrar, onAuditad
       setGenerando(false);
     }
   }, [t]);
+
+  // Al cerrarse por cualquier vía, la próxima apertura puede volver a lanzar el ejemplo.
+  useEffect(() => {
+    if (!abierto) autoLanzado.current = false;
+  }, [abierto]);
 
   // "Auditar la factura de ejemplo" desde el tablero: genera la factura y la audita de una vez.
   useEffect(() => {
@@ -192,7 +226,7 @@ export default function ModalAuditar({ abierto, autoEjemplo, onCerrar, onAuditad
             onClick={cerrar}
             disabled={estado === 'procesando'}
             aria-label={t('common.close')}
-            className="rounded-lg p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700 disabled:opacity-40 dark:hover:bg-gray-800"
+            className="rounded-lg p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 disabled:opacity-40 dark:hover:bg-gray-800"
           >
             <XMarkIcon className="h-6 w-6" aria-hidden="true" />
           </button>
@@ -312,7 +346,7 @@ export default function ModalAuditar({ abierto, autoEjemplo, onCerrar, onAuditad
                   setArrastrando(false);
                   agregarArchivos(e.dataTransfer.files);
                 }}
-                className={`rounded-lg border-2 border-dashed p-6 text-center transition-colors ${
+                className={`rounded-lg border-2 border-dashed p-6 text-center transition-colors focus-within:ring-2 focus-within:ring-primary-500 ${
                   arrastrando ? 'border-primary-500 bg-primary-50 dark:bg-primary-950' : 'border-gray-300 dark:border-gray-600'
                 }`}
               >
@@ -370,7 +404,7 @@ export default function ModalAuditar({ abierto, autoEjemplo, onCerrar, onAuditad
                           type="button"
                           onClick={() => setArchivos(archivos.filter((_, j) => j !== i))}
                           aria-label={t('upload.remove', { name: a.file.name })}
-                          className="rounded p-1 text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-950"
+                          className="rounded p-1 text-red-600 hover:bg-red-50 hover:text-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 dark:hover:bg-red-950"
                         >
                           <XMarkIcon className="h-5 w-5" aria-hidden="true" />
                         </button>

@@ -13,7 +13,17 @@ export function formatearCOP(valor: number | undefined | null, locale: string): 
   }).format(Number(valor) || 0);
 }
 
-/** Fecha en hora de Colombia (fija, para que no dependa de la zona del navegador). */
+/**
+ * Zona con la que se lee una fecha del backend. Cuando el modelo lee la fecha
+ * de la factura, el servidor la guarda como fecha sin hora (medianoche UTC):
+ * leerla en hora de Colombia la correría al día anterior, así que se lee en
+ * UTC. Las demás (fecha de la auditoría, con hora) se leen en hora de Colombia.
+ */
+export function zonaDeFecha(iso: string): 'UTC' | 'America/Bogota' {
+  return /T00:00:00(?:\.0+)?(?:Z|\+00:00)$/.test(iso) ? 'UTC' : 'America/Bogota';
+}
+
+/** Fecha con zona fija (no depende de la zona del navegador: sin errores de hidratación). */
 export function formatearFecha(iso: string | undefined, locale: string): string {
   if (!iso) return '';
   const fecha = new Date(iso);
@@ -22,7 +32,7 @@ export function formatearFecha(iso: string | undefined, locale: string): string 
     year: 'numeric',
     month: 'short',
     day: 'numeric',
-    timeZone: 'America/Bogota',
+    timeZone: zonaDeFecha(iso),
   });
 }
 
@@ -76,32 +86,21 @@ export function decisionDeGlosa(glosa: Glosa, propuesto: number): DecisionGlosa 
 }
 
 /**
- * El backend de la demo guarda un prestador y un pagador fijos con nombres de
- * entidades reales (no los lee del PDF) y los repite en sus textos. La demo no
- * tiene relación con esas entidades, así que en pantalla y en los reportes se
- * muestran como "de ejemplo".
+ * El backend de la demo guarda un prestador y un pagador fijos (no los lee del
+ * PDF) con nombres y NIT de entidades reales, y repite el nombre del pagador en
+ * los textos de las glosas y en las instrucciones del modelo. La demo no tiene
+ * relación con esas entidades: en pantalla y en los informes se muestran como
+ * "de ejemplo". Los patrones cubren solo lo que ese código del backend escribe.
  */
-const PAGADORES_REALES = [
-  'nueva eps',
-  'salud total',
-  'compensar',
-  'sanitas',
-  'eps sura',
-  'famisanar',
-  'coosalud',
-  'mutual ser',
-  'emssanar',
-  'savia salud',
-  'aliansalud',
-];
-const PRESTADORES_REALES = ['colsubsidio'];
+const RE_PAGADOR = /\bnueva\s*e\.?\s?p\.?\s?s\b\.?/gi;
+const RE_PRESTADOR = /\bcolsubsidio\b/gi;
+const RE_NIT = /\b(?:860\.?007\.?336|900\.?156\.?264)(?:\s?-\s?\d)?\b/g;
 
-function escapar(texto: string): string {
-  return texto.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+function reiniciar() {
+  RE_PAGADOR.lastIndex = 0;
+  RE_PRESTADOR.lastIndex = 0;
+  RE_NIT.lastIndex = 0;
 }
-
-const RE_PAGADORES = new RegExp(`\\b(?:${PAGADORES_REALES.map(escapar).join('|')})\\b`, 'gi');
-const RE_PRESTADORES = new RegExp(`\\b(?:${PRESTADORES_REALES.map(escapar).join('|')})\\b`, 'gi');
 
 export function nombreEntidad(
   nombre: string | undefined,
@@ -110,9 +109,8 @@ export function nombreEntidad(
 ): string {
   const limpio = (nombre || '').trim();
   if (!limpio) return etiquetas[tipo];
-  RE_PAGADORES.lastIndex = 0;
-  RE_PRESTADORES.lastIndex = 0;
-  if (RE_PAGADORES.test(limpio) || RE_PRESTADORES.test(limpio) || /^eps demo$/i.test(limpio)) {
+  reiniciar();
+  if (RE_PAGADOR.test(limpio) || RE_PRESTADOR.test(limpio) || /^eps demo$/i.test(limpio)) {
     return etiquetas[tipo];
   }
   return limpio;
@@ -120,10 +118,14 @@ export function nombreEntidad(
 
 export function anonimizarTexto(
   texto: string | undefined,
-  etiquetas: { prestador: string; pagador: string },
+  etiquetas: { prestador: string; pagador: string; nit?: string },
 ): string {
   if (!texto) return '';
-  return texto.replace(RE_PAGADORES, etiquetas.pagador).replace(RE_PRESTADORES, etiquetas.prestador);
+  reiniciar();
+  return texto
+    .replace(RE_PAGADOR, etiquetas.pagador)
+    .replace(RE_PRESTADOR, etiquetas.prestador)
+    .replace(RE_NIT, etiquetas.nit ?? 'NIT');
 }
 
 /** Nombre de archivo seguro a partir de un texto libre. */

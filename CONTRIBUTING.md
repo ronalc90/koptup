@@ -6,17 +6,16 @@ Gracias por tu interés en aportar a Koptup. Esta guía resume las convenciones 
 
 ## Cómo correr el proyecto local
 
-El [README](./README.md#7-quick-start) tiene la versión detallada. Resumen rápido:
+[SETUP.md](./SETUP.md) tiene la versión detallada. Resumen rápido:
 
 ```bash
 git clone https://github.com/ronalc90/koptup.git
 cd koptup
 NODE_ENV=development npm install
-cp .env.example .env
-cp apps/web/.env.example apps/web/.env.local
-cp apps/backend/.env.example apps/backend/.env
-docker run -d --name koptup-mongo -p 27017:27017 mongo:7
-npm run dev   # levanta web (:3000) + backend (:3001)
+cp apps/web/.env.example apps/web/.env.local       # apunta a http://localhost:3001
+cp apps/backend/.env.example apps/backend/.env     # cambia JWT_SECRET y JWT_REFRESH_SECRET
+npm run docker:up                                   # MongoDB 7 y Redis 7 locales (docker-compose.dev.yml)
+npm run dev                                         # web (:3000) + backend (:3001)
 ```
 
 ---
@@ -117,8 +116,7 @@ Las demos son el corazón comercial de Koptup. Para crear una nueva:
 2. **Mensajes i18n** — `apps/web/messages/demos/<slug>.es.json` y `<slug>.en.json`
    - `scripts/merge-messages.mjs` los combina en `messages/_demos.<idioma>.json` (se ejecuta automáticamente antes de `dev`, `build` y `test`; esos archivos se versionan). Usa `useTranslations('demo<Slug>')`.
 
-3. **Backend** (opcional) — las rutas viven en `apps/backend/src/routes/` y se registran en `apps/backend/src/index.ts`.
-   - Ojo: `apps/backend/src/modules/` **no** está montado en el servidor; hoy solo lo usan sus pruebas.
+3. **Backend** (opcional) — las rutas viven en `apps/backend/src/routes/`, se montan en `apps/backend/src/app.ts` y declaran su política en `apps/backend/src/routes/POLICIES.md`. Los errores responden `{ success: false, code, message }` (usa `AppError` o `sendError` de `apps/backend/src/utils/http-error.ts`).
 
 4. **Catálogo** — agrega la tarjeta en `apps/web/src/app/demo/page.tsx` (catálogo público) con título, categoría y descripción, y el slug en `DEMO_CATALOG_SLUGS` de `apps/web/src/lib/demos.ts` (de ahí salen los conteos de demos del sitio).
 

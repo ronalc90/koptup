@@ -6,6 +6,7 @@
  * para ser coherentes entre pestañas (la suma de miembros por nivel es el
  * total de Resultados, el saldo sale del libro de puntos, etc.).
  */
+import { addDays, endOfMonth, monthDay, monthKeyAgo, partsOf, weekdayOf } from './dates';
 
 export type TierKey = 'classic' | 'silver' | 'gold' | 'diamond';
 export const TIERS: TierKey[] = ['classic', 'silver', 'gold', 'diamond'];
@@ -31,11 +32,14 @@ export const CLUB = {
   domain: 'ceibaverde.example',
 };
 
-/** Calendario de la demo: la semana simulada del 5 al 11 de octubre de 2026. */
-export const DEMO_YEAR = 2026;
-export const DEMO_MONTH = 10;
-export const DEMO_WEEK = ['2026-10-05', '2026-10-06', '2026-10-07', '2026-10-08', '2026-10-09', '2026-10-10', '2026-10-11'];
-export const DEMO_TODAY = '2026-10-06';
+/**
+ * Calendario: la demo trabaja con la fecha de hoy en Colombia. Los datos de
+ * ejemplo se arman con esa fecha (la «fecha de anclaje») cuando la página ya
+ * está en el navegador, así que las compras, los vencimientos y los meses de
+ * los reportes siempre quedan antes de hoy.
+ */
+/** Días hacia atrás que acepta la caja para registrar una compra (hoy incluido). */
+export const SALE_DAYS_BACK = 7;
 
 /* ------------------------------- Reglas ------------------------------- */
 
@@ -51,7 +55,9 @@ export interface Rules {
   expiryMonths: number;
   referrerReward: number;
   refereeReward: number;
-  /** Puntos de compras acumulados en el año para entrar a cada nivel. */
+  /** Bono de cumpleaños en pesos (0 = sin bono). */
+  birthdayGift: number;
+  /** Puntos de compras de los últimos 12 meses para entrar a cada nivel. */
   thresholds: Record<TierKey, number>;
   downgradeMonths: number;
   /** Devolución en saldo (alternativa a puntos), en % por nivel. */
@@ -59,21 +65,28 @@ export interface Rules {
   showLeaderboard: boolean;
 }
 
-export const DEFAULT_RULES: Rules = {
-  baseAmount: 1000,
-  pointValue: 10,
-  categoryMult: { personalCare: 1, otc: 1, dermo: 1.5, baby: 1, vitamins: 1, rx: 0 },
-  dayRule: { enabled: true, category: 'personalCare', weekday: 2, mult: 2 },
-  channelMult: { store: 1, app: 1.5, delivery: 1 },
-  welcomeBonus: 100,
-  expiryMonths: 12,
-  referrerReward: 500,
-  refereeReward: 300,
-  thresholds: { classic: 0, silver: 1500, gold: 4000, diamond: 8000 },
-  downgradeMonths: 6,
-  cashback: { classic: 0.5, silver: 1, gold: 1.5, diamond: 2 },
-  showLeaderboard: false,
-};
+/**
+ * Reglas de ejemplo. La regla del día arranca en el día de la semana de hoy
+ * para que se pueda probar en la Caja sin cambiar la fecha de la compra.
+ */
+export function defaultRules(today: string): Rules {
+  return {
+    baseAmount: 1000,
+    pointValue: 10,
+    categoryMult: { personalCare: 1, otc: 1, dermo: 1.5, baby: 1, vitamins: 1, rx: 0 },
+    dayRule: { enabled: true, category: 'personalCare', weekday: weekdayOf(today), mult: 2 },
+    channelMult: { store: 1, app: 1.5, delivery: 1 },
+    welcomeBonus: 100,
+    expiryMonths: 12,
+    referrerReward: 500,
+    refereeReward: 300,
+    birthdayGift: 15000,
+    thresholds: { classic: 0, silver: 1500, gold: 4000, diamond: 8000 },
+    downgradeMonths: 6,
+    cashback: { classic: 0.5, silver: 1, gold: 1.5, diamond: 2 },
+    showLeaderboard: false,
+  };
+}
 
 /* ----------------------------- Recompensas ----------------------------- */
 
@@ -117,99 +130,105 @@ export interface Member {
   since: string;
   sede: SedeKey;
   whatsappOptIn: boolean;
-  /** Meses de 2026 con al menos una compra antes de la demo. */
-  historyMonths: number[];
+  /** Meses (AAAA-MM) con al menos una compra antes de la demo que no están en el libro de puntos. */
+  historyMonths: string[];
   /** Amigos referidos antes de la demo. */
   referralsBase: number;
-  /** Puntos de 2025 que vencen el 31 de octubre de 2026 (antes de canjes de la sesión). */
+  /** Puntos ganados hace un año que vencen al final de este mes (antes de los canjes de la demo). */
   expiringBase: number;
   referredBy?: string;
   /** Inscrito durante la demo. */
   session?: boolean;
 }
 
-export const MEMBERS: Member[] = [
-  {
-    id: 'm-laura',
-    name: 'Laura Martínez Ríos',
-    cedula: '1020456781',
-    phone: '3005550142',
-    email: 'laura.martinez@correo.example',
-    birthMonth: 10,
-    since: '2023-03-14',
-    sede: 'chapinero',
-    whatsappOptIn: true,
-    historyMonths: [1, 2, 4, 5, 6, 7, 8, 9, 10],
-    referralsBase: 2,
-    expiringBase: 240,
-  },
-  {
-    id: 'm-andres',
-    name: 'Andrés Felipe Gómez',
-    cedula: '79845112',
-    phone: '3105550187',
-    email: 'andres.gomez@correo.example',
-    birthMonth: 3,
-    since: '2022-08-02',
-    sede: 'chapinero',
-    whatsappOptIn: true,
-    historyMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9],
-    referralsBase: 1,
-    expiringBase: 0,
-  },
-  {
-    id: 'm-camila',
-    name: 'Camila Rojas Peña',
-    cedula: '1032778904',
-    phone: '3155550123',
-    since: '2026-05-28',
-    sede: 'chapinero',
-    whatsappOptIn: false,
-    historyMonths: [5, 7, 9],
-    referralsBase: 0,
-    expiringBase: 0,
-    referredBy: 'm-laura',
-  },
-  {
-    id: 'm-jhon',
-    name: 'Jhon Fredy Ospina',
-    cedula: '1017223509',
-    phone: '3015550198',
-    birthMonth: 12,
-    since: '2024-11-20',
-    sede: 'laureles',
-    whatsappOptIn: true,
-    historyMonths: [2, 6, 8, 9],
-    referralsBase: 0,
-    expiringBase: 0,
-  },
-  {
-    id: 'm-valentina',
-    name: 'Valentina Cárdenas',
-    cedula: '1144087336',
-    phone: '3205550176',
-    email: 'vcardenas@correo.example',
-    birthMonth: 6,
-    since: '2021-02-11',
-    sede: 'granada',
-    whatsappOptIn: true,
-    historyMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-    referralsBase: 4,
-    expiringBase: 0,
-  },
-  {
-    id: 'm-santiago',
-    name: 'Santiago Restrepo Mejía',
-    cedula: '1036654210',
-    phone: '3045550111',
-    since: '2026-08-15',
-    sede: 'laureles',
-    whatsappOptIn: false,
-    historyMonths: [8],
-    referralsBase: 0,
-    expiringBase: 0,
-  },
-];
+/** Miembros de ejemplo con fechas relativas a la fecha de anclaje (hoy en Colombia). */
+export function sampleMembers(anchor: string): Member[] {
+  const { m: month } = partsOf(anchor);
+  const ago = (...months: number[]) => months.map((n) => monthKeyAgo(anchor, n));
+  return [
+    {
+      id: 'm-laura',
+      name: 'Laura Martínez Ríos',
+      cedula: '1020456781',
+      phone: '3005550142',
+      email: 'laura.martinez@correo.example',
+      // Cumple este mes: así se ve el regalo de cumpleaños en la app.
+      birthMonth: month,
+      since: monthDay(anchor, 43, 14),
+      sede: 'chapinero',
+      whatsappOptIn: true,
+      historyMonths: [],
+      referralsBase: 2,
+      expiringBase: 240,
+    },
+    {
+      id: 'm-andres',
+      name: 'Andrés Felipe Gómez',
+      cedula: '79845112',
+      phone: '3105550187',
+      email: 'andres.gomez@correo.example',
+      birthMonth: month === 3 ? 4 : 3,
+      since: monthDay(anchor, 50, 2),
+      sede: 'chapinero',
+      whatsappOptIn: true,
+      historyMonths: ago(1, 2, 3, 4, 5, 6, 7, 8, 9),
+      referralsBase: 1,
+      expiringBase: 0,
+    },
+    {
+      id: 'm-camila',
+      name: 'Camila Rojas Peña',
+      cedula: '1032778904',
+      phone: '3155550123',
+      since: monthDay(anchor, 5, 28),
+      sede: 'chapinero',
+      whatsappOptIn: false,
+      historyMonths: ago(1, 3, 5),
+      referralsBase: 0,
+      expiringBase: 0,
+      referredBy: 'm-laura',
+    },
+    {
+      id: 'm-jhon',
+      name: 'Jhon Fredy Ospina',
+      cedula: '1017223509',
+      phone: '3015550198',
+      birthMonth: month === 12 ? 11 : 12,
+      since: monthDay(anchor, 23, 20),
+      sede: 'laureles',
+      whatsappOptIn: true,
+      historyMonths: ago(1, 2, 4, 8),
+      referralsBase: 0,
+      expiringBase: 0,
+    },
+    {
+      id: 'm-valentina',
+      name: 'Valentina Cárdenas',
+      cedula: '1144087336',
+      phone: '3205550176',
+      email: 'vcardenas@correo.example',
+      birthMonth: month === 6 ? 7 : 6,
+      since: monthDay(anchor, 68, 11),
+      sede: 'granada',
+      whatsappOptIn: true,
+      historyMonths: ago(1, 2, 3, 4, 5, 6, 7, 8, 9),
+      referralsBase: 4,
+      expiringBase: 0,
+    },
+    {
+      id: 'm-santiago',
+      name: 'Santiago Restrepo Mejía',
+      cedula: '1036654210',
+      phone: '3045550111',
+      since: monthDay(anchor, 2, 15),
+      sede: 'laureles',
+      whatsappOptIn: false,
+      historyMonths: ago(2),
+      referralsBase: 0,
+      expiringBase: 0,
+    },
+  ];
+}
 
 /* ---------------------------- Libro de puntos ---------------------------- */
 
@@ -236,59 +255,67 @@ export interface LedgerTx {
   session?: boolean;
 }
 
-type Purchase = [date: string, sede: SedeKey, channel: ChannelKey, category: CategoryKey, amount: number, points: number];
+type Purchase = [monthsAgo: number, day: number, channel: ChannelKey, category: CategoryKey, amount: number, points: number];
 
-/** Compras de 2026 de Laura (los puntos ya aplican las reglas por defecto). */
+/**
+ * Compras de Laura en los últimos 12 meses (ninguna en el mes en curso, para
+ * que la misión «Compra 2 veces este mes» se complete con las compras de la
+ * demo). Los puntos aplican la regla base y los multiplicadores de categoría y
+ * canal de ejemplo; suman 3.110 puntos para el nivel.
+ */
 const LAURA_PURCHASES: Purchase[] = [
-  ['2026-01-13', 'chapinero', 'store', 'personalCare', 142000, 284],
-  ['2026-02-20', 'chapinero', 'store', 'dermo', 236000, 354],
-  ['2026-04-07', 'chapinero', 'store', 'personalCare', 98000, 196],
-  ['2026-04-25', 'chapinero', 'store', 'vitamins', 164000, 164],
-  ['2026-05-16', 'chapinero', 'store', 'baby', 310000, 310],
-  ['2026-06-09', 'chapinero', 'store', 'personalCare', 205000, 410],
-  ['2026-07-03', 'chapinero', 'store', 'otc', 87000, 87],
-  ['2026-07-18', 'chapinero', 'store', 'dermo', 268000, 402],
-  ['2026-08-21', 'chapinero', 'app', 'vitamins', 190000, 285],
-  ['2026-09-12', 'chapinero', 'store', 'baby', 276000, 276],
-  ['2026-09-26', 'chapinero', 'store', 'personalCare', 221000, 221],
-  ['2026-10-02', 'chapinero', 'store', 'otc', 121000, 121],
+  [11, 13, 'store', 'personalCare', 142000, 142],
+  [10, 20, 'store', 'dermo', 236000, 354],
+  [8, 7, 'store', 'personalCare', 98000, 98],
+  [8, 25, 'store', 'vitamins', 164000, 164],
+  [7, 16, 'store', 'baby', 310000, 310],
+  [6, 9, 'store', 'personalCare', 205000, 205],
+  [6, 22, 'store', 'dermo', 190000, 285],
+  [5, 3, 'store', 'otc', 87000, 87],
+  [5, 18, 'store', 'dermo', 268000, 402],
+  [4, 21, 'app', 'vitamins', 190000, 285],
+  [3, 12, 'store', 'baby', 276000, 276],
+  [2, 26, 'store', 'personalCare', 221000, 221],
+  [1, 2, 'store', 'otc', 121000, 121],
+  [1, 19, 'delivery', 'personalCare', 160000, 160],
 ];
 
-function buildLedger(): LedgerTx[] {
+/** Libro de puntos de ejemplo con fechas relativas a la fecha de anclaje. */
+export function sampleLedger(anchor: string): LedgerTx[] {
   const out: LedgerTx[] = [];
   let n = 0;
   const id = () => `h${++n}`;
-  out.push({ id: id(), memberId: 'm-laura', date: '2026-01-01', kind: 'opening', points: 1840 });
-  LAURA_PURCHASES.forEach(([date, sede, channel, category, amount, points]) => {
-    out.push({ id: id(), memberId: 'm-laura', date, kind: 'earn', points, amount, category, channel, sede });
+  const opening = monthDay(anchor, 12, 1);
+  const lastMonthEnd = addDays(monthDay(anchor, 0, 1), -1);
+  out.push({ id: id(), memberId: 'm-laura', date: opening, kind: 'opening', points: 1840 });
+  LAURA_PURCHASES.forEach(([monthsAgo, day, channel, category, amount, points]) => {
+    out.push({ id: id(), memberId: 'm-laura', date: monthDay(anchor, monthsAgo, day), kind: 'earn', points, amount, category, channel, sede: 'chapinero' });
   });
-  out.push({ id: id(), memberId: 'm-laura', date: '2026-05-28', kind: 'referral', points: 500, label: 'Camila R.' });
-  out.push({ id: id(), memberId: 'm-laura', date: '2026-07-18', kind: 'redeem', points: -1000, rewardId: 'voucher10', sede: 'chapinero' });
-  out.push({ id: id(), memberId: 'm-laura', date: '2026-08-30', kind: 'referral', points: 500, label: 'Paola C.' });
-  out.push({ id: id(), memberId: 'm-laura', date: '2026-09-12', kind: 'redeem', points: -600, rewardId: 'delivery', sede: 'chapinero' });
+  out.push({ id: id(), memberId: 'm-laura', date: monthDay(anchor, 5, 28), kind: 'referral', points: 500, label: 'Camila R.' });
+  out.push({ id: id(), memberId: 'm-laura', date: monthDay(anchor, 5, 18), kind: 'redeem', points: -1000, rewardId: 'voucher10', sede: 'chapinero' });
+  out.push({ id: id(), memberId: 'm-laura', date: monthDay(anchor, 2, 30), kind: 'referral', points: 500, label: 'Paola C.' });
+  out.push({ id: id(), memberId: 'm-laura', date: monthDay(anchor, 3, 12), kind: 'redeem', points: -600, rewardId: 'delivery', sede: 'chapinero' });
 
-  // Resto de miembros: saldo de 2025 + resumen de compras de 2026 (+ canjes).
+  // Resto de miembros: saldo anterior + resumen de compras de los últimos 12 meses (+ canjes).
   const rest: [string, number, number, number][] = [
-    // memberId, saldo inicial, puntos de compras 2026, puntos canjeados 2026
+    // memberId, saldo anterior, puntos de compras, puntos canjeados
     ['m-andres', 2160, 5420, 2600],
     ['m-camila', 0, 640, 0],
     ['m-jhon', 880, 2150, 600],
     ['m-valentina', 3150, 9360, 6300],
     ['m-santiago', 0, 380, 0],
   ];
-  rest.forEach(([memberId, opening, earned, redeemed]) => {
-    if (opening) out.push({ id: id(), memberId, date: '2026-01-01', kind: 'opening', points: opening });
+  rest.forEach(([memberId, openingPts, earned, redeemed]) => {
+    if (openingPts) out.push({ id: id(), memberId, date: opening, kind: 'opening', points: openingPts });
     if (memberId === 'm-camila' || memberId === 'm-santiago') {
-      out.push({ id: id(), memberId, date: memberId === 'm-camila' ? '2026-05-28' : '2026-08-15', kind: 'welcome', points: 100 });
+      out.push({ id: id(), memberId, date: memberId === 'm-camila' ? monthDay(anchor, 5, 28) : monthDay(anchor, 2, 15), kind: 'welcome', points: 100 });
     }
-    if (memberId === 'm-camila') out.push({ id: id(), memberId, date: '2026-05-28', kind: 'referral', points: 300, label: 'Laura M.' });
-    out.push({ id: id(), memberId, date: '2026-09-30', kind: 'summary', points: earned });
-    if (redeemed) out.push({ id: id(), memberId, date: '2026-09-30', kind: 'redeem', points: -redeemed });
+    if (memberId === 'm-camila') out.push({ id: id(), memberId, date: monthDay(anchor, 5, 28), kind: 'referral', points: 300, label: 'Laura M.' });
+    out.push({ id: id(), memberId, date: lastMonthEnd, kind: 'summary', points: earned });
+    if (redeemed) out.push({ id: id(), memberId, date: lastMonthEnd, kind: 'redeem', points: -redeemed });
   });
   return out;
 }
-
-export const INITIAL_LEDGER: LedgerTx[] = buildLedger();
 
 /* ------------------------------- Misiones ------------------------------- */
 
@@ -330,11 +357,16 @@ export interface Campaign {
   message?: string;
   segment: Segment;
   channel: CampaignChannel;
-  /** 0 = domingo … 6 = sábado. */
-  day: number;
+  /** Campañas que se repiten cada semana: 0 = domingo … 6 = sábado. */
+  day?: number;
+  /** Campañas de un solo envío (las que creas en la demo): AAAA-MM-DD. */
+  date?: string;
   time: string;
   status: CampaignStatus;
+  /** Se envía de lunes a sábado (la de cumpleaños). */
   daily?: boolean;
+  /** Creada en la demo. */
+  session?: boolean;
 }
 
 export const DEFAULT_CAMPAIGNS: Campaign[] = [
@@ -372,6 +404,14 @@ export const DEFAULT_ALERTS: FraudAlert[] = [
   { id: 'f3', kind: 'referral', severity: 'medium', status: 'open', memberLabel: 'Kevin A. · 318 *** 0144' },
   { id: 'f4', kind: 'redeem', severity: 'low', status: 'open', memberLabel: 'Natalia S. · 312 *** 0109' },
 ];
+
+/** Días antes de la fecha de anclaje en que pasó cada evento de las alertas de ejemplo. */
+export const SAMPLE_ALERT_DAYS: Record<string, [number, number, number]> = {
+  f1: [1, 1, 1],
+  f2: [30, 23, 12],
+  f3: [2, 2, 2],
+  f4: [3, 3, 3],
+};
 
 /** Reglas antifraude que la demo evalúa de verdad sobre las compras que registras. */
 export const FRAUD_RULES = { sameDayPurchases: 3, highAmount: 2_000_000 };
@@ -431,10 +471,13 @@ export interface Draw {
   winner?: string;
 }
 
-export const DEFAULT_DRAWS: Draw[] = [
-  { id: 'd1', key: 'basket', date: '2026-10-30', ticketCost: 200, participants: 1284, status: 'scheduled' },
-  { id: 'd2', key: 'skincare', date: '2026-09-30', ticketCost: 300, participants: 962, status: 'done', winner: 'Diana P. · Laureles' },
-];
+/** Sorteo de este mes (programado para el último día) y el del mes pasado (ya realizado). */
+export function sampleDraws(anchor: string): Draw[] {
+  return [
+    { id: 'd1', key: 'basket', date: endOfMonth(anchor), ticketCost: 200, participants: 1284, status: 'scheduled' },
+    { id: 'd2', key: 'skincare', date: endOfMonth(anchor, -1), ticketCost: 300, participants: 962, status: 'done', winner: 'Diana P. · Laureles' },
+  ];
+}
 
 /** Participantes ficticios para el sorteo simulado. */
 export const DRAW_PARTICIPANTS = [
@@ -451,7 +494,7 @@ export const DRAW_PARTICIPANTS = [
 /* ------------------------------ Resultados ------------------------------ */
 
 /**
- * Miembros por puntos de compras acumulados en el año, en tramos de 250
+ * Miembros por puntos de compras de los últimos 12 meses, en tramos de 250
  * puntos (el último tramo incluye 12.250 o más). Suma 29.200 miembros.
  * Con los umbrales por defecto da 18.300 Clásico, 7.500 Plata, 2.700 Oro y 700 Diamante.
  */
@@ -479,8 +522,7 @@ export const ANALYTICS = {
   atRisk: 3400,
   dormant: 6300,
   vipShare: 0.72,
-  /** Retención por cohorte (mes de inscripción mayo–octubre 2026). */
-  cohortStartMonth: 5,
+  /** Retención por cohorte: una fila por mes de inscripción, de hace 5 meses a este mes. */
   cohort: [
     [100, 78, 66, 59, 54, 51],
     [100, 80, 67, 60, 55],

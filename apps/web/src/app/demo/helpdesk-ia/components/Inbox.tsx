@@ -7,7 +7,7 @@ import Button from '@/components/ui/Button';
 import type { BrandId, Category, Channel, Priority, Ticket } from './data';
 import { downloadFile, includesNorm, priorityRank, slaRemaining, toCsv } from './engine';
 import SlaBadge from './SlaBadge';
-import { ChannelBadge, PriorityBadge, smallInputCls } from './ui';
+import { ChannelBadge, PriorityBadge, smallInputCls, smallSelectCls } from './ui';
 import type { HdText } from './useHelpdeskText';
 
 export type InboxView = 'all' | 'open' | 'pending' | 'resolved' | 'unassigned' | 'atRisk';
@@ -98,30 +98,33 @@ export default function Inbox({ hd, tickets, clock, channel, priority, brand, ca
     <section className="order-2 lg:order-none lg:col-span-4 min-w-0">
       <Card variant="bordered" padding="none" className="overflow-hidden">
         <CardHeader className="p-3 sm:p-4 border-b border-secondary-200 dark:border-secondary-700 mb-0 space-y-2">
-          <div className="flex items-center justify-between gap-2">
-            <CardTitle className="text-base sm:text-lg">{t('inbox.title')}</CardTitle>
-            <span className="text-xs text-secondary-500">{t('inbox.count', { count: filtered.length })}</span>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-2">
-            <div className="relative flex-1 min-w-0">
-              <MagnifyingGlassIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-secondary-400" aria-hidden="true" />
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder={t('inbox.search')}
-                aria-label={t('inbox.search')}
-                className={`${smallInputCls} pl-8 py-2 text-sm`}
-              />
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <div className="min-w-0">
+              <CardTitle className="text-base sm:text-lg">{t('inbox.title')}</CardTitle>
+              <p className="text-xs text-secondary-500 mt-0.5" aria-live="polite">
+                {t('inbox.count', { count: filtered.length, active: filtered.filter((tk) => tk.status !== 'resolved').length })}
+              </p>
             </div>
             <Button size="sm" onClick={onNewTicket} className="whitespace-nowrap">
               <PlusIcon className="h-4 w-4 mr-1" aria-hidden="true" />
               {t('inbox.newTicket')}
             </Button>
           </div>
+          <div className="relative min-w-0">
+            <MagnifyingGlassIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-secondary-400" aria-hidden="true" />
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={t('inbox.search')}
+              aria-label={t('inbox.search')}
+              className={`${smallInputCls} pl-8 py-2 text-sm`}
+            />
+          </div>
           <div className="flex flex-wrap items-center gap-2">
             <label className="flex items-center gap-1.5 text-xs text-secondary-600 dark:text-secondary-400">
               {t('inbox.viewLabel')}
-              <select value={view} onChange={(e) => setView(e.target.value as InboxView)} className={`${smallInputCls} w-auto`}>
+              <select value={view} onChange={(e) => setView(e.target.value as InboxView)} className={`${smallSelectCls} w-auto`}>
                 {VIEWS.map((v) => (
                   <option key={v} value={v}>
                     {t(`inbox.views.${v}`)}
@@ -131,7 +134,7 @@ export default function Inbox({ hd, tickets, clock, channel, priority, brand, ca
             </label>
             <label className="flex items-center gap-1.5 text-xs text-secondary-600 dark:text-secondary-400">
               {t('inbox.sortLabel')}
-              <select value={sort} onChange={(e) => setSort(e.target.value as SortKey)} className={`${smallInputCls} w-auto`}>
+              <select value={sort} onChange={(e) => setSort(e.target.value as SortKey)} className={`${smallSelectCls} w-auto`}>
                 {SORTS.map((s) => (
                   <option key={s} value={s}>
                     {t(`inbox.sorts.${s}`)}

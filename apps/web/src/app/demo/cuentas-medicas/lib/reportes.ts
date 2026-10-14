@@ -1,5 +1,7 @@
 import { downloadBlob } from '@/lib/utils';
-import type { DetalleFactura, Factura } from '../tipos-auditoria';
+import type { DetalleFactura } from '../tipos-auditoria';
+import type { FacturaRevisada } from './espacio';
+import { resumirRevision } from './revision';
 import { tarifaDe } from './tarifarioDemo';
 import {
   anonimizarTexto,
@@ -29,7 +31,7 @@ function descargarCSV(filas: Array<Array<string | number>>, archivo: string, loc
 }
 
 function etiquetasEntidad(t: Traductor) {
-  return { prestador: t('entities.provider'), pagador: t('entities.payer') };
+  return { prestador: t('entities.provider'), pagador: t('entities.payer'), nit: t('entities.nit') };
 }
 
 function estadoFactura(estado: string, t: Traductor, claves: Record<string, string>): string {
@@ -38,7 +40,7 @@ function estadoFactura(estado: string, t: Traductor, claves: Record<string, stri
 }
 
 export function exportarListaCSV(
-  facturas: Factura[],
+  facturas: FacturaRevisada[],
   locale: string,
   t: Traductor,
   clavesEstado: Record<string, string>,
@@ -54,16 +56,18 @@ export function exportarListaCSV(
       t('invoices.columns.billed'),
       t('invoices.columns.denied'),
       t('invoices.columns.toPay'),
+      t('invoices.columns.pending'),
     ],
-    ...facturas.map((f) => [
+    ...facturas.map(({ factura: f, revision }) => [
       f.numeroFactura,
-      estadoFactura(f.estado, t, clavesEstado),
+      estadoFactura(revision.estado, t, clavesEstado),
       nombreEntidad(f.ips?.nombre, 'prestador', etiquetas),
       nombreEntidad(f.eps?.nombre, 'pagador', etiquetas),
       formatearFecha(f.fechaEmision, locale),
       Math.round(f.valorTotal || 0),
       Math.round(f.totalGlosas || 0),
       Math.round(f.valorAceptado || 0),
+      revision.pendientes,
     ]),
   ];
   descargarCSV(filas, t('report.listFileName'), locale);
@@ -195,7 +199,7 @@ export async function exportarDetallePDF(
     10,
   );
   parrafo(
-    `${t('report.pdf.registered')}: ${formatearFecha(factura.fechaEmision, locale)}   ${t('report.pdf.state')}: ${estadoFactura(factura.estado, t, clavesEstado)}`,
+    `${t('report.pdf.registered')}: ${formatearFecha(factura.fechaEmision, locale)}   ${t('report.pdf.state')}: ${estadoFactura(resumirRevision(factura, detalle.glosas).estado, t, clavesEstado)}`,
     9,
   );
   y += 3;

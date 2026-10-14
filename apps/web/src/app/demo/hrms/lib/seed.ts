@@ -14,7 +14,7 @@ import type {
 } from './types';
 import { currentPeriod, previousMonth } from './payroll';
 
-export const STATE_VERSION = 5;
+export const STATE_VERSION = 6;
 
 /** Nombre de la colaboradora que usa la app en la demo. */
 export const APP_EMPLOYEE_NAME = 'Camila Rojas Parra';
@@ -373,27 +373,42 @@ function buildReviews(emps: Employee[]): Review[] {
   });
 }
 
+/** A quién se le asigna cada curso obligatorio (también a quien ingresa en la demo). */
+export const COURSE_AUDIENCE: Record<CourseId, (e: Employee) => boolean> = {
+  induction: () => true,
+  sst50: (e) => e.positionId === 'supervisor' || e.positionId === 'hrHead' || e.positionId === 'hrAnalyst' || e.positionId === 'qualityHead',
+  food: (e) => e.area === 'production' || e.area === 'quality',
+  heights: (e) => e.area === 'maintenance',
+  pesv: (e) => e.positionId === 'driver',
+  sagrilaft: (e) => e.area === 'finance' || e.area === 'sales' || e.area === 'management',
+  dataProtection: (e) => e.area === 'people' || e.area === 'sales' || e.area === 'finance' || e.area === 'management',
+  harassment: () => true,
+};
+
 function buildCourses(base: ISODate, emps: Employee[]): Course[] {
   const r = rng(616);
   const all = emps.filter((e) => e.status !== 'retired');
-  const ids = (f: (e: Employee) => boolean) => all.filter(f).map((e) => e.id);
-  const spec: [CourseId, number, string[], number][] = [
-    ['induction', 20, ids(() => true), 0.93],
-    ['sst50', -5, ids((e) => e.positionId === 'supervisor' || e.positionId === 'hrHead' || e.positionId === 'hrAnalyst' || e.positionId === 'qualityHead'), 0.7],
-    ['food', 45, ids((e) => e.area === 'production' || e.area === 'quality'), 0.72],
-    ['heights', 10, ids((e) => e.area === 'maintenance'), 0.5],
-    ['pesv', -12, ids((e) => e.positionId === 'driver'), 0.67],
-    ['sagrilaft', 60, ids((e) => e.area === 'finance' || e.area === 'sales' || e.area === 'management'), 0.4],
-    ['dataProtection', 30, ids((e) => e.area === 'people' || e.area === 'sales' || e.area === 'finance' || e.area === 'management'), 0.65],
-    ['harassment', 90, ids(() => true), 0.3],
+  const ids = (id: CourseId) => all.filter(COURSE_AUDIENCE[id]).map((e) => e.id);
+  const spec: [CourseId, number, number][] = [
+    ['induction', 20, 0.93],
+    ['sst50', -5, 0.7],
+    ['food', 45, 0.72],
+    ['heights', 10, 0.5],
+    ['pesv', -12, 0.67],
+    ['sagrilaft', 60, 0.4],
+    ['dataProtection', 30, 0.65],
+    ['harassment', 90, 0.3],
   ];
-  return spec.map(([id, dueOff, assigned, pct]) => ({
-    id,
-    hours: COURSE_HOURS[id],
-    due: addDays(base, dueOff),
-    assigned,
-    completed: assigned.filter(() => r() < pct),
-  }));
+  return spec.map(([id, dueOff, pct]) => {
+    const assigned = ids(id);
+    return {
+      id,
+      hours: COURSE_HOURS[id],
+      due: addDays(base, dueOff),
+      assigned,
+      completed: assigned.filter(() => r() < pct),
+    };
+  });
 }
 
 function buildSurveys(base: ISODate): Survey[] {
@@ -419,10 +434,12 @@ export function buildState(base: ISODate): HrState {
     candidates,
     processes,
     run: { periodId: period.id, status: 'draft', novelties: buildNovelties(employees) },
+    paidRuns: [],
     filing: { month: previousMonth(base), einvoice: 'pending', cunes: {}, pila: 'pending' },
     reviews: buildReviews(employees),
     courses: buildCourses(base, employees),
     surveys: buildSurveys(base),
+    guide: {},
     seq: 1000,
   };
 }

@@ -7,16 +7,17 @@ import { ClipboardDocumentIcon, CodeBracketIcon } from '@heroicons/react/24/outl
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import { DEMO_TODAY, PREFIXES } from './data';
+import { PREFIXES } from './data';
 import { nextNumber } from './docs';
-import { draftLines, draftParty } from './draft';
+import { draftLines, draftParty, isNote } from './draft';
 import { computeTotals } from './fiscal';
-import { SectionTitle } from './ui';
+import { focusRing, onTabsKeyDown, SectionTitle } from './ui';
 import type { BillingStore } from './useBillingStore';
 
 type ApiTab = 'request' | 'response' | 'webhook';
+const API_TABS: ApiTab[] = ['request', 'response', 'webhook'];
 
-const ENDPOINTS: [string, string, string][] = [
+const endpoints = (period: string): [string, string, string][] => [
   ['POST', '/v1/invoices', 'invoices'],
   ['POST', '/v1/credit-notes', 'creditNotes'],
   ['POST', '/v1/debit-notes', 'debitNotes'],
@@ -26,7 +27,7 @@ const ENDPOINTS: [string, string, string][] = [
   ['GET', '/v1/documents/{id}/xml', 'xml'],
   ['GET', '/v1/reception', 'reception'],
   ['POST', '/v1/reception/{id}/events', 'events'],
-  ['GET', '/v1/reports/sales?period=2026-10', 'reports'],
+  ['GET', `/v1/reports/sales?period=${period}`, 'reports'],
 ];
 
 const WEBHOOKS = [
@@ -40,12 +41,13 @@ const WEBHOOKS = [
 
 export function ApiPanel({ store }: { store: BillingStore }) {
   const t = useTranslations('demoBilling');
-  const { state, draft, tab: emissionTab } = store;
+  const { state, today, draft, tab: emissionTab } = store;
   const [tab, setTab] = useState<ApiTab>('request');
 
   const code = useMemo(() => {
     const type = emissionTab === 'contingencia' ? draft.type : emissionTab;
-    const ref = draft.refId ? state.docs.find((d) => d.id === draft.refId) : undefined;
+    // Solo las notas llevan factura de referencia.
+    const ref = isNote(type) && draft.refId ? state.docs.find((d) => d.id === draft.refId) : undefined;
     const conceptLabel = draft.concept
       ? t(`${type === 'notaCredito' ? 'creditConcepts' : 'debitConcepts'}.${draft.concept}`).replace(/^\d+ · /, '')
       : '';
@@ -55,9 +57,11 @@ export function ApiPanel({ store }: { store: BillingStore }) {
     const prefix = type === 'factura' ? state.issuer.prefix : PREFIXES[type];
     const number = `${prefix}${nextNumber(state.docs, type, prefix)}`;
     const path = { factura: 'invoices', notaCredito: 'credit-notes', notaDebito: 'debit-notes', pos: 'pos-documents' }[type];
+    const host = `https://${t('api.sample.host')}`;
+    const docId = t('api.sample.docId');
     const body = {
-      external_id: 'pedido-10482',
-      issue_date: DEMO_TODAY,
+      external_id: t('api.sample.externalId'),
+      issue_date: today,
       ...(ref ? { reference: { number: ref.id, concept_code: draft.concept || null } } : {}),
       customer:
         party.idType === 'CF'
@@ -68,8 +72,8 @@ export function ApiPanel({ store }: { store: BillingStore }) {
     };
     if (tab === 'request') {
       return [
-        `curl -X POST https://api.tu-empresa.example/v1/${path} \\`,
-        '  -H "Authorization: Bearer <tu-llave-de-api>" \\',
+        `curl -X POST ${host}/v1/${path} \\`,
+        `  -H "Authorization: Bearer <${t('api.sample.apiKey')}>" \\`,
         '  -H "Content-Type: application/json" \\',
         "  -d '" + JSON.stringify(body, null, 2).replace(/'/g, "'\\''") + "'",
       ].join('\n');
@@ -77,13 +81,13 @@ export function ApiPanel({ store }: { store: BillingStore }) {
     if (tab === 'response') {
       return JSON.stringify(
         {
-          id: 'doc_ejemplo_01',
+          id: docId,
           number,
           status: state.dianDown ? 'contingency' : 'accepted',
-          [type === 'factura' ? 'cufe' : 'cude']: '<sha384-96-caracteres>',
+          [type === 'factura' ? 'cufe' : 'cude']: `<${t('api.sample.hash')}>`,
           totals: { subtotal: totals.subtotal, vat: totals.iva, total: totals.total },
-          pdf_url: `https://api.tu-empresa.example/v1/documents/doc_ejemplo_01/pdf`,
-          xml_url: `https://api.tu-empresa.example/v1/documents/doc_ejemplo_01/xml`,
+          pdf_url: `${host}/v1/documents/${docId}/pdf`,
+          xml_url: `${host}/v1/documents/${docId}/xml`,
         },
         null,
         2,
@@ -92,14 +96,14 @@ export function ApiPanel({ store }: { store: BillingStore }) {
     return JSON.stringify(
       {
         event: 'invoice.accepted',
-        created_at: `${DEMO_TODAY}T10:15:00-05:00`,
-        data: { id: 'doc_ejemplo_01', number, status: 'accepted', total: totals.total },
-        signature: 'sha256=<firma-hmac-del-webhook>',
+        created_at: `${today}T10:15:00-05:00`,
+        data: { id: docId, number, status: 'accepted', total: totals.total },
+        signature: `sha256=<${t('api.sample.signature')}>`,
       },
       null,
       2,
     );
-  }, [draft, emissionTab, state.docs, state.issuer.prefix, state.dianDown, tab, t]);
+  }, [draft, emissionTab, state.docs, state.issuer.prefix, state.dianDown, tab, t, today]);
 
   const copy = async () => {
     try {
@@ -123,16 +127,21 @@ export function ApiPanel({ store }: { store: BillingStore }) {
         }
       />
       <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-        <div role="tablist" aria-label={t('api.title')} className="flex flex-wrap gap-2">
-          {(['request', 'response', 'webhook'] as ApiTab[]).map((k) => (
+        <div role="tablist" aria-label={t('api.title')} className="flex flex-wrap gap-2" onKeyDown={(e) => onTabsKeyDown(e, API_TABS, tab, setTab)}>
+          {API_TABS.map((k) => (
             <button
               key={k}
+              id={`fe-api-tab-${k}`}
               type="button"
               role="tab"
               aria-selected={tab === k}
+              aria-controls="fe-api-code"
+              tabIndex={tab === k ? 0 : -1}
               onClick={() => setTab(k)}
               className={
                 'px-3 py-1 rounded-md text-xs font-medium ' +
+                focusRing +
+                ' ' +
                 (tab === k ? 'bg-primary-600 text-white' : 'bg-secondary-100 dark:bg-secondary-800 text-secondary-700 dark:text-secondary-200')
               }
             >
@@ -144,7 +153,13 @@ export function ApiPanel({ store }: { store: BillingStore }) {
           <ClipboardDocumentIcon className="w-4 h-4 mr-1" /> {t('api.copy')}
         </Button>
       </div>
-      <pre className="rounded-lg bg-secondary-900 text-secondary-100 text-[11px] leading-relaxed p-4 overflow-x-auto max-h-80">
+      <pre
+        id="fe-api-code"
+        role="tabpanel"
+        aria-labelledby={`fe-api-tab-${tab}`}
+        tabIndex={0}
+        className={'rounded-lg bg-secondary-900 text-secondary-100 text-[11px] leading-relaxed p-4 overflow-x-auto max-h-80 ' + focusRing}
+      >
         <code>{code}</code>
       </pre>
       <p className="mt-1 text-[11px] text-secondary-500">{t('api.live')}</p>
@@ -152,7 +167,7 @@ export function ApiPanel({ store }: { store: BillingStore }) {
         <div className="min-w-0">
           <p className="text-sm font-semibold text-secondary-900 dark:text-white mb-2">{t('api.endpoints')}</p>
           <ul className="space-y-1 text-xs">
-            {ENDPOINTS.map(([method, path, key]) => (
+            {endpoints(today.slice(0, 7)).map(([method, path, key]) => (
               <li key={path} className="flex items-start gap-2">
                 <Badge variant={method === 'GET' ? 'info' : 'success'} size="sm" className="flex-shrink-0">
                   {method}

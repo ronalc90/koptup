@@ -1,15 +1,28 @@
 {
   "demoExpertSystem": {
     "meta": {
-      "title": "Motor de reglas para auditoría de cuentas médicas",
-      "description": "Demo privada del motor de reglas del auditor: activa reglas de glosa, ajusta la tolerancia de tarifa, simula su efecto en un lote de facturas de ejemplo y busca códigos CUPS.",
+      "title": "Sistema experto de auditoría médica",
+      "description": "Demo privada del sistema experto de auditoría médica: activa o desactiva reglas de glosa, ajusta la tolerancia de tarifa, simula su efecto en 12 facturas de ejemplo antes de guardar y busca códigos CUPS.",
       "breadcrumbHome": "Inicio",
       "breadcrumbDemos": "Demos",
-      "breadcrumbName": "Motor de reglas del auditor"
+      "breadcrumbName": "Sistema experto de auditoría médica"
     },
-    "back": "Volver a Auditoría de cuentas médicas",
-    "title": "Motor de reglas del auditor",
-    "subtitle": "Configura las reglas de glosa, simula su efecto en un lote de facturas de ejemplo antes de guardarlas y busca códigos CUPS.",
+    "back": "Volver a las demos",
+    "title": "Sistema experto de auditoría médica",
+    "subtitle": "Es el motor de reglas que propone glosas en la auditoría de cuentas médicas: activa o desactiva reglas, ajusta la tolerancia de tarifa y mira su efecto en un lote de facturas de ejemplo antes de guardar.",
+    "audience": "Para coordinadores de auditoría de cuentas médicas en EPS, firmas auditoras e IPS. Empieza por los tres pasos de abajo.",
+    "start": {
+      "title": "Cómo empezar",
+      "progress": "{hechos} de {total} pasos",
+      "done": "Listo: ya viste cómo cambia el resultado antes de guardar.",
+      "stepDone": "(hecho)",
+      "simuladorTitle": "Mira las glosas que propone",
+      "simuladorText": "El simulador aplica las 8 reglas a 12 facturas de ejemplo y explica cada glosa.",
+      "cambioTitle": "Cambia una regla o la tolerancia",
+      "cambioText": "En Reglas, apaga una regla o mueve la tolerancia de tarifa.",
+      "efectoTitle": "Compara antes de guardar",
+      "efectoText": "Vuelve al simulador: verás qué glosas aparecen o desaparecen y cuánto dinero mueven."
+    },
     "sampleBadge": "Datos de ejemplo",
     "sampleBadgeHint": "Facturas, pacientes, prestadores, convenio y tarifas de esta demo son ficticios.",
     "status": {
@@ -40,7 +53,7 @@
       "login": "Iniciar sesión",
       "sin-accesoTitle": "Tu cuenta no tiene acceso a esta demo",
       "sin-accesoText": "Es una demo privada: el equipo de KopTup habilita el acceso. Mientras tanto puedes usar el simulador y la búsqueda en el catálogo de ejemplo.",
-      "request": "Solicitar acceso",
+      "request": "Solicitar acceso a esta demo",
       "limiteTitle": "El servidor de la demo recibió demasiadas consultas",
       "limiteText": "Espera unos minutos y vuelve a intentarlo. El simulador y la búsqueda en el catálogo de ejemplo siguen funcionando en tu navegador.",
       "sin-conexionTitle": "No pudimos conectar con el servidor de la demo",
@@ -128,27 +141,24 @@
       "refreshing": "Actualizando…",
       "loading": "Consultando el servidor…",
       "noData": "Sin datos del servidor",
-      "accounts": "Cuentas médicas en el servidor",
-      "accountsProcessed": "{procesadas} procesadas con el motor ({porcentaje} %)",
       "catalog": "Catálogo CUPS del servidor",
       "catalogActive": "{activos} códigos activos",
-      "vectorized": "Códigos con embedding",
+      "vectorized": "Códigos vectorizados",
       "vectorizedDetail": "{hechos} de {total} ({porcentaje} %)",
       "vectorizedEmpty": "Sin catálogo cargado",
       "rulesActive": "Reglas activas en el servidor",
       "rulesActiveDetail": "de {total} reglas del motor",
-      "emptyCatalog": "El catálogo CUPS del servidor está vacío. En tu proyecto se carga desde la tabla oficial vigente; mientras tanto, la búsqueda de códigos usa el catálogo de ejemplo.",
-      "emptyAccounts": "Aún no hay cuentas médicas registradas en el servidor de la demo.",
+      "emptyCatalog": "El catálogo CUPS del servidor de la demo está vacío, así que la búsqueda semántica no está disponible y la búsqueda de códigos usa el catálogo de ejemplo. En tu proyecto se carga la tabla CUPS oficial vigente.",
       "byCategory": "Catálogo del servidor por categoría",
       "services": "Servicios del motor",
       "serviceRules": "Motor de reglas",
       "serviceRulesOk": "{activas} de {total} reglas activas",
       "serviceRulesUnknown": "No se pudo leer la configuración",
       "serviceSemantic": "Búsqueda semántica en el servidor",
-      "serviceSemanticOk": "{total} códigos con embedding",
-      "serviceSemanticOff": "No disponible: el catálogo no tiene códigos con embedding",
+      "serviceSemanticOk": "{total} códigos vectorizados",
+      "serviceSemanticOff": "No disponible: el catálogo del servidor no tiene códigos vectorizados",
       "serviceSample": "Catálogo de ejemplo",
-      "serviceSampleText": "{total} códigos, búsqueda por texto en tu navegador",
+      "serviceSampleText": "{total} códigos, búsqueda por palabras en tu navegador",
       "available": "Disponible",
       "unavailable": "No disponible",
       "batchTitle": "Lote de ejemplo",
@@ -156,17 +166,19 @@
       "batchPoint1": "{ips} prestadores (IPS) ficticios y un pagador de ejemplo.",
       "batchPoint2": "Al menos un error sembrado para cada una de las {reglas} reglas del motor.",
       "batchPoint3": "{pactadas} servicios con tarifa pactada; el resto se valora con el manual tarifario.",
-      "batchCta": "Abrir el simulador"
+      "batchCta": "Abrir el simulador",
+      "tolerance": "Tolerancia de tarifa guardada",
+      "toleranceDetail": "Manual por defecto: {manual}"
     },
     "search": {
       "title": "Buscar códigos CUPS",
       "subtitle": "Escribe el procedimiento como lo diría tu equipo y encuentra el código.",
       "sourceLabel": "Dónde buscar",
       "sourceSample": "Catálogo de ejemplo",
-      "sourceSampleHint": "Búsqueda por texto en tu navegador ({total} códigos)",
+      "sourceSampleHint": "Búsqueda por palabras en tu navegador ({total} códigos)",
       "sourceServer": "Catálogo del servidor",
-      "sourceServerHint": "Búsqueda semántica con embeddings ({total} códigos)",
-      "sourceServerOff": "No disponible: el catálogo del servidor no tiene códigos con embedding.",
+      "sourceServerHint": "Búsqueda semántica por significado, con vectores ({total} códigos)",
+      "sourceServerOff": "La búsqueda semántica (por significado) usa el catálogo del servidor y se activa cuando ese catálogo tiene códigos vectorizados; hoy no tiene ninguno.",
       "inputLabel": "Procedimiento a buscar",
       "placeholder": "Ej.: radiografía de tórax",
       "button": "Buscar",
@@ -196,7 +208,9 @@
         "limite": "El servidor recibió demasiadas consultas. Espera unos minutos o usa el catálogo de ejemplo.",
         "sin-conexion": "No hay conexión con el servidor de la demo.",
         "servidor": "El servidor respondió con un error. Intenta de nuevo o usa el catálogo de ejemplo."
-      }
+      },
+      "sourceServerUnknown": "La búsqueda semántica en el catálogo del servidor no está disponible porque no hay conexión con el servidor.",
+      "sourceOnlySample": "Buscas por palabras en un catálogo de ejemplo de {total} códigos CUPS, aquí en tu navegador."
     },
     "rules": {
       "title": "Reglas del motor",
@@ -226,8 +240,10 @@
         "servidor": "No se guardó: el servidor respondió con un error."
       },
       "storageTitle": "Dónde se guarda",
-      "storageText": "En esta demo, el servidor del motor guarda una sola configuración en memoria, compartida por quienes usan la demo, que vuelve a los valores por defecto cuando el servidor se reinicia. En tu proyecto se guarda por cliente y por convenio, con historial de cambios.",
-      "codesNote": "Los códigos 101, 102… son la numeración interna del motor. En tu proyecto se mapean a los códigos del manual de glosas vigente."
+      "storageText": "Tu borrador (lo que editas aquí) se conserva en este navegador hasta que lo guardes o lo descartes. Lo guardado vive en el servidor de la demo: una sola configuración en memoria, compartida, que vuelve a los valores por defecto cuando el servidor se reinicia. En tu proyecto se guarda por cliente y por convenio, con historial de cambios.",
+      "codesNote": "Los códigos 101, 102… son la numeración interna de este motor (no coinciden con los de la demo «Sistema experto para salud»). En tu proyecto se mapean a los códigos del manual de glosas vigente.",
+      "teamOnly": "Solo el equipo de KopTup puede guardar en el servidor, porque es una sola configuración compartida por quienes usan la demo. Puedes probar todos tus cambios en el simulador; tu borrador se conserva en este navegador.",
+      "sharedNote": "Lo que guardes aplica para todas las personas que usan esta demo."
     },
     "simulator": {
       "title": "Simulador sobre el lote de ejemplo",
@@ -296,21 +312,29 @@
         "s5Text": "En tu proyecto, el auditor acepta, ajusta o descarta cada glosa antes de comunicarla al prestador."
       },
       "aiTitle": "Qué hace la IA y qué no",
-      "ai1": "Sí: extraer datos de documentos (en tu proyecto) y buscar códigos por significado con embeddings (en el servidor, cuando el catálogo tiene códigos vectorizados).",
+      "ai1": "Sí: extraer datos de documentos (en tu proyecto) y buscar códigos por significado con vectores semánticos (en el servidor, cuando su catálogo tiene códigos vectorizados).",
       "ai2": "No: decidir glosas. Las reglas son condiciones explícitas y auditables.",
       "ai3": "No: radicar ni comunicar glosas sin revisión humana.",
       "realTitle": "Qué es real en esta demo",
-      "realSummary": "Cifras reales que devuelve el servidor de la demo: cuentas, catálogo, vectorización y reglas activas.",
-      "realRules": "Se leen y se guardan en el servidor de la demo (configuración compartida en memoria, que se restablece al reiniciarlo).",
+      "realSummary": "Cifras reales que devuelve el servidor de la demo: reglas activas, tolerancia guardada, catálogo CUPS y códigos vectorizados.",
+      "realRules": "Se leen del servidor de la demo y solo el equipo de KopTup las guarda allí (configuración compartida en memoria, que se restablece al reiniciarlo). Tu borrador se conserva en este navegador.",
       "realSimulator": "Se ejecuta en tu navegador sobre 12 facturas de ejemplo con la configuración que editas.",
-      "realSearch": "Catálogo de ejemplo con búsqueda por texto en tu navegador; catálogo del servidor con búsqueda semántica cuando tiene códigos vectorizados.",
+      "realSearch": "Catálogo de ejemplo de 22 códigos con búsqueda por palabras en tu navegador. La búsqueda semántica del servidor (por significado, con vectores) aparece solo cuando su catálogo tiene códigos vectorizados.",
       "realCodes": "Numeración interna del motor (101, 102…). En tu proyecto se mapea al manual de glosas vigente.",
       "rowCodes": "Códigos de regla",
       "projectTitle": "En tu proyecto",
       "project1": "Configuración por cliente y por convenio, persistente y con historial de cambios.",
       "project2": "Catálogos CUPS y CIE-10 oficiales vigentes, con su fecha de versión.",
       "project3": "Reglas adicionales acordadas con tu equipo de auditoría, con pruebas antes de activarlas.",
-      "project4": "Integración con tu flujo de radicación y respuesta de glosas."
+      "project4": "Integración con tu flujo de radicación y respuesta de glosas.",
+      "rowReading": "Lectura de facturas con IA",
+      "realReading": "No está en esta demo: el lote de ejemplo ya viene estructurado. Se muestra en «Sistema experto para salud», otra demo privada.",
+      "otherTitle": "¿Quieres ver la lectura de facturas con IA?",
+      "otherText": "La extracción de datos de facturas y la auditoría factura por factura están en «Sistema experto para salud», otra demo privada de KopTup.",
+      "otherNeedsInvite": "Esa demo requiere su propia invitación: el acceso a esta no la incluye.",
+      "otherHasAccess": "Tu cuenta ya tiene acceso a esa demo.",
+      "otherOpen": "Abrir Sistema experto para salud",
+      "otherRequest": "Solicitar invitación a esa demo"
     }
   }
 }

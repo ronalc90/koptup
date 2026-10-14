@@ -8,6 +8,19 @@
       "breadcrumbDemos": "Demos",
       "loading": "Loading the demo…"
     },
+    "intro": {
+      "back": "Back to the demo catalog",
+      "guidedDemo": "Request a guided demo",
+      "quote": "Get a quote for your project system",
+      "kicker": "Interactive demo · For companies that work by project",
+      "simBadge": "Notices, invoicing and payments are simulated",
+      "localBadge": "Saved only in this browser",
+      "forWhomLabel": "Who it is for:",
+      "forWhom": "construction firms, agencies, software companies and project offices that report progress by email, WhatsApp and Excel today and want their client to see progress and approve without phone calls.",
+      "startLabel": "Where to start:",
+      "start": "follow the 5 steps in “Try this in 2 minutes”; they are checked off as you do them. You can switch the industry (construction, agency or software) above the board.",
+      "startCta": "See the 5 steps"
+    },
     "common": {
       "close": "Close"
     },
@@ -147,7 +160,12 @@
       "move": "Move a task to the client review column (drag it or use the ⋮ menu): the client is notified (simulated).",
       "client": "Open the client view and approve a deliverable or request changes.",
       "reports": "See hours, budget per milestone and team workload in Reports.",
-      "weekly": "Generate the weekly report as a PDF and the WhatsApp message."
+      "weekly": "Open the weekly report: download it as a PDF and copy the WhatsApp message.",
+      "progress": "{done} of {total} done",
+      "doneSr": "(done)",
+      "allDone": "Done! You have seen the essentials: portfolio, client approval, reports and the weekly report. Want it with your projects, your brand and your integrations?",
+      "allDoneGuided": "Request a guided demo",
+      "allDoneQuote": "Get a quote"
     },
     "kanban": {
       "hint": "Drag cards between columns or use each card's ⋮ menu (works on mobile). Click a title to see the details.",
@@ -235,7 +253,8 @@
       "state": {
         "complete": "Finished",
         "late": "Overdue",
-        "open": "In progress"
+        "open": "In progress",
+        "closed": "Sprint closed"
       },
       "progress": "Progress",
       "spent": "Spent: {cost} of {budget}",
@@ -276,7 +295,11 @@
       "csvHours": "Hours",
       "csvCost": "Cost (COP)",
       "csvNote": "Note",
-      "hoursFile": "hours"
+      "hoursFile": "hours",
+      "invoiced": "Invoiced: {value} + VAT",
+      "invoicedByProgress": "for the finished work ({pct}%)",
+      "noBillingValue": "Set the amount to invoice in Project settings › Milestones and budget",
+      "progressAtClose": "Progress when closed"
     },
     "billing": {
       "title": "Bill milestone",
@@ -294,7 +317,13 @@
       "total": "Total",
       "simulatedTitle": "Simulated in the demo",
       "simulatedBody": "A sample pro forma is created here and the notice to the client is recorded. In your project it connects to your e-invoicing software (for example, Siigo or Alegra) and your payment gateway (for example, Wompi or PayU) to send the payment link.",
-      "sentNote": "The notice to {who} was recorded (simulated)."
+      "sentNote": "The notice to {who} was recorded (simulated).",
+      "basisTitle": "How much of this sprint to invoice?",
+      "basisHint": "The sprint was closed with {pct}% of the work finished (by estimated hours); the rest moved to the next sprint.",
+      "basisAgreed": "Agreed sprint fee: {value}",
+      "basisProgress": "Proportional to the finished work ({pct}%): {value}",
+      "conceptSprint": "Closed sprint: {name}",
+      "conceptProgress": "{name}: finished work ({pct}% of the sprint)"
     },
     "weekly": {
       "title": "Weekly report: {project}",
@@ -322,7 +351,8 @@
       "email": "Email to {who}",
       "whatsapp": "WhatsApp",
       "simulated": "Simulated in the demo: no message is sent. In your project it goes out by email and WhatsApp Business (with Meta-approved templates), for example every Monday.",
-      "history": "Recorded sends"
+      "history": "Recorded sends",
+      "introClient": "This is how you receive the report from {company}: it is calculated from the project progress right now."
     },
     "outbox": {
       "channel": {
@@ -423,12 +453,12 @@
       "mentionSent": "{names} will be notified (simulated in the demo)",
       "attachments": "Attachments ({count})",
       "attach": "Attach file",
-      "attachHint": "Sample documents are generated as PDFs when you download them. Files you attach stay only in your browser during this session.",
+      "attachHint": "Sample documents are generated as PDFs when you download them. Files you attach (up to 10 MB) are saved only in this browser: nothing is uploaded to a server.",
       "fileTooBig": "The file is larger than 10 MB.",
       "attached": "You attached {name}",
       "noAttachments": "No attachments.",
       "sampleDoc": "Sample PDF · generated on download",
-      "uploadedDoc": "Uploaded by you · {size} KB · this session only",
+      "uploadedDoc": "Uploaded by you · {size} KB · saved in this browser",
       "download": "Download",
       "removeAttachment": "Remove {name}",
       "history": "History",
@@ -440,7 +470,8 @@
       "deleteTitle": "Delete the task?",
       "deleteBody": "“{task}” and its logged hours will be deleted. This cannot be undone.",
       "cancel": "Cancel",
-      "deleteConfirm": "Delete"
+      "deleteConfirm": "Delete",
+      "attachedSessionOnly": "You attached {name}, but this browser does not allow saving it: it disappears when you reload."
     },
     "history": {
       "automation": "Automation",
@@ -595,15 +626,18 @@
       "closed": "closed",
       "milestoneSaved": "Milestone updated",
       "moneyPreview": "Budget: {budget} · To bill: {billing}",
-      "teamHint": "People in the workspace with their hourly cost (for the spent budget) and weekly capacity (for team workload).",
+      "teamHint": "People in the workspace. Change the hourly cost (used for the spent budget) and the weekly capacity (used for team workload): reports are recalculated when you save.",
       "you": "You",
-      "rate": "{rate} per hour",
-      "capacity": "{hours} h per week",
       "plan": {
         "pro": "Professional plan",
         "enterprise": "Enterprise plan",
         "custom": "Quoted separately"
-      }
+      },
+      "rateLabel": "Hourly cost (COP)",
+      "capacityLabel": "Hours per week",
+      "memberSaved": "{name} updated",
+      "memberPreview": "{rate} per hour · {hours} h per week",
+      "capacityInvalid": "Enter between 1 and 80 hours per week."
     },
     "integrations": {
       "intro": "These connections are not active in the demo. They are set up in your implementation according to the plan and scope you choose.",
@@ -660,9 +694,10 @@
       "city": "City",
       "budget": "Total budget (COP, optional)",
       "color": "Color",
-      "datesNote": "Task dates are calculated from today in business days. The budget is split evenly across milestones.",
+      "datesNote": "Task dates are calculated from today in business days. The budget and the contract value are split evenly across milestones (you can adjust them in Project settings).",
       "created": "Project “{name}” created with {count, plural, =0 {no tasks} one {# task} other {# tasks}}",
-      "blankMilestone": "Phase 1"
+      "blankMilestone": "Phase 1",
+      "contract": "Contract value before VAT (COP, optional)"
     },
     "templates": {
       "remodelacion": {
@@ -793,7 +828,7 @@
         "fotos": "Photo log"
       },
       "footer": "Generated in the browser by the project management demo. Companies, clients, tax IDs and people are fictitious.",
-      "uploadGone": "The file is no longer available: attachments are kept only during the session you uploaded them in.",
+      "uploadGone": "The file is no longer available in this browser (site data was cleared or it was attached on another device).",
       "weeklyFile": "weekly-report",
       "weeklyTitle": "Weekly report: {project}",
       "weeklyPeriod": "{from} to {to} · Client: {client}",
@@ -826,11 +861,12 @@
       "value": "Amount",
       "invoiceConcept": "Finished milestone: {milestone}",
       "iva": "VAT 19%",
-      "invoiceNote": "Sample document with no tax validity. In your implementation, the e-invoice is issued by your invoicing software (for example, Siigo or Alegra) and payment is collected through your payment gateway."
+      "invoiceNote": "Sample document with no tax validity. In your implementation, the e-invoice is issued by your invoicing software (for example, Siigo or Alegra) and payment is collected through your payment gateway.",
+      "invoiceConceptProgress": "{milestone}: finished work ({pct}% of the sprint)"
     },
     "footer": {
-      "sample": "Sample data: companies, clients, tax IDs, people and figures are fictitious. Dates are calculated from the day you open the demo. Records are in Spanish because they belong to fictitious Colombian companies.",
-      "storage": "Your changes are saved only in this browser (7 days). Nothing is sent to a server.",
+      "sample": "Sample data: companies, clients, tax IDs, people and figures are fictitious. Dates are calculated from the day you open the demo, using Colombia’s date and time. Records are in Spanish because they belong to fictitious Colombian companies.",
+      "storage": "Your changes and the files you attach are saved only in this browser (7 days). Nothing is sent to a server and nobody else sees them.",
       "integrations": "Email and WhatsApp notices, invoicing and payments are simulated; in your project they connect to your services.",
       "ai": "This demo doesn't use artificial intelligence: the indicators come from visible rules applied to the data."
     }

@@ -7,6 +7,7 @@ import { titleOf } from '../lib/models';
 import { useCms } from '../lib/store';
 import { formatDateTime } from '../lib/time';
 import { STATUSES, TOUR_STEPS, type TourStep } from '../lib/types';
+import { CommercialLinks } from './Commercial';
 import { btn, card, STATUS_COLORS, TypeBadge, useUntil } from './ui';
 
 const TOUR_TARGET: Record<TourStep, { view?: 'models'; entry?: string }> = {
@@ -64,18 +65,39 @@ export default function Dashboard() {
               const target = TOUR_TARGET[s];
               return (
                 <li key={s} className="flex items-start gap-3">
-                  {ok ? <CheckSolid className="w-6 h-6 text-emerald-600 shrink-0" aria-label={t('stepDone')} /> : <span className="w-6 h-6 shrink-0 rounded-full border-2 border-slate-300 dark:border-slate-600 text-xs font-bold text-slate-500 flex items-center justify-center">{i + 1}</span>}
+                  {ok ? (
+                    <span role="img" aria-label={t('stepDone')} className="shrink-0">
+                      <CheckSolid className="w-6 h-6 text-emerald-600" />
+                    </span>
+                  ) : (
+                    <span className="w-6 h-6 shrink-0 rounded-full border-2 border-slate-300 dark:border-slate-600 text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center justify-center" aria-hidden="true">
+                      {i + 1}
+                    </span>
+                  )}
                   <div className="min-w-0 flex-1">
                     <p className={`text-sm font-semibold ${ok ? 'text-slate-500 dark:text-slate-400' : 'text-slate-900 dark:text-white'}`}>{t(`tour.${s}.title`)}</p>
                     <p className="text-xs text-slate-600 dark:text-slate-400">{t(`tour.${s}.desc`)}</p>
                   </div>
-                  <button type="button" className={btn.small} onClick={() => (target.view ? go(target.view) : target.entry && openEntry(target.entry))} disabled={!!target.entry && !state.entries.some((e) => e.id === target.entry)}>
+                  <button
+                    type="button"
+                    className={btn.small}
+                    onClick={() => (target.view ? go(target.view) : target.entry && openEntry(target.entry))}
+                    disabled={!!target.entry && !state.entries.some((e) => e.id === target.entry)}
+                    aria-label={`${t('go')}: ${t(`tour.${s}.title`)}`}
+                  >
                     {t('go')}
                   </button>
                 </li>
               );
             })}
           </ol>
+          {done === TOUR_STEPS.length && (
+            <div className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-900 dark:bg-emerald-950/40" role="status">
+              <p className="font-semibold text-emerald-900 dark:text-emerald-100">{t('tourDoneTitle')}</p>
+              <p className="mt-1 text-sm text-emerald-900/90 dark:text-emerald-100/90">{t('tourDoneBody')}</p>
+              <CommercialLinks className="mt-3" />
+            </div>
+          )}
         </section>
 
         <section className={`${card} p-5 lg:col-span-2`} aria-labelledby="cms-truth-title">

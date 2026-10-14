@@ -1,14 +1,15 @@
 {
   "offeringsCatalog": {
     "section": {
+      "eyebrow": "¿Buscas algo distinto a un asistente que responde con tus documentos?",
       "title": "Otras soluciones a medida",
-      "subtitle": "Elige cómo quieres trabajar con nosotros: compra el software (te entregamos el código) o suscríbete al SaaS mensual (lo hospedamos nosotros)."
+      "subtitle": "Los planes de arriba son los del asistente RAG. Lo que sigue son otros productos, con precios propios: compra el software (te entregamos el código) o suscríbete al SaaS mensual (lo hospedamos nosotros)."
     },
     "search": "Buscar...",
     "modality": {
       "label": "Modalidad",
       "compra": "Comprar el software",
-      "compraDesc": "One-time setup + mantenimiento opcional. El código fuente queda en tu poder.",
+      "compraDesc": "Pago único de implementación y mantenimiento opcional. El código fuente queda en tu poder.",
       "saas": "Suscripción SaaS mensual",
       "saasDesc": "Lo hospedamos nosotros, pagas una mensualidad y cancelas cuando quieras."
     },
@@ -22,7 +23,7 @@
       "label": "Moneda",
       "cop": "COP",
       "usd": "USD",
-      "trmReference": "Precios fijados en COP. El valor en USD es una referencia calculada con una TRM de {value} por dólar."
+      "trmReference": "Los precios de estas soluciones se fijan en COP; el valor en USD es una referencia calculada con una TRM de {value} por dólar. (Los planes RAG de arriba tienen precio fijo en COP y en USD.)"
     },
     "card": {
       "viewMore": "Ver más detalles",
@@ -58,7 +59,7 @@
     },
     "banner": {
       "title": "Cómo escalamos",
-      "body": "Equipo basado en Colombia opera Lun–Vie 8AM–5PM. Construimos software alineado con HIPAA/SOC 2/ISO 27001 pero la certificación formal corre por cuenta del cliente. Si necesitas un alcance mayor al Enterprise, cotizamos personalizado en 48h hábiles."
+      "body": "Equipo basado en Colombia que atiende de lunes a viernes, de 8:00 a. m. a 6:00 p. m. (hora de Colombia). Si tu proyecto debe cumplir normas como ISO 27001, SOC 2 o HIPAA, lo diseñamos con esos requisitos; la certificación formal la tramita tu empresa. Si necesitas un alcance mayor al del nivel más alto, cotizamos personalizado en 48 horas hábiles."
     },
     "supportSLA": {
       "email-24h": "Email horario laboral · 24h hábiles",

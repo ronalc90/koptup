@@ -4,13 +4,17 @@
  * conocimiento de esta demo.
  *
  * Usa las rutas reales del chatbot RAG (`/api/chatbot`):
- *   1. La primera vez crea un bot (`POST /bots`) y le sube los artículos como
- *      documentos de texto (`POST /bots/:id/docs`). El id queda en
- *      localStorage para reutilizarlo; si el servidor lo perdió, se recrea.
+ *   1. La primera vez crea un bot de ejemplo (`POST /bots` con `kind: "sample"`:
+ *      el servidor no guarda sus conversaciones y lo borra tras 30 días sin
+ *      uso) y le sube los artículos como documentos de texto
+ *      (`POST /bots/:id/docs`). El id queda en localStorage para
+ *      reutilizarlo; si el servidor lo perdió, se recrea.
  *   2. Cada borrador es una pregunta a `POST /bots/:id/chat`: el backend busca
  *      los fragmentos relevantes (BM25) y, si tiene clave de OpenAI, llama al
- *      modelo con reglas para no inventar y citar la fuente. Sin clave
- *      responde en modo extractivo (los fragmentos tal cual) y la UI lo dice.
+ *      modelo con reglas para no inventar y citar la fuente (con el tope de
+ *      gasto mensual del chatbot). Sin clave, sin cupo o si el proveedor
+ *      falla responde en modo extractivo (los fragmentos tal cual) y la UI lo
+ *      dice. No se envía `channel`, así que el servidor no guarda la pregunta.
  */
 import { BACKEND_URL } from '@/lib/backend-url';
 
@@ -23,7 +27,12 @@ const UPLOAD_BATCH = 5;
 /** Largo máximo de la pregunta que acepta el backend (2000) con margen. */
 export const MAX_MESSAGE_CHARS = 1900;
 
-export type AiErrorKind = 'network' | 'rateLimited' | 'server';
+/**
+ * `rateLimitedCreate`: se alcanzó el límite de bots nuevos por hora desde la
+ * misma conexión (POST /bots). `rateLimited`: demasiadas preguntas seguidas
+ * (límite por minuto).
+ */
+export type AiErrorKind = 'network' | 'rateLimited' | 'rateLimitedCreate' | 'server';
 
 export class AiError extends Error {
   readonly kind: AiErrorKind;
@@ -52,6 +61,8 @@ export interface AiDraft {
   /** El servidor respondió con el modelo de IA (no en modo extractivo). */
   llm: boolean;
   providerError: boolean;
+  /** Modo extractivo por el tope de gasto mensual o porque no se pudo medir. */
+  budget: 'exhausted' | 'unavailable' | null;
   latencyMs: number;
   costUSD: number | null;
 }
@@ -125,10 +136,16 @@ export interface KbBot {
 const ownerHeaders = (token: string | null): Record<string, string> => (token ? { [OWNER_HEADER]: token } : {});
 
 async function createBot(lang: string, docs: KbDoc[], persona: string, name: string): Promise<KbBot> {
-  const created = await call<{ botId: string; ownerToken?: string }>('/bots', {
-    method: 'POST',
-    body: JSON.stringify({ name, systemPrompt: persona, tone: 'friendly', languages: [lang], avatar: '🎧', color: '#e11d48' }),
-  });
+  let created: { botId: string; ownerToken?: string };
+  try {
+    created = await call<{ botId: string; ownerToken?: string }>('/bots', {
+      method: 'POST',
+      body: JSON.stringify({ name, systemPrompt: persona, tone: 'friendly', languages: [lang], avatar: '🎧', color: '#e11d48', kind: 'sample' }),
+    });
+  } catch (err) {
+    if (err instanceof AiError && err.kind === 'rateLimited') throw new AiError('rateLimitedCreate', 'HTTP 429 (bots)');
+    throw err;
+  }
   const ownerToken = typeof created.ownerToken === 'string' && created.ownerToken ? created.ownerToken : null;
   // El backend acepta hasta 5 archivos por petición: se suben por lotes.
   for (let i = 0; i < docs.length; i += UPLOAD_BATCH) {
@@ -204,6 +221,7 @@ export async function draftReply(bot: KbBot, message: string): Promise<AiDraft> 
     model,
     llm: model !== '' && !model.startsWith('extractive'),
     providerError: r.error === 'llm_provider_error',
+    budget: r.error === 'budget_exhausted' ? 'exhausted' : r.error === 'budget_unavailable' ? 'unavailable' : null,
     latencyMs: typeof r.latencyMs === 'number' ? r.latencyMs : 0,
     costUSD: typeof r.costUSD === 'number' ? r.costUSD : null,
   };
@@ -215,4 +233,23 @@ export function stripCitations(text: string): string {
     .replace(/\s*\[\d+\](?:\s*\[\d+\])*/g, '')
     .replace(/[ \t]+\n/g, '\n')
     .trim();
+}
+
+export interface AiSourceGroup {
+  name: string;
+  items: AiSource[];
+}
+
+/**
+ * Agrupa las fuentes por artículo: el servidor puede devolver dos fragmentos
+ * del mismo artículo con citas distintas ([1] y [2]).
+ */
+export function groupSources(sources: AiSource[]): AiSourceGroup[] {
+  const groups: AiSourceGroup[] = [];
+  for (const s of sources) {
+    const g = groups.find((x) => x.name === s.name);
+    if (g) g.items.push(s);
+    else groups.push({ name: s.name, items: [s] });
+  }
+  return groups;
 }

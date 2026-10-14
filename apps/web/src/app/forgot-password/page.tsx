@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 import Button from '@/components/ui/Button';
 import Card, { CardContent } from '@/components/ui/Card';
 import { EnvelopeIcon, ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 
 export default function ForgotPasswordPage() {
+  const t = useTranslations('passwordRecovery.forgot');
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -24,7 +26,7 @@ export default function ForgotPasswordPage() {
       await api.requestPasswordReset(email);
       setSuccess(true);
     } catch (err: any) {
-      setError('Ocurrió un error al enviar el correo. Por favor intenta nuevamente.');
+      setError(t('error'));
     } finally {
       setIsLoading(false);
     }
@@ -43,11 +45,11 @@ export default function ForgotPasswordPage() {
               KopTup
             </span>
           </Link>
-          <h2 className="mt-6 text-3xl font-bold text-secondary-900 dark:text-white">
-            Recuperar contraseña
-          </h2>
+          <h1 className="mt-6 text-3xl font-bold text-secondary-900 dark:text-white">
+            {t('title')}
+          </h1>
           <p className="mt-2 text-sm text-secondary-600 dark:text-secondary-400">
-            Te enviaremos un enlace para restablecer tu contraseña
+            {t('subtitle')}
           </p>
         </div>
 
@@ -59,22 +61,23 @@ export default function ForgotPasswordPage() {
                   <CheckCircleIcon className="h-16 w-16 text-green-500" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-secondary-900 dark:text-white mb-2">
-                    Correo enviado
-                  </h3>
+                  <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-2">
+                    {t('successTitle')}
+                  </h2>
+                  {/* El backend responde igual exista o no la cuenta: no se afirma que el correo salió. */}
                   <p className="text-sm text-secondary-600 dark:text-secondary-400">
-                    Hemos enviado un enlace de recuperación a <span className="font-semibold">{email}</span>
+                    {t.rich('successBody', { email, strong: (chunks) => <span className="font-semibold">{chunks}</span> })}
                   </p>
                   <p className="text-sm text-secondary-600 dark:text-secondary-400 mt-2">
-                    Revisa tu bandeja de entrada y sigue las instrucciones para restablecer tu contraseña.
+                    {t('successHint')}
                   </p>
                 </div>
-                <Link href="/login">
-                  <Button fullWidth variant="outline">
+                <Button fullWidth variant="outline" asChild>
+                  <Link href="/login">
                     <ArrowLeftIcon className="h-5 w-5 mr-2" />
-                    Volver al inicio de sesión
-                  </Button>
-                </Link>
+                    {t('backToLogin')}
+                  </Link>
+                </Button>
               </div>
             ) : (
               <>
@@ -88,7 +91,7 @@ export default function ForgotPasswordPage() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div>
                     <label htmlFor="email" className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                      Correo electrónico
+                      {t('email')}
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -103,7 +106,7 @@ export default function ForgotPasswordPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="block w-full pl-10 pr-3 py-3 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white placeholder-secondary-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                        placeholder="tu@email.com"
+                        placeholder={t('emailPlaceholder')}
                       />
                     </div>
                   </div>
@@ -114,14 +117,14 @@ export default function ForgotPasswordPage() {
                     fullWidth
                     disabled={isLoading}
                   >
-                    {isLoading ? 'Enviando...' : 'Enviar enlace de recuperación'}
+                    {isLoading ? t('submitting') : t('submit')}
                   </Button>
                 </form>
 
                 <div className="mt-6 text-center">
                   <Link href="/login" className="inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-500">
                     <ArrowLeftIcon className="h-4 w-4 mr-2" />
-                    Volver al inicio de sesión
+                    {t('backToLogin')}
                   </Link>
                 </div>
               </>
@@ -132,7 +135,7 @@ export default function ForgotPasswordPage() {
         {/* Back to Home */}
         <p className="text-center">
           <Link href="/" className="text-sm text-secondary-600 dark:text-secondary-400 hover:text-secondary-900 dark:hover:text-white">
-            Volver al inicio
+            {t('backHome')}
           </Link>
         </p>
       </div>

@@ -7,7 +7,7 @@ import { PlusIcon } from '@heroicons/react/24/outline';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import { BOMS, ITEMS, ITEM_BY_SKU, explodeBom } from '../lib/catalog';
-import { periodRange, stockOf, valuationAt } from '../lib/engine';
+import { stockOf, valuationAt } from '../lib/engine';
 import { opMatches } from '../lib/search';
 import { pad } from '../lib/seed';
 import { useErp } from '../lib/store';
@@ -17,6 +17,7 @@ import { Empty, FieldLabel, Modal, MoreButton, Note, SectionHeader, btn, inputCl
 
 export default function ManufacturingModule() {
   const t = useTranslations('demoErp.manufacturing');
+  const tc = useTranslations('demoErp.common');
   const { state, computed, filters, dispatch, ensureOpenPeriod } = useErp();
   const f = useFmt();
   const [bomSku, setBomSku] = useState(BOMS[0].sku);
@@ -24,7 +25,7 @@ export default function ManufacturingModule() {
   const openPoFor = useOpenPoFor();
   const createPo = useCreateReorderPo();
   const current = useMemo(() => valuationAt(computed.movements, '9999-12-31'), [computed]);
-  const r = periodRange(filters.period);
+  const r = useErp().range;
 
   const orders = useMemo(
     () =>
@@ -77,12 +78,12 @@ export default function ManufacturingModule() {
   const start = (o: ProductionOrder) => {
     if (shortagesFor(o).length) return;
     dispatch({ type: 'startOp', id: o.id });
-    if (ensureOpenPeriod()) toast(t('periodSwitched'));
+    ensureOpenPeriod();
     toast.success(t('toasts.started', { doc: o.no }));
   };
   const finish = (o: ProductionOrder) => {
     dispatch({ type: 'finishOp', id: o.id });
-    if (ensureOpenPeriod()) toast(t('periodSwitched'));
+    ensureOpenPeriod();
     toast.success(t('toasts.finished', { doc: o.no, qty: f.qty(o.qty), item: f.item(o.sku) }));
   };
 
@@ -137,7 +138,7 @@ export default function ManufacturingModule() {
           </button>
         </SectionHeader>
         {orders.length === 0 ? (
-          <Empty>{t('orders.empty')}</Empty>
+          <Empty>{filters.search.trim() ? tc('noResults') : t('orders.empty')}</Empty>
         ) : (
           <div className="space-y-3">
             {pager.visible.map((o) => {
@@ -295,7 +296,7 @@ function OpForm({ initial, onClose }: { initial: { sku: string; qty: number }; o
     if (!q || q <= 0 || q > 50000) return setError(t('form.errorQty'));
     const n = state.counters.OP;
     dispatch({ type: 'createOp', sku, qty: q });
-    if (ensureOpenPeriod()) toast(t('periodSwitched'));
+    ensureOpenPeriod();
     toast.success(t('toasts.created', { doc: `OP-${pad(n)}` }));
     onClose();
   };

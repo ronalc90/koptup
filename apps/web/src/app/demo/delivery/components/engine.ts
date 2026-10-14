@@ -4,7 +4,7 @@
 // así el servidor y el navegador muestran lo mismo y se puede probar.
 
 import type {
-  CartLine, Driver, MenuItem, Order, Place, Pricing, Sede, SedeId, Stage, Vehicle, ZoneId,
+  CartLine, Driver, MenuItem, Order, PaymentId, Place, Pricing, Sede, SedeId, Stage, Vehicle, ZoneId,
 } from './types';
 
 // ---------------------------------------------------------------------------
@@ -29,8 +29,15 @@ export const ACCEPT_WINDOW_S = 45;
 export const DRIVER_BASE_PAY = 4000;
 export const DRIVER_PAY_PER_KM = 700;
 export const TIP_OPTIONS = [0, 2000, 3000, 5000];
+/** Medios de pago en línea (los demás se pagan al recibir). */
+export const ONLINE_PAYMENTS: PaymentId[] = ['nequi', 'daviplata', 'pse', 'card'];
 export const BIG_CASH_LIMIT = 200000;
 export const GPS_FAR_M = 300;
+/**
+ * Fecha de referencia de los datos de ejemplo. Es la que se usa en el primer
+ * render (servidor y navegador iguales); al montar, la demo pasa a la fecha de
+ * hoy en Colombia (ver `todayInBogota`) y corre los vencimientos con ella.
+ */
 export const DEMO_DATE = '2026-10-08';
 
 export function km(a: Place, b: Place): number {
@@ -318,6 +325,38 @@ export function driverPay(o: Order, sedes: Sede[]): number {
 }
 
 // ---------------------------------------------------------------------------
+// Reloj de la demo: cuándo pasa cada etapa
+// ---------------------------------------------------------------------------
+// El reloj avanza en tiempo real, pero preparar, ir a la sede y llevar el pedido
+// toman minutos. Al marcar «listo», «recogido» o «entregado», la demo adelanta
+// el reloj hasta el momento en que eso pasaría, para que los tiempos sean reales.
+
+/** Cuándo termina la preparación que eligió la sede. */
+export function readyAt(o: Order): number {
+  return (o.t.accepted ?? o.t.created) + (o.prepMin ?? 15) * 60;
+}
+
+/** Cuándo se puede recoger: el pedido está listo y el repartidor ya llegó a la sede. */
+export function pickupAt(o: Order, driver: Driver | undefined, sede: Sede): number {
+  const ready = o.t.ready ?? readyAt(o);
+  if (!driver) return ready;
+  const arrive = (o.t.assigned ?? ready) + travelMin(km(driver.place, sede.place), driver.vehicle) * 60;
+  return Math.max(ready, arrive);
+}
+
+/** Cuándo llega el repartidor a la dirección del cliente. */
+export function deliverAt(o: Order, driver: Driver | undefined, sede: Sede): number {
+  return (o.t.pickedUp ?? o.t.created) + travelMin(km(sede.place, o.customer.place), driver?.vehicle) * 60;
+}
+
+/** Llegada estimada que ve el cliente (y la del WhatsApp): en camino, salida + trayecto; antes, la hora prometida. */
+export function orderEta(o: Order, driver: Driver | undefined, sede: Sede): number | null {
+  if (o.stage === 'pickedUp' && o.t.pickedUp) return deliverAt(o, driver, sede);
+  if (o.promisedMin) return o.t.created + o.promisedMin * 60;
+  return null;
+}
+
+// ---------------------------------------------------------------------------
 // Reportes (todo calculado desde los pedidos)
 // ---------------------------------------------------------------------------
 
@@ -543,15 +582,31 @@ export function streetName(street: 'calle' | 'carrera', num: number): string {
 }
 
 /** Días entre la fecha de la demo y una fecha AAAA-MM-DD (negativo = ya pasó). */
-export function daysUntil(date: string, today = DEMO_DATE): number {
-  const p = (s: string) => {
-    const [y, m, d] = s.split('-').map((x) => parseInt(x, 10));
-    return Date.UTC(y, m - 1, d);
-  };
-  return Math.round((p(date) - p(today)) / 86400000);
+export function daysUntil(date: string, today: string): number {
+  return Math.round((utcDay(date) - utcDay(today)) / 86400000);
 }
 
-export function docStatus(expires: string | undefined, today = DEMO_DATE): 'valid' | 'expiring' | 'expired' {
+function utcDay(s: string): number {
+  const [y, m, d] = s.split('-').map((x) => parseInt(x, 10));
+  return Date.UTC(y, m - 1, d);
+}
+
+/** Suma días a una fecha AAAA-MM-DD (sin depender de la zona horaria). */
+export function shiftDate(date: string, days: number): string {
+  return new Date(utcDay(date) + days * 86400000).toISOString().slice(0, 10);
+}
+
+/**
+ * Fecha de hoy en Colombia (AAAA-MM-DD). Depende del reloj del navegador:
+ * llámala solo después de montar (en un efecto), nunca en el primer render.
+ */
+export function todayInBogota(now: Date = new Date()): string {
+  const parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(now);
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? '';
+  return `${get('year')}-${get('month')}-${get('day')}`;
+}
+
+export function docStatus(expires: string | undefined, today: string): 'valid' | 'expiring' | 'expired' {
   if (!expires) return 'valid';
   const d = daysUntil(expires, today);
   if (d < 0) return 'expired';

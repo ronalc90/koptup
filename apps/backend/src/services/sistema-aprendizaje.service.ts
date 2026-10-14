@@ -11,6 +11,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import OpenAI from 'openai';
+import { createOpenAIClient } from './openai.service';
 
 /**
  * Decisión tomada por la IA con metadatos completos
@@ -71,7 +72,8 @@ class SistemaAprendizajeService {
   constructor() {
     const apiKey = process.env.OPENAI_API_KEY;
     if (apiKey) {
-      this.openai = new OpenAI({ apiKey });
+      // Cliente con el tope mensual de gasto de las APIs de salud (HEALTH_MONTHLY_BUDGET_USD).
+      this.openai = createOpenAIClient({ feature: 'health', apiKey });
     }
 
     // Rutas para almacenar decisiones y datos de training

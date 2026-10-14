@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import {
@@ -17,12 +17,12 @@ import {
 } from '@heroicons/react/24/outline';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { DEMO_TODAY, PREFIXES, RESOLUTION, type BillingDoc, type DocType, type HistoryEntry } from './data';
-import { colombiaNow, cufeInput, docTotals, formatDate, nextNumber } from './docs';
+import { PREFIXES, type BillingDoc, type DocType, type HistoryEntry } from './data';
+import { cufeInput, docTotals, formatDate, nextNumber } from './docs';
 import { draftForType, draftLines, draftParty, isNote, validateDraft } from './draft';
-import { addDays, computeTotals, formatCOP, groupThousands, sha384Hex } from './fiscal';
+import { addDays, colombiaNow, computeTotals, formatCOP, groupThousands, sha384Hex } from './fiscal';
 import { BuyerForm, IssuesList, LinesEditor, NoteForm, PaymentFields, PosBuyer, TotalsSummary } from './EmissionForms';
-import { QrSvg, SectionTitle, StatusBadge, useMonths } from './ui';
+import { focusRing, onTabsKeyDown, QrSvg, SectionTitle, StatusBadge, useMonths } from './ui';
 import { qrText } from './docs';
 import type { BillingStore, EmissionTab } from './useBillingStore';
 import { useDocActions } from './useDocActions';
@@ -36,11 +36,15 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 export function EmissionPanel({ store }: { store: BillingStore }) {
   const t = useTranslations('demoBilling');
   const months = useMonths();
-  const { state, draft, setDraft, tab, setTab, successId, setSuccessId, addDoc, updateDoc, markProgress, setDianDown, setDetailId } = store;
+  const { state, today, resolution, draft, setDraft, tab, setTab, successId, setSuccessId, addDoc, updateDoc, markProgress, setDianDown, setDetailId } = store;
   const { downloadPdf, downloadXml } = useDocActions(store);
   const [phase, setPhase] = useState<Phase | null>(null);
   const [failedAt, setFailedAt] = useState<Phase | null>(null);
   const [transmitting, setTransmitting] = useState<string | null>(null);
+  // Al terminar de emitir, el resultado reemplaza al formulario (más corto): se lleva el
+  // foco y la vista al resultado para que no quede fuera de la pantalla.
+  const resultRef = useRef<HTMLHeadingElement>(null);
+  const revealResult = useRef(false);
 
   const issuer = state.issuer;
   const docType: DocType = tab === 'contingencia' ? draft.type : tab;
@@ -54,7 +58,7 @@ export function EmissionPanel({ store }: { store: BillingStore }) {
   );
   const party = draftParty(draft, ref);
   const totals = computeTotals(lines, party);
-  const issues = validateDraft(draft, state.docs, ref, lines, issuer.prefix);
+  const issues = validateDraft(draft, state.docs, ref, lines, issuer.prefix, resolution.to);
   const prefix = docType === 'factura' ? issuer.prefix : PREFIXES[docType];
   const next = nextNumber(state.docs, docType, prefix);
   const busy = phase !== null || transmitting !== null;
@@ -65,20 +69,20 @@ export function EmissionPanel({ store }: { store: BillingStore }) {
     if (busy || issues.length > 0 || tab === 'contingencia') return;
     setFailedAt(null);
     const id = `${prefix}${next}`;
-    const { time } = colombiaNow();
+    const { date, time } = colombiaNow();
     const hhmm = time.slice(0, 5);
     const doc: BillingDoc = {
       id,
       type: docType,
       prefix,
       number: next,
-      issueDate: DEMO_TODAY,
+      issueDate: date,
       issueTime: `${time}-05:00`,
       client: party,
       lines: lines.map((l, i) => ({ ...l, id: `${id}-l${i + 1}` })),
       paymentForm: docType === 'pos' || isNote(docType) ? 'contado' : draft.paymentForm,
       paymentMethod: draft.paymentMethod,
-      dueDate: docType === 'factura' && draft.paymentForm === 'credito' ? addDays(DEMO_TODAY, draft.creditDays) : undefined,
+      dueDate: docType === 'factura' && draft.paymentForm === 'credito' ? addDays(date, draft.creditDays) : undefined,
       status: 'accepted',
       cufe: '',
       refId: isNote(docType) ? ref?.id : undefined,
@@ -98,7 +102,7 @@ export function EmissionPanel({ store }: { store: BillingStore }) {
       setPhase(s);
       await sleep(PHASE_MS);
     }
-    const h = (key: HistoryEntry['key'], detail?: string): HistoryEntry => ({ date: DEMO_TODAY, time: hhmm, key, detail });
+    const h = (key: HistoryEntry['key'], detail?: string): HistoryEntry => ({ date, time: hhmm, key, detail });
     if (down) {
       doc.status = 'contingency';
       doc.history = [h('xml'), h('signed'), h('queued')];
@@ -112,13 +116,26 @@ export function EmissionPanel({ store }: { store: BillingStore }) {
     if (docType === 'factura') markProgress('invoice');
     if (docType === 'notaCredito') markProgress('creditNote');
     setPhase(null);
+    revealResult.current = true;
     setSuccessId(id);
   };
+
+  useEffect(() => {
+    if (!success || !revealResult.current) return;
+    revealResult.current = false;
+    const heading = resultRef.current;
+    if (!heading) return;
+    heading.focus({ preventScroll: true });
+    const r = heading.getBoundingClientRect();
+    if (r.top < 96 || r.bottom > window.innerHeight) document.getElementById('emision')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [success]);
 
   const another = () => {
     setSuccessId(null);
     setFailedAt(null);
     setDraft(() => draftForType(docType));
+    // El botón desaparece con el resultado: el foco vuelve a la pestaña activa.
+    document.getElementById(`fe-tab-${tab}`)?.focus();
   };
 
   const transmitQueue = async () => {
@@ -128,8 +145,8 @@ export function EmissionPanel({ store }: { store: BillingStore }) {
     for (const d of pending) {
       setTransmitting(d.id);
       await sleep(PHASE_MS * 2);
-      const { time } = colombiaNow();
-      const entry = (key: HistoryEntry['key'], detail?: string): HistoryEntry => ({ date: DEMO_TODAY, time: time.slice(0, 5), key, detail });
+      const now = colombiaNow();
+      const entry = (key: HistoryEntry['key'], detail?: string): HistoryEntry => ({ date: now.date, time: now.time.slice(0, 5), key, detail });
       updateDoc(d.id, (x) => ({
         ...x,
         status: 'accepted',
@@ -165,25 +182,35 @@ export function EmissionPanel({ store }: { store: BillingStore }) {
   );
 
   return (
-    <Card variant="bordered" padding="md" className="lg:col-span-3 min-w-0" id="emision">
+    <Card variant="bordered" padding="md" className="lg:col-span-3 min-w-0 scroll-mt-24" id="emision">
       <SectionTitle
         icon={<DocumentPlusIcon className="w-5 h-5" />}
         title={t('emission.title')}
         subtitle={t('emission.subtitle')}
       />
-      <div role="tablist" aria-label={t('emission.title')} className="flex flex-wrap gap-2 mb-4">
+      <div
+        role="tablist"
+        aria-label={t('emission.title')}
+        className="flex flex-wrap gap-2 mb-4"
+        onKeyDown={(e) => !busy && onTabsKeyDown(e, TABS, tab, setTab)}
+      >
         {TABS.map((k) => {
           const active = k === tab;
           return (
             <button
               key={k}
+              id={`fe-tab-${k}`}
               type="button"
               role="tab"
               aria-selected={active}
+              aria-controls="fe-emission-panel"
+              tabIndex={active ? 0 : -1}
               disabled={busy}
               onClick={() => setTab(k)}
               className={
                 'px-3 py-1.5 text-sm rounded-lg transition inline-flex items-center gap-1.5 disabled:opacity-50 ' +
+                focusRing +
+                ' ' +
                 (active
                   ? 'bg-emerald-600 text-white shadow-sm'
                   : 'bg-secondary-100 dark:bg-secondary-800 text-secondary-700 dark:text-secondary-200 hover:bg-secondary-200 dark:hover:bg-secondary-700')
@@ -191,13 +218,16 @@ export function EmissionPanel({ store }: { store: BillingStore }) {
             >
               {t(`emission.tabs.${k}`)}
               {k === 'contingencia' && queue.length > 0 && (
-                <span className="rounded-full bg-amber-500 text-white text-[10px] px-1.5">{queue.length}</span>
+                <span className="rounded-full bg-amber-500 text-white text-[10px] px-1.5" aria-label={t('contingency.queueCount', { n: queue.length })}>
+                  {queue.length}
+                </span>
               )}
             </button>
           );
         })}
       </div>
 
+      <div id="fe-emission-panel" role="tabpanel" aria-labelledby={`fe-tab-${tab}`}>
       {state.dianDown && tab !== 'contingencia' && (
         <div className="mb-4 flex items-start gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 p-3 text-sm text-amber-800 dark:text-amber-200">
           <SignalSlashIcon className="w-5 h-5 flex-shrink-0" />
@@ -269,10 +299,10 @@ export function EmissionPanel({ store }: { store: BillingStore }) {
               <SignalSlashIcon className="w-10 h-10 text-amber-600 flex-shrink-0" />
             )}
             <div className="min-w-0">
-              <h3 className="text-lg font-bold text-secondary-900 dark:text-white">
+              <h3 ref={resultRef} tabIndex={-1} className="text-lg font-bold text-secondary-900 dark:text-white focus:outline-none">
                 {success.status === 'accepted'
-                  ? t('success.accepted', { doc: `${t(`docTypesShort.${success.type}`)} ${success.id}` })
-                  : t('success.queued', { doc: `${t(`docTypesShort.${success.type}`)} ${success.id}` })}
+                  ? t('success.accepted', { type: success.type, id: success.id })
+                  : t('success.queued', { type: success.type, id: success.id })}
               </h3>
               <p className="text-sm text-secondary-500 dark:text-secondary-400">
                 {success.status === 'accepted'
@@ -326,20 +356,21 @@ export function EmissionPanel({ store }: { store: BillingStore }) {
           )}
           {docType === 'factura' && draft.paymentForm === 'credito' && (
             <p className="-mt-3 text-xs text-secondary-500">
-              {t('form.dueDate', { date: formatDate(addDays(DEMO_TODAY, draft.creditDays), months) })}
+              {t('form.dueDate', { date: formatDate(addDays(today, draft.creditDays), months) })}
             </p>
           )}
           <TotalsSummary totals={totals} showRete={docType === 'factura'} />
           <p className="text-xs text-secondary-500 dark:text-secondary-400">
             {docType === 'factura'
               ? t('emission.resolution', {
-                  number: RESOLUTION.number,
-                  date: formatDate(RESOLUTION.date, months),
+                  number: resolution.number,
+                  date: formatDate(resolution.date, months),
                   prefix,
-                  from: RESOLUTION.from,
-                  to: RESOLUTION.to,
+                  from: resolution.from,
+                  to: resolution.to,
                   next: `${prefix}${next}`,
-                  left: groupThousands(Math.max(0, RESOLUTION.to - next + 1)),
+                  n: Math.max(0, resolution.to - next + 1),
+                  left: groupThousands(Math.max(0, resolution.to - next + 1)),
                 })
               : t('emission.nextNumber', { next: `${prefix}${next}` })}
           </p>
@@ -360,6 +391,7 @@ export function EmissionPanel({ store }: { store: BillingStore }) {
           </div>
         </div>
       )}
+      </div>
     </Card>
   );
 }

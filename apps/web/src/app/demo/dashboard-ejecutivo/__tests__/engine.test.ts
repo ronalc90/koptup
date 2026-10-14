@@ -4,8 +4,8 @@
  * ejemplo son determinísticos y el CSV del visitante se lee bien.
  */
 import { buildUploadDataset, guessMapping, parseAmount, parseCsv, toCsv } from '../lib/csv';
-import { buildSample } from '../lib/dataset';
-import { normalizeDate } from '../lib/dates';
+import { buildSample as buildSampleAt } from '../lib/dataset';
+import { addMonths, lastClosedMonth, lastDay, normalizeDate } from '../lib/dates';
 import {
   aging,
   alerts,
@@ -15,17 +15,22 @@ import {
   cashFlow,
   findPeriod,
   forecast,
+  hasMonths,
   kpis,
   openInvoices,
   periodEnd,
   periodOptions,
   pnl,
   totals,
+  trailingSeries,
+  yearBefore,
 } from '../lib/engine';
-import { formatNit, nitDv, PRESETS } from '../lib/presets';
-import { SECTORS } from '../lib/types';
+import { formatNit, nitDv, PRESETS, REFERENCE_ANCHOR, SAMPLE_MONTHS } from '../lib/presets';
+import { SECTORS, type SectorId } from '../lib/types';
 
 const params = (sector: (typeof SECTORS)[number]) => ({ goalGrowth: PRESETS[sector].goalGrowth, thresholds: PRESETS[sector].thresholds });
+/** Datos de ejemplo con el corte de referencia (30 sep 2026), el mismo de la guía. */
+const buildSample = (sector: SectorId) => buildSampleAt(sector, REFERENCE_ANCHOR);
 
 describe('Tablero ejecutivo · datos de ejemplo', () => {
   it('genera siempre las mismas facturas (sin Date.now ni Math.random)', () => {
@@ -36,8 +41,11 @@ describe('Tablero ejecutivo · datos de ejemplo', () => {
     for (const s of SECTORS) {
       const ds = buildSample(s);
       expect(new Set(ds.rows.map((r) => r.id)).size).toBe(ds.rows.length);
+      expect(ds.months).toHaveLength(SAMPLE_MONTHS);
+      expect(ds.months[0]).toBe('2024-10');
+      expect(ds.cutoff).toBe('2026-09-30');
       for (const r of ds.rows) {
-        expect(r.date >= '2025-01-01' && r.date <= ds.cutoff).toBe(true);
+        expect(r.date >= '2024-10-01' && r.date <= ds.cutoff).toBe(true);
         expect(r.value).toBeGreaterThan(0);
         if (r.paid) expect(r.paid <= ds.cutoff && r.paid >= r.date).toBe(true);
       }
@@ -47,6 +55,81 @@ describe('Tablero ejecutivo · datos de ejemplo', () => {
   it('el NIT de ejemplo lleva el dígito de verificación de la DIAN', () => {
     expect(nitDv('800197268')).toBe(4);
     expect(formatNit('901457832')).toBe(`901.457.832-${nitDv('901457832')}`);
+    expect(formatNit('800197268-4')).toBe('800.197.268-4');
+    for (const s of SECTORS) expect(formatNit(PRESETS[s].company.nit)).toMatch(/^\d{3}\.\d{3}\.\d{3}-\d$/);
+  });
+});
+
+describe('Tablero ejecutivo · fechas coherentes con hoy', () => {
+  it('el corte es el último mes cerrado en Colombia (UTC−5)', () => {
+    expect(lastClosedMonth(new Date('2026-10-14T15:00:00Z'))).toBe('2026-09');
+    // 30 sep 2026 a las 10 p. m. en Bogotá: todavía es septiembre.
+    expect(lastClosedMonth(new Date('2026-10-01T03:00:00Z'))).toBe('2026-08');
+    expect(lastClosedMonth(new Date('2026-10-01T06:00:00Z'))).toBe('2026-09');
+    // 31 dic 2026 a las 11:59 p. m. en Bogotá y 1 ene 2027 a medianoche.
+    expect(lastClosedMonth(new Date('2027-01-01T04:59:00Z'))).toBe('2026-11');
+    expect(lastClosedMonth(new Date('2027-01-01T05:00:00Z'))).toBe('2026-12');
+  });
+
+  const anchors = Array.from({ length: 12 }, (_, i) => addMonths('2026-10', i));
+
+  it('los datos terminan en el mes de corte y nada queda después del corte', () => {
+    for (const a of anchors) {
+      const ds = buildSampleAt('comercio', a);
+      expect(ds.months[ds.months.length - 1]).toBe(a);
+      expect(ds.cutoff).toBe(lastDay(a));
+      for (const r of ds.rows) {
+        expect(r.date <= ds.cutoff).toBe(true);
+        if (r.paid) expect(r.paid <= ds.cutoff).toBe(true);
+      }
+    }
+  });
+
+  it('la historia del ejemplo se mantiene cada mes: ventas bajo la meta, Cali rezagada y clientes en riesgo', () => {
+    for (const a of anchors) {
+      const ds = buildSampleAt('comercio', a);
+      const ctx = buildContext(buildIndex(ds), findPeriod(ds, null), params('comercio'));
+      expect(ctx.kpis.compliance!).toBeGreaterThan(0.9);
+      expect(ctx.kpis.compliance!).toBeLessThan(0.97);
+      expect(ctx.cities.find((c) => c.key === 'Cali')!.compliance!).toBeLessThan(0.8);
+      expect(ctx.customers.filter((c) => c.segment === 'riesgo').length).toBeGreaterThanOrEqual(3);
+      expect(ctx.customers.some((c) => c.segment === 'nuevo')).toBe(true);
+      // La caja arranca sobre el mínimo: si salta la alerta de caja es por una semana proyectada.
+      expect(ctx.cash!.start).toBeGreaterThanOrEqual(params('comercio').thresholds.cashFloor * 1e6);
+    }
+  });
+
+  it('el selector ofrece los últimos 12 meses, sus trimestres y el año a la fecha, todos con año anterior para comparar', () => {
+    for (const a of ['2026-09', '2027-01', '2027-02', '2026-11']) {
+      const ds = buildSampleAt('comercio', a);
+      const idx = buildIndex(ds);
+      const opts = periodOptions(ds);
+      const months = opts.filter((p) => p.kind === 'month');
+      expect(months).toHaveLength(12);
+      expect(months[0].key).toBe(`m:${a}`);
+      expect(months[11].key).toBe(`m:${addMonths(a, -11)}`);
+      const quarters = opts.filter((p) => p.kind === 'quarter');
+      expect(quarters.length).toBeGreaterThanOrEqual(4);
+      expect(quarters[0].months).toContain(a);
+      const ytd = opts.filter((p) => p.kind === 'year');
+      expect(ytd).toHaveLength(1);
+      expect(ytd[0].months[ytd[0].months.length - 1]).toBe(a);
+      for (const p of opts) expect(hasMonths(idx, yearBefore(p.months))).toBe(true);
+    }
+    expect(periodOptions(buildSampleAt('comercio', '2027-01')).find((p) => p.kind === 'year')!.months).toEqual(['2027-01']);
+  });
+
+  it('el gráfico muestra 12 meses con meta y, en el último mes, 3 meses proyectados', () => {
+    const ds = buildSample('comercio');
+    const idx = buildIndex(ds);
+    const fc = forecast(idx);
+    const latest = trailingSeries(idx, '2026-09', 10, fc);
+    expect(latest.map((p) => p.month)).toEqual([...Array.from({ length: 12 }, (_, i) => addMonths('2025-10', i)), '2026-10', '2026-11', '2026-12']);
+    expect(latest.every((p) => p.budget !== null)).toBe(true);
+    expect(latest.filter((p) => p.forecast).length).toBe(3);
+    const older = trailingSeries(idx, '2026-03', 10, fc);
+    expect(older).toHaveLength(12);
+    expect(older.some((p) => p.forecast)).toBe(false);
   });
 });
 
@@ -98,6 +181,32 @@ describe('Tablero ejecutivo · las cifras cuadran entre vistas', () => {
     }
   });
 
+  it('la prima de servicios se proyecta en junio y en diciembre', () => {
+    for (const [a, month] of [
+      ['2026-09', '2026-12'],
+      ['2027-03', '2027-06'],
+    ]) {
+      const idx = buildIndex(buildSampleAt('comercio', a));
+      const cf = cashFlow(idx, forecast(idx))!;
+      const bonus = cf.weeks.filter((w) => w.events.includes('bonus'));
+      expect(bonus).toHaveLength(1);
+      expect(bonus[0].start.slice(0, 7) <= month && bonus[0].end.slice(0, 7) >= month).toBe(true);
+    }
+  });
+
+  it('la alerta de caja mira también la caja al corte', () => {
+    const ds = buildSample('comercio');
+    const idx = buildIndex(ds);
+    const p = findPeriod(ds, null);
+    const th = PRESETS.comercio.thresholds;
+    const cash = (cashFloor: number) => alerts(buildContext(idx, p, { goalGrowth: 10, thresholds: { ...th, cashFloor } })).find((a) => a.kind === 'cashFloor');
+    const start = cashFlow(idx, forecast(idx))!.start / 1e6;
+    expect(cash(start + 1)).toMatchObject({ values: expect.objectContaining({ todayBelow: 1 }) });
+    expect(cash(0)).toBeUndefined();
+    const def = cash(th.cashFloor);
+    if (def) expect(def.values.todayBelow).toBe(0);
+  });
+
   it('la meta sale del año anterior y cambia con el crecimiento configurado', () => {
     const ds = buildSample('comercio');
     const idx = buildIndex(ds);
@@ -125,6 +234,7 @@ describe('Tablero ejecutivo · las cifras cuadran entre vistas', () => {
     const fc = forecast(idx);
     expect(fc.method).toBe('seasonal');
     expect(fc.points.map((x) => x.month)).toEqual(['2026-10', '2026-11', '2026-12']);
+    expect(forecast(buildIndex(buildSampleAt('servicios', '2027-02'))).points.map((x) => x.month)).toEqual(['2027-03', '2027-04', '2027-05']);
     for (const x of fc.points) expect(x.low < x.value && x.value < x.high).toBe(true);
   });
 });

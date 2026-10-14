@@ -1,92 +1,94 @@
-import Cookies from 'js-cookie';
 import { API_BASE } from '@/lib/backend-url';
-import type {
-  DetalleFactura,
-  Estadisticas,
-  Factura,
-  FiltrosFacturas,
-  ResultadoProcesamiento,
-} from './tipos-auditoria';
+import { authFetch, getValidAccessToken } from '@/lib/auth-token';
+import type { DetalleFactura, Factura, FiltrosFacturas, ResultadoProcesamiento } from './tipos-auditoria';
 
 /**
  * Cliente de la demo para /api/auditoria.
  *
- * Todas las llamadas envían el token de sesión (cookie `accessToken`, la misma
- * que usa `src/lib/api.ts`) como `Authorization: Bearer`. La demo es privada:
- * el backend puede responder 401/403 si la persona no tiene un acceso activo, y
- * la página lo muestra como "Tu acceso a esta demo no está activo".
+ * Todas las llamadas van con la sesión (`authFetch` de `src/lib/auth-token.ts`:
+ * envía `Authorization: Bearer` y renueva el token si venció). La demo es
+ * privada: el backend responde 401 sin sesión y 403 sin un acceso vigente, y
+ * la página lo muestra como "Tu acceso a esta demo no está activo" con el
+ * motivo concreto (sesión cerrada, acceso vencido, revocado…).
  */
 
 export class ApiError extends Error {
   readonly status: number;
+  /** `code` del cuerpo de error del backend (p. ej. `rate_limited`, `demo_access_required`). */
+  readonly code: string;
+  /** `motivo` que manda el control de acceso a demos (`expirado`, `revocado`…). */
+  readonly motivo: string;
 
-  constructor(status: number, message: string) {
-    super(message);
+  constructor(status: number, code = '', motivo = '', message = '') {
+    super(message || code || `HTTP ${status}`);
     this.name = 'ApiError';
     this.status = status;
+    this.code = code;
+    this.motivo = motivo;
   }
 }
 
-/** 401 (sin sesión o vencida) o 403 (sin acceso a la demo). */
+/** 401 (sin sesión o vencida) o 403 (sin acceso a la demo, o demo desactivada). */
 export function esErrorDeAcceso(error: unknown): boolean {
   return error instanceof ApiError && (error.status === 401 || error.status === 403);
 }
 
-let refrescoEnCurso: Promise<string | null> | null = null;
+export type MotivoAcceso = 'sesion' | 'expirado' | 'revocado' | 'sinAcceso' | 'desactivada';
 
-/** Renueva el token de acceso con el refresh token (mismo flujo que src/lib/api.ts). */
-function refrescarToken(): Promise<string | null> {
-  const refreshToken = Cookies.get('refreshToken');
-  if (!refreshToken) return Promise.resolve(null);
-  if (!refrescoEnCurso) {
-    refrescoEnCurso = (async () => {
-      try {
-        const resp = await fetch(`${API_BASE}/auth/refresh`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ refreshToken }),
-        });
-        if (!resp.ok) return null;
-        const cuerpo = await resp.json();
-        const token: string | undefined = cuerpo?.data?.accessToken;
-        if (token) Cookies.set('accessToken', token, { expires: 1 / 96 });
-        return token ?? null;
-      } catch {
-        return null;
-      } finally {
-        refrescoEnCurso = null;
-      }
-    })();
-  }
-  return refrescoEnCurso;
+/** Por qué el servidor negó el acceso (para explicarlo en pantalla). */
+export function motivoDeAcceso(error: unknown): MotivoAcceso {
+  if (!(error instanceof ApiError) || error.status === 401) return 'sesion';
+  if (error.code === 'demo_disabled') return 'desactivada';
+  if (error.motivo === 'expirado') return 'expirado';
+  if (error.motivo === 'revocado') return 'revocado';
+  return 'sinAcceso';
 }
 
-async function solicitar(ruta: string, init: RequestInit = {}, reintentar = true): Promise<Response> {
-  const headers = new Headers(init.headers);
-  const token = Cookies.get('accessToken');
-  if (token) headers.set('Authorization', `Bearer ${token}`);
+/** Tipo de error para elegir el mensaje (claves `errors.*` de la demo). */
+export type TipoError =
+  | 'network'
+  | 'server'
+  | 'notFound'
+  | 'badRequest'
+  | 'rateLimited'
+  | 'aiLimit'
+  | 'aiUnavailable'
+  | 'aiBudget'
+  | 'unavailable';
 
+export function tipoDeError(error: unknown): TipoError {
+  if (!(error instanceof ApiError)) return 'server';
+  if (error.status === 0) return 'network';
+  if (error.status === 404) return 'notFound';
+  if (error.status === 400 || error.status === 422) return 'badRequest';
+  if (error.status === 429) return error.code === 'ai_user_limit' ? 'aiLimit' : 'rateLimited';
+  if (error.status === 503) {
+    if (error.code === 'budget_exhausted') return 'aiBudget';
+    if (error.code === 'ai_unavailable') return 'aiUnavailable';
+    return 'unavailable';
+  }
+  return 'server';
+}
+
+async function solicitar(ruta: string, init: RequestInit = {}): Promise<Response> {
+  // Sin sesión (ni token ni forma de renovarlo) no se llama al servidor: la
+  // respuesta sería un 401 seguro. Se muestra directamente «Tu sesión se cerró».
+  if (!(await getValidAccessToken())) throw new ApiError(401, 'login_required', 'sin_sesion');
   let resp: Response;
   try {
-    resp = await fetch(`${API_BASE}${ruta}`, { ...init, headers });
+    resp = await authFetch(`${API_BASE}${ruta}`, init);
   } catch {
     throw new ApiError(0, 'network');
   }
-
-  if (resp.status === 401 && reintentar && Cookies.get('refreshToken')) {
-    const nuevo = await refrescarToken();
-    if (nuevo) return solicitar(ruta, init, false);
-  }
-
   if (!resp.ok) {
-    let mensaje = '';
+    let cuerpo: { code?: unknown; motivo?: unknown; message?: unknown } | null = null;
     try {
-      const cuerpo = await resp.clone().json();
-      mensaje = typeof cuerpo?.message === 'string' ? cuerpo.message : '';
+      cuerpo = await resp.clone().json();
     } catch {
       // respuesta sin JSON
     }
-    throw new ApiError(resp.status, mensaje);
+    const texto = (v: unknown) => (typeof v === 'string' ? v : '');
+    throw new ApiError(resp.status, texto(cuerpo?.code), texto(cuerpo?.motivo), texto(cuerpo?.message));
   }
   return resp;
 }
@@ -98,10 +100,6 @@ async function datos<T>(ruta: string, init?: RequestInit): Promise<T> {
 }
 
 export const auditoriaAPI = {
-  obtenerEstadisticas(): Promise<Estadisticas> {
-    return datos<Estadisticas>('/auditoria/estadisticas');
-  },
-
   async obtenerFacturas(
     filtros: FiltrosFacturas,
     page = 1,

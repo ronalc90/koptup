@@ -5,7 +5,8 @@ Esta carpeta contiene toda la documentación técnica del proyecto KopTup.
 ## 📁 Estructura de Documentación
 
 ### 📚 Guías
-- [**QUICKSTART.md**](./guides/QUICKSTART.md) - Guía rápida de inicio
+- [**QUICKSTART.md**](./guides/QUICKSTART.md) - Guía rápida de inicio (la versión completa está en [`SETUP.md`](../SETUP.md))
+- La documentación al día del producto, la operación y la API está en la wiki: [`docs/wiki/`](./wiki/Home.md)
 
 ### 🔧 Módulos
 - [**CUENTAS_MEDICAS_README.md**](./modules/CUENTAS_MEDICAS_README.md) - Módulo de Cuentas Médicas
@@ -17,7 +18,7 @@ Esta carpeta contiene toda la documentación técnica del proyecto KopTup.
 - [**SISTEMA_EXPERTO_API.md**](./modules/SISTEMA_EXPERTO_API.md) - API del Sistema Experto
 
 ### 🚀 Deployment
-- [**DEPLOYMENT.md**](./deployment/DEPLOYMENT.md) - Guía de despliegue
+- [**DEPLOYMENT.md**](./deployment/DEPLOYMENT.md) - Remite a [Operación y despliegue](./wiki/Doc-11-Operacion-y-Despliegue.md), la guía vigente
 - [**IMPLEMENTACION_COMPLETA.md**](./deployment/IMPLEMENTACION_COMPLETA.md) - Implementación completa
 
 ## 🔍 Buscar Documentación

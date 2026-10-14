@@ -1,24 +1,28 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { AssistantError, ask, ensurePolicyBot, forgetPolicyBot, type AssistantAnswer } from '../lib/assistant';
 import { policyDocs } from '../lib/policies';
+import { useHr } from '../lib/store';
 
-interface Msg {
+export interface Msg {
   role: 'user' | 'assistant';
   content: string;
   answer?: AssistantAnswer;
   error?: boolean;
 }
 
-/** Chat del colaborador con el asistente de políticas (IA real vía backend, con citas). */
-export default function Assistant() {
+/**
+ * Chat del colaborador con el asistente de políticas (IA real vía backend, con citas).
+ * La conversación la guarda la app (`msgs`), así no se pierde al volver al menú.
+ */
+export default function Assistant({ msgs, setMsgs }: { msgs: Msg[]; setMsgs: Dispatch<SetStateAction<Msg[]>> }) {
   const t = useTranslations('demoHrms.assistant');
   const locale = useLocale();
   const lang = locale === 'en' ? 'en' : 'es';
-  const [msgs, setMsgs] = useState<Msg[]>([]);
+  const { dispatch } = useHr();
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
@@ -41,13 +45,15 @@ export default function Assistant() {
       try {
         answer = await ask(botId, q, history);
       } catch (err) {
-        if (err instanceof AssistantError && err.kind === 'server') {
+        // El servidor borra los bots de ejemplo tras 30 días sin uso: se pide de nuevo una vez.
+        if (err instanceof AssistantError && err.status === 404) {
           forgetPolicyBot(lang);
           botId = await ensurePolicyBot(lang, docs, t('persona'), t('botName'));
           answer = await ask(botId, q, history);
         } else throw err;
       }
       setMsgs((m) => [...m, { role: 'assistant', content: answer.reply, answer }]);
+      dispatch({ type: 'guide.assistant' });
     } catch (err) {
       const kind = err instanceof AssistantError ? err.kind : 'server';
       setMsgs((m) => [...m, { role: 'assistant', content: t(`errors.${kind}`), error: true }]);
@@ -88,7 +94,7 @@ export default function Assistant() {
               )}
               {m.answer && (
                 <p className="mt-1 text-[9px] text-secondary-500">
-                  {m.answer.llm ? t('modeLlm', { model: m.answer.model }) : m.answer.providerError ? t('modeProviderError') : t('modeExtractive')}
+                  {m.answer.noAi ? t(`noAi.${m.answer.noAi}`) : t('modeLlm', { model: m.answer.model })}
                 </p>
               )}
             </div>

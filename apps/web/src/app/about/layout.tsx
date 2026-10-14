@@ -1,12 +1,14 @@
 import { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { generateMetadata, getBreadcrumbSchema } from '@/lib/seo-config';
 
 export const metadata: Metadata = generateMetadata('about');
 
-export default function AboutLayout({ children }: { children: React.ReactNode }) {
+export default async function AboutLayout({ children }: { children: React.ReactNode }) {
+  const t = await getTranslations('aboutPage');
   const breadcrumbSchema = getBreadcrumbSchema([
-    { name: 'Inicio', url: '/' },
-    { name: 'Nosotros', url: '/about' },
+    { name: t('breadcrumbHome'), url: '/' },
+    { name: t('breadcrumbAbout'), url: '/about' },
   ]);
 
   return (

@@ -3,6 +3,7 @@
 import { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 import Button from '@/components/ui/Button';
 import Card, { CardContent } from '@/components/ui/Card';
@@ -15,6 +16,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 function ResetPasswordInner() {
+  const t = useTranslations('passwordRecovery.reset');
   const searchParams = useSearchParams();
   const token = searchParams.get('token') || '';
 
@@ -30,15 +32,15 @@ function ResetPasswordInner() {
     setError('');
 
     if (!token) {
-      setError('El enlace de recuperación es inválido o expiró. Solicita uno nuevo.');
+      setError(t('errorInvalidLink'));
       return;
     }
     if (password.length < 8) {
-      setError('La contraseña debe tener al menos 8 caracteres.');
+      setError(t('errorLength'));
       return;
     }
     if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden.');
+      setError(t('errorMismatch'));
       return;
     }
 
@@ -47,10 +49,7 @@ function ResetPasswordInner() {
       await api.resetPassword(token, password);
       setSuccess(true);
     } catch (err: any) {
-      setError(
-        err?.response?.data?.message ||
-          'No se pudo restablecer la contraseña. El enlace pudo haber expirado.'
-      );
+      setError(err?.response?.data?.message || t('errorGeneric'));
     } finally {
       setIsLoading(false);
     }
@@ -69,11 +68,11 @@ function ResetPasswordInner() {
               KopTup
             </span>
           </Link>
-          <h2 className="mt-6 text-3xl font-bold text-secondary-900 dark:text-white">
-            Nueva contraseña
-          </h2>
+          <h1 className="mt-6 text-3xl font-bold text-secondary-900 dark:text-white">
+            {t('title')}
+          </h1>
           <p className="mt-2 text-sm text-secondary-600 dark:text-secondary-400">
-            Crea una contraseña nueva para tu cuenta
+            {t('subtitle')}
           </p>
         </div>
 
@@ -85,16 +84,16 @@ function ResetPasswordInner() {
                   <CheckCircleIcon className="h-16 w-16 text-green-500" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-secondary-900 dark:text-white mb-2">
-                    Contraseña actualizada
-                  </h3>
+                  <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-2">
+                    {t('successTitle')}
+                  </h2>
                   <p className="text-sm text-secondary-600 dark:text-secondary-400">
-                    Tu contraseña se cambió correctamente. Ya puedes iniciar sesión con ella.
+                    {t('successBody')}
                   </p>
                 </div>
-                <Link href="/login">
-                  <Button fullWidth>Ir a iniciar sesión</Button>
-                </Link>
+                <Button fullWidth asChild>
+                  <Link href="/login">{t('goToLogin')}</Link>
+                </Button>
               </div>
             ) : (
               <>
@@ -107,7 +106,7 @@ function ResetPasswordInner() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div>
                     <label htmlFor="password" className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                      Nueva contraseña
+                      {t('password')}
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -123,13 +122,13 @@ function ResetPasswordInner() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="block w-full pl-10 pr-10 py-3 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white placeholder-secondary-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                        placeholder="Mínimo 8 caracteres"
+                        placeholder={t('passwordPlaceholder')}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary-400 hover:text-secondary-600"
-                        aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                        aria-label={showPassword ? t('hide') : t('show')}
                       >
                         {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
                       </button>
@@ -138,7 +137,7 @@ function ResetPasswordInner() {
 
                   <div>
                     <label htmlFor="confirmPassword" className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                      Confirmar contraseña
+                      {t('confirm')}
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -154,20 +153,20 @@ function ResetPasswordInner() {
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         className="block w-full pl-10 pr-3 py-3 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white placeholder-secondary-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                        placeholder="Repite la contraseña"
+                        placeholder={t('confirmPlaceholder')}
                       />
                     </div>
                   </div>
 
                   <Button type="submit" size="lg" fullWidth disabled={isLoading}>
-                    {isLoading ? 'Guardando...' : 'Restablecer contraseña'}
+                    {isLoading ? t('submitting') : t('submit')}
                   </Button>
                 </form>
 
                 <div className="mt-6 text-center">
                   <Link href="/login" className="inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-500">
                     <ArrowLeftIcon className="h-4 w-4 mr-2" />
-                    Volver al inicio de sesión
+                    {t('backToLogin')}
                   </Link>
                 </div>
               </>

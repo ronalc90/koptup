@@ -85,9 +85,20 @@ export interface Milestone {
   budget: number;
   /** Valor a facturar al cliente al cerrar el hito (COP, antes de IVA). */
   billing: number;
-  invoice?: { number: string; on: ISODate };
+  invoice?: {
+    number: string;
+    on: ISODate;
+    /** Valor facturado antes de IVA (si falta, es el valor a facturar del hito). */
+    amount?: number;
+    /** 'agreed' = valor pactado del hito o sprint; 'progress' = proporcional a lo terminado al cerrar el sprint. */
+    basis?: InvoiceBasis;
+  };
   closed?: boolean;
+  /** Avance del sprint (0–100, por horas estimadas) en el momento de cerrarlo, antes de pasar lo pendiente al siguiente. */
+  closedProgress?: number;
 }
+
+export type InvoiceBasis = 'agreed' | 'progress';
 
 export interface ChecklistItem {
   id: string;
@@ -246,3 +257,7 @@ export interface Filters {
 }
 
 export const EMPTY_FILTERS: Filters = { q: '', assignee: '', priority: '', milestone: '', overdueOnly: false };
+
+/** Pasos de la guía «Prueba esto en 2 minutos» (se marcan solos al hacerlos). */
+export type GuideStep = 'portfolio' | 'move' | 'client' | 'reports' | 'weekly';
+export const GUIDE_STEPS: GuideStep[] = ['portfolio', 'move', 'client', 'reports', 'weekly'];

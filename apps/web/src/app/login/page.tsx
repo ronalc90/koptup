@@ -48,7 +48,8 @@ export default function LoginPage() {
       setSessionExpiredMessage(t('sessionExpired'));
     }
 
-    if (authError === 'auth_failed') {
+    // `google_auth_failed`: el inicio de sesión con Google falló o su código venció.
+    if (authError === 'auth_failed' || authError === 'google_auth_failed') {
       setError(t('errorGoogle'));
     } else if (authError) {
       setError(t('errorGeneric'));
@@ -143,9 +144,9 @@ export default function LoginPage() {
               KopTup
             </span>
           </Link>
-          <h2 className="mt-6 text-3xl font-bold text-secondary-900 dark:text-white">
+          <h1 className="mt-6 text-3xl font-bold text-secondary-900 dark:text-white">
             {t('title')}
-          </h2>
+          </h1>
           <p className="mt-2 text-sm text-secondary-600 dark:text-secondary-400">
             {t('subtitle')}
           </p>
@@ -153,9 +154,11 @@ export default function LoginPage() {
 
         {redirectTarget && (
           <div className="p-4 bg-primary-50 dark:bg-primary-950 border border-primary-200 dark:border-primary-800 rounded-lg text-center">
-            {/* TODO: extract to i18n */}
             <p className="text-sm text-primary-700 dark:text-primary-300">
-              Inicia sesión para continuar a <span className="font-semibold">{redirectTarget}</span>
+              {t.rich('redirectNotice', {
+                target: redirectTarget,
+                strong: (chunks) => <span className="font-semibold">{chunks}</span>,
+              })}
             </p>
           </div>
         )}
@@ -240,7 +243,7 @@ export default function LoginPage() {
                     value={formData.email}
                     onChange={handleChange}
                     className="block w-full pl-10 pr-3 py-3 border border-secondary-300 dark:border-secondary-700 rounded-lg bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white placeholder-secondary-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="tu@email.com"
+                    placeholder={t('emailPlaceholder')}
                   />
                 </div>
               </div>
@@ -328,13 +331,12 @@ export default function LoginPage() {
         </p>
 
         {/* Continuar como invitado */}
-        {/* TODO: extract to i18n */}
         <div className="text-center">
           <Link
             href="/demo"
             className="inline-flex items-center gap-1 text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
           >
-            Continuar como invitado y ver demos
+            {t('guestLink')}
             <ArrowRightIcon className="h-4 w-4" />
           </Link>
         </div>

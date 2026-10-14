@@ -25,6 +25,8 @@ interface DraftQuestion {
   q: string;
   options: string[];
   correct: number;
+  /** Lección (en orden, contando todos los módulos) que explica la respuesta. */
+  lesson?: number;
 }
 interface Draft {
   id: string | null;
@@ -82,7 +84,10 @@ function toDraft(c: Course): Draft {
       }))
       .filter((m) => m.lessons.length > 0),
     files: c.files ?? [],
-    quiz: c.quiz.map((qq) => ({ q: qq.q.es, options: qq.options.map((o) => o.es), correct: qq.correct })),
+    quiz: c.quiz.map((qq) => {
+      const idx = lessonsOf(c).findIndex((x) => x.id === qq.lessonId);
+      return { q: qq.q.es, options: qq.options.map((o) => o.es), correct: qq.correct, lesson: idx >= 0 ? idx : undefined };
+    }),
   };
 }
 
@@ -102,12 +107,14 @@ function buildCourse(d: Draft, id: string, instructor: string, index: number, to
       return { id: `${id}-l${n}`, n, kind: ls.kind, title: same(ls.title.trim()), duration, lines };
     }),
   }));
+  const flat = modules.flatMap((m) => m.lessons);
   const quiz: QuizQuestion[] = d.quiz.map((qq, i) => ({
     id: `${id}-q${i + 1}`,
     q: same(qq.q.trim()),
     options: qq.options.map((o) => same(o.trim())),
     correct: qq.correct,
-    lessonId: modules[0]?.lessons[0]?.id ?? `${id}-l1`,
+    // Refuerzo: la lección de donde salió la pregunta (o la primera si se escribió a mano).
+    lessonId: flat[qq.lesson ?? 0]?.id ?? flat[0]?.id ?? `${id}-l1`,
   }));
   if (quiz.length > 0) {
     n += 1;
@@ -435,7 +442,7 @@ export default function AuthoringPanel({ onPreview }: { onPreview: (id: string) 
                 <label className="flex flex-col items-center justify-center gap-2 p-6 rounded-xl border-2 border-dashed border-secondary-300 dark:border-secondary-700 cursor-pointer hover:border-primary-400 text-center">
                   <DocumentArrowUpIcon className="w-8 h-8 text-secondary-400" />
                   <span className="text-sm font-medium text-secondary-700 dark:text-secondary-200">{t('authoring.filesPick')}</span>
-                  <span className="text-[11px] text-secondary-500">{t('authoring.filesTypes')}</span>
+                  <span className="text-[11px] text-secondary-500 dark:text-secondary-400">{t('authoring.filesTypes')}</span>
                   <input
                     type="file"
                     multiple
@@ -483,14 +490,14 @@ export default function AuthoringPanel({ onPreview }: { onPreview: (id: string) 
                         toast.error(t('authoring.generateNone'));
                         return;
                       }
-                      set({ quiz: [...draft.quiz, ...generated] });
+                      set({ quiz: [...draft.quiz, ...generated.map((g) => ({ q: g.q, options: g.options, correct: g.correct, lesson: g.source }))] });
                       toast.success(t('authoring.generateDone', { count: generated.length }));
                     }}
                   >
                     <SparklesIcon className="w-4 h-4" />
                     {t('authoring.generate')}
                   </button>
-                  <span className="text-[11px] text-secondary-500">{t('authoring.generateHint')}</span>
+                  <span className="text-[11px] text-secondary-500 dark:text-secondary-400">{t('authoring.generateHint')}</span>
                 </div>
                 {draft.quiz.map((qq, qi) => (
                   <div key={qi} className="rounded-xl border border-secondary-200 dark:border-secondary-700 p-3 space-y-2">
@@ -519,7 +526,7 @@ export default function AuthoringPanel({ onPreview }: { onPreview: (id: string) 
                         </label>
                       ))}
                     </div>
-                    <p className="text-[11px] text-secondary-500">{t('authoring.correctHint')}</p>
+                    <p className="text-[11px] text-secondary-500 dark:text-secondary-400">{t('authoring.correctHint')}</p>
                   </div>
                 ))}
                 <button

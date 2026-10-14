@@ -1,160 +1,475 @@
 {
-  "demoDocsPro": {
-    "section": {
-      "title": "Capacidades Enterprise DMS",
-      "subtitle": "Funcionalidades avanzadas listas para empresas con altos volúmenes documentales y cumplimiento normativo estricto."
-    },
-    "tabs": {
-      "ingesta": "Ingesta multi-canal",
-      "ocr": "OCR + extracción",
-      "search": "Hybrid Search",
-      "clauses": "Cláusulas",
-      "compare": "Comparación de versiones",
-      "watermark": "Watermarks dinámicas",
-      "retention": "Retención & Legal Hold",
-      "encryption": "Zero-knowledge",
-      "ediscovery": "E-discovery",
-      "sign": "Firma electrónica"
-    },
-    "ingesta": {
-      "title": "Ingesta multi-canal",
-      "subtitle": "Cinco vías oficiales para entrar documentos al vault, todas con auditoría y antivirus.",
-      "channels": {
-        "email": { "name": "Email-to-vault", "desc": "Reenvía cualquier correo y los adjuntos quedan indexados." },
-        "scan": { "name": "Scan-to-vault móvil", "desc": "App iOS/Android con captura en JPEG + OCR auto." },
-        "office": { "name": "Plugin Office", "desc": "Guardar desde Word, Excel y Outlook con un clic." },
-        "drive": { "name": "Drive sync", "desc": "Sincroniza carpetas de Google Drive y OneDrive." },
-        "api": { "name": "API upload", "desc": "Endpoint REST con firma HMAC y cuotas por tenant." }
+  "demoDocs": {
+    "shell": {
+      "back": "Volver al catálogo de demos",
+      "title": "Gestor documental con IA",
+      "sampleBadge": "Datos de ejemplo",
+      "sampleHint": "La empresa, las personas, los NIT, los valores y los documentos son ficticios.",
+      "serverBadge": "Tus documentos en el servidor",
+      "caseLine": "Caso de ejemplo: archivo de {company} (NIT {nit}, {city}), una empresa ficticia. Organízalo como quieras: los cambios quedan en tu navegador.",
+      "serverLine": "Los documentos que subes con tu cuenta: el servidor extrae el texto, la IA los resume y etiqueta, y puedes buscarlos por significado. Cada cuenta ve solo los suyos.",
+      "loading": "Cargando el gestor documental…",
+      "modeLabel": "Fuente de los documentos",
+      "modes": {
+        "sample": "Datos de ejemplo",
+        "server": "Mis documentos"
       },
-      "emailLabel": "Tu dirección Email-to-vault",
-      "copy": "Copiar",
-      "copied": "¡Copiado!"
+      "menu": "Vistas y carpetas"
     },
-    "ocr": {
-      "title": "OCR + extracción de datos",
-      "subtitle": "Sube una factura o contrato y la IA extrae entidades, tablas y bounding boxes.",
-      "drop": "Suelta el PDF aquí o haz clic para simular",
-      "supports": "PDF · PNG · JPG · TIFF (hasta 50 MB)",
-      "preview": "Vista previa con bounding boxes",
-      "table": "Tabla extraída",
-      "entities": "Entidades reconocidas",
-      "headers": { "concept": "Concepto", "qty": "Cant.", "unit": "Unitario", "total": "Total" },
-      "entity": {
-        "name": "Razón social",
+    "how": {
+      "title": "Qué es real y qué es simulado",
+      "realTitle": "Funciona de verdad",
+      "real": [
+        "Datos de ejemplo: favoritos, renombrar, mover de carpeta, crear carpetas, papelera, restaurar, eliminar definitivamente y restablecer. Se guardan en tu navegador.",
+        "Búsqueda en el nombre, las etiquetas y el texto de cada documento, con el fragmento que coincide; filtros por tipo, fecha y etiqueta; orden.",
+        "Detección de cláusulas y nivel de riesgo por reglas sobre el texto del contrato abierto; comparación palabra por palabra entre versiones.",
+        "Retención por carpeta: la fecha hasta la que se conserva cada documento se calcula, y la retención legal bloquea la papelera.",
+        "Descargas generadas en tu navegador: inventario CSV, paquete para auditoría (CSV o JSON) y copia en PDF con marca de agua.",
+        "Mis documentos (con sesión): subida de PDF, DOCX, TXT y CSV, resumen y etiquetas con IA, búsqueda por significado, «Explicar con IA» y «¿Por qué este resultado?» en el servidor, con tope de gasto de IA."
+      ],
+      "simTitle": "Es de ejemplo o simulado",
+      "sim": [
+        "Los 16 documentos de la constructora son ficticios; sus resúmenes, palabras clave y explicaciones están escritos de antemano (no los genera una IA en vivo).",
+        "La lectura OCR de las facturas escaneadas es de ejemplo: en esta demo no se procesa ninguna imagen.",
+        "Con los datos de ejemplo, «Buscar por significado» amplía la búsqueda con sinónimos en tu navegador; no usa IA.",
+        "Los tiempos de retención son ilustrativos y la regla se aplica solo en esta demo, no en el servidor."
+      ],
+      "tourTitle": "Recorrido sugerido",
+      "tour": [
+        "Busca «cláusula penal» y mira el fragmento resaltado en cada tarjeta.",
+        "Abre el contrato de obra: pulsa «Detectar cláusulas» y luego «Comparar versiones».",
+        "Abre una factura escaneada y pulsa «Ver lectura OCR».",
+        "Activa la retención legal de «Contratos» (icono de archivo en Carpetas) e intenta mover un contrato a la papelera.",
+        "Exporta el inventario o arma un paquete para auditoría; para subir tus documentos, entra a «Mis documentos»."
+      ],
+      "buildTitle": "Lo que implementamos en tu proyecto",
+      "build": [
+        "OCR real para documentos escaneados y lectura de facturas electrónicas.",
+        "Entrada por correo, celular, Google Drive o SharePoint, y por API.",
+        "Permisos por carpeta, auditoría de accesos y tabla de retención documental (TRD) de tu empresa.",
+        "Conexión con tu asistente RAG para preguntar a tus documentos y recibir respuestas con la fuente."
+      ]
+    },
+    "sidebar": {
+      "brand": "Gestor documental",
+      "navLabel": "Vistas y carpetas",
+      "upload": "Subir documentos",
+      "resetSample": "Restablecer datos de ejemplo",
+      "views": {
+        "all": "Todos los documentos",
+        "favorites": "Favoritos",
+        "recent": "Recientes",
+        "trash": "Papelera"
+      },
+      "foldersTitle": "Carpetas",
+      "newFolder": "Nueva carpeta",
+      "retention": "Retención por carpeta",
+      "holdBadge": "Retención legal",
+      "storage": "Almacenamiento",
+      "storageUsed": "{size} en {count, plural, one {# documento} other {# documentos}}",
+      "storageSample": "Tamaños de ejemplo."
+    },
+    "folders": {
+      "contracts": "Contratos",
+      "invoices": "Facturas de proveedores",
+      "minutes": "Actas y notas",
+      "licenses": "Licencias y pólizas",
+      "hr": "Talento humano",
+      "finance": "Finanzas",
+      "general": "General"
+    },
+    "toolbar": {
+      "searchLabel": "Buscar en los documentos",
+      "searchPlaceholder": "Busca por nombre, etiqueta o texto del documento…",
+      "clear": "Borrar la búsqueda",
+      "semantic": "Buscar por significado",
+      "semanticHint": "Escribe primero qué buscas",
+      "filters": "Filtros",
+      "export": "Exportar CSV",
+      "audit": "Paquete para auditoría",
+      "suggested": "Prueba:",
+      "results": "{count, plural, =0 {Ningún documento} one {# documento} other {# documentos}}",
+      "typeLabel": "Tipo",
+      "types": {
+        "all": "Todos los tipos",
+        "pdf": "PDF",
+        "docx": "Word",
+        "txt": "Texto",
+        "csv": "CSV",
+        "other": "Otro"
+      },
+      "dateLabel": "Fecha",
+      "dates": {
+        "all": "Cualquier fecha",
+        "d7": "Últimos 7 días",
+        "d30": "Últimos 30 días",
+        "d365": "Último año"
+      },
+      "tagLabel": "Etiqueta",
+      "tagAll": "Todas las etiquetas",
+      "sortLabel": "Ordenar",
+      "sort": {
+        "relevance": "Relevancia (al buscar)",
+        "newest": "Más recientes",
+        "oldest": "Más antiguos",
+        "name": "Nombre (A-Z)",
+        "size": "Tamaño"
+      },
+      "clearFilters": "Quitar filtros"
+    },
+    "list": {
+      "label": "Documentos",
+      "gridLabel": "Lista de documentos",
+      "empty": {
+        "all": "No hay documentos en esta vista.",
+        "favorites": "Aún no tienes favoritos: usa la estrella de una tarjeta.",
+        "recent": "No hay documentos recientes.",
+        "trash": "La papelera está vacía.",
+        "folder": "Esta carpeta está vacía. Mueve documentos a ella desde el panel del documento.",
+        "search": "Ningún documento coincide con la búsqueda o los filtros."
+      },
+      "trashNote": "Los documentos de la papelera se pueden restaurar o eliminar definitivamente.",
+      "emptyTrash": "Vaciar papelera",
+      "favorite": "Marcar como favorito",
+      "unfavorite": "Quitar de favoritos",
+      "rename": "Renombrar",
+      "restore": "Restaurar",
+      "destroy": "Eliminar definitivamente",
+      "deletedOn": "En la papelera desde el {date}",
+      "matchIn": "En el texto:",
+      "folderPolicy": "Retención: {policy}",
+      "changeRetention": "Cambiar retención"
+    },
+    "upload": {
+      "dropTitle": "Arrastra archivos aquí o haz clic para elegirlos",
+      "dropHint": "PDF, DOCX, TXT o CSV de hasta 10 MB. El servidor extrae el texto y la IA genera el resumen, las etiquetas y las palabras clave.",
+      "toFolder": "Se guardan en la carpeta: {folder}",
+      "progress": "Subiendo {index} de {total}: {name} ({pct} %)",
+      "processing": "Analizando {name} en el servidor ({index} de {total})…",
+      "problem": {
+        "type": "{name}: tipo de archivo no admitido. Usa PDF, DOCX, TXT o CSV.",
+        "size": "{name}: pesa más de 10 MB.",
+        "empty": "{name}: el archivo está vacío."
+      },
+      "sampleTitle": "Estás viendo datos de ejemplo",
+      "sampleText": "Para subir tus propios documentos y analizarlos con IA, inicia sesión o solicita acceso.",
+      "sampleTextSession": "Para subir tus documentos y analizarlos con IA, cambia a «Mis documentos».",
+      "goServer": "Ir a Mis documentos"
+    },
+    "access": {
+      "title": "Inicia sesión o solicita acceso para subir tus documentos",
+      "text": "Los documentos se guardan por cuenta: con sesión iniciada, el servidor guarda tus archivos y solo tú los ves.",
+      "points": [
+        "Sube PDF, DOCX, TXT o CSV de hasta 10 MB.",
+        "La IA genera el resumen, las etiquetas y las palabras clave de cada uno.",
+        "Búscalos por significado y pide «Explicar con IA».",
+        "Organízalos con favoritos, carpetas y papelera."
+      ],
+      "login": "Iniciar sesión",
+      "request": "Solicitar acceso",
+      "sample": "Seguir con los datos de ejemplo"
+    },
+    "server": {
+      "loading": "Trayendo tus documentos…",
+      "errorTitle": "No pudimos traer tus documentos",
+      "retry": "Reintentar",
+      "emptyText": "Aún no tienes documentos. Sube un PDF, DOCX, TXT o CSV para verlo resumido y etiquetado, o explora los datos de ejemplo."
+    },
+    "panel": {
+      "label": "Documento {name}",
+      "preview": "Vista previa",
+      "previewText": "Texto del documento",
+      "previewScan": "Imagen escaneada (representación de ejemplo)",
+      "noPreview": "La demo no guarda una copia del archivo para mostrarla: aquí ves lo que el servidor extrajo y analizó.",
+      "watermarkOn": "Ver con marca de agua",
+      "watermarkOff": "Quitar marca de agua",
+      "watermarkHint": "La marca lleva tu nombre, la fecha y un identificador; se repite en la copia en PDF.",
+      "downloadCopy": "Descargar copia con marca de agua (PDF)",
+      "summarySample": "Resumen (escrito de antemano para los datos de ejemplo)",
+      "summaryAi": "Resumen con IA",
+      "noSummary": "El servidor guardó este documento sin resumen de IA (texto muy corto o no extraíble, o IA no disponible).",
+      "keywords": "Palabras clave",
+      "entities": "Datos encontrados",
+      "entityKinds": {
+        "party": "Empresa",
         "nit": "NIT",
-        "date": "Fecha emisión",
-        "amount": "Monto total",
-        "city": "Ciudad"
-      }
-    },
-    "search": {
-      "title": "Hybrid Search (BM25 + Dense)",
-      "subtitle": "Combina coincidencia léxica con embeddings para máxima precisión.",
-      "placeholder": "Ej: cláusula de confidencialidad en contratos 2025",
-      "go": "Buscar",
-      "modes": { "bm25": "BM25", "dense": "Dense", "hybrid": "Hybrid" },
-      "score": "score",
-      "results": "resultados"
-    },
-    "clauses": {
-      "title": "Extracción de cláusulas en contratos",
-      "subtitle": "Detecta y clasifica cláusulas críticas con nivel de riesgo automático.",
-      "doc": "Contrato_Prestacion_Servicios_2026.pdf",
-      "items": {
-        "confidentiality": { "name": "Confidencialidad", "snippet": "Las partes se obligan a mantener en estricta reserva..." },
-        "payment": { "name": "Pago", "snippet": "El pago se efectuará dentro de los 30 días siguientes..." },
-        "indemnity": { "name": "Indemnización", "snippet": "El proveedor responderá por todo daño directo causado..." },
-        "termination": { "name": "Terminación", "snippet": "Cualquiera de las partes podrá dar por terminado el contrato..." }
+        "value": "Valor",
+        "date": "Fecha",
+        "term": "Plazo",
+        "city": "Ciudad",
+        "person": "Persona",
+        "role": "Cargo",
+        "reference": "Número"
       },
-      "risk": { "low": "Bajo", "medium": "Medio", "high": "Alto" }
-    },
-    "compare": {
-      "title": "Comparación inteligente entre versiones",
-      "subtitle": "Diff lado a lado con resaltado de adiciones, eliminaciones y cambios semánticos.",
-      "before": "v1.0 — original",
-      "after": "v1.1 — propuesta",
-      "summary": "3 adiciones · 2 eliminaciones · 1 cambio de cláusula"
+      "folder": "Carpeta",
+      "retentionTitle": "Retención",
+      "keepUntil": "{policy}: se conserva hasta el {date}",
+      "keepPerm": "Se conserva de forma permanente",
+      "noPolicy": "Sin política de retención",
+      "onHold": "Retención legal activa",
+      "holdExplain": "La carpeta tiene retención legal: sus documentos no se pueden mover a la papelera ni eliminar hasta que la quites.",
+      "editRetention": "Cambiar la retención de la carpeta",
+      "tools": "Herramientas",
+      "ocr": "Ver lectura OCR",
+      "clauses": "Detectar cláusulas",
+      "versions": "Comparar versiones ({count})",
+      "noTools": "Este documento no tiene cláusulas, versiones ni lectura OCR.",
+      "serverToolsNote": "La lectura OCR, las cláusulas, las versiones y la copia con marca de agua están en los datos de ejemplo: el servidor de la demo guarda el texto extraído, no el archivo para mostrarlo.",
+      "signText": "¿Necesitas firmarlo?",
+      "signLink": "Prueba la demo de Firma electrónica",
+      "explainSample": "Ver explicación",
+      "explainAi": "Explicar con IA",
+      "explaining": "La IA está leyendo el documento…",
+      "explanationTitle": "Explicación del documento",
+      "explanationSample": "Escrita de antemano para los datos de ejemplo (no llama a la IA).",
+      "explanationAi": "Generada por IA en el servidor.",
+      "explanationEmpty": "La IA no devolvió texto.",
+      "trash": "Mover a la papelera"
     },
     "watermark": {
-      "title": "Watermarks dinámicas",
-      "subtitle": "Marca de agua personalizada por usuario y sesión, embebida al exportar.",
-      "label": "Visto por",
-      "id": "ID"
+      "label": "Visto por {name} · {date}",
+      "visitor": "Visitante",
+      "pdfFooter": "Copia controlada de un documento de ejemplo - Gestor documental con IA (demo)"
+    },
+    "ocr": {
+      "title": "Lectura OCR de la factura",
+      "note": "Lectura de ejemplo, escrita de antemano para esta factura escaneada: la demo no procesa imágenes. En tu proyecto se conecta un motor OCR y los datos se validan contra la factura electrónica.",
+      "image": "Imagen escaneada",
+      "highlight": "Resaltar los campos leídos",
+      "fieldsTitle": "Campos leídos",
+      "fields": {
+        "issuer": "Emisor",
+        "nit": "NIT del emisor",
+        "number": "Número",
+        "date": "Fecha de emisión",
+        "cufe": "CUFE",
+        "buyer": "Adquiriente",
+        "subtotal": "Subtotal",
+        "iva": "IVA 19 %",
+        "total": "Total"
+      },
+      "confidence": "Confianza {pct} %",
+      "review": "revisar",
+      "checksTitle": "Verificaciones (calculadas en tu navegador)",
+      "checks": {
+        "nitOk": "El dígito de verificación del NIT es correcto.",
+        "nitBad": "El dígito de verificación del NIT no coincide.",
+        "linesOk": "La suma de las líneas coincide con el subtotal.",
+        "linesBad": "La suma de las líneas no coincide con el subtotal.",
+        "totalOk": "Subtotal más IVA da el total.",
+        "totalBad": "Subtotal más IVA no da el total."
+      },
+      "linesTitle": "Líneas leídas",
+      "headers": {
+        "concept": "Concepto",
+        "qty": "Cant.",
+        "unit": "Valor unitario",
+        "total": "Total"
+      },
+      "totalsLine": "Subtotal {subtotal} · IVA {iva} · Total {total}",
+      "download": "Descargar campos (CSV)",
+      "csvField": "Campo",
+      "csvValue": "Valor",
+      "csvConfidence": "Confianza (%)"
+    },
+    "clauses": {
+      "title": "Cláusulas detectadas",
+      "note": "Detección por reglas en tu navegador sobre el texto de este documento. En tu proyecto se hace con IA y la revisa tu equipo jurídico.",
+      "none": "No se encontraron cláusulas en este documento.",
+      "summary": "{total, plural, one {# cláusula} other {# cláusulas}}: {high} de riesgo alto, {medium} de riesgo medio y {low} de riesgo bajo.",
+      "filterLabel": "Filtrar por riesgo",
+      "filterAll": "Todas",
+      "types": {
+        "payment": "Pago",
+        "penalty": "Cláusula penal o multas",
+        "renewal": "Prórroga automática",
+        "termination": "Terminación",
+        "confidentiality": "Confidencialidad",
+        "indemnity": "Indemnidad",
+        "guarantee": "Garantías y pólizas",
+        "term": "Plazo o vigencia",
+        "dispute": "Solución de controversias"
+      },
+      "risk": {
+        "low": "Riesgo bajo",
+        "medium": "Riesgo medio",
+        "high": "Riesgo alto"
+      },
+      "reasons": {
+        "penaltyPercent": "Pena o multas de hasta el {percent} %: alto desde 15 %, medio desde 10 %.",
+        "penaltyNoPercent": "Pena sin porcentaje definido.",
+        "renewal": "Se renueva sola: revisa con cuánto tiempo hay que avisar.",
+        "indemnityUnlimited": "Responsabilidad sin límite de cuantía.",
+        "indemnity": "Una parte responde por los perjuicios.",
+        "terminationFree": "Una parte puede terminar sin pagar indemnización.",
+        "terminationCost": "Terminar antes tiene un costo.",
+        "termination": "Terminación con preaviso.",
+        "paymentLong": "Plazo de pago mayor a 45 días.",
+        "payment": "Condiciones de pago.",
+        "guarantee": "Pide garantías o pólizas.",
+        "confidentiality": "Obligación de reserva.",
+        "dispute": "Define cómo se resuelven las diferencias.",
+        "term": "Fija el plazo o la vigencia."
+      }
+    },
+    "versions": {
+      "title": "Comparar versiones",
+      "note": "Comparación palabra por palabra calculada en tu navegador con el texto de cada versión.",
+      "history": "Historial de versiones",
+      "from": "Versión anterior",
+      "to": "Versión nueva",
+      "same": "Elige dos versiones distintas para compararlas.",
+      "summary": "{changes, plural, one {# cambio} other {# cambios}}, {additions, plural, one {# texto agregado} other {# textos agregados}} y {deletions, plural, one {# texto eliminado} other {# textos eliminados}} ({added, plural, one {# palabra nueva} other {# palabras nuevas}} y {removed, plural, one {# quitada} other {# quitadas}}).",
+      "legendDel": "Eliminado",
+      "legendAdd": "Agregado"
     },
     "retention": {
-      "title": "Retención & Legal Hold",
-      "subtitle": "Políticas por carpeta con bloqueo WORM (Write Once Read Many) y notificación legal.",
-      "headers": { "folder": "Carpeta", "policy": "Política", "expires": "Vence", "worm": "WORM", "hold": "Legal Hold" },
-      "policies": { "p7": "7 años", "p10": "10 años", "p3": "3 años", "perm": "Permanente" },
-      "active": "Activo",
-      "inactive": "Inactivo"
+      "title": "Retención por carpeta",
+      "note": "Tiempos ilustrativos: en tu proyecto se configuran con la tabla de retención documental (TRD) de tu empresa. En esta demo la regla se guarda en tu navegador y se aplica en esta pantalla.",
+      "holdHelp": "La retención legal impide mover a la papelera o eliminar los documentos de la carpeta, por ejemplo durante una auditoría o un proceso judicial.",
+      "headers": {
+        "folder": "Carpeta",
+        "policy": "Se conserva",
+        "docs": "Documentos",
+        "hold": "Retención legal"
+      },
+      "policyFor": "Tiempo de conservación de {folder}",
+      "holdLabel": "Retención legal en {folder}",
+      "inTrash": "(+{count} en la papelera)",
+      "policies": {
+        "none": "Sin política",
+        "y1": "1 año",
+        "y3": "3 años",
+        "y5": "5 años",
+        "y10": "10 años",
+        "perm": "Permanente"
+      },
+      "reset": "Restablecer",
+      "done": "Listo"
     },
-    "encryption": {
-      "title": "Zero-knowledge encryption",
-      "subtitle": "El cliente posee las llaves. Ni siquiera Koptup puede leer el contenido.",
-      "toggle": "Activar cifrado BYO-key",
-      "badge": "BYO-key activo",
-      "flow": {
-        "1": "1. Cliente genera key local",
-        "2": "2. Documento se cifra en el navegador",
-        "3": "3. Solo el ciphertext viaja al servidor",
-        "4": "4. Descifrado solo con tu key"
-      }
-    },
-    "ediscovery": {
-      "title": "E-discovery export",
-      "subtitle": "Búsqueda compleja con filtros legales y exportación en formato EDRM.",
+    "audit": {
+      "title": "Paquete para auditoría",
+      "noteSample": "Reúne los documentos que cumplen los criterios y descarga su índice (CSV) o un paquete JSON con el texto de cada uno. Se arma en tu navegador con los datos de ejemplo.",
+      "noteServer": "Reúne tus documentos que cumplen los criterios y descarga su índice (CSV) o un JSON con sus datos y resúmenes. Se arma en tu navegador con la lista que trajo el servidor.",
       "keywords": "Palabras clave",
-      "custodian": "Custodio",
-      "dateFrom": "Desde",
-      "dateTo": "Hasta",
-      "format": "Formato",
-      "generate": "Generar bundle",
-      "ready": "Bundle listo: 248 documentos · 1.4 GB"
-    },
-    "sign": {
-      "title": "Firma electrónica integrada",
-      "subtitle": "Cuatro niveles de firma compatibles con eIDAS y Ley 527 de Colombia.",
-      "button": "Firmar electrónicamente",
-      "menuTitle": "Selecciona el nivel de firma",
-      "levels": {
-        "simple": { "name": "Simple", "desc": "Aceptación clic + IP + timestamp" },
-        "advanced": { "name": "Avanzada", "desc": "Identificación + autenticación biométrica" },
-        "qualified": { "name": "Cualificada", "desc": "Certificado emitido por entidad acreditada" },
-        "ley527": { "name": "Ley 527 CO", "desc": "Firma digital con certificado de entidad reconocida" }
+      "keywordsHint": "Busca en el nombre, las etiquetas y el texto",
+      "folder": "Carpeta",
+      "folderAll": "Todas las carpetas",
+      "from": "Desde",
+      "to": "Hasta",
+      "includeTrash": "Incluir los documentos de la papelera",
+      "matches": "{count, plural, =0 {Ningún documento cumple los criterios} one {# documento cumple los criterios} other {# documentos cumplen los criterios}}",
+      "downloadCsv": "Descargar índice (CSV)",
+      "downloadJson": "Descargar paquete (JSON)",
+      "stateActive": "Activo",
+      "stateTrash": "En la papelera",
+      "yes": "Sí",
+      "no": "No",
+      "cols": {
+        "name": "Nombre",
+        "folder": "Carpeta",
+        "type": "Tipo",
+        "size": "Tamaño (bytes)",
+        "date": "Fecha",
+        "state": "Estado",
+        "tags": "Etiquetas",
+        "keepUntil": "Se conserva hasta",
+        "hold": "Retención legal"
       }
     },
-    "topbar": {
-      "modeLabel": "Modo",
-      "modeHint": "Cambia el algoritmo de búsqueda"
+    "semantic": {
+      "title": "Búsqueda por significado",
+      "query": "Consulta: «{query}»",
+      "sampleNote": "Datos de ejemplo: la búsqueda se amplía con términos relacionados (sinónimos de ejemplo) en tu navegador, sin IA. En «Mis documentos», con sesión, este botón usa IA en el servidor.",
+      "serverNote": "La IA compara el significado de tu consulta con el de cada documento y muestra los que pasan del 50 % de similitud.",
+      "searching": "Buscando…",
+      "noResults": "No encontramos documentos relacionados. Prueba con otras palabras.",
+      "noResultsServer": "Ningún documento pasa del 50 % de similitud. Prueba con otras palabras.",
+      "relevance": {
+        "high": "Muy relevante",
+        "mid": "Relevante",
+        "low": "Algo relevante"
+      },
+      "similarity": "{pct} % de similitud",
+      "open": "Abrir documento",
+      "why": "¿Por qué este resultado?",
+      "explaining": "La IA está explicando…",
+      "whyDirect": "Coincide con lo que escribiste: {terms}.",
+      "whyRelated": "Y con términos relacionados: {terms}.",
+      "whySnippet": "Fragmento:"
     },
-    "uploadMenu": {
-      "label": "Subir documento",
-      "title": "Elige un canal de ingesta",
-      "subtitle": "Cinco vías oficiales para entrar documentos al vault."
+    "confirm": {
+      "trashTitle": "¿Mover a la papelera?",
+      "trashText": "«{name}» pasará a la Papelera. Desde allí puedes restaurarlo o eliminarlo definitivamente.",
+      "trashOk": "Mover a la papelera",
+      "destroyTitle": "¿Eliminar definitivamente?",
+      "destroyTextSample": "«{name}» desaparecerá de los datos de ejemplo de tu navegador. Puedes recuperarlo con «Restablecer datos de ejemplo».",
+      "destroyTextServer": "«{name}» se borrará del servidor. Esta acción no se puede deshacer.",
+      "destroyOk": "Eliminar definitivamente",
+      "emptyTitle": "¿Vaciar la papelera?",
+      "emptyText": "{count, plural, =0 {No hay documentos para eliminar.} one {Se eliminará definitivamente # documento.} other {Se eliminarán definitivamente # documentos.}}",
+      "emptyHeld": "{count, plural, one {# documento queda en la papelera} other {# documentos quedan en la papelera}} porque su carpeta tiene retención legal.",
+      "emptyOk": "Vaciar papelera",
+      "resetTitle": "¿Restablecer los datos de ejemplo?",
+      "resetText": "Vuelven los 16 documentos, las carpetas y las reglas de retención originales. Se pierden tus cambios en los datos de ejemplo.",
+      "resetOk": "Restablecer"
     },
-    "viewer": {
-      "actionsTitle": "Acciones PRO",
-      "processOcr": "Procesar con OCR",
-      "detectClauses": "Detectar cláusulas",
-      "compareVersions": "Comparar versiones",
-      "watermarkToggle": "Aplicar marca de agua",
-      "watermarkOn": "Marca de agua activa",
-      "encryptionBadge": "Cifrado zero-knowledge BYO-key",
-      "encryptionTooltip": "Solo el cliente posee las llaves; el contenido nunca viaja en claro.",
-      "close": "Cerrar"
+    "rename": {
+      "title": "Renombrar documento",
+      "label": "Nombre del archivo",
+      "save": "Guardar"
     },
-    "globalActions": {
-      "ediscovery": "E-discovery",
-      "encryption": "Cifrado",
-      "ediscoveryTitle": "Búsqueda E-discovery",
-      "encryptionTitle": "Configuración de cifrado"
+    "newFolder": {
+      "title": "Nueva carpeta",
+      "label": "Nombre de la carpeta",
+      "create": "Crear carpeta",
+      "hintSample": "La carpeta se guarda en tu navegador, con los datos de ejemplo.",
+      "hintServer": "La carpeta queda en este navegador hasta que muevas o subas un documento a ella; desde ese momento la guarda el servidor.",
+      "errors": {
+        "empty": "Escribe un nombre.",
+        "exists": "Ya hay una carpeta con ese nombre.",
+        "tooLong": "Usa máximo 60 caracteres."
+      }
     },
-    "folderBadges": {
-      "worm": "WORM",
-      "hold": "Legal Hold",
-      "policyShort": "Retención",
-      "openPanel": "Ver políticas de retención"
+    "toasts": {
+      "renamed": "Nombre actualizado.",
+      "moved": "Documento movido a «{folder}».",
+      "trashed": "Documento movido a la papelera.",
+      "restored": "Documento restaurado.",
+      "destroyed": "Documento eliminado definitivamente.",
+      "trashEmptied": "{count, plural, =0 {No había documentos para eliminar.} one {Se eliminó # documento.} other {Se eliminaron # documentos.}}",
+      "trashEmptiedHeld": "{count, plural, one {Se eliminó # documento} other {Se eliminaron # documentos}}; {held} con retención legal siguen en la papelera.",
+      "folderCreated": "Carpeta «{folder}» creada.",
+      "uploaded": "{count, plural, one {Se subió # documento.} other {Se subieron # documentos.}}",
+      "uploadedNoAi": "{count, plural, one {# documento quedó guardado} other {# documentos quedaron guardados}} sin análisis de IA (cupo de IA agotado o IA no disponible).",
+      "sampleReset": "Datos de ejemplo restablecidos.",
+      "onHold": "«{folder}» tiene retención legal: no se puede eliminar.",
+      "exported": "{count, plural, one {Inventario de # documento descargado.} other {Inventario de # documentos descargado.}}",
+      "auditReady": "{count, plural, one {Paquete con # documento descargado.} other {Paquete con # documentos descargado.}}",
+      "downloaded": "Archivo descargado.",
+      "copyReady": "Copia con marca de agua descargada."
+    },
+    "errors": {
+      "login": "Tu sesión no está activa. Inicia sesión para ver y subir tus documentos.",
+      "rateLimit": "Hiciste muchas solicitudes seguidas. Espera un momento y vuelve a intentarlo.",
+      "forbidden": "El servidor no permitió esta acción.",
+      "notFound": "El documento ya no existe en el servidor.",
+      "fileType": "Tipo de archivo no admitido. Usa PDF, DOCX, TXT o CSV.",
+      "fileSize": "El archivo pesa más de 10 MB.",
+      "noText": "Este documento no tiene texto que la IA pueda leer.",
+      "aiOff": "La IA no está configurada en este servidor.",
+      "aiBudget": "Se agotó el cupo mensual de IA de esta función. Escríbenos y te ayudamos con tu caso.",
+      "aiUserLimit": "Llegaste al límite diario de solicitudes con IA de tu cuenta. Vuelve a intentarlo mañana.",
+      "aiUnavailable": "La IA no está disponible en este momento. Intenta de nuevo en unos minutos.",
+      "network": "No hay conexión con el servidor. Revisa tu conexión y vuelve a intentarlo.",
+      "server": "El servidor tuvo un problema. Intenta de nuevo en unos minutos.",
+      "pdf": "No se pudo generar el PDF."
+    },
+    "common": {
+      "cancel": "Cancelar",
+      "close": "Cerrar",
+      "show": "Ver",
+      "hide": "Ocultar"
     }
   }
 }

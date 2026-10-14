@@ -136,3 +136,77 @@ export function RoutingBanner({ hd, result, onClose, onOpen }: { hd: HdText; res
     </div>
   );
 }
+
+// ---------------------------------------------------------------------------
+// Primeros pasos
+// ---------------------------------------------------------------------------
+
+export interface GuideStep {
+  id: string;
+  done: boolean;
+  onAction: () => void;
+}
+
+/**
+ * Recorrido corto para quien llega por primera vez: cuatro pasos con su botón
+ * y una marca cuando ya se hicieron (se calcula con los datos de la demo).
+ */
+export function GettingStarted({ hd, steps, open, onToggle }: { hd: HdText; steps: GuideStep[]; open: boolean; onToggle: () => void }) {
+  const { t } = hd;
+  const done = steps.filter((s) => s.done).length;
+  return (
+    <section aria-labelledby="hd-guide-title" className="mb-6 rounded-2xl border border-rose-200 dark:border-rose-900/60 bg-white/80 dark:bg-secondary-900/80 p-4 sm:p-5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 id="hd-guide-title" className="text-base sm:text-lg font-bold text-secondary-900 dark:text-white flex items-center gap-2">
+          <SparklesIcon className="h-5 w-5 text-rose-600 dark:text-rose-400" aria-hidden="true" />
+          {t('guide.title')}
+        </h2>
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-secondary-500">{t('guide.progress', { done, total: steps.length })}</span>
+          <button
+            type="button"
+            onClick={onToggle}
+            aria-expanded={open}
+            aria-controls="hd-guide-steps"
+            className="text-xs font-medium text-primary-700 dark:text-primary-300 hover:underline"
+          >
+            {open ? t('guide.hide') : t('guide.show')}
+          </button>
+        </div>
+      </div>
+      {open && (
+        <ol id="hd-guide-steps" className="mt-3 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+          {steps.map((s, i) => (
+            <li
+              key={s.id}
+              className={`flex flex-col rounded-xl border p-3 ${
+                s.done
+                  ? 'border-green-300 dark:border-green-800 bg-green-50/70 dark:bg-green-950/20'
+                  : 'border-secondary-200 dark:border-secondary-700 bg-white dark:bg-secondary-900'
+              }`}
+            >
+              <p className="flex items-center gap-2 text-sm font-semibold text-secondary-900 dark:text-white">
+                {s.done ? (
+                  <CheckCircleIcon className="h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" aria-label={t('guide.done')} />
+                ) : (
+                  <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-rose-600 text-[11px] font-bold text-white" aria-hidden="true">
+                    {i + 1}
+                  </span>
+                )}
+                {t(`guide.steps.${s.id}.title`)}
+              </p>
+              <p className="mt-1 flex-1 text-xs text-secondary-600 dark:text-secondary-400">{t(`guide.steps.${s.id}.text`)}</p>
+              <button
+                type="button"
+                onClick={s.onAction}
+                className="mt-2 self-start text-xs font-semibold text-primary-700 dark:text-primary-300 hover:underline"
+              >
+                {t(`guide.steps.${s.id}.action`)} →
+              </button>
+            </li>
+          ))}
+        </ol>
+      )}
+    </section>
+  );
+}

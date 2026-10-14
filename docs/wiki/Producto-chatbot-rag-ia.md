@@ -50,46 +50,45 @@ Las demás ofertas del catálogo pasan a **"Otras soluciones a medida"**. Varias
 
 ## Estado actual
 
-Evidencia en `main` (producción) y en la rama `rag-reposicionamiento`, que ya está terminada: lo que figura en su columna está hecho en la rama `rag-reposicionamiento` (pendiente de merge). Estado al 8 de octubre de 2026.
+Estado al 14 de octubre de 2026. El reposicionamiento RAG (home, `/rag`, landings por sector, planes y "Prueba con tu documento") ya está en `main` (PR #113). La persistencia en MongoDB, la propiedad de los bots, los topes de IA, el widget real, los bots de ejemplo compartidos y la verificación final están en la rama `ccr-55ceecf7-dpc10i`, **pendientes de merge**. En producción el chatbot no funciona mientras el backend de Railway no responda ([Correcciones pendientes, 0.1](16-Correcciones-Pendientes.md#p0-riesgo-o-bloqueo)).
 
-| Aspecto | En producción (`main`) | En la rama `rag-reposicionamiento` | Evidencia |
-|---|---|---|---|
-| Posicionamiento | La home dice "Transformamos tus ideas en soluciones tecnológicas"; el chatbot es una tarjeta más entre 27 | Home, `/rag`, landings por sector, "RAG" en el menú y en el footer | `src/components/home/HomeContent.tsx`, `src/app/rag/` (rama) |
-| Precio | 4 niveles del catálogo viejo (compra y SaaS) y "desde $499 USD" en `/chatbots-ia` | **Planes RAG** en `/services#planes-rag` y en `/rag`; la tarjeta "Chatbot RAG con IA" se oculta del catálogo | `src/lib/rag-plans.ts`, `src/components/rag/RagPlans.tsx` (rama) |
-| Demo | Existe, con dos modos: **Playground** y **Builder** (`page.tsx`, 776 líneas; `components/builder/BuilderMode.tsx`) | Tercer modo **"Prueba con tu documento"**, enlace a `/rag` y title "Demo RAG: prueba con tu documento": hecho en la rama `rag-reposicionamiento` (pendiente de merge). La subida queda apagada hasta configurarla en Railway | `apps/web/src/app/demo/chatbot/`, `components/upload/` (rama) |
-| Real o maqueta | **Parcialmente real.** El chat llama al backend (`chatWithBot` en `components/builder/api.ts`), con búsqueda por palabras clave (tipo BM25) y OpenAI si hay clave; sin clave responde en modo extractivo. Pipeline, telemetría, fuentes conectadas y escenarios son simulados (`components/data.ts`) | Igual | `page.tsx` líneas 290–365, `components/data.ts` |
-| Respuestas con fuente | El prompt de los bots de la demo no obligaba a responder solo con los documentos | **Resuelto:** reglas fijas que se agregan siempre al prompt (solo fragmentos, citas [1], [2]… y "No encontré esa información en los documentos cargados.") | `GROUNDING_RULES` y `NOT_FOUND_REPLY` en `chatbot.routes.ts` (rama) |
-| Backend | Rutas reales en `chatbot.routes.ts` (943 líneas): bots, documentos, URLs, chat, conversaciones y modelos. Estado en `Map` en memoria y volcado a disco (`data/chatbot-store.ts`), que se pierde en cada despliegue | Igual para los bots (la persistencia es Fase 0). Nueva API `/api/demo-rag` para "Prueba con tu documento", con el pipeline compartido en `services/rag-pipeline.ts` | `chatbot.routes.ts`, `chatbot-store.ts`, `routes/demo-rag.routes.ts` (rama) |
-| Ingesta de PDF y DOCX | La ruta de bots solo decodifica texto plano (`decodeBase64Text`); la ruta heredada sí usa `services/pdf.service.ts`, y `mammoth` está instalado | Resuelto para la demo: `/api/demo-rag` lee PDF por página (`pdf-parse`) y DOCX (`mammoth`). La ruta de bots del Builder sigue igual (Fase 2, tarea 11) | `services/demo-rag.service.ts` (rama), `chatbot.routes.ts` línea 155 |
-| Backend heredado | Segunda API "por sesión" (`/session`, `/upload`, `/message`) con modelo Mongo `Chatbot`; solo la usa la página huérfana `/demo/chatbot/preview` (498 líneas) y los proxies `apps/web/src/app/api/chatbot/*` | Igual | `apps/web/src/hooks/useChatbot.ts` |
-| Widget embebible | `LivePreview.tsx` y `EmbedCode.tsx` muestran un iframe a `/embed/chatbot/<botId>`, un script de CDN, un paquete React y un webhook que no existen en el repo | Igual (Fase 2) | `components/builder/` |
-| Integraciones (Drive, SharePoint, WhatsApp, bases de datos, APIs) | No existen | `/rag` las presenta por plan (una fuente en Esencial, hasta 3 en Profesional, WhatsApp desde Profesional); **no hay código de conectores** | `messages/offerings/_rag-page.es.json` (rama) |
-| SEO de la demo | Title "Chatbot Médico con IA para el Sector Salud" y breadcrumb de salud, aunque la demo es genérica | **Resuelto:** title "Demo RAG: prueba con tu documento" e imagen para redes con el mensaje RAG. El encabezado dentro de la demo sigue en inglés (tarea 15) | `seoConfig['demo-chatbot']` en `src/lib/seo-config.ts` |
-| i18n ES/EN | Sí (`messages/demos/chatbot.{es,en}.json`, ~28 KB cada uno), con voseo ("Hacé", "Probá") y datos de ejemplo en inglés fijos en `data.ts` | Voseo corregido (commit `d2a4f66`); los datos de ejemplo en inglés siguen (Fase 2) | `messages/demos/chatbot.es.json` |
-| Medición | No hay analítica | Hecho en la rama `rag-reposicionamiento` (pendiente de merge): banner de cookies, GA4, Google Ads, LinkedIn Insight y los 5 eventos, sin IDs reales configurados todavía | `src/lib/analytics.ts`, `src/components/consent/CookieBanner.tsx` (rama) |
-| Tests | Un smoke test (`__tests__/page.test.tsx`, 11 líneas) que hoy no se ejecuta | Igual | [Seguridad y calidad](10-Seguridad-y-Calidad.md) |
-| Tamaño | 5.469 líneas en `apps/web/src/app/demo/chatbot/` (4.162 en `components/`) | — | `wc -l` |
+| Aspecto | Estado en la rama `ccr-55ceecf7-dpc10i` | Evidencia |
+|---|---|---|
+| Posicionamiento | Home, `/rag`, landings por sector, "RAG" en el menú y en el footer (ya en `main`) | `src/components/home/HomeContent.tsx`, `src/app/rag/` |
+| Precio | **Planes RAG** en `/services#planes-rag` y en `/rag`. Lo que no existe todavía en el código (conectores de Google Drive y SharePoint, canal de WhatsApp, permisos por rol, panel de métricas, SSO y auditoría) se presenta como **"se construye en tu proyecto"** en las tarjetas, en `/rag`, en `/chatbots-ia`, en el JSON-LD y en `llms.txt` | `messages/offerings/_rag-plans.*.json`, `_rag-page.*.json`, `_chatbots-page.*.json`, `src/components/seo/StructuredData.tsx`, `public/llms.txt` |
+| Demo | Tres modos: **Prueba el asistente** (cuatro empresas ficticias colombianas —RR. HH., tienda, IPS y firma de abogados—, bot de ejemplo compartido por huella de contenido; cada landing por sector la abre con su empresa con `?empresa=`), **Prueba con tu documento** (PDF, DOCX o TXT propio) y **Configura el tuyo** (bot propio con widget real). El cierre de la página ofrece «Cotizar el piloto» con el plan ya elegido y «Solicitar demo guiada», que abre el contacto con el mensaje de demo guiada | `apps/web/src/app/demo/chatbot/`, [Guía de la demo](Guia-Demo-chatbot.md) |
+| Real o maqueta | **Real:** búsqueda BM25, modelo de OpenAI con clave y presupuesto, citas, fragmentos y "Cómo se respondió" con los datos de cada respuesta. Sin clave o sin presupuesto, **modo extractivo** con una nota que lo explica. Las métricas de la sesión se calculan en el navegador con las respuestas reales | `routes/chatbot.routes.ts` (`POST /bots/:botId/chat`), `components/StatsWidget.tsx` |
+| Respuestas con fuente | Reglas fijas que se agregan siempre al prompt (solo fragmentos, citas [1], [2]… y "No encontré esa información…"). Los textos que escribe el servidor sin modelo salen en español o inglés según `lang` (o el primer idioma del bot) | `GROUNDING_RULES`, `REPLY_TEXT` y `replyLangFor` en `chatbot.routes.ts` |
+| Backend | Bots, documentos, fragmentos y conversaciones en MongoDB (`chatbot_bots`, `chatbot_bot_chunks`, `chatbot_turns`); las conversaciones del widget vencen a los 30 días (índice TTL); el archivo heredado `data/chatbots/state.json` se migra una vez y se borra. Propiedad por token del navegador, tope de gasto mensual (`CHATBOT_MONTHLY_BUDGET_USD`) y cupos por IP: 180 consultas por minuto (sin contar `GET /models`), 60 preguntas por minuto y 30 bots nuevos por hora | `services/chatbot-store.service.ts`, `middleware/rateLimiter.ts` |
+| Ingesta | PDF y DOCX se leen en la ruta de bots (`document-text.service`), además de TXT, MD, CSV y páginas web públicas (`safe-fetch.service`). `/api/demo-rag` cita por página | `chatbot.routes.ts` (`POST /bots/:botId/docs`, `/urls`), `services/demo-rag.service.ts` |
+| Backend heredado | **Retirado.** La API "por sesión" (`/session`, `/upload`, `/message`…) responde 404; al arrancar, el backend borra lo que dejó (colección `chatbots` y `uploads/chatbot`) | `services/chatbot-legacy-cleanup.service.ts`, `src/index.ts` |
+| Widget embebible | **Real:** `public/widget.js` + `/embed/chatbot/<id>`. Se pinta solo el chat (sin menú, pie, banner de cookies ni etiquetas de medición) y cada error dice su causa (429, servidor no disponible, sin conexión) | `src/app/embed/chatbot/[botId]/`, `components/layout/ConditionalLayout.tsx` |
+| Integraciones (Drive, SharePoint, WhatsApp, bases de datos, APIs) | **No hay código de conectores.** Se ofrecen como construcción en el proyecto de cada plan y así lo dicen las páginas | Búsqueda sin resultados de `googleapis`, `sharepoint` o `graph.microsoft` en `apps/` |
+| SEO de la demo | Title "Demo RAG: prueba con tu documento" e imagen para redes con el mensaje RAG. Los metadatos son en español también con el sitio en inglés (decisión: una sola URL por página, ver [SEO, analítica y legal](Doc-12-SEO-Analitica-y-Legal.md)) | `seoConfig['demo-chatbot']` en `src/lib/seo-config.ts` |
+| i18n ES/EN | Completo en la interfaz (`messages/demos/chatbot.{es,en}.json`) y en los textos del servidor | `messages/demos/chatbot.es.json` |
+| Medición | Banner de cookies, GA4, Google Ads, LinkedIn Insight y los 5 eventos, sin IDs configurados en producción. El chat insertado no se mide | `src/lib/analytics.ts`, `src/components/analytics/Analytics.tsx` (`NO_TRACKING_PATHS`) |
+| Tests | Jest backend (`chatbot`, `chatbot-storage`, `chatbot-sample-bots`, `chatbot-legacy-lang`, `chatbot-rate-limit`, `budget`, `ai-limits`, `demo-rag-limits`), Jest web (página de la demo, bots de ejemplo, `embed-channel`) y e2e (`rag-upload`, `embed-chatbot`, `/demo/chatbot` en `demos.spec`), todos en CI | `apps/backend/src/__tests__/`, `apps/web/e2e/` |
 
 ### Problemas detectados (con ruta)
 
 | # | Problema | Estado |
 |---|---|---|
-| 1 | **La demo no le habla al comprador colombiano.** Las empresas de ejemplo son "Acme Corp / Globex / Umbrella" (`TENANTS` en `components/data.ts`) y los escenarios hablan de `payments-svc`, Snowflake y grafos de servicios | Pendiente (Fase 2, tarea 15) |
-| 2 | **El selector "Tenant" no hace nada:** el estado `tenant` de `page.tsx` solo llega a `TopBar` | Pendiente (Fase 2, tarea 15) |
-| 3 | **Primero aparece una respuesta prefabricada:** `handleSend` elige un escenario por expresión regular y lo muestra mientras llega la respuesta real | Pendiente (Fase 2, tarea 15) |
-| 4 | **Métricas simuladas presentadas como reales:** `StatsWidget` cambia valores al azar cada 4 s y `PipelinePanel` muestra pasos y modelos que el backend no ejecuta | Pendiente (Fase 2, tarea 15) |
-| 5 | **Mensaje sobretécnico:** "19 capas de plataforma" (`Sidebar.tsx`, `CapabilityPanel.tsx`) y tooltips para ingenieros | Pendiente (Fase 2, tarea 15) |
-| 6 | **El widget embebible no funciona fuera de la demo** (ver tabla) y el micrositio `/chatbot/<id>` de `BuilderMode.tsx` tampoco existe | Pendiente (Fase 2, tarea 12) |
-| 7 | **PDF y DOCX no se leen en la ruta de bots** | Para la demo, hecho en la rama `rag-reposicionamiento` (pendiente de merge) con `/api/demo-rag`. En la ruta de bots del Builder sigue pendiente (Fase 2, tarea 11) |
-| 8 | **La ingesta de URLs existe en la API (`ingestBotUrls`) pero no hay campo en `ConfigPanel.tsx`** | Pendiente (Fase 2, tarea 17) |
-| 9 | **Botones sin acción:** 👍, 👎 y "Regenerar" en `ChatPanel.tsx` | Pendiente (Fase 2, tarea 16) |
-| 10 | **SEO contradictorio** de `/demo/chatbot` (metadata de "chatbot médico") | Resuelto en la rama (title "Demo RAG: prueba con tu documento") |
-| 11 | **Precio contradictorio** ("desde $499 USD" frente al catálogo) | Resuelto en la rama en `/chatbots-ia`, la home, `/register`, `/services`, `llms.txt`, `/desarrollo-web-colombia` y `/bienvenido-producthunt` (auditoría final) |
-| 12 | **El prompt no obligaba a responder solo con los documentos** | Resuelto en la rama (`GROUNDING_RULES`) |
-| 13 | **`/rag` anuncia integraciones y widget que aún no tienen código.** Es correcto como oferta (se construyen en el proyecto de cada plan), pero deben existir antes de entregar el primer plan Esencial o Profesional | Pendiente (Fase 2, tareas 12–14) |
-| 14 | **La sección de seguridad de `/rag` describe el almacenamiento actual** (servidor de KopTup). Cuando la Fase 0 mueva los datos a MongoDB y al almacenamiento de objetos, hay que actualizar ese texto | Pendiente (Fase 0, tarea 1) |
-| 15 | **Endurecimiento pendiente:** antes de recibir tráfico pagado hay que completar las tareas genéricas de la Fase 0 (autenticación y autorización en servidor, límites de costo y rate-limit en endpoints de IA, rotación de credenciales). "Prueba con tu documento" ya tiene sus límites y su tope en la rama, pero el modo Builder & Embed y las preguntas libres del Playground siguen sin tope de costo | Pendiente (Fase 0, tareas 1–3) |
-| 16 | **El encabezado de la demo sigue en inglés** ("Enterprise RAG Chatbot") y promete cosas que la demo no hace ("hybrid retrieval", "orquestación de agentes") | Pendiente (Fase 2, tarea 15) |
+| 1 | **La demo no le hablaba al comprador colombiano** ("Acme Corp / Globex / Umbrella") | Resuelto: tres empresas ficticias colombianas |
+| 2 | **El selector "Tenant" no hacía nada** | Resuelto: el selector de empresa cambia los documentos y el bot |
+| 3 | **Primero aparecía una respuesta prefabricada** | Resuelto: solo se muestra la respuesta del servidor |
+| 4 | **Métricas simuladas presentadas como reales** | Resuelto: las métricas de la sesión se calculan con las respuestas reales y lo dicen |
+| 5 | **Mensaje sobretécnico** ("19 capas de plataforma") | Resuelto |
+| 6 | **El widget embebible no funcionaba fuera de la demo** | Resuelto: `widget.js` + `/embed/chatbot/<id>` |
+| 7 | **PDF y DOCX no se leían en la ruta de bots** | Resuelto |
+| 8 | **La ingesta de URLs no tenía campo en el Builder** | Resuelto: «O agrega una página web pública» |
+| 9 | **Botones sin acción** (👍, 👎, "Regenerar") | Resuelto: valoración local que lo dice y «Volver a preguntar» |
+| 10 | **SEO contradictorio** de `/demo/chatbot` | Resuelto |
+| 11 | **Precio contradictorio** ("desde $499 USD") | Resuelto |
+| 12 | **El prompt no obligaba a responder solo con los documentos** | Resuelto (`GROUNDING_RULES`) |
+| 13 | **Integraciones y funciones de los planes presentadas como existentes** | Resuelto en los textos (se construyen en el proyecto). Los conectores, el canal de WhatsApp, los permisos por rol y el panel de métricas siguen sin código: deben existir antes de entregar el primer plan que los incluya (Fase 2, tareas 12–14) |
+| 14 | **La API heredada "por sesión" guardaba preguntas y documentos sin vencimiento** | Resuelto: retirada y limpieza única al arrancar |
+| 15 | **Endurecimiento:** autorización, topes de costo y cupos del chatbot | Hecho en la rama `ccr-55ceecf7-dpc10i` (pendiente de merge). Falta rotar credenciales ([Correcciones pendientes, 0.2](16-Correcciones-Pendientes.md#p0-riesgo-o-bloqueo)) |
+| 16 | **Producción:** el backend de Railway responde "Application not found" y `main` no tiene las correcciones de la rama | Pendiente: acción del dueño (volver a desplegar el backend e integrar la rama) |
 
 ---
 
@@ -123,7 +122,7 @@ flowchart TD
   C -->|"evento demo_start"| D{"¿Quiere probar con su documento?"}
   D -->|"Si"| E["Prueba con tu documento: email y autorización Ley 1581"]
   E -->|"evento demo_upload y lead demo-rag"| F["10 preguntas con cita, documento borrado a la hora"]
-  D -->|"No"| G["Ver planes o Agenda un piloto"]
+  D -->|"No"| G["Ver planes o Cotizar el piloto"]
   F --> G
   G -->|"evento plan_click o generate_lead"| H["Llamada de 30 min con comercial"]
   H --> I["Piloto RAG: 2 semanas, COP 3.900.000 / USD 1.200"]
@@ -136,10 +135,10 @@ flowchart TD
 
 | Paso | Qué ve el visitante | Qué hace KopTup | Dónde vive |
 |---|---|---|---|
-| 1. Landing | `/rag` explica qué es RAG, casos por sector, cómo funciona, seguridad, cómo evita respuestas inventadas, integraciones, planes y FAQ. Las landings por sector son cortas: H1, 3 casos, enlace a `/rag` y CTA | Pauta en Google y LinkedIn hacia `/rag` o la landing del sector | `src/app/rag/`, `src/components/rag/` (rama) |
+| 1. Landing | `/rag` explica qué es RAG, casos por sector, cómo funciona, seguridad, cómo evita respuestas inventadas, integraciones, planes y FAQ, con un índice de anclas bajo el H1. Cada landing por sector abre con la demo de su sector, «Cotizar el piloto» y el precio del piloto; después trae casos de uso, un ejemplo ilustrativo con un documento ficticio de la demo, sus datos y qué pasa si la respuesta no está, cómo empieza el piloto y el CTA | Pauta en Google y LinkedIn hacia `/rag` o la landing del sector | `src/app/rag/`, `src/components/rag/` (rama) |
 | 2. Demo pública | `/demo/chatbot` con un documento de ejemplo. No pide registro | Cupo por visitante y tope mensual de gasto | `apps/web/src/app/demo/chatbot/` |
 | 3. "Prueba con tu documento" | Sube un PDF, DOCX o TXT y pregunta sobre él. Solo da su email y marca la autorización de datos | El email entra como **lead con origen `demo-rag`** por el mismo canal del formulario de contacto (en la rama, `services/lead.service.ts` guarda un `Contact` con `source = demo-rag` y avisa por email y WhatsApp; con el sistema de demos, un `Lead` con canal `demo_rag` en **Admin › Leads**). El comercial lo contacta en 1 día hábil | Etapa 6: hecho en la rama `rag-reposicionamiento` (pendiente de merge), API `/api/demo-rag` |
-| 4. Agenda un piloto | Botones "Agenda un piloto" (en `/rag` va a `/contact`; en `/chatbots-ia` y en la tabla de planes va a `/contact?service=sistema-rag&plan=piloto`, con el plan prellenado) | Llamada de 30 min, alcance y orden de servicio | `/contact` (rama) |
+| 4. Cotizar el piloto | Botones «Cotizar el piloto» de `/rag`, las landings por sector, `/chatbots-ia`, la tabla de planes y la demo: van a `/contact?service=sistema-rag&plan=piloto`. El formulario llega con el encabezado «Cotiza el plan Piloto RAG», el precio y la duración, «Qué pasa después» (llamada de 30 minutos, alcance, qué entrega el cliente) y sin el campo de presupuesto. Al enviar, la confirmación repite el email y dice que no llega un correo automático | Llamada de 30 min, alcance y orden de servicio | `/contact` |
 | 5. Piloto RAG | Su propio asistente con una fuente y hasta 100 documentos, interfaz web con citas | Informe de precisión con 50 preguntas | Kit del Piloto (tarea 10) |
 | 6. Plan | Propuesta del plan Esencial, Profesional o Empresarial con el crédito del Piloto | Implementación y operación mensual | [Panel de administración](05-Panel-de-Administracion.md) (propuestas, Fase 3) |
 
@@ -157,14 +156,14 @@ Este producto no usa la plantilla `/productos/<slug>`: su landing es **`/rag`**,
 
 | Ruta | Qué es | Estado |
 |---|---|---|
-| `/rag` | Página principal del producto. Title "Sistemas RAG para empresas en Colombia \| KopTup". 9 secciones en este orden: qué es RAG (para un gerente), casos por sector, cómo funciona (documentos → índice → búsqueda → respuesta con cita), seguridad y privacidad (lo que el código hace hoy), cómo evitamos respuestas inventadas, integraciones, planes y precios, FAQ con `FAQPage` y CTA "Prueba con tu documento" / "Agenda un piloto". JSON-LD `Service` con cada plan como `Offer` | Hecha en la rama |
-| `/rag/salud` | H1, 3 casos (protocolos clínicos, normativa del sector, auditoría de cuentas médicas), enlace a `/rag` y CTA. Enlaza la demo de cuentas médicas, que se presenta como **"Sistema experto para salud"** porque su código no usa búsqueda vectorial ([Demo cuentas médicas](Demo-cuentas-medicas.md)) | Hecha en la rama (incluye la nueva etiqueta de cuentas médicas) |
-| `/rag/legal` | H1, 3 casos (contratos, conceptos jurídicos internos, normativa), enlace a `/rag` y CTA | Hecha en la rama |
-| `/rag/soporte` | H1, 3 casos (manuales, políticas, base de conocimiento para agentes), enlace a `/rag` y CTA | Hecha en la rama |
-| `/chatbots-ia` | Reescrita como "Chatbots RAG para WhatsApp y web": "Desde COP 9.900.000, o piloto de COP 3.900.000", "Se actualiza cuando agregas o cambias documentos", tiempos alineados con los planes, sin cifras sin respaldo | Hecha en la rama |
+| `/rag` | Página principal del producto. Title "Sistemas RAG para empresas en Colombia \| KopTup". 9 secciones en este orden: qué es RAG (para un gerente), casos por sector, cómo funciona (documentos → índice → búsqueda → respuesta con cita), seguridad y privacidad (lo que el código hace hoy), cómo evitamos respuestas inventadas, integraciones, planes y precios, FAQ con `FAQPage` (10 preguntas, incluidas «¿Entiende sinónimos?» y «¿Qué tengo que entregar para el piloto?») y CTA «Prueba con tu documento» / «Cotizar el piloto». H1 «Sistemas RAG: IA que responde con los documentos de tu empresa», precio del piloto bajo los botones e índice de anclas (sector, cómo funciona, tus datos, precios, preguntas). JSON-LD `Service` con cada plan como `Offer` | Hecha |
+| `/rag/salud` | H1 «IA que responde con tus protocolos, normas y contratos con EPS, citando la fuente», botones «Probar la demo con una IPS de ejemplo» (`?empresa=salud`) y «Cotizar el piloto» con el precio; 3 casos (protocolos clínicos, normativa del sector, consulta para auditoría de cuentas médicas: «el asistente responde preguntas; no revisa las facturas»), ejemplo de glosas citado del «Manual de cuentas médicas (ejemplo)» de la demo, bloque de datos de pacientes y, aparte, el **«Sistema experto para salud»** como otro producto (su código no usa búsqueda vectorial; [Demo cuentas médicas](Demo-cuentas-medicas.md)) con un solo aviso de invitación | Hecha |
+| `/rag/legal` | H1 para firmas y áreas legales, botón «Probar la demo con una firma de ejemplo» (`?empresa=legal`), 3 casos (contratos, conceptos jurídicos internos, normativa y jurisprudencia), bloque «¿Y si cita una sentencia que no existe?» y confidencialidad | Hecha |
+| `/rag/soporte` | H1, botón «Probar la demo con una tienda de ejemplo» (`?empresa=tienda`), 3 casos (manuales, políticas, base de conocimiento para agentes), ejemplo de garantías y aviso de que el chat del sitio es público | Hecha |
+| `/chatbots-ia` | Reescrita como "Chatbots RAG para WhatsApp y web": «Piloto: COP 3.900.000, pago único. Planes desde COP 9.900.000 de implementación + COP 1.490.000 al mes», «Instruido para no inventar», tiempos alineados con los planes, sin cifras sin respaldo | Hecha |
 | `/soluciones-ia` | RAG pasa a ser la primera solución, con enlace a `/rag`; sin cifras sin respaldo | Hecha en la rama |
-| `/services#planes-rag` | Los 4 planes arriba de todo; el catálogo queda debajo como "Otras soluciones a medida" | Hecha en la rama |
-| Inicio | H1 "IA que responde con los documentos de tu empresa", botones "Probar la demo" y "Ver planes", el chatbot RAG como primera demo destacada | Hecha en la rama |
+| `/services#planes-rag` | Los 4 planes arriba de todo, con el total en COP con IVA del 19 %, el costo del primer año, «Qué necesitamos de ti» en el piloto, el aviso de que el chat del Esencial es público y «Todavía no pagas nada» bajo los botones; el catálogo queda debajo como «Otras soluciones a medida», separado («¿Buscas algo distinto a un asistente que responde con tus documentos?») y con precios en «COP» | Hecha |
+| Inicio | H1 "IA que responde con los documentos de tu empresa", botones "Probar la demo" y "Ver planes", franja bajo el hero con los sectores (salud, legal, soporte), el precio del piloto y «Cómo tratamos tus datos»; el chatbot RAG como primera demo destacada; los servicios generales bajo «Además, desarrollamos software a medida» | Hecha |
 | `/productos/chatbot-rag-ia` | No se crea: redirige con 301 a `/rag` cuando existan las landings de producto ([Landing de producto](Seccion-Landing-de-Producto.md)) | Fase 1 |
 
 **Palabras clave** (una intención por URL, ver [Landings SEO](Seccion-Landings-SEO.md)):
@@ -172,7 +171,7 @@ Este producto no usa la plantilla `/productos/<slug>`: su landing es **`/rag`**,
 - Técnicas: "RAG", "retrieval augmented generation", "base de conocimiento con IA" → `/rag`.
 - De problema: "chatbot con los documentos de la empresa" → `/chatbots-ia`; "buscar en contratos con IA" → `/rag/legal`; "asistente IA para manuales internos" → `/rag/soporte`.
 
-![/rag en la rama rag-reposicionamiento: H1 "Sistemas RAG para empresas en Colombia", botones "Prueba con tu documento" y "Agenda un piloto", y el inicio de "¿Qué es RAG?"](images/despues/rag-pagina-rag.jpg)
+![/rag: H1 "Sistemas RAG: IA que responde con los documentos de tu empresa", botones "Prueba con tu documento" y "Cotizar el piloto", el precio del piloto y el índice de la página (sector, cómo funciona, tus datos, precios, preguntas)](images/despues/rag-pagina-rag.jpg)
 
 *`/rag` en un build de la rama `rag-reposicionamiento` terminada (pendiente de merge; aún no está en producción). Más capturas en la galería "Después" de [Reposicionamiento RAG](13-Reposicionamiento-RAG.md).*
 
@@ -193,7 +192,7 @@ Mejoras por pantalla (Fase 2), plantillas por sector y recorrido guiado.
 | `OnboardingTour` (en `page.tsx`) | 4 pasos técnicos con voseo | Recorrido de 5 pasos (abajo) en español con "tú" |
 | `ui/DeviceFrame.tsx` | Marco de teléfono genérico | Vista **"WhatsApp"** con burbujas tipo WhatsApp Business |
 | Builder: `LivePreview.tsx` / `EmbedCode.tsx` | Iframe a una ruta inexistente; snippets que no funcionan | Ruta `/embed/chatbot/[botId]` y script real; mostrar solo los snippets que funcionan |
-| `/demo/chatbot/preview` | Página huérfana con la API heredada | Eliminar junto con `hooks/useChatbot.ts` y los proxies `api/chatbot/*` |
+| `/demo/chatbot/preview` | Página huérfana con la API heredada | Retirada, junto con `hooks/useChatbot.ts` y los proxies `api/chatbot/*` (queda la API heredada del backend) |
 
 **Plantillas por sector** (organizaciones ficticias; verificar en el RUES que el nombre no exista antes de publicar):
 
@@ -212,7 +211,7 @@ flowchart LR
   B --> C["3. Abre la fuente citada"]
   C --> D["4. Pregunta fuera de alcance: responde No encontré esa información"]
   D --> E["5. Prueba con tu documento"]
-  E --> F["CTA: Agenda un piloto"]
+  E --> F["CTA: Cotizar el piloto"]
 ```
 > [Ver diagrama como imagen](images/diagramas/Producto-chatbot-rag-ia-2.png)
 
@@ -221,17 +220,17 @@ flowchart LR
 | Parte de la demo | Acceso | Límites |
 |---|---|---|
 | Playground con documento de ejemplo | `publico`: sin registro, indexable | Cupo por visitante y tope mensual de gasto de la demo |
-| **"Prueba con tu documento"** | `publico` con **email + autorización Ley 1581** (sin cuenta) | PDF, DOCX o TXT de hasta 5 MB y 30 páginas; 10 preguntas por documento; 3 documentos por IP al día; documento y fragmentos borrados a la hora |
+| **"Prueba con tu documento"** | `publico` con **email + autorización Ley 1581** (sin cuenta) | PDF, DOCX o TXT de hasta 5 MB y 30 páginas; 10 preguntas por documento; 3 documentos por red (IP) al día, y la demo lo dice así; documento y fragmentos borrados a la hora |
 | Builder ("Configura el tuyo": marca, documentos, URLs, código para insertar) | Vista previa pública; guardar un bot propio exige un acceso (`DemoGrant`) | Cupo ampliado del grant (Fase 2) |
-| Demo guiada | Por "Agenda un piloto" o por el formulario "Solicitar demo" cuando exista | Sesión con un comercial |
+| Demo guiada | «Pedir una demo guiada» de la demo abre `/contact?service=sistema-rag&motivo=demo-guiada` con el mensaje ya escrito | Sesión con un comercial |
 
 #### "Prueba con tu documento" (etapa 6: hecho en la rama rag-reposicionamiento, pendiente de merge)
 
 - **Qué pide:** solo el email y una casilla **sin marcar** de autorización de tratamiento de datos (Ley 1581 de 2012) con enlace a `/privacy`. Nada más.
 - **Lead:** el email se envía como lead con origen **`demo-rag`** por el mismo canal del formulario de contacto. Llega al equipo como hoy llegan los contactos (email y WhatsApp internos).
-- **Límites:** 10 preguntas por documento y 3 documentos por IP al día. El cupo diario y el contador de gasto usan el Redis que ya tiene el proyecto (`REDIS_URL`). La función solo se enciende con `DEMO_UPLOAD_ENABLED=true`, Redis y `OPENAI_API_KEY`; si falta algo, queda apagada y muestra "Agenda una demo con nosotros".
+- **Límites:** 10 preguntas por documento y 3 documentos por IP al día. El cupo diario y el contador de gasto usan el Redis que ya tiene el proyecto (`REDIS_URL`). La función solo se enciende con `DEMO_UPLOAD_ENABLED=true`, Redis y `OPENAI_API_KEY`; si falta algo, queda apagada y muestra «Pide una demo guiada».
 - **Borrado:** el documento y su índice viven solo en la memoria del servidor y se borran a la hora (TTL de 1 hora). Nada queda en almacenamiento permanente.
-- **Tope de gasto:** `DEMO_MONTHLY_BUDGET_USD` (por defecto 50). Al alcanzarlo, la subida se desactiva y aparece "Agenda una demo con nosotros" → `/contact`.
+- **Tope de gasto:** `DEMO_MONTHLY_BUDGET_USD` (por defecto 50). Al alcanzarlo, la subida se desactiva y aparece «Pide una demo guiada» → `/contact?service=sistema-rag&motivo=demo-guiada`.
 - **Citas:** cada respuesta cita la página o el fragmento del documento.
 - **Aviso visible:** "No subas información confidencial en la demo".
 - **Eventos:** `demo_upload` al subir el documento y `demo_start` en la primera pregunta (con consentimiento de cookies).
@@ -304,7 +303,8 @@ Fuente única en el código de la rama: `apps/web/src/lib/rag-plans.ts` (montos)
 
 **Condiciones:**
 
-- **IVA:** los precios en COP y en USD se publican **más IVA si aplica**. La clasificación tributaria de cada concepto la define el contador ([Comercial, marketing y legal](11-Comercial-Marketing-y-Legal.md)).
+- **IVA:** los precios en COP y en USD se publican **más IVA si aplica**. Debajo de cada precio en COP la tabla muestra el total con el IVA general del 19 % (`withRagVat` en `rag-plans.ts`) y la nota dice que la propuesta confirma si el caso lo lleva. La clasificación tributaria de cada concepto la define el contador ([Comercial, marketing y legal](11-Comercial-Marketing-y-Legal.md)): **el dueño debe confirmar que el 19 % es la tarifa que aplica**.
+- **Primer año:** Esencial COP 27.780.000 y Profesional COP 60.780.000, más IVA (implementación + 12 mensualidades; `ragFirstYearCop`).
 - **USD fijos:** los planes RAG no se convierten con TRM. El resto del catálogo ("Otras soluciones a medida") calcula su USD con una sola constante, `TRM_REFERENCIA = 3300`.
 - **Pregunta adicional sobre el tope del plan:** COP 250 / USD 0,08.
 - **WhatsApp:** las tarifas de Meta por mensajes se cobran aparte, **al costo**.
@@ -317,15 +317,18 @@ Fuente única en el código de la rama: `apps/web/src/lib/rag-plans.ts` (montos)
 2. **Definir "fuente" y "documento":** una fuente es una carpeta de Drive, un sitio de SharePoint o la carga manual; un documento es un archivo, con un tamaño máximo por archivo.
 3. **Precisar "soporte prioritario"** (tiempo de primera respuesta) frente al soporte Lun–Vie de Esencial.
 4. **Empresarial:** publicar qué incluye el SLA base (disponibilidad, horario, tiempos de respuesta) aunque el precio sea a convenir.
-5. **Publicar las condiciones del Piloto** (alcance, qué entrega el cliente, cómo se calcula el informe y el crédito) en `/terms#piloto`.
+5. **Publicar las condiciones del Piloto** (alcance, qué entrega el cliente, cómo se calcula el informe y el crédito) en `/terms#piloto`. Lo que entrega el cliente (hasta 100 documentos de un origen, 50 preguntas con su respuesta esperada y una persona que valide) ya se dice en la tarjeta del Piloto, en la FAQ de `/rag`, en las landings por sector y en `/contact`.
+6. **Confirmar si la mensualidad del Profesional incluye alojamiento y actualización de documentos** como la del Esencial; si es así, decir «Todo lo de la mensualidad del Esencial, más:» en su tarjeta.
+7. **Definir quién accede a la interfaz del Piloto** (¿con usuario y contraseña?, ¿cuántos usuarios?) y qué pasa con los documentos y el asistente si no se contrata después de las 2 semanas.
 
 ---
 
 ## Seguridad y privacidad
 
-Lo que `/rag` dice en la rama (y debe seguir siendo cierto):
+Lo que `/rag` dice (y debe seguir siendo cierto):
 
-- Los documentos se procesan, fragmentan e indexan en el servidor de KopTup; las preguntas y respuestas quedan registradas allí.
+- Los documentos se procesan, fragmentan e indexan en el servidor de KopTup, alojado en Railway con una base MongoDB; las preguntas y respuestas quedan registradas allí. Estos proveedores, igual que OpenAI, pueden procesar los datos fuera de Colombia, principalmente en Estados Unidos (lo mismo que dice `/privacy`).
+- Aun en el plan Empresarial (en la nube o los servidores del cliente), cada respuesta se redacta con la API de OpenAI: la pregunta y los fragmentos relevantes salen hacia OpenAI. Las landings de salud, legal y soporte resumen esto en su bloque de datos y enlazan a `/rag#seguridad`; la de salud recomienda empezar con documentos sin datos de pacientes.
 - El proveedor de IA es **OpenAI** vía API, con **GPT-4o mini** por defecto. La clave del proveedor vive solo en el servidor.
 - A OpenAI se envía lo necesario para cada respuesta: la pregunta, los fragmentos más relevantes (no el documento completo), las instrucciones del asistente y los últimos mensajes.
 - Según la política vigente de la API de OpenAI, por defecto los datos enviados por API no se usan para entrenar modelos, y pueden conservarse hasta 30 días para detectar abusos. Si la política cambia, se actualiza la FAQ de `/rag`.
@@ -374,7 +377,7 @@ flowchart TD
 
 ### Fase 0 — Endurecimiento
 
-- Persistir el chatbot en MongoDB y los archivos en almacenamiento de objetos (hoy el estado se pierde en cada despliegue).
+- ~~Persistir el chatbot en MongoDB~~ (hecho en la rama `ccr-55ceecf7-dpc10i`). Falta llevar los archivos de otras funciones a almacenamiento de objetos.
 - Autenticación y autorización en servidor en todas las rutas del chatbot, aislamiento de bots por cuenta, rate-limit con almacén compartido y topes de costo de IA (pasarela de IA de [Backend y API](09-Backend-y-API.md), tareas 4–6).
 - Rotar credenciales y actualizar dependencias.
 - **Por qué primero:** la pauta va a traer tráfico a una demo con IA real y a documentos de terceros.
@@ -390,9 +393,9 @@ flowchart TD
 ### Fase 2 — Demos vendibles (incluye el producto entregable)
 
 - Núcleo RAG compartido: ingesta real, fragmentos con página, embeddings, búsqueda híbrida y citas.
-- **Widget embebible real** (lo que vende el plan Esencial).
+- ~~**Widget embebible real**~~ (hecho: `widget.js` + `/embed/chatbot/<id>`).
 - **Conectores Google Drive y SharePoint** y **canal WhatsApp** (lo que venden Esencial y Profesional).
-- Demo honesta por sector, recorrido guiado, Builder con acceso y retiro de la API heredada.
+- Demo honesta por sector y recorrido guiado (hechos), Builder con acceso y ~~retiro de la API heredada~~ (hecho).
 - Permisos por rol y panel de métricas (Profesional).
 
 ### Fase 3 — Propuestas y conversión

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState, type KeyboardEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   ArrowLeftIcon,
@@ -92,6 +92,7 @@ export default function EntryEditor({ id }: { id: string }) {
   const fieldLabel = useFieldLabel();
   const [tab, setTab] = useState<Tab>('preview');
   const [previewMode, setPreviewMode] = useState<'draft' | 'live'>('draft');
+  const tabRefs = useRef<Partial<Record<Tab, HTMLButtonElement | null>>>({});
   const [scheduling, setScheduling] = useState(false);
   const [requesting, setRequesting] = useState(false);
   const [note, setNote] = useState('');
@@ -144,6 +145,25 @@ export default function EntryEditor({ id }: { id: string }) {
     { id: 'history', show: true },
     { id: 'ai', show: true },
   ];
+  const visibleTabs = tabs.filter((x) => x.show).map((x) => x.id);
+  // Pestañas con teclado: flechas, Inicio y Fin cambian de pestaña y mueven el foco.
+  const onTabKey = (e: KeyboardEvent<HTMLButtonElement>) => {
+    const i = visibleTabs.indexOf(tab);
+    const to =
+      e.key === 'ArrowRight' ? (i + 1) % visibleTabs.length
+        : e.key === 'ArrowLeft' ? (i - 1 + visibleTabs.length) % visibleTabs.length
+          : e.key === 'Home' ? 0
+            : e.key === 'End' ? visibleTabs.length - 1
+              : -1;
+    if (to < 0) return;
+    e.preventDefault();
+    setTab(visibleTabs[to]);
+    tabRefs.current[visibleTabs[to]]?.focus();
+  };
+
+  // Vista previa: si no hay cambios sin publicar, borrador y publicada son lo mismo y se muestra como publicada.
+  const upToDate = !!entry.live && !changes;
+  const shownMode: 'draft' | 'live' = upToDate ? 'live' : entry.live ? previewMode : 'draft';
 
   const workflow = () => {
     const s = entry.status;
@@ -329,15 +349,22 @@ export default function EntryEditor({ id }: { id: string }) {
         </section>
 
         <section className={`${card} p-4 min-w-0`} aria-label={t('panelLabel')}>
-          <div className="flex gap-1 overflow-x-auto mb-4 -mx-1 px-1" role="tablist" aria-label={t('panelLabel')}>
+          <div className="flex gap-1 overflow-x-auto mb-4 -mx-1 px-1 py-0.5" role="tablist" aria-label={t('panelLabel')}>
             {tabs
               .filter((x) => x.show)
               .map((x) => (
                 <button
                   key={x.id}
+                  ref={(el) => {
+                    tabRefs.current[x.id] = el;
+                  }}
+                  id={`cms-tab-${x.id}`}
                   type="button"
                   role="tab"
                   aria-selected={tab === x.id}
+                  aria-controls="cms-tabpanel"
+                  tabIndex={tab === x.id ? 0 : -1}
+                  onKeyDown={onTabKey}
                   onClick={() => setTab(x.id)}
                   className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold ${tab === x.id ? 'bg-pink-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                 >
@@ -345,9 +372,10 @@ export default function EntryEditor({ id }: { id: string }) {
                 </button>
               ))}
           </div>
+          <div role="tabpanel" id="cms-tabpanel" aria-labelledby={`cms-tab-${tab}`}>
           {tab === 'preview' && (
             <div className="space-y-3">
-              {entry.live && (
+              {entry.live && changes && (
                 <div className="inline-flex rounded-lg border border-slate-300 dark:border-slate-600 overflow-hidden" role="group" aria-label={t('previewVersion')}>
                   {(['draft', 'live'] as const).map((m) => (
                     <button key={m} type="button" aria-pressed={previewMode === m} onClick={() => setPreviewMode(m)} className={`px-3 py-1.5 text-xs font-semibold ${previewMode === m ? 'bg-slate-800 text-white dark:bg-slate-200 dark:text-slate-900' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200'}`}>
@@ -356,13 +384,14 @@ export default function EntryEditor({ id }: { id: string }) {
                   ))}
                 </div>
               )}
-              <SitePreview entry={entry} content={previewMode === 'live' && entry.live ? entry.live : entry.content} mode={previewMode === 'live' && entry.live ? 'live' : 'draft'} />
+              <SitePreview entry={entry} content={shownMode === 'live' && entry.live ? entry.live : entry.content} mode={shownMode} upToDate={upToDate} />
             </div>
           )}
           {tab === 'seo' && <SeoPanel entry={entry} readOnly={!editable} onSeo={(key, v) => edit((c) => ({ ...c, seo: { ...c.seo, [key]: v } }))} />}
           {tab === 'api' && <EntryApiPanel entry={entry} />}
           {tab === 'history' && <HistoryPanel entry={entry} />}
           {tab === 'ai' && <AiPanel entry={entry} readOnly={!editable} onField={(fid, v) => setField(fid, v)} onBlockHtml={setBlockHtml} />}
+          </div>
         </section>
       </div>
 

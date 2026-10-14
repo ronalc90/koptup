@@ -5,7 +5,7 @@
  * búsqueda semántica rápida y precisa.
  */
 
-import { getOpenAI } from './openai.service';
+import { getOpenAIFor } from './openai.service';
 import CUPS from '../models/CUPS';
 import { logger } from '../utils/logger';
 
@@ -36,7 +36,7 @@ export class EmbeddingsService {
    * Genera embedding para un texto usando OpenAI
    */
   async generarEmbedding(texto: string): Promise<number[]> {
-    const openai = getOpenAI();
+    const openai = getOpenAIFor('health');
 
     try {
       const respuesta = await openai.embeddings.create({

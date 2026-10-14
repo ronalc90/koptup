@@ -7,9 +7,12 @@ import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import { trackPlanClick } from '@/lib/analytics';
 import {
+  CalculatorIcon,
   ChatBubbleLeftRightIcon,
   CheckCircleIcon,
+  ClipboardDocumentListIcon,
   InformationCircleIcon,
+  LockOpenIcon,
   ReceiptPercentIcon,
 } from '@heroicons/react/24/outline';
 import {
@@ -17,14 +20,19 @@ import {
   RAG_PLANS,
   formatRagCOP,
   formatRagUSD,
+  ragFirstYearCop,
   ragPlanContactHref,
+  withRagVat,
   type RagPlan,
 } from '@/lib/rag-plans';
 
 /**
  * Tabla de planes RAG (Piloto, Esencial, Profesional, Empresarial) con las
- * notas de precios: IVA, pregunta adicional sobre el tope y tarifas de Meta
- * para WhatsApp. Se usa en /services#planes-rag y en /rag ("la misma tabla").
+ * notas de precios: IVA, pregunta adicional sobre el tope, tarifas de Meta
+ * para WhatsApp y un ejemplo para calcular cuántas preguntas se necesitan.
+ * Debajo de las tarjetas dice qué pasa al pulsar un botón (formulario corto,
+ * respuesta en 24 horas hábiles, todavía no se paga nada). Se usa en
+ * /services#planes-rag y en /rag ("la misma tabla").
  *
  * Solo renderiza las tarjetas y las notas: el título de la sección y el `id`
  * del ancla los pone la página que la usa.
@@ -41,9 +49,14 @@ export default function RagPlans({ className = '' }: { className?: string }) {
         ))}
       </div>
 
-      <div className="mt-8 rounded-2xl border border-secondary-200 dark:border-secondary-800 bg-white dark:bg-secondary-900 p-5 shadow-medium">
+      {/* Qué pasa al pulsar un botón de plan */}
+      <p className="mt-6 text-center text-sm font-medium text-secondary-700 dark:text-secondary-300">
+        {t('ctaNote')}
+      </p>
+
+      <div className="mt-6 rounded-2xl border border-secondary-200 dark:border-secondary-800 bg-white dark:bg-secondary-900 p-5 shadow-medium">
         <h3 className="text-sm font-bold text-secondary-900 dark:text-white">{t('notes.title')}</h3>
-        <ul className="mt-3 grid md:grid-cols-3 gap-4">
+        <ul className="mt-3 grid md:grid-cols-2 gap-4">
           <li className="flex items-start gap-2 text-sm text-secondary-600 dark:text-secondary-400">
             <ReceiptPercentIcon className="h-5 w-5 text-primary-600 dark:text-primary-400 flex-shrink-0" />
             <span>{t('notes.tax')}</span>
@@ -56,6 +69,10 @@ export default function RagPlans({ className = '' }: { className?: string }) {
                 usd: formatRagUSD(RAG_EXTRA_QUESTION_PRICE.usd, locale),
               })}
             </span>
+          </li>
+          <li className="flex items-start gap-2 text-sm text-secondary-600 dark:text-secondary-400">
+            <CalculatorIcon className="h-5 w-5 text-primary-600 dark:text-primary-400 flex-shrink-0" />
+            <span>{t('notes.questionsExample')}</span>
           </li>
           <li className="flex items-start gap-2 text-sm text-secondary-600 dark:text-secondary-400">
             <ChatBubbleLeftRightIcon className="h-5 w-5 text-primary-600 dark:text-primary-400 flex-shrink-0" />
@@ -101,6 +118,11 @@ export function RagPlanCard({ plan, showCta = true }: { plan: RagPlan; showCta?:
       ? t('price.setupFrom')
       : t('price.setup');
 
+  // Lo que el cliente entrega (Piloto) y quién puede usar el asistente (Esencial).
+  const clientNeeds = t.has(`${key}.needs`) ? asStringList(t.raw(`${key}.needs`)) : [];
+  const accessNote = t.has(`${key}.accessNote`) ? t(`${key}.accessNote`) : null;
+  const firstYear = ragFirstYearCop(plan);
+
   return (
     <Card
       variant="bordered"
@@ -128,6 +150,11 @@ export function RagPlanCard({ plan, showCta = true }: { plan: RagPlan; showCta?:
             <p className="text-xs text-secondary-500 dark:text-secondary-400">
               {formatRagUSD(plan.setup.usd, locale)}
             </p>
+            <p className="mt-1 text-xs text-secondary-600 dark:text-secondary-300" data-vat="setup">
+              {t(plan.setupIsFrom ? 'price.withVatFrom' : 'price.withVat', {
+                cop: formatRagCOP(withRagVat(plan.setup.cop), locale),
+              })}
+            </p>
           </div>
 
           {plan.monthlyMode !== 'none' ? (
@@ -147,13 +174,24 @@ export function RagPlanCard({ plan, showCta = true }: { plan: RagPlan; showCta?:
                   <p className="text-xs text-secondary-500 dark:text-secondary-400">
                     {formatRagUSD(plan.monthly.usd, locale)} {t('price.perMonth')}
                   </p>
+                  <p className="mt-1 text-xs text-secondary-600 dark:text-secondary-300" data-vat="monthly">
+                    {t('price.withVatMonthly', { cop: formatRagCOP(withRagVat(plan.monthly.cop), locale) })}
+                  </p>
                 </>
               ) : (
-                <p className="text-xl font-bold text-secondary-900 dark:text-white">
+                // Frase completa (no un monto): tamaño de texto, no de precio.
+                <p className="text-base font-bold text-secondary-900 dark:text-white">
                   {t('price.monthlyBySla')}
                 </p>
               )}
             </div>
+          ) : null}
+
+          {firstYear !== null ? (
+            <p className="pt-3 border-t border-secondary-200 dark:border-secondary-700 text-xs text-secondary-700 dark:text-secondary-300" data-first-year>
+              <span className="font-semibold">{t('price.firstYearLabel')}</span>{' '}
+              {t('price.firstYear', { cop: formatRagCOP(firstYear, locale) })}
+            </p>
           ) : null}
 
           <p className="text-[11px] text-secondary-500 dark:text-secondary-400">{t('price.tax')}</p>
@@ -167,9 +205,32 @@ export function RagPlanCard({ plan, showCta = true }: { plan: RagPlan; showCta?:
           <FeatureList title={t('monthlyIncludesTitle')} items={monthlyIncludes} />
         ) : null}
 
+        {/* Lo que el cliente entrega en el piloto */}
+        {clientNeeds.length > 0 ? (
+          <section className="rounded-lg border border-secondary-200 dark:border-secondary-700 p-3">
+            <h4 className="flex items-center gap-1.5 text-sm font-bold text-secondary-900 dark:text-white mb-2">
+              <ClipboardDocumentListIcon className="h-4 w-4 text-primary-600 dark:text-primary-400" aria-hidden="true" />
+              {t('needsTitle')}
+            </h4>
+            <ul className="space-y-1.5 text-xs text-secondary-700 dark:text-secondary-300 list-disc pl-4">
+              {clientNeeds.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
         {plan.hasNote ? (
           <p className="rounded-lg bg-primary-50 dark:bg-primary-950 border border-primary-200 dark:border-primary-800 p-3 text-xs text-primary-800 dark:text-primary-200">
             {t(`${key}.note`)}
+          </p>
+        ) : null}
+
+        {/* Quién puede preguntarle al asistente (el widget es público) */}
+        {accessNote ? (
+          <p className="flex items-start gap-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 p-3 text-xs text-amber-900 dark:text-amber-100">
+            <LockOpenIcon className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+            <span>{accessNote}</span>
           </p>
         ) : null}
 

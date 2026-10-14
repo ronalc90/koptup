@@ -2,26 +2,28 @@
   "demoCrm": {
     "meta": {
       "title": "CRM con IA: demo de embudo de ventas y pronóstico",
-      "description": "Demo interactiva de un CRM para equipos comerciales en Colombia, con datos de ejemplo: embudo con arrastrar y soltar, puntaje de leads explicado, pronóstico en pesos, secuencias de seguimiento y borradores de correo y WhatsApp.",
+      "description": "Demo interactiva de un CRM para equipos comerciales en Colombia, con datos de ejemplo: embudo con arrastrar y soltar, puntaje de cada contacto explicado, pronóstico en pesos frente a la meta, secuencias de seguimiento y borradores de correo y WhatsApp hechos con plantillas que puedes mejorar con un modelo de IA.",
       "breadcrumbHome": "Inicio",
       "breadcrumbDemos": "Demos",
       "breadcrumbName": "CRM con IA"
     },
     "pageTitle": "CRM con IA",
-    "pageSubtitle": "Embudo de ventas, puntaje de leads, pronóstico en pesos y borradores de correo y WhatsApp para tu equipo comercial. Pruébalo: crea, mueve y cierra negocios.",
+    "pageSubtitle": "A quién llamar hoy, qué decirle y cuánto vas a facturar: embudo de ventas, puntaje de cada contacto, pronóstico en pesos y borradores de WhatsApp y correo. Crea, mueve y cierra negocios; todo se recalcula al instante.",
     "sampleBadge": "Datos de ejemplo",
-    "sampleBadgeHint": "Es el CRM de una empresa de logística ficticia (Logística Quindara S.A.S.). Empresas, personas, NIT, correos, teléfonos y cifras son inventados. Fecha de corte de los datos: {date}.",
+    "sampleBadgeHint": "Es el CRM de una empresa de logística ficticia (Logística Quindara S.A.S.). Empresas, personas, NIT, correos, teléfonos y cifras son inventados.",
     "howItWorks": {
       "title": "Qué es real en esta demo",
       "show": "Ver",
       "hide": "Ocultar",
-      "real": "Todo se calcula en tu navegador con los datos de ejemplo: puntaje de cada lead, probabilidad de cierre, métricas, pronóstico y alertas. Puedes crear, mover, editar y eliminar negocios, y los cambios se guardan solo en este navegador.",
-      "simulated": "Los envíos de WhatsApp y correo, los pasos de las secuencias y el análisis de llamadas son simulados: no sale ningún mensaje ni se graba nada. Los borradores salen de plantillas y el puntaje de reglas; aquí no se llama a un modelo de IA.",
+      "real": "Todo se calcula en tu navegador con los datos de ejemplo: puntaje de cada contacto, probabilidad de cierre, métricas, pronóstico y alertas. Puedes crear, mover, editar y eliminar negocios, exportar los contactos en CSV y descargar la cotización en PDF; los cambios se guardan solo en este navegador.",
+      "dates": "La fecha de corte es hoy (hora de Colombia). Si vuelves otro día, las fechas de los datos y de lo que registraste se corren para que «ayer», «hace 3 días» y el periodo del pronóstico sigan teniendo sentido.",
+      "simulated": "Los envíos de WhatsApp y correo, los pasos de las secuencias y el análisis de llamadas son simulados: no sale ningún mensaje ni se graba nada. El puntaje sale de reglas y los borradores de plantillas. La única llamada a un modelo de IA es «Mejorar con IA» en el asistente: envía el borrador al servidor de KopTup y devuelve una redacción nueva (con cupo de uso).",
       "project": "En tu proyecto, el puntaje y los borradores los genera un modelo de IA con tu histórico de ventas, y el CRM se conecta a tu WhatsApp Business, tu correo y tu telefonía."
     },
     "reset": {
       "button": "Restablecer datos",
-      "confirm": "¿Volver a los datos de ejemplo? Se borran los cambios que hiciste en este navegador.",
+      "title": "¿Volver a los datos de ejemplo?",
+      "confirm": "Se borran los negocios, actividades, mensajes y secuencias que cambiaste en este navegador, y el recorrido vuelve a empezar.",
       "yes": "Sí, restablecer",
       "done": "Datos de ejemplo restablecidos."
     },
@@ -92,6 +94,7 @@
     },
     "dates": {
       "months": ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"],
+      "monthsLong": ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
       "ago": "{days, plural, =0 {hoy} =1 {ayer} other {hace # días}}",
       "overdue": "{days, plural, =1 {vencida hace 1 día} other {vencida hace # días}}"
     },
@@ -108,7 +111,7 @@
       "moveToLabel": "Mover {company} a otra etapa",
       "openCard": "Abrir la ficha de {company}",
       "scoreTitle": "Puntaje {score}: {temp}",
-      "probabilityHint": "Probabilidad de cierre = base de la etapa ajustada por el puntaje del lead (reglas de ejemplo).",
+      "probabilityHint": "Probabilidad de cierre = base de la etapa ajustada por el puntaje del contacto (reglas de ejemplo).",
       "moved": "{company} pasó a «{stage}».",
       "wonToast": "¡Negocio ganado! {company} · {value}.",
       "lostToast": "{company} quedó como perdido. Motivo: {reason}.",
@@ -122,7 +125,7 @@
       "subtitle": "Todos tus contactos con su puntaje, canal preferido y próxima acción. Busca, filtra, ordena y exporta.",
       "searchLabel": "Buscar contactos",
       "searchPlaceholder": "Buscar por nombre, empresa, NIT, ciudad o correo…",
-      "tempFilter": "Filtrar por temperatura del lead",
+      "tempFilter": "Filtrar por temperatura del contacto",
       "filters": {
         "all": "Todos",
         "hot": "Calientes",
@@ -198,7 +201,7 @@
       "logText": "Detalle de la actividad",
       "logPlaceholder": "Ej.: llamé para confirmar la visita del jueves",
       "logSubmit": "Registrar",
-      "logHint": "Se guarda con la fecha de corte de la demo ({date}). Una llamada, un WhatsApp, un correo o una reunión cuentan como contacto y suben el puntaje.",
+      "logHint": "Se guarda con la fecha de hoy ({date}). Una llamada, un WhatsApp, un correo o una reunión cuentan como contacto y suben el puntaje.",
       "logged": "Actividad registrada en el historial.",
       "logTypes": {
         "note": "Nota",
@@ -218,9 +221,10 @@
         "size": "Tamaño de la empresa",
         "stage": "Etapa",
         "nextAction": "Próxima acción",
-        "lostReason": "Motivo de pérdida"
+        "lostReason": "Motivo de pérdida",
+        "budget": "Presupuesto confirmado",
+        "decision": "Habla con quien decide"
       },
-      "nextActionSaved": "Próxima acción actualizada.",
       "delete": "Eliminar negocio",
       "deleteConfirm": "¿Eliminar este negocio y su historial de este navegador?",
       "deleteYes": "Sí, eliminar",
@@ -231,8 +235,33 @@
         "quoteHint": "Se genera en tu navegador con los datos actuales de este negocio.",
         "download": "Descargar PDF",
         "downloaded": "Descargaste la cotización de ejemplo.",
+        "error": "No pudimos generar el PDF en este navegador. Inténtalo de nuevo.",
         "noQuote": "Todavía no hay cotización: se genera cuando el negocio llega a «Propuesta enviada».",
         "lost": "El negocio se perdió: su cotización ya no está vigente."
+      },
+      "tabsLabel": "Secciones de la ficha",
+      "edit": "Editar datos",
+      "editTitle": "Editar los datos del negocio",
+      "editHint": "Los cambios se guardan en este navegador y quedan en el historial. Presupuesto, quien decide y tamaño cambian el puntaje.",
+      "saveChanges": "Guardar cambios",
+      "saved": "Datos del negocio actualizados.",
+      "fieldNames": {
+        "company": "empresa",
+        "nit": "NIT",
+        "contactName": "contacto",
+        "role": "cargo",
+        "email": "correo",
+        "phone": "teléfono",
+        "city": "ciudad",
+        "title": "nombre del negocio",
+        "value": "valor",
+        "closeDate": "cierre estimado",
+        "owner": "vendedor",
+        "channel": "canal preferido",
+        "size": "tamaño de la empresa",
+        "budgetConfirmed": "presupuesto confirmado",
+        "decisionMaker": "habla con quien decide",
+        "nextAction": "próxima acción"
       }
     },
     "recs": {
@@ -240,7 +269,7 @@
       "lost": "Se perdió por «{reason}»: programa un nuevo contacto en unos meses.",
       "overdue": "{days, plural, =1 {La fecha estimada de cierre venció ayer} other {La fecha estimada de cierre venció hace # días}}: actualízala o mueve el negocio.",
       "stale": "Lleva {days} días sin contacto: haz seguimiento hoy.",
-      "hot": "Lead caliente con contacto reciente: prioriza este negocio.",
+      "hot": "Contacto caliente y con contacto reciente: prioriza este negocio.",
       "budget": "Confirma el presupuesto aprobado antes de avanzar.",
       "decision": "Pide una reunión con quien toma la decisión.",
       "channel": "Escríbele por {channel}: es su canal preferido.",
@@ -268,15 +297,16 @@
       "sequenceSeed": "Secuencia: {step}.",
       "sequence": "Secuencia: {step} (simulado).",
       "enrolled": "Inscrito en la secuencia de seguimiento a cotizaciones.",
-      "replied": "Respondió a la secuencia de seguimiento."
+      "replied": "Respondió a la secuencia de seguimiento.",
+      "edited": "Datos actualizados: {fields}."
     },
     "forecast": {
       "title": "Pronóstico de ventas",
       "subtitle": "Se calcula con los negocios del embudo: si cambias una etapa o creas un negocio, el pronóstico cambia.",
       "periodLabel": "Periodo del pronóstico",
       "period": {
-        "month": "Octubre 2026",
-        "quarter": "4.º trimestre 2026"
+        "month": "{month} {year}",
+        "quarter": "{quarter}.º trimestre {year}"
       },
       "attainment": "Cumplimiento proyectado de la meta",
       "attainmentSub": "Proyección {projection} de una meta de {quota}",
@@ -298,7 +328,7 @@
       "byStageSub": "Participación de cada etapa en el valor abierto.",
       "stageLine": "{count} · {value} · {share} %",
       "trend": "Ganado por mes y ponderado abierto",
-      "trendAria": "Gráfico de barras: valor ganado por mes de julio a octubre y valor ponderado abierto por mes de cierre de octubre a diciembre de 2026",
+      "trendAria": "Gráfico de barras: valor ganado por mes de {from} a {to} y valor ponderado abierto por mes de cierre de {to} a {last} de {year}",
       "trendUnit": "Millones de COP",
       "legendWon": "Ganado",
       "legendWeighted": "Ponderado abierto (por mes de cierre estimado)",
@@ -315,7 +345,7 @@
     "assistant": {
       "title": "Asistente de redacción",
       "subtitle": "Arma un borrador de correo o WhatsApp con los datos del contacto, edítalo, cópialo y regístralo en el historial.",
-      "simulatedNote": "En esta demo los borradores salen de plantillas (objetivo × tono × canal) con los datos del contacto y tu contexto; no se llama a un modelo de IA y no se envía nada. En tu proyecto los redacta un modelo de IA con el historial del cliente.",
+      "simulatedNote": "Los borradores salen de plantillas (objetivo × tono × canal, con 6 redacciones por objetivo) con los datos del contacto y tu contexto. «Mejorar con IA» sí es real: envía el borrador al servidor de KopTup, que lo reescribe con un modelo de lenguaje (con cupo de uso; no escribas datos personales reales). Aquí no se envía ningún mensaje al cliente. En tu proyecto, el modelo redacta desde cero con el historial del cliente.",
       "contact": "Contacto",
       "channel": "Canal",
       "objective": "Objetivo",
@@ -334,7 +364,7 @@
         "consultative": "Consultivo"
       },
       "context": "Contexto (opcional)",
-      "contextPlaceholder": "Ej.: pidió pagar en dos cuotas",
+      "contextPlaceholder": "Ej.: necesitan arrancar antes de la temporada alta",
       "generate": "Generar borrador",
       "generateAgain": "Generar de nuevo con estas opciones",
       "empty": "Elige el contacto, el canal, el objetivo y el tono, y genera el borrador.",
@@ -347,7 +377,7 @@
       "regenerate": "Otra versión",
       "chars": "{count} caracteres",
       "send": "Registrar como enviado (simulado)",
-      "sendHint": "No se envía ningún mensaje: se registra en el historial del contacto con fecha {date} y cuenta como contacto reciente.",
+      "sendHint": "No se envía ningún mensaje: se registra en el historial del contacto con la fecha de hoy ({date}) y cuenta como contacto reciente.",
       "sentToast": "Registrado en el historial de {name} (simulado: no se envió ningún mensaje).",
       "quickActions": "Acciones rápidas",
       "quickHint": "Calculadas con reglas sobre los datos de {name}.",
@@ -381,37 +411,57 @@
         },
         "body": {
           "intro": {
-            "a": "Soy {owner}, de {seller}. Trabajamos con empresas de {city} en {title} y creo que podemos ayudarle a {company} a tener sus despachos más organizados.",
-            "b": "Te escribe {owner}, de {seller}. Creo que a {company} le puede servir lo que hacemos en {title} y me gustaría contarte cómo funciona."
+            "a": "Soy {owner}, de {seller}, y trabajo con empresas de {city} en proyectos como «{title}». Creo que podemos ayudarle a {company} a tener sus despachos más organizados.",
+            "b": "Te escribe {owner}, de {seller}: creo que a {company} le puede servir lo que hacemos en proyectos como «{title}» y me gustaría contarte cómo funciona.",
+            "c": "Mi nombre es {owner} y trabajo en {seller}; vi que {company} despacha desde {city} y quería contarte cómo ayudamos a empresas parecidas con proyectos como «{title}»."
           },
           "followUp": {
             "a": "Te escribo para dar seguimiento a «{title}». Quedamos en que el siguiente paso era {nextAction}.",
-            "b": "¿Cómo vas con «{title}»? Quiero asegurarme de que tengas lo necesario para avanzar; el siguiente paso es {nextAction}."
+            "b": "¿Cómo vas con «{title}»? Quiero asegurarme de que tengas lo necesario para avanzar; el siguiente paso es {nextAction}.",
+            "c": "Retomo «{title}» para no perder el ritmo. Lo que sigue de nuestra parte es {nextAction}."
           },
           "proposal": {
             "a": "Te comparto la propuesta de «{title}» por {value}. Incluye el alcance que conversamos y la forma de pago.",
-            "b": "Ya está lista la propuesta de «{title}»: valor total {value}, con el alcance y los tiempos que acordamos."
+            "b": "Ya está lista la propuesta de «{title}»: valor total {value}, con el alcance y los tiempos que acordamos.",
+            "c": "Como te prometí, aquí va la propuesta de «{title}»: {value} con el alcance, los tiempos y la forma de pago que hablamos."
           },
           "reEngage": {
             "a": "No hablamos de «{title}» desde el {since}. ¿Sigue siendo una prioridad para {company}?",
-            "b": "Retomo nuestra conversación del {since} sobre «{title}». Si algo cambió en {company}, me cuentas y ajustamos la propuesta."
+            "b": "Retomo nuestra conversación del {since} sobre «{title}». Si algo cambió en {company}, me cuentas y ajustamos la propuesta.",
+            "c": "Hace un tiempo, el {since}, hablamos de «{title}». Tengo una idea para que {company} arranque con una primera fase más pequeña."
           },
           "closing": {
             "a": "Ya tenemos todo listo para arrancar con «{title}» ({value}). Solo falta tu confirmación para enviarte el contrato.",
-            "b": "Para iniciar «{title}» en la fecha acordada necesitamos tu aprobación esta semana. El valor final es {value}."
+            "b": "Para iniciar «{title}» en la fecha acordada necesitamos tu aprobación esta semana. El valor final es {value}.",
+            "c": "Con tu visto bueno dejamos «{title}» ({value}) listo para arrancar y te envío el contrato hoy mismo."
           }
         },
         "context": "Tuve en cuenta lo que me comentaste: {context}.",
         "toneLine": {
           "friendly": "Cualquier cosa me escribes por aquí, con gusto te ayudo.",
-          "consultative": "Antes de seguir, me gustaría entender qué resultado esperan lograr antes de fin de año."
+          "consultative": "Antes de seguir, me gustaría entender qué resultado esperan lograr en los próximos meses."
         },
         "cta": {
-          "intro": "¿Te queda bien una llamada de 15 minutos esta semana?",
-          "followUp": "¿Te sirve que lo revisemos el jueves en la mañana?",
-          "proposal": "¿Qué día podemos revisarla juntos para resolver tus dudas?",
-          "reEngage": "Si ya no es el momento, me avisas y lo retomamos más adelante.",
-          "closing": "¿Te envío hoy el contrato para firma?"
+          "intro": {
+            "a": "¿Te queda bien una llamada de 15 minutos esta semana?",
+            "b": "Si te sirve, te llamo el martes o el miércoles; dime qué hora te queda mejor."
+          },
+          "followUp": {
+            "a": "¿Te sirve que lo revisemos el jueves en la mañana?",
+            "b": "¿Hay algo que te falte para avanzar esta semana?"
+          },
+          "proposal": {
+            "a": "¿Qué día podemos revisarla juntos para resolver tus dudas?",
+            "b": "¿Te parece si la revisamos en una llamada de 20 minutos?"
+          },
+          "reEngage": {
+            "a": "Si ya no es el momento, me avisas y lo retomamos más adelante.",
+            "b": "¿Te interesa que lo miremos en una llamada corta?"
+          },
+          "closing": {
+            "a": "¿Te envío hoy el contrato para firma?",
+            "b": "¿Me confirmas hoy para reservar la fecha de inicio?"
+          }
         },
         "subject": {
           "intro": "{seller} para {company}",
@@ -428,6 +478,25 @@
         },
         "signature": "{owner}\nEquipo comercial · {seller}",
         "whatsappSign": "{owner} · {seller}"
+      },
+      "version": "Versión {n} de {total}",
+      "ai": {
+        "button": "Mejorar con IA",
+        "working": "Mejorando…",
+        "hint": "Envía este borrador al servidor de KopTup, que lo reescribe con un modelo de lenguaje real.",
+        "applied": "Redacción mejorada por un modelo de IA real. Revísala antes de usarla.",
+        "undo": "Deshacer",
+        "errors": {
+          "network": "No pudimos conectar con el servidor de IA. El borrador de plantilla sigue aquí y el resto de la demo funciona igual.",
+          "timeout": "La IA tardó demasiado en responder. Inténtalo de nuevo en un momento.",
+          "notConfigured": "La IA no está configurada en este servidor en este momento. El borrador de plantilla sigue funcionando; si quieres verla, pide una demo guiada.",
+          "unavailable": "La IA no está disponible en este momento. Inténtalo de nuevo en unos minutos; el resto de la demo sigue funcionando.",
+          "budget": "Alcanzamos el cupo mensual de IA de las demos. El borrador de plantilla sigue funcionando; si quieres verla, te la mostramos en una demo guiada.",
+          "rateLimited": "Llegaste al límite de solicitudes de IA por ahora. Espera unos minutos y vuelve a intentarlo.",
+          "access": "La IA de redacción no está abierta a visitantes en este momento. El borrador de plantilla sigue funcionando; si quieres verla, pide una demo guiada.",
+          "invalid": "El servidor no aceptó este borrador (vacío o demasiado largo). Acórtalo y vuelve a intentarlo.",
+          "server": "El servicio de IA respondió con un error. Inténtalo de nuevo en un momento."
+        }
       }
     },
     "calls": {
@@ -500,7 +569,8 @@
       "ranToast": "{step} · {company} (simulado).",
       "finishedToast": "{company} completó la secuencia (simulado).",
       "repliedToast": "{company} respondió: la secuencia se detiene.",
-      "removedToast": "{company} salió de la secuencia."
+      "removedToast": "{company} salió de la secuencia.",
+      "openProfile": "Abrir la ficha de {company}"
     },
     "newDeal": {
       "title": "Nuevo negocio",
@@ -523,20 +593,24 @@
         "size": "Tamaño de la empresa",
         "budget": "Presupuesto confirmado",
         "decision": "Habla con quien decide",
-        "nextAction": "Próxima acción"
+        "nextAction": "Próxima acción",
+        "closedOn": "Fecha de cierre"
       },
-      "titlePlaceholder": "Ej.: Distribución regional 2027",
+      "titlePlaceholder": "Ej.: Distribución regional en la Costa",
       "defaultNextAction": "Hacer el primer contacto",
       "scoreHint": "El puntaje y la probabilidad se calculan con estos datos y el contacto de hoy.",
       "errors": {
         "required": "Este campo es obligatorio.",
         "value": "Escribe un valor mayor que cero.",
         "email": "Revisa el correo.",
-        "nit": "NIT no válido. Ej.: 900.123.456-7",
-        "closeDate": "La fecha debe ser igual o posterior al {date}."
+        "nit": "Escribe 9 dígitos y el dígito de verificación. Ej.: 900.123.456-8",
+        "closeDate": "La fecha debe ser igual o posterior al {date}.",
+        "nitDv": "El dígito de verificación no corresponde: para ese número es {dv}."
       },
       "submit": "Crear negocio",
-      "created": "{company} se agregó a «{stage}»."
+      "created": "{company} se agregó a «{stage}».",
+      "nitPlaceholder": "900.123.456-8",
+      "nitHint": "9 dígitos y el dígito de verificación; se comprueba con el cálculo de la DIAN."
     },
     "pdf": {
       "sample": "DOCUMENTO DE EJEMPLO - DATOS FICTICIOS - GENERADO EN LA DEMO DEL CRM",
@@ -554,31 +628,33 @@
     "common": {
       "close": "Cerrar",
       "cancel": "Cancelar",
-      "save": "Guardar"
+      "save": "Guardar",
+      "yes": "Sí",
+      "no": "No"
     },
     "data": {
       "seller": "Logística Quindara S.A.S.",
       "deals": {
-        "d1": { "role": "Gerente de compras", "title": "Distribución nacional 2027", "nextAction": "Enviar el contrato con anticipo del 30 %" },
+        "d1": { "role": "Gerente de compras", "title": "Contrato de distribución nacional", "nextAction": "Enviar el contrato con anticipo del 30 %" },
         "d2": { "role": "Director de logística", "title": "Transporte de materiales a obra", "nextAction": "Confirmar quién aprueba la propuesta" },
         "d3": { "role": "Gerente general", "title": "Bodegaje refrigerado en Funza", "nextAction": "Confirmar el presupuesto aprobado" },
         "d4": { "role": "Jefe de compras", "title": "Despachos semanales a la Costa", "nextAction": "Enviar la propuesta de rutas" },
-        "d5": { "role": "Directora administrativa", "title": "Distribución de material académico 2027", "nextAction": "Hacer la llamada de calificación" },
+        "d5": { "role": "Directora administrativa", "title": "Distribución de material académico", "nextAction": "Hacer la llamada de calificación" },
         "d6": { "role": "Gerente de operaciones", "title": "Última milla para tiendas propias", "nextAction": "Revisar la propuesta con su comité" },
         "d7": { "role": "Coordinadora de compras", "title": "Transporte con cadena de frío", "nextAction": "Enviar el reporte de temperatura y la propuesta del piloto" },
         "d8": { "role": "Gerente comercial", "title": "Rutas a fincas de Santander", "nextAction": "Agendar la visita a su bodega" },
         "d9": { "role": "Jefa de abastecimiento", "title": "Mensajería de muestras de laboratorio", "nextAction": "Reactivar con un caso de uso del sector salud" },
         "d10": { "role": "Gerente general", "title": "Consolidación de carga para exportación", "nextAction": "Ajustar la propuesta a dos contenedores por mes" },
         "d11": { "role": "Directora de compras", "title": "Distribución a droguerías y tiendas", "nextAction": "Negociar el plazo de pago" },
-        "d12": { "role": "Jefe de bodega", "title": "Bodegaje para la temporada navideña", "nextAction": "Confirmar el interés por llamada" },
+        "d12": { "role": "Jefe de bodega", "title": "Bodegaje para la temporada alta", "nextAction": "Confirmar el interés por llamada" },
         "d13": { "role": "Gerente financiera", "title": "Logística inversa de garantías", "nextAction": "Enviar la propuesta económica" },
         "w1": { "role": "Gerente de logística", "title": "Rutas Villavicencio–Bogotá", "nextAction": "Revisión trimestral del servicio" },
         "w2": { "role": "Directora de operaciones", "title": "Transporte refrigerado en Boyacá", "nextAction": "Encuesta de satisfacción del primer mes" },
         "w3": { "role": "Jefe de compras", "title": "Distribución de repuestos a talleres", "nextAction": "Ofrecer la ampliación a Medellín" },
         "w4": { "role": "Gerente general", "title": "Entregas diarias a puntos de venta", "nextAction": "Programar el inicio de la operación" },
-        "l1": { "role": "Jefe de compras", "title": "Transporte de materia prima", "nextAction": "Volver a contactar en febrero de 2027" },
-        "l2": { "role": "Gerente de operaciones", "title": "Distribución regional de bebidas", "nextAction": "Volver a contactar en enero de 2027" },
-        "l3": { "role": "Director administrativo", "title": "Mensajería nacional de pedidos", "nextAction": "Volver a contactar en diciembre" }
+        "l1": { "role": "Jefe de compras", "title": "Transporte de materia prima", "nextAction": "Volver a contactar en cuatro meses" },
+        "l2": { "role": "Gerente de operaciones", "title": "Distribución regional de bebidas", "nextAction": "Volver a contactar en tres meses" },
+        "l3": { "role": "Director administrativo", "title": "Mensajería nacional de pedidos", "nextAction": "Volver a contactar en dos meses" }
       },
       "calls": {
         "c1": {
@@ -590,7 +666,7 @@
           ],
           "transcript": [
             "Hola, Laura. Gracias por el espacio. ¿Pudiste revisar la propuesta de distribución nacional?",
-            "Sí, la revisé con mi equipo. El alcance nos sirve; lo que más nos preocupa es arrancar antes de la temporada de diciembre.",
+            "Sí, la revisé con mi equipo. El alcance nos sirve; lo que más nos preocupa es arrancar antes de la temporada alta.",
             "Entiendo. Si firmamos este mes, podemos tener la primera ruta operando en tres semanas.",
             "Eso nos sirve. ¿Y la forma de pago? Para nosotros es más fácil un anticipo y el resto a 30 días.",
             "Lo podemos hacer: 30 % de anticipo y el saldo a 30 días.",
@@ -617,7 +693,7 @@
           "topics": ["Presupuesto", "Competencia", "Volumen de carga"],
           "actions": [
             "Ajustar la propuesta a dos contenedores por mes",
-            "Llamar de nuevo después del 13 de octubre"
+            "Llamar de nuevo en una semana, cuando terminen la cosecha"
           ],
           "transcript": [
             "Felipe, te llamo para saber cómo vas con la propuesta de consolidación de carga.",
@@ -625,10 +701,60 @@
             "Entiendo. ¿Qué volumen sí podrían mover desde ahora?",
             "Unos dos contenedores al mes. Además, otra empresa nos ofreció un precio más bajo.",
             "Ajusto la propuesta a dos contenedores y te muestro qué incluye cada opción.",
-            "Listo, pero llámame después del 13 de octubre, cuando cerremos la cosecha."
+            "Listo, pero llámame la otra semana, cuando cerremos la cosecha."
           ]
         }
       }
+    },
+    "header": {
+      "back": "Volver al catálogo de demos",
+      "audience": "Para gerentes comerciales y equipos de venta B2B en Colombia que hoy llevan sus clientes en Excel y WhatsApp. Funciona en tu navegador con datos de ejemplo: el puntaje sale de reglas y los borradores de plantillas, que puedes pulir con un modelo de IA real desde el asistente. Empieza por el recorrido de abajo.",
+      "requestDemo": "Solicitar demo guiada",
+      "quote": "Cotizar tu CRM",
+      "company": "Empresa de ejemplo: {name}",
+      "asOf": "Datos al {date} (hoy)"
+    },
+    "guide": {
+      "title": "Recorrido sugerido (5 pasos, unos 5 minutos)",
+      "subtitle": "Cada paso se marca solo cuando lo haces en la demo.",
+      "progress": "{done} de {total} hechos",
+      "show": "Mostrar",
+      "hide": "Ocultar",
+      "done": "Hecho",
+      "steps": {
+        "move": {
+          "title": "Mueve un negocio",
+          "text": "Arrastra una tarjeta a otra etapa o usa «Mover a…»: la probabilidad, las métricas y el pronóstico cambian al instante.",
+          "action": "Ir al embudo"
+        },
+        "open": {
+          "title": "Mira por qué un contacto está caliente",
+          "text": "Abre la ficha: el puntaje se explica factor por factor y trae recomendaciones.",
+          "action": "Abrir una ficha"
+        },
+        "draft": {
+          "title": "Redacta y registra un WhatsApp",
+          "text": "Arma el borrador con los datos del contacto, mejóralo con IA si quieres y regístralo como enviado (simulado).",
+          "action": "Abrir el asistente"
+        },
+        "forecast": {
+          "title": "Revisa el pronóstico",
+          "text": "Cuánto vas a facturar frente a la meta del mes o del trimestre, y qué negocios están en riesgo.",
+          "action": "Ver el pronóstico"
+        },
+        "sequence": {
+          "title": "Automatiza el seguimiento",
+          "text": "Inscribe un negocio en la secuencia o ejecuta su siguiente paso (simulado).",
+          "action": "Ir a secuencias"
+        }
+      },
+      "finished": "¡Listo! Ya viste el CRM completo. ¿Lo quieres con tu proceso comercial, tus vendedores y tu WhatsApp?",
+      "finishedDemo": "Solicitar demo guiada",
+      "finishedQuote": "Cotizar tu CRM"
+    },
+    "nextActionAuto": {
+      "won": "Agendar el inicio de la operación",
+      "lost": "Volver a contactar en tres meses"
     }
   }
 }

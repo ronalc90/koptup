@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { notify } from '../lib/notify';
 import { ArrowDownTrayIcon, CheckCircleIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
 import { sourceMeta } from '../lib/data';
-import { DEMO_TODAY, dateTime } from '../lib/format';
+import { date as fmtDate, dateTime, dayShift, shiftIso } from '../lib/format';
 import { useDemo } from '../lib/store';
 import type { SourceId } from '../lib/types';
 import { Panel, Section, btn, downloadText } from './ui';
@@ -14,10 +14,13 @@ const PRINCIPLES = ['apiFirst', 'review', 'pace', 'noEvasion', 'personal', 'log'
 
 export default function Compliance({ sourceId }: { sourceId: SourceId }) {
   const t = useTranslations('demoScraping');
-  const { loc, fullHistory } = useDemo();
+  const { s, loc, clock, fullHistory } = useDemo();
   const meta = sourceMeta(sourceId);
   const log = fullHistory.filter((h) => h.sourceId === sourceId).slice(0, 8);
   const name = t(`sources.${sourceId}.name`);
+  // La fecha de la última revisión es de ejemplo y se corre con los demás datos.
+  const reviewed = fmtDate(shiftIso(meta.reviewed, dayShift(s.day)), loc);
+  const sheetValue = (f: (typeof SHEET_FIELDS)[number]) => (f === 'reviewed' ? reviewed : t(`compliance.sheets.${sourceId}.${f}`));
 
   const download = () => {
     const lines = [
@@ -25,12 +28,12 @@ export default function Compliance({ sourceId }: { sourceId: SourceId }) {
       t('compliance.fileSample'),
       '',
       `${t('compliance.origin')}: ${meta.origin}`,
-      ...SHEET_FIELDS.map((f) => `${t(`compliance.fields.${f}`)}: ${t(`compliance.sheets.${sourceId}.${f}`)}`),
+      ...SHEET_FIELDS.map((f) => `${t(`compliance.fields.${f}`)}: ${sheetValue(f)}`),
       '',
       `${t('compliance.logTitle')}:`,
       ...log.map((h) => `- ${dateTime(h.at, loc)} · ${t(`values.trigger.${h.trigger}`)} · ${t(`values.runStatus.${h.status}`)} · ${t('compliance.logRecords', { count: h.records })}`),
     ];
-    const file = `koptup-demo-ficha-${sourceId}-${DEMO_TODAY}.txt`;
+    const file = `koptup-demo-ficha-${sourceId}-${clock.today}.txt`;
     downloadText(file, `﻿${lines.join('\r\n')}\r\n`, 'text/plain;charset=utf-8');
     notify.success(t('delivery.downloaded', { file }));
   };
@@ -61,7 +64,7 @@ export default function Compliance({ sourceId }: { sourceId: SourceId }) {
             {SHEET_FIELDS.map((f) => (
               <div key={f} className="grid gap-1 py-2 sm:grid-cols-3">
                 <dt className="text-secondary-400">{t(`compliance.fields.${f}`)}</dt>
-                <dd className="text-secondary-100 sm:col-span-2">{t(`compliance.sheets.${sourceId}.${f}`)}</dd>
+                <dd className="text-secondary-100 sm:col-span-2">{sheetValue(f)}</dd>
               </div>
             ))}
           </dl>

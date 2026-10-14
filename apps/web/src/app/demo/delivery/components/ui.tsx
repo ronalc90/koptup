@@ -13,20 +13,34 @@ export function useMoney() {
   return (n: number) => fmtMoney(n, locale);
 }
 
+/**
+ * Marco de celular. En pantallas pequeñas (el visitante ya está en un celular)
+ * la app ocupa el ancho y crece con su contenido, sin un "celular dentro del
+ * celular" con desplazamiento propio; desde 640 px se ve el marco de 680 px.
+ */
 export function PhoneFrame({ children, label, overlay }: { children: ReactNode; label: string; overlay?: ReactNode }) {
   return (
     <div className="mx-auto w-full max-w-[400px]">
-      <div className="mb-2 text-center text-xs font-semibold uppercase tracking-wider text-secondary-500 dark:text-secondary-400">{label}</div>
-      <div className="relative overflow-hidden rounded-[2.2rem] border-[10px] border-secondary-900 bg-secondary-900 shadow-2xl dark:border-secondary-700 dark:bg-secondary-950">
-        <div className="absolute left-1/2 top-0 z-20 h-5 w-28 -translate-x-1/2 rounded-b-2xl bg-secondary-900 dark:bg-secondary-950" />
-        <div className="h-[680px] overflow-y-auto overflow-x-hidden bg-secondary-50 text-secondary-900 dark:bg-secondary-900 dark:text-white">{children}</div>
+      <div className="mb-2 text-center text-xs font-semibold uppercase tracking-wider text-secondary-600 dark:text-secondary-400">{label}</div>
+      <div className="relative rounded-2xl border border-secondary-200 bg-secondary-50 shadow-sm dark:border-secondary-700 dark:bg-secondary-900 sm:overflow-hidden sm:rounded-[2.2rem] sm:border-[10px] sm:border-secondary-900 sm:bg-secondary-900 sm:shadow-2xl sm:dark:border-secondary-700 sm:dark:bg-secondary-950">
+        <div className="absolute left-1/2 top-0 z-20 hidden h-5 w-28 -translate-x-1/2 rounded-b-2xl bg-secondary-900 dark:bg-secondary-950 sm:block" aria-hidden="true" />
+        <div className="rounded-2xl bg-secondary-50 text-secondary-900 dark:bg-secondary-900 dark:text-white sm:h-[680px] sm:overflow-y-auto sm:overflow-x-hidden sm:rounded-none">{children}</div>
         {overlay}
       </div>
     </div>
   );
 }
 
-/** Ventana modal. Dentro del teléfono usa scope="phone" (cubre solo la pantalla del teléfono). */
+// Ventanas abiertas, de la más vieja a la más nueva: Escape cierra solo la de arriba.
+const modalStack: symbol[] = [];
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+/**
+ * Ventana modal. Dentro del teléfono usa scope="phone": desde 640 px cubre solo
+ * la pantalla del marco; en un celular real ocupa la pantalla como una hoja
+ * que sube desde abajo. El foco entra a la ventana, Tab no sale de ella,
+ * Escape la cierra y el foco vuelve al control que la abrió.
+ */
 export function Modal({
   title, onClose, children, footer, scope = 'page',
 }: { title: string; onClose: () => void; children: ReactNode; footer?: ReactNode; scope?: 'page' | 'phone' }) {
@@ -37,13 +51,41 @@ export function Modal({
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeRef.current(); };
+    const id = Symbol('modal');
+    modalStack.push(id);
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const onKey = (e: KeyboardEvent) => {
+      if (modalStack[modalStack.length - 1] !== id) return;
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeRef.current();
+        return;
+      }
+      if (e.key !== 'Tab' || !ref.current) return;
+      const items = Array.from(ref.current.querySelectorAll<HTMLElement>(FOCUSABLE)).filter((el) => el.offsetParent !== null);
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      const inside = ref.current.contains(document.activeElement);
+      if (e.shiftKey && (document.activeElement === first || !inside)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (document.activeElement === last || !inside)) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
     window.addEventListener('keydown', onKey);
     ref.current?.focus();
-    return () => window.removeEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      const i = modalStack.indexOf(id);
+      if (i >= 0) modalStack.splice(i, 1);
+      if (opener && opener.isConnected) opener.focus();
+    };
   }, []);
-  const wrap = scope === 'page' ? 'fixed inset-0 z-[70] items-center p-4' : 'absolute inset-0 z-30 items-end';
-  const box = scope === 'page' ? 'max-h-[85vh] w-full max-w-lg rounded-2xl' : 'max-h-[88%] w-full rounded-t-2xl';
+  const wrap = scope === 'page' ? 'fixed inset-0 z-[70] items-center p-4' : 'fixed inset-0 z-[70] items-end sm:absolute sm:z-30';
+  const box = scope === 'page' ? 'max-h-[85vh] w-full max-w-lg rounded-2xl' : 'max-h-[88vh] w-full rounded-t-2xl sm:max-h-[88%]';
   return (
     <div className={`flex justify-center bg-black/50 ${wrap}`} onClick={onClose}>
       <div
@@ -56,7 +98,7 @@ export function Modal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between gap-2 border-b border-secondary-200 px-4 py-3 dark:border-secondary-700">
-          <h3 className="text-sm font-bold">{title}</h3>
+          <h2 className="text-sm font-bold">{title}</h2>
           <button type="button" onClick={onClose} aria-label={t('close')} className="rounded-full p-1 hover:bg-secondary-100 dark:hover:bg-secondary-800">
             <XMarkIcon className="h-5 w-5" />
           </button>
@@ -69,10 +111,12 @@ export function Modal({
 }
 
 export function Toasts() {
+  const t = useTranslations('demoDelivery.common');
   const { toasts, dismissToast } = useDelivery();
-  if (!toasts.length) return null;
+  // La región aria-live existe siempre (los lectores de pantalla solo anuncian cambios dentro de una región ya presente).
+  // En el celular los avisos salen arriba, debajo del menú, para no tapar las ventanas que suben desde abajo ni «Ver carrito».
   return (
-    <div className="pointer-events-none fixed bottom-4 left-4 right-4 z-[80] flex flex-col items-end gap-2 sm:left-auto" aria-live="polite">
+    <div className="pointer-events-none fixed left-4 right-4 top-[72px] z-[80] flex flex-col items-end gap-2 sm:bottom-4 sm:left-auto sm:top-auto" aria-live="polite">
       {toasts.map((x) => (
         <div
           key={x.id}
@@ -82,7 +126,7 @@ export function Toasts() {
           }`}
         >
           <span className="flex-1">{x.text}</span>
-          <button type="button" onClick={() => dismissToast(x.id)} className="opacity-80 hover:opacity-100" aria-label="×">
+          <button type="button" onClick={() => dismissToast(x.id)} className="opacity-80 hover:opacity-100" aria-label={t('closeToast')}>
             <XMarkIcon className="h-4 w-4" />
           </button>
         </div>
@@ -129,11 +173,16 @@ export function StageBadge({ stage }: { stage: Stage }) {
 }
 
 export function Stars({ value, onChange, size = 'h-4 w-4', label }: { value: number; onChange?: (n: number) => void; size?: string; label?: string }) {
+  const t = useTranslations('demoDelivery.common');
   return (
-    <span className="inline-flex items-center gap-0.5" role={onChange ? 'radiogroup' : undefined} aria-label={label}>
+    <span
+      className="inline-flex items-center gap-0.5"
+      role={onChange ? 'group' : 'img'}
+      aria-label={onChange ? label : t('stars', { n: value })}
+    >
       {[1, 2, 3, 4, 5].map((n) =>
         onChange ? (
-          <button key={n} type="button" role="radio" aria-checked={value === n} aria-label={`${n}`} onClick={() => onChange(n)}>
+          <button key={n} type="button" aria-pressed={value === n} aria-label={t('stars', { n })} onClick={() => onChange(n)}>
             <StarSolid className={`${size} ${n <= value ? 'text-amber-400' : 'text-secondary-300 dark:text-secondary-600'}`} />
           </button>
         ) : (
@@ -205,77 +254,80 @@ export function MapView({
   const clamp = (v: number) => Math.max(4, Math.min(96, v));
 
   return (
-    <div className={`relative w-full overflow-hidden rounded-xl border border-secondary-200 bg-gradient-to-br from-emerald-50 to-sky-100 dark:border-secondary-700 dark:from-secondary-800 dark:to-secondary-900 ${height}`}>
-      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+    <figure className="w-full">
+      <div className={`relative w-full overflow-hidden rounded-xl border border-secondary-200 bg-gradient-to-br from-emerald-50 to-sky-100 dark:border-secondary-700 dark:from-secondary-800 dark:to-secondary-900 ${height}`}>
+        <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          {ROAD_CALLES.map((c) => {
+            const y = pct({ calle: c, carrera: 0 }).y;
+            return inside(y) ? <line key={`c${c}`} x1={0} x2={100} y1={y} y2={y} stroke="#94a3b8" strokeOpacity={0.55} strokeWidth={3} vectorEffect="non-scaling-stroke" /> : null;
+          })}
+          {ROAD_CARRERAS.map((c) => {
+            const x = pct({ calle: 0, carrera: c }).x;
+            return inside(x) ? <line key={`k${c}`} y1={0} y2={100} x1={x} x2={x} stroke="#94a3b8" strokeOpacity={0.55} strokeWidth={3} vectorEffect="non-scaling-stroke" /> : null;
+          })}
+          {routes.map((r) => {
+            const a = pct(r.from);
+            const b = pct(r.to);
+            const mid = pct({ calle: r.from.calle, carrera: r.to.carrera });
+            return (
+              <polyline
+                key={r.id}
+                points={`${a.x},${a.y} ${mid.x},${mid.y} ${b.x},${b.y}`}
+                fill="none"
+                stroke={r.color}
+                strokeWidth={2.5}
+                strokeDasharray={r.dashed ? '5 4' : undefined}
+                vectorEffect="non-scaling-stroke"
+              />
+            );
+          })}
+        </svg>
         {ROAD_CALLES.map((c) => {
           const y = pct({ calle: c, carrera: 0 }).y;
-          return inside(y) ? <line key={`c${c}`} x1={0} x2={100} y1={y} y2={y} stroke="#94a3b8" strokeOpacity={0.55} strokeWidth={3} vectorEffect="non-scaling-stroke" /> : null;
+          return inside(y) && y > 4 && y < 92 ? (
+            <span key={`lc${c}`} className="absolute left-1 text-[9px] font-medium text-secondary-500 dark:text-secondary-400" style={{ top: `${y}%`, transform: 'translateY(-110%)' }}>
+              Cl {c}
+            </span>
+          ) : null;
         })}
         {ROAD_CARRERAS.map((c) => {
           const x = pct({ calle: 0, carrera: c }).x;
-          return inside(x) ? <line key={`k${c}`} y1={0} y2={100} x1={x} x2={x} stroke="#94a3b8" strokeOpacity={0.55} strokeWidth={3} vectorEffect="non-scaling-stroke" /> : null;
+          return inside(x) && x > 4 && x < 94 ? (
+            <span key={`lk${c}`} className="absolute top-1 text-[9px] font-medium text-secondary-500 dark:text-secondary-400" style={{ left: `${x}%`, transform: 'translateX(-50%)' }}>
+              Cra {c}
+            </span>
+          ) : null;
         })}
-        {routes.map((r) => {
-          const a = pct(r.from);
-          const b = pct(r.to);
-          const mid = pct({ calle: r.from.calle, carrera: r.to.carrera });
+        {zones?.map((z) => {
+          const p = pct(ZONE_CENTERS[z.id]);
+          return inside(p.x) && inside(p.y) ? (
+            <span key={z.id} className="absolute text-[10px] font-semibold uppercase tracking-wide text-secondary-400 dark:text-secondary-500" style={{ left: `${clamp(p.x)}%`, top: `${clamp(p.y)}%`, transform: 'translate(-50%, 40%)' }}>
+              {z.label}
+            </span>
+          ) : null;
+        })}
+        {points.map((pt) => {
+          const p = pct(pt.place);
           return (
-            <polyline
-              key={r.id}
-              points={`${a.x},${a.y} ${mid.x},${mid.y} ${b.x},${b.y}`}
-              fill="none"
-              stroke={r.color}
-              strokeWidth={2.5}
-              strokeDasharray={r.dashed ? '5 4' : undefined}
-              vectorEffect="non-scaling-stroke"
-            />
+            <div
+              key={pt.id}
+              className={`absolute ${pt.muted ? 'opacity-50' : ''} ${pt.kind === 'driver' ? 'z-10' : ''}`}
+              // El repartidor lleva la etiqueta debajo del punto y el resto encima, para que no se tapen cuando coinciden.
+              style={{ left: `${clamp(p.x)}%`, top: `${clamp(p.y)}%`, transform: pt.kind === 'driver' ? 'translate(-50%, -8px)' : 'translate(-50%, -100%)' }}
+            >
+              <div className="relative flex flex-col items-center">
+                <div className={`relative h-4 w-4 rounded-full border-2 border-white shadow-md ${PIN[pt.kind]}`}>
+                  {pt.pulse && <span className={`absolute inset-0 -m-1 animate-ping rounded-full opacity-40 ${PIN[pt.kind]}`} />}
+                </div>
+                <div className="mt-0.5 max-w-[110px] truncate rounded bg-white px-1 py-0.5 text-[9px] font-semibold text-secondary-700 shadow dark:bg-secondary-800 dark:text-secondary-200">{pt.label}</div>
+              </div>
+            </div>
           );
         })}
-      </svg>
-      {ROAD_CALLES.map((c) => {
-        const y = pct({ calle: c, carrera: 0 }).y;
-        return inside(y) && y > 4 && y < 92 ? (
-          <span key={`lc${c}`} className="absolute left-1 text-[9px] font-medium text-secondary-500 dark:text-secondary-400" style={{ top: `${y}%`, transform: 'translateY(-110%)' }}>
-            Cl {c}
-          </span>
-        ) : null;
-      })}
-      {ROAD_CARRERAS.map((c) => {
-        const x = pct({ calle: 0, carrera: c }).x;
-        return inside(x) && x > 4 && x < 94 ? (
-          <span key={`lk${c}`} className="absolute top-1 text-[9px] font-medium text-secondary-500 dark:text-secondary-400" style={{ left: `${x}%`, transform: 'translateX(-50%)' }}>
-            Cra {c}
-          </span>
-        ) : null;
-      })}
-      {zones?.map((z) => {
-        const p = pct(ZONE_CENTERS[z.id]);
-        return inside(p.x) && inside(p.y) ? (
-          <span key={z.id} className="absolute text-[10px] font-semibold uppercase tracking-wide text-secondary-400 dark:text-secondary-500" style={{ left: `${clamp(p.x)}%`, top: `${clamp(p.y)}%`, transform: 'translate(-50%, 40%)' }}>
-            {z.label}
-          </span>
-        ) : null;
-      })}
-      {points.map((pt) => {
-        const p = pct(pt.place);
-        return (
-          <div
-            key={pt.id}
-            className={`absolute ${pt.muted ? 'opacity-50' : ''} ${pt.kind === 'driver' ? 'z-10' : ''}`}
-            // El repartidor lleva la etiqueta debajo del punto y el resto encima, para que no se tapen cuando coinciden.
-            style={{ left: `${clamp(p.x)}%`, top: `${clamp(p.y)}%`, transform: pt.kind === 'driver' ? 'translate(-50%, -8px)' : 'translate(-50%, -100%)' }}
-          >
-            <div className="relative flex flex-col items-center">
-              <div className={`relative h-4 w-4 rounded-full border-2 border-white shadow-md ${PIN[pt.kind]}`}>
-                {pt.pulse && <span className={`absolute inset-0 -m-1 animate-ping rounded-full opacity-40 ${PIN[pt.kind]}`} />}
-              </div>
-              <div className="mt-0.5 max-w-[110px] truncate rounded bg-white px-1 py-0.5 text-[9px] font-semibold text-secondary-700 shadow dark:bg-secondary-800 dark:text-secondary-200">{pt.label}</div>
-            </div>
-          </div>
-        );
-      })}
-      <div className="absolute bottom-1.5 right-1.5 max-w-[90%] rounded-md bg-white/85 px-2 py-0.5 text-right text-[9px] font-medium text-secondary-600 dark:bg-secondary-900/85 dark:text-secondary-300">{hint}</div>
-    </div>
+      </div>
+      {/* La leyenda va debajo del mapa: encima tapaba puntos y nombres. */}
+      <figcaption className="mt-1 text-right text-[10px] font-medium text-secondary-600 dark:text-secondary-300">{hint}</figcaption>
+    </figure>
   );
 }
 

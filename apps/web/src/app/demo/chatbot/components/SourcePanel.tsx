@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useRef } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { XMarkIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
-import type { SourceChunk } from './data';
+import { formatDecimal, type SourceChunk } from './data';
 import InfoIcon from './ui/InfoIcon';
+import { useDialogFocus } from './ui/useDialogFocus';
 
 interface SourcePanelProps {
   chunk: SourceChunk | null;
@@ -19,15 +20,9 @@ interface SourcePanelProps {
  */
 export default function SourcePanel({ chunk, onClose, onOpenDocument }: SourcePanelProps) {
   const t = useTranslations('demoChatbot');
-
-  useEffect(() => {
-    if (!chunk) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [chunk, onClose]);
+  const locale = useLocale() === 'en' ? 'en' : 'es';
+  const ref = useRef<HTMLElement>(null);
+  useDialogFocus(!!chunk, ref, onClose);
 
   if (!chunk) return null;
 
@@ -40,6 +35,7 @@ export default function SourcePanel({ chunk, onClose, onOpenDocument }: SourcePa
       onClick={onClose}
     >
       <aside
+        ref={ref}
         className="flex h-full w-full max-w-md flex-col border-l border-secondary-200 bg-white shadow-2xl dark:border-secondary-700 dark:bg-secondary-900"
         onClick={(e) => e.stopPropagation()}
       >
@@ -78,7 +74,7 @@ export default function SourcePanel({ chunk, onClose, onOpenDocument }: SourcePa
               {t('sourcePanel.score')}
               <InfoIcon content={t('sourcePanel.scoreHint')} size="xs" side="bottom" align="end" />
             </dt>
-            <dd className="font-mono text-secondary-900 dark:text-secondary-100">{chunk.score.toFixed(3)}</dd>
+            <dd className="font-mono text-secondary-900 dark:text-secondary-100">{formatDecimal(chunk.score, 3, locale)}</dd>
           </div>
         </dl>
 

@@ -39,13 +39,15 @@ import {
   nextTicketNumber,
   normalize,
   route,
+  slaInfo,
   slaRemaining,
   type Classification,
   type RouteResult,
 } from './engine';
 
 const STORAGE_KEY = 'koptup.helpdesk.v1';
-const STORAGE_VERSION = 1;
+/** 2: reloj con pausa, avance de los primeros pasos y hora del SLA vencido. */
+const STORAGE_VERSION = 2;
 
 export interface HelpdeskState {
   version: number;
@@ -56,6 +58,10 @@ export interface HelpdeskState {
   settings: Settings;
   /** Reloj de la demo en minutos desde las 00:00 del día de referencia. */
   clock: number;
+  /** El reloj no avanza solo (los botones «+15 min» sí lo mueven). */
+  paused: boolean;
+  /** Primeros pasos: el visitante ya revisó el SLA y las PQRS. */
+  tourSla: boolean;
   /** Contador para ids de notas, mensajes, macros y registros. */
   seq: number;
   pqrsSeq: number;
@@ -70,6 +76,8 @@ export function initialState(): HelpdeskState {
     surveys: SEED_SURVEYS,
     settings: SEED_SETTINGS,
     clock: START_CLOCK,
+    paused: false,
+    tourSla: false,
     // Por encima de los ids de los datos de ejemplo (l1…l9, s1…s9).
     seq: 100,
     pqrsSeq: SEED_PQRS_SEQ,
@@ -100,6 +108,8 @@ type Action =
   | { type: 'hydrate'; state: HelpdeskState }
   | { type: 'reset' }
   | { type: 'tick'; minutes: number }
+  | { type: 'pause'; paused: boolean }
+  | { type: 'tourSla' }
   | { type: 'slaSweep' }
   | { type: 'reply'; id: string; text: string }
   | { type: 'customerReply'; id: string }
@@ -146,7 +156,10 @@ function macroNameParam(m: Macro): string {
   return typeof m.name === 'string' ? m.name.replace(/^@+/, '') : `@${m.name.k}`;
 }
 
-function reducer(state: HelpdeskState, action: Action): HelpdeskState {
+export type HelpdeskAction = Action;
+
+/** Reductor de la mesa de ayuda (exportado para las pruebas). */
+export function reducer(state: HelpdeskState, action: Action): HelpdeskState {
   const { clock } = state;
   switch (action.type) {
     case 'hydrate':
@@ -155,12 +168,18 @@ function reducer(state: HelpdeskState, action: Action): HelpdeskState {
       return initialState();
     case 'tick':
       return { ...state, clock: state.clock + action.minutes };
+    case 'pause':
+      return { ...state, paused: action.paused };
+    case 'tourSla':
+      return state.tourSla ? state : { ...state, tourSla: true };
     case 'slaSweep': {
       let seq = state.seq;
       let changed = false;
       const tickets = state.tickets.map((t) => {
         if (t.slaHandled || t.status !== 'open' || slaRemaining(t, clock) > 0) return t;
         changed = true;
+        const info = slaInfo(t, clock);
+        const slaBreach = info.kind === 'first' || info.kind === 'resolution' ? { kind: info.kind, due: info.due } : null;
         const to = bumpPriority(t.priority);
         const text: Txt =
           to === t.priority
@@ -169,6 +188,7 @@ function reducer(state: HelpdeskState, action: Action): HelpdeskState {
         return {
           ...t,
           slaHandled: true,
+          slaBreach,
           priority: to,
           tags: t.tags.includes('sla-vencido') ? t.tags : [...t.tags, 'sla-vencido'],
           notes: [...t.notes, note(seq++, 'system', text, clock)],
@@ -469,11 +489,21 @@ export function processIncoming(
   };
 }
 
+/** Lo guardado por la versión 1 (sin pausa ni avance de los primeros pasos) sigue sirviendo. */
+function migrate(v: unknown): unknown {
+  if (v && typeof v === 'object' && (v as { version?: unknown }).version === 1) {
+    return { ...(v as object), version: STORAGE_VERSION, paused: false, tourSla: false };
+  }
+  return v;
+}
+
 function isValidState(v: unknown): v is HelpdeskState {
   if (!v || typeof v !== 'object') return false;
   const s = v as Partial<HelpdeskState>;
   return (
     s.version === STORAGE_VERSION &&
+    typeof s.paused === 'boolean' &&
+    typeof s.tourSla === 'boolean' &&
     Array.isArray(s.tickets) &&
     Array.isArray(s.macros) &&
     Array.isArray(s.autoLog) &&
@@ -498,7 +528,7 @@ export function useHelpdeskStore() {
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) {
-        const parsed = JSON.parse(raw) as unknown;
+        const parsed = migrate(JSON.parse(raw) as unknown);
         if (isValidState(parsed)) dispatch({ type: 'hydrate', state: parsed });
       }
     } catch {
@@ -516,11 +546,12 @@ export function useHelpdeskStore() {
     }
   }, [state, hydrated]);
 
-  // Reloj de la demo: avanza un minuto por cada minuto real.
+  // Reloj de la demo: avanza un minuto por cada minuto real, salvo en pausa.
   useEffect(() => {
+    if (state.paused) return;
     const id = window.setInterval(() => dispatch({ type: 'tick', minutes: 1 }), 60_000);
     return () => window.clearInterval(id);
-  }, []);
+  }, [state.paused]);
 
   // Regla de escalamiento por SLA vencido.
   useEffect(() => {

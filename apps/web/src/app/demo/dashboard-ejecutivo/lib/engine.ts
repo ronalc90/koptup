@@ -97,26 +97,35 @@ export function buildIndex(ds: Dataset): Index {
 /* Períodos                                                            */
 /* ------------------------------------------------------------------ */
 
-function monthsOfPeriod(ds: Dataset, kind: Period['kind'], year: number, index: number): MonthKey[] {
-  return ds.months.filter((m) => {
-    if (yearOf(m) !== year) return false;
-    if (kind === 'month') return monthNum(m) === index;
-    if (kind === 'quarter') return quarterOf(m) === index;
-    return true;
-  });
-}
-
-/** Períodos del año más reciente con datos: año a la fecha, trimestres y meses (del más reciente al más antiguo). */
+/**
+ * Períodos que se pueden elegir: los últimos 12 meses con datos (cada uno tiene
+ * su mismo mes del año anterior para la meta y la comparación), los trimestres
+ * que caben en esos 12 meses (más el trimestre en curso, aunque esté
+ * incompleto) y el año a la fecha. Del más reciente al más antiguo.
+ */
 export function periodOptions(ds: Dataset): Period[] {
   if (!ds.months.length) return [];
-  const year = yearOf(ds.months[ds.months.length - 1]);
-  const inYear = ds.months.filter((m) => yearOf(m) === year);
+  const last = ds.months[ds.months.length - 1];
+  const window = ds.months.slice(-12);
+  const have = new Set(ds.months);
   const out: Period[] = [];
-  const months = [...inYear].reverse();
-  for (const m of months) out.push({ key: `m:${m}`, kind: 'month', year, index: monthNum(m), months: [m] });
-  const quarters = Array.from(new Set(inYear.map(quarterOf))).sort((a, b) => b - a);
-  for (const q of quarters) out.push({ key: `q:${year}-${q}`, kind: 'quarter', year, index: q, months: monthsOfPeriod(ds, 'quarter', year, q) });
-  out.push({ key: `y:${year}`, kind: 'year', year, index: 0, months: inYear });
+  for (const m of [...window].reverse()) out.push({ key: `m:${m}`, kind: 'month', year: yearOf(m), index: monthNum(m), months: [m] });
+  const seen = new Set<string>();
+  for (const m of [...window].reverse()) {
+    const year = yearOf(m);
+    const q = quarterOf(m);
+    const id = `${year}-${q}`;
+    if (seen.has(id)) continue;
+    seen.add(id);
+    const first = `${year}-${String((q - 1) * 3 + 1).padStart(2, '0')}`;
+    const expected = [0, 1, 2].map((k) => addMonths(first, k)).filter((x) => x <= last);
+    const isLatest = expected.includes(last);
+    if (!expected.every((x) => have.has(x))) continue;
+    if (!isLatest && first < window[0]) continue;
+    out.push({ key: `q:${id}`, kind: 'quarter', year, index: q, months: expected });
+  }
+  const year = yearOf(last);
+  out.push({ key: `y:${year}`, kind: 'year', year, index: 0, months: ds.months.filter((m) => yearOf(m) === year) });
   return out;
 }
 
@@ -414,18 +423,21 @@ export interface MonthPoint {
   forecast: ForecastPoint | null;
 }
 
-/** Serie del año del período: real, meta y proyección de los meses siguientes al corte. */
-export function yearSeries(idx: Index, year: number, goalGrowth: number, fc: Forecast): MonthPoint[] {
-  return Array.from({ length: 12 }, (_, i) => {
-    const month = `${year}-${String(i + 1).padStart(2, '0')}`;
-    const actual = idx.byMonth.has(month) ? totals(idx, [month]).sales : null;
-    return {
-      month,
-      actual,
-      budget: budget(idx, [month], goalGrowth),
-      forecast: fc.points.find((p) => p.month === month) ?? null,
-    };
-  }).filter((p) => p.actual !== null || p.forecast !== null || p.budget !== null);
+/**
+ * Serie mensual del gráfico de ventas: los 12 meses que terminan en `end`
+ * (real y meta) y, si `end` es el último mes con datos, los meses proyectados.
+ */
+export function trailingSeries(idx: Index, end: MonthKey, goalGrowth: number, fc: Forecast): MonthPoint[] {
+  const months = Array.from({ length: 12 }, (_, i) => addMonths(end, i - 11)).filter((m) => idx.byMonth.has(m));
+  const withForecast = fc.points.length > 0 && fc.points[0].month === addMonths(end, 1);
+  const points: MonthPoint[] = months.map((month) => ({
+    month,
+    actual: totals(idx, [month]).sales,
+    budget: budget(idx, [month], goalGrowth),
+    forecast: null,
+  }));
+  if (withForecast) for (const f of fc.points) points.push({ month: f.month, actual: null, budget: budget(idx, [f.month], goalGrowth), forecast: f });
+  return points;
 }
 
 /* ------------------------------------------------------------------ */
@@ -674,8 +686,9 @@ export function cashFlow(idx: Index, fc: Forecast): CashFlow | null {
         if (!w.events.includes('payroll')) w.events.push('payroll');
       }
     }
-    if (monthNum(m) === 12) {
-      const w = weekOf(`${m}-18`);
+    // Prima de servicios: media nómina antes del 30 de junio y antes del 20 de diciembre.
+    if (monthNum(m) === 6 || monthNum(m) === 12) {
+      const w = weekOf(`${m}-${monthNum(m) === 6 ? '26' : '18'}`);
       if (w) {
         w.payroll += payroll / 2;
         w.events.push('bonus');
@@ -949,13 +962,14 @@ export function alerts(ctx: Context): Alert[] {
       }
     }
   }
-  if (ctx.cash && ctx.cash.min.balance < th.cashFloor * 1e6) {
+  // Caja mínima: se mira la caja al corte y el saldo de cierre de cada semana proyectada.
+  if (ctx.cash && Math.min(ctx.cash.start, ctx.cash.min.balance) < th.cashFloor * 1e6) {
     out.push({
       id: 'cashFloor',
       kind: 'cashFloor',
       severity: 'critical',
       view: 'finanzas',
-      values: { balance: ctx.cash.min.balance, week: ctx.cash.min.n, floor: th.cashFloor * 1e6 },
+      values: { balance: ctx.cash.min.balance, week: ctx.cash.min.n, floor: th.cashFloor * 1e6, today: ctx.cash.start, todayBelow: ctx.cash.start < th.cashFloor * 1e6 ? 1 : 0 },
       labels: { start: ctx.cash.min.start, end: ctx.cash.min.end },
     });
   }

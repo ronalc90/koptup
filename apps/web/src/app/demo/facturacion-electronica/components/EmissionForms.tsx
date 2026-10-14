@@ -25,7 +25,7 @@ import {
   TAX_RATE,
   type Totals,
 } from './fiscal';
-import { Field, inputCls, labelCls } from './ui';
+import { Field, focusRing, inputCls, labelCls } from './ui';
 
 type SetDraft = (fn: (d: Draft) => Draft) => void;
 
@@ -82,7 +82,7 @@ export function BuyerForm({ draft, setDraft, docs }: { draft: Draft; setDraft: S
         {(chk.state === 'missingDv' || chk.state === 'badDv') && (
           <button
             type="button"
-            className="ml-1 underline font-medium"
+            className={'ml-1 rounded underline font-medium ' + focusRing}
             onClick={() => onIdChange(`${chk.digits}-${chk.expectedDv}`)}
           >
             {t('form.useDv', { dv: chk.expectedDv })}
@@ -240,7 +240,7 @@ export function LinesEditor({ draft, setDraft, showRete }: { draft: Draft; setDr
           <button
             type="button"
             onClick={() => add({ description: '', qty: 1, unitPrice: 0, tax: 'iva19', rete: 'none' })}
-            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-primary-600 text-primary-600 text-sm hover:bg-primary-50 dark:hover:bg-primary-950"
+            className={'inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-primary-600 text-primary-600 text-sm hover:bg-primary-50 dark:hover:bg-primary-950 ' + focusRing}
           >
             <PlusIcon className="w-4 h-4" /> {t('form.addLine')}
           </button>
@@ -265,7 +265,7 @@ export function LinesEditor({ draft, setDraft, showRete }: { draft: Draft; setDr
                   type="button"
                   onClick={() => remove(l.id)}
                   aria-label={t('form.removeLine', { n: i + 1 })}
-                  className="p-2 rounded-md text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 flex-shrink-0"
+                  className={'p-2 rounded-md text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 flex-shrink-0 ' + focusRing}
                 >
                   <TrashIcon className="w-4 h-4" />
                 </button>
@@ -329,7 +329,7 @@ export function LinesEditor({ draft, setDraft, showRete }: { draft: Draft; setDr
                 )}
               </div>
               <p className="mt-2 text-right text-xs text-secondary-600 dark:text-secondary-300 tabular-nums">
-                {t('form.line.base')}: {formatCOP(base)} · IVA: {formatCOP(Math.round(base * TAX_RATE[l.tax]))}
+                {t('form.line.base')}: {formatCOP(base)} · {t('form.line.taxAmount')}: {formatCOP(Math.round(base * TAX_RATE[l.tax]))}
               </p>
             </div>
           );
@@ -568,7 +568,7 @@ export function TotalsSummary({ totals, showRete }: { totals: Totals; showRete: 
           <div key={k} className="flex justify-between gap-3 text-xs">
             <dt className="text-secondary-500 dark:text-secondary-400">
               {t('summary.base', { tax: t(`taxOptions.${k}`) })}
-              {totals.byTax[k].tax > 0 && ` → IVA ${formatCOP(totals.byTax[k].tax)}`}
+              {totals.byTax[k].tax > 0 && ` → ${t('form.line.taxAmount')} ${formatCOP(totals.byTax[k].tax)}`}
             </dt>
             <dd className="whitespace-nowrap text-secondary-700 dark:text-secondary-200">{formatCOP(totals.byTax[k].base)}</dd>
           </div>

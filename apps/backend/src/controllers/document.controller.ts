@@ -27,10 +27,9 @@ function requireUserId(req: AuthRequest): string {
   if (!id) throw new AppError('Unauthorized', 401);
   return id;
 }
-const DELETE_PIN = '1010'; // PIN requerido para eliminar documentos
 
 /**
- * Sube un documento y lo procesa con IA (DEMO PÚBLICO)
+ * Sube un documento y lo procesa con IA
  */
 export const uploadDocument = asyncHandler(
   async (req: AuthRequest, res: Response) => {
@@ -68,10 +67,15 @@ export const uploadDocument = asyncHandler(
       };
       let embedding: number[] = [];
 
-      if (extractedText && process.env.OPENAI_API_KEY) {
+      // Sin cupo de IA (tope mensual o límite diario del usuario) el documento
+      // se guarda sin análisis y la respuesta lo dice.
+      const aiAllowed = req.aiGate?.allowed !== false;
+      let aiAnalyzed = false;
+      if (extractedText && process.env.OPENAI_API_KEY && aiAllowed) {
         try {
           aiAnalysis = await analyzeDocument(extractedText, file.originalname);
           embedding = await generateDocumentEmbedding(extractedText);
+          aiAnalyzed = true;
         } catch (error) {
           logger.error('Error analyzing document with AI:', error);
           // Continuar sin análisis de IA
@@ -113,7 +117,12 @@ export const uploadDocument = asyncHandler(
 
       res.json({
         success: true,
-        message: 'Documento subido y procesado exitosamente',
+        message: aiAnalyzed
+          ? 'Documento subido y procesado exitosamente'
+          : req.aiGate?.allowed === false
+            ? `Documento guardado sin análisis de IA. ${req.aiGate.message ?? ''}`.trim()
+            : 'Documento guardado sin análisis de IA.',
+        ai: { analyzed: aiAnalyzed, ...(req.aiGate?.allowed === false ? { code: req.aiGate.code } : {}) },
         data: {
           id: document._id,
           filename: document.original_filename,
@@ -137,7 +146,7 @@ export const uploadDocument = asyncHandler(
 );
 
 /**
- * Obtiene todos los documentos con filtros (DEMO PÚBLICO)
+ * Obtiene todos los documentos con filtros
  */
 export const getDocuments = asyncHandler(
   async (req: AuthRequest, res: Response) => {
@@ -218,7 +227,7 @@ export const getDocuments = asyncHandler(
 );
 
 /**
- * Búsqueda semántica por significado (DEMO PÚBLICO)
+ * Búsqueda semántica por significado
  */
 export const searchDocumentsBySemantic = asyncHandler(
   async (req: AuthRequest, res: Response) => {
@@ -288,7 +297,7 @@ export const searchDocumentsBySemantic = asyncHandler(
 );
 
 /**
- * Explica por qué un documento es similar a una búsqueda (DEMO PÚBLICO)
+ * Explica por qué un documento es similar a una búsqueda
  */
 export const explainDocumentSimilarity = asyncHandler(
   async (req: AuthRequest, res: Response) => {
@@ -343,7 +352,7 @@ export const explainDocumentSimilarity = asyncHandler(
 );
 
 /**
- * Explica un documento usando IA (DEMO PÚBLICO)
+ * Explica un documento usando IA
  */
 export const explainDocumentById = asyncHandler(
   async (req: AuthRequest, res: Response) => {
@@ -384,7 +393,7 @@ export const explainDocumentById = asyncHandler(
 );
 
 /**
- * Actualiza un documento (renombrar, mover carpeta, favorito) - DEMO PÚBLICO
+ * Actualiza un documento (renombrar, mover carpeta, favorito)
  */
 export const updateDocument = asyncHandler(
   async (req: AuthRequest, res: Response) => {
@@ -432,18 +441,15 @@ export const updateDocument = asyncHandler(
 );
 
 /**
- * Marca un documento como eliminado (requiere PIN 1010)
+ * Mueve un documento a la papelera (o lo borra del todo con
+ * `?permanent=true`). Solo el dueño: la consulta filtra por su id. La
+ * confirmación ("¿Seguro?") la pide la interfaz antes de llamar.
  */
 export const deleteDocument = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const userId = requireUserId(req);
     const { id } = req.params;
-    const { permanent, pin } = req.query;
-
-    // Verificar PIN
-    if (pin !== DELETE_PIN) {
-      throw new AppError('PIN incorrecto. Se requiere PIN 1010 para eliminar documentos.', 403);
-    }
+    const { permanent } = req.query;
 
     const document = await Document.findOne({
       _id: id,
@@ -493,7 +499,7 @@ export const deleteDocument = asyncHandler(
 );
 
 /**
- * Restaura un documento de la papelera (DEMO PÚBLICO)
+ * Restaura un documento de la papelera
  */
 export const restoreDocument = asyncHandler(
   async (req: AuthRequest, res: Response) => {
@@ -528,7 +534,7 @@ export const restoreDocument = asyncHandler(
 );
 
 /**
- * Obtiene las carpetas con contadores (DEMO PÚBLICO)
+ * Obtiene las carpetas con contadores
  */
 export const getFolders = asyncHandler(
   async (req: AuthRequest, res: Response) => {
@@ -563,7 +569,7 @@ export const getFolders = asyncHandler(
 );
 
 /**
- * Crea una nueva carpeta (DEMO PÚBLICO)
+ * Crea una nueva carpeta
  */
 export const createFolder = asyncHandler(
   async (req: AuthRequest, res: Response) => {
@@ -595,7 +601,7 @@ export const createFolder = asyncHandler(
 );
 
 /**
- * Obtiene estadísticas del gestor de documentos (DEMO PÚBLICO)
+ * Obtiene estadísticas del gestor de documentos
  */
 export const getDocumentStats = asyncHandler(
   async (req: AuthRequest, res: Response) => {

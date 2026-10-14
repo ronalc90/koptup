@@ -50,6 +50,21 @@ export const quarterOf = (m: MonthKey): number => Math.floor((monthNum(m) - 1) /
 /** Día de la semana (0 = domingo). */
 export const weekday = (d: ISODate): number => new Date(toDays(d) * DAY).getUTCDay();
 
+/** ¿Es un mes `AAAA-MM` válido? */
+export const isMonthKey = (s: unknown): s is MonthKey => typeof s === 'string' && /^\d{4}-(0[1-9]|1[0-2])$/.test(s);
+
+/**
+ * Último mes cerrado en Colombia (UTC−5 todo el año, sin horario de verano)
+ * para un instante dado. Es el mes de corte de los datos de ejemplo: el 14 de
+ * octubre de 2026 devuelve `2026-09`. Se calcula en el servidor y llega al
+ * navegador como dato, así el HTML y la hidratación usan el mismo mes.
+ */
+export function lastClosedMonth(now: Date): MonthKey {
+  const bogota = new Date(now.getTime() - 5 * 3_600_000);
+  const current = `${bogota.getUTCFullYear()}-${String(bogota.getUTCMonth() + 1).padStart(2, '0')}`;
+  return addMonths(current, -1);
+}
+
 export function monthRange(from: MonthKey, to: MonthKey): MonthKey[] {
   const out: MonthKey[] = [];
   for (let m = from; m <= to; m = addMonths(m, 1)) out.push(m);

@@ -43,6 +43,8 @@ import {
   resendActivation,
   resolveDemosForGrant,
 } from './demo-grants.service';
+import { onDemoAccessGranted } from './leads.service';
+import { isCommerceEnabled } from '../config/commerce';
 import { logger } from '../utils/logger';
 
 const SLUG = /^[a-z0-9-]{2,60}$/;
@@ -76,6 +78,8 @@ export const DemoRequestInputSchema = z.object({
     .min(1, 'Elige al menos una demo.')
     .max(10, 'Puedes pedir hasta 10 demos por solicitud.'),
   casoDeUso: z.string().trim().min(10, 'Cuéntanos en pocas palabras qué quieres resolver (mínimo 10 caracteres).').max(2000),
+  // Se acepta por compatibilidad con formularios anteriores, pero se ignora:
+  // la versión de la política que se guarda la fija siempre el servidor.
   versionPolitica: optionalText(40),
   origen: z
     .object({
@@ -200,7 +204,8 @@ export async function createDemoRequest(
     fecha: now,
     ipHash: hashIp(ctx.ip),
     userAgent: ctx.userAgent?.slice(0, 300),
-    versionPolitica: input.versionPolitica ?? currentPrivacyPolicyVersion(),
+    // Siempre la del servidor (PRIVACY_POLICY_VERSION): nunca la del cliente.
+    versionPolitica: currentPrivacyPolicyVersion(),
   };
 
   // ¿Ya tiene una solicitud abierta reciente? Se le suman las demos.
@@ -252,6 +257,13 @@ export async function createDemoRequest(
         service: `Solicitud de demo: ${demoNames.join(', ')}`.slice(0, 300),
         message: leadMessage(saved, demoNames),
         source: 'demo-request',
+        consentimiento: {
+          aceptado: true,
+          fecha: saved.consentimiento.fecha,
+          ipHash: saved.consentimiento.ipHash,
+          userAgent: saved.consentimiento.userAgent,
+          versionPolitica: saved.consentimiento.versionPolitica,
+        },
       });
       await DemoRequest.updateOne({ _id: saved._id }, { $set: { lead: contact._id } });
       const result = await notified;
@@ -431,6 +443,21 @@ export async function approveDemoRequest(id: string, body: z.infer<typeof Approv
     },
     { new: true },
   );
+
+  // Pipeline comercial (solo con COMMERCE_ENABLED=true): el lead pasa a
+  // `demo` y queda ligado a la cuenta.
+  if (isCommerceEnabled()) {
+    await onDemoAccessGranted({
+      email: r.email,
+      nombre: r.nombre,
+      empresa: r.empresa,
+      telefono: r.telefono,
+      userId: granted.user.id,
+      demos,
+      source: 'demo-request',
+      actor,
+    });
+  }
 
   await recordAudit({
     actor,

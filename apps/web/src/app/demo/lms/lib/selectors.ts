@@ -2,7 +2,7 @@
 import { COURSES } from './catalog';
 import { diffDays, type ISODate } from './dates';
 import { myCohortRow, progressOf } from './engine';
-import type { CohortEnrollment, Course, LmsState, Sale } from './types';
+import type { Certificate, CohortEnrollment, Course, LmsState, Sale } from './types';
 
 export function allCourses(s: LmsState): Course[] {
   return [...COURSES, ...s.customCourses];
@@ -14,6 +14,11 @@ export function catalogCourses(s: LmsState): Course[] {
 
 export function courseById(s: LmsState, id: string): Course | undefined {
   return allCourses(s).find((c) => c.id === id);
+}
+
+/** Certificados vigentes (los reemitidos quedan anulados y no se cuentan). */
+export function activeCertificates(s: Pick<LmsState, 'certificates'>): Certificate[] {
+  return s.certificates.filter((c) => !c.replacedBy);
 }
 
 /** Cohorte de ejemplo + las inscripciones de quien recorre la demo. */

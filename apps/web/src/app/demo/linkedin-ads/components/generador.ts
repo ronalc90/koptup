@@ -169,6 +169,30 @@ export function aplicarUtm(texto: string, url: string, consulta: string, conUtm:
     .join('');
 }
 
+function escaparRegex(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * Lleva a la URL canónica (`url`) cualquier enlace absoluto a la misma demo
+ * que use otro dominio o traiga sus propios parámetros (por ejemplo, el que
+ * escribe la IA con el dominio del servidor). Así la UTM se puede agregar o
+ * quitar igual que en el texto de plantillas.
+ */
+export function normalizarEnlaceDemo(texto: string, path: string, url: string): string {
+  const re = new RegExp(`https?://[^\\s/]+${escaparRegex(path)}/?(?:\\?[^\\s)\\]»"']*)?(?=$|[\\s)\\]»"'.,;:!?])`, 'g');
+  return texto.replace(re, (m) => {
+    // Un punto o una coma final pertenecen a la frase, no a la URL.
+    const cola = /[.,;:!?]+$/.exec(m)?.[0] ?? '';
+    return url + cola;
+  });
+}
+
+/** ¿El texto trae la URL exacta de la demo (no otra ruta que empiece igual)? */
+export function incluyeEnlace(texto: string, url: string): boolean {
+  return texto.split(url).slice(1).some((parte) => !/^[/\w-]/.test(parte));
+}
+
 /* ───────────────────────────── generadores ───────────────────────────── */
 
 const ESTILOS_BULLETS: Record<TonoPost, (items: string[]) => string> = {

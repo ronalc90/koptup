@@ -11,7 +11,7 @@ import {
   monthlyTrend,
   stageDistribution,
 } from './crm';
-import { PlanBadge, SectionHeader } from './ui';
+import { PlanBadge, SectionHeader, linkCls } from './ui';
 import { useCrmText } from './useCrmText';
 
 interface Props {
@@ -26,12 +26,21 @@ export default function ForecastView({ deals, onOpen }: Props) {
   const { t } = tx;
   const [period, setPeriod] = useState<PeriodId>('quarter');
 
-  const f = useMemo(() => forecastFor(deals, period), [deals, period]);
+  const ref = tx.ref;
+  const f = useMemo(() => forecastFor(deals, period, ref), [deals, period, ref]);
   const dist = useMemo(() => stageDistribution(deals), [deals]);
-  const trend = useMemo(() => monthlyTrend(deals), [deals]);
-  const alerts = useMemo(() => forecastAlerts(deals, period), [deals, period]);
+  const trend = useMemo(() => monthlyTrend(deals, ref), [deals, ref]);
+  const alerts = useMemo(() => forecastAlerts(deals, period, ref), [deals, period, ref]);
   const maxBar = Math.max(1, ...trend.map((m) => Math.max(m.won, m.weighted)));
-  const monthsShort = t.raw('dates.months') as string[];
+  const refMonth = ref.slice(0, 7);
+  const pastMonths = trend.filter((m) => m.month <= refMonth);
+  const nextMonths = trend.filter((m) => m.month >= refMonth);
+  const trendAria = t('forecast.trendAria', {
+    from: tx.monthLong(pastMonths[0]?.month ?? refMonth),
+    to: tx.monthLong(refMonth),
+    last: tx.monthLong(nextMonths[nextMonths.length - 1]?.month ?? refMonth),
+    year: (nextMonths[nextMonths.length - 1]?.month ?? refMonth).slice(0, 4),
+  });
 
   const cards = [
     { key: 'won', value: f.won, color: 'bg-green-500' },
@@ -65,7 +74,7 @@ export default function ForecastView({ deals, onOpen }: Props) {
                       : 'text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800'
                   }`}
                 >
-                  {t(`forecast.period.${p}`)}
+                  {tx.periodLabel(p, true)}
                 </button>
               ))}
             </div>
@@ -191,9 +200,8 @@ export default function ForecastView({ deals, onOpen }: Props) {
           <h3 className="font-semibold text-secondary-900 dark:text-white">{t('forecast.trend')}</h3>
           <span className="text-xs text-secondary-500">{t('forecast.trendUnit')}</span>
         </div>
-        <div className="flex items-end gap-2 sm:gap-4 h-44" role="img" aria-label={t('forecast.trendAria')}>
+        <div className="flex items-end gap-2 sm:gap-4 h-44" role="img" aria-label={trendAria}>
           {trend.map((m) => {
-            const monthIdx = Number(m.month.slice(5, 7)) - 1;
             const mWon = Math.round(m.won / 1_000_000);
             const mW = Math.round(m.weighted / 1_000_000);
             return (
@@ -211,7 +219,9 @@ export default function ForecastView({ deals, onOpen }: Props) {
                     />
                   </div>
                 </div>
-                <span className="text-xs text-secondary-600 dark:text-secondary-400">{monthsShort[monthIdx]}</span>
+                <span className={`text-xs ${m.month === refMonth ? 'font-semibold text-secondary-900 dark:text-white' : 'text-secondary-600 dark:text-secondary-400'}`}>
+                  {tx.monthShort(m.month)}
+                </span>
               </div>
             );
           })}
@@ -245,7 +255,7 @@ export default function ForecastView({ deals, onOpen }: Props) {
                   ) : (
                     <span className="text-amber-600" aria-hidden="true">•</span>
                   )}
-                  <span>{t(`forecast.alert.${a.kind}`, { value: tx.money(a.value), period: t(`forecast.period.${period}`) })}</span>
+                  <span>{t(`forecast.alert.${a.kind}`, { value: tx.money(a.value), period: tx.periodLabel(period) })}</span>
                 </li>
               );
             }
@@ -259,11 +269,7 @@ export default function ForecastView({ deals, onOpen }: Props) {
                     stage: t(`stages.${a.deal.stage}`),
                     value: tx.moneyShort(a.deal.value),
                   })}{' '}
-                  <button
-                    type="button"
-                    onClick={() => onOpen(a.deal.id)}
-                    className="text-primary-700 dark:text-primary-300 underline underline-offset-2 hover:no-underline"
-                  >
+                  <button type="button" onClick={() => onOpen(a.deal.id)} className={linkCls}>
                     {t('forecast.openDeal')}
                   </button>
                 </span>

@@ -32,7 +32,7 @@
 |---|---|---|
 | Demo | Existe. Encabezado con "Modo ético", "En vivo" y "Ejecutar"; **10 pestañas** (Dashboard, Builder visual, Scheduler, Proxies, Anti-bot, Outputs, Diff detection, Monitoring, Cluster, GDPR); barra lateral "Mis scrapers" con 5 extractores, buscador y filtros | `apps/web/src/app/demo/scraping/page.tsx` (206 líneas), `components/views.tsx` (745 líneas) |
 | Real o maqueta | **Maqueta.** Extractores, proxies, workers, ejecuciones y diferencias son constantes (`PROXIES`, `WORKERS`, `RUNS`, `DIFF` en `views.tsx`; `scrapers` en `page.tsx`). "Ejecutar" solo repite 10 líneas de log cada 700 ms. No hay `fetch` ni llamadas a backend o IA | `page.tsx`, `views.tsx` |
-| Backend | Módulo en memoria `apps/backend/src/modules/scraping/` (CRUD de `Scraper` y `Job`; `runScraper` solo crea un registro "queued"; ~165 líneas) **no montado** en el servidor. No descarga ni procesa páginas | `scraping.service.ts`, `scraping.data.ts` |
+| Backend | Módulo en memoria `apps/backend/src/modules/scraping/` (retirado del repositorio en octubre de 2026, está en el historial de git; CRUD de `Scraper` y `Job`; `runScraper` solo crea un registro "queued"; ~165 líneas) **no montado** en el servidor. No descarga ni procesa páginas | `scraping.service.ts`, `scraping.data.ts` |
 | i18n ES/EN | Textos en `apps/web/messages/demos/scraping.{es,en}.json` (~9,6 KB). Textos fijos en el código: "— run the scraper to stream logs —", "● LIVE / ○ IDLE", "jobs:", "pods", "$ 342.40 / mes", estados de ejecución `ok/partial/error` sin traducir (`views.tsx`) | |
 | Tests | Solo smoke test (`__tests__/page.test.tsx`, 11 líneas), que hoy no se ejecuta | |
 | Tamaño | 984 líneas en total (`wc -l`) | |
@@ -161,7 +161,7 @@ En **Admin › Catálogo de demos** se cambia el `accessMode` (por ejemplo, a `s
 | Calidad y reparación | Métricas de campos completos y de volumen esperado; cuando una página cambia, la IA propone el nuevo selector y un ingeniero lo aprueba |
 | Entrega | Excel/CSV, Google Sheets, base de datos para Power BI, API REST, webhook; conector a la base de conocimiento del asistente RAG |
 | Operación | Cola de trabajos (por ejemplo BullMQ sobre Redis), almacenamiento con retención configurable, bitácora de ejecuciones, autorización verificada en el servidor |
-| Base existente | `apps/backend/src/modules/scraping/` sirve solo como modelo de datos de partida (`Scraper`, `Job`) |
+| Base existente | `apps/backend/src/modules/scraping/` (retirado del repositorio en octubre de 2026: está en el historial de git) sirve solo como modelo de datos de partida (`Scraper`, `Job`) |
 
 **SaaS:** sin base real, así que **"SaaS: lista de espera"** (DECISIÓN 7). Además del core multi-tenant y el cobro recurrente de la Fase 4 (Wompi/PayU en COP, Stripe en USD), un SaaS de extracción de autoservicio exige verificación de cada cliente, lista de fuentes permitidas y bloqueadas, revisión de cada fuente nueva, medición de páginas y de costos de proxies por cliente y una política de uso aceptable con suspensión. **Recomendación:** si se ofrece SaaS, que sea **"datos como servicio"** (Koptup opera las fuentes aprobadas y el cliente recibe los datos por suscripción), no un extractor de autoservicio.
 

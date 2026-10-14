@@ -1,8 +1,9 @@
 /**
- * Historia de ejemplo (enero–septiembre de 2026) generada de forma
- * determinista: misma semilla → mismos datos en el servidor y en el navegador.
- * Simula día a día compras, ventas, recaudos, traslados, producción, gastos,
- * nómina e impuestos de un grupo empresarial ficticio.
+ * Historia de ejemplo generada de forma determinista: misma fecha de trabajo →
+ * mismos datos en cualquier navegador y en las pruebas. Va del 1 de enero
+ * (lib/calendar.ts) hasta la fecha de trabajo, que es el cierre del mes
+ * anterior a hoy. Simula día a día compras, ventas, recaudos, traslados,
+ * producción, gastos, nómina e impuestos de un grupo empresarial ficticio.
  */
 import {
   CUSTOMERS,
@@ -12,12 +13,13 @@ import {
   ITEM_BY_SKU,
   PAYROLL_EMPLOYER_FACTOR,
   PO_LEVEL2_THRESHOLD,
+  REFERENCE_WORK_DATE,
   SUPPLIER_BY_ID,
-  WORK_DATE,
   explodeBom,
 } from './catalog';
+import { businessDayOnOrAfter, businessDayOnOrBefore, historyStartFor } from './calendar';
 import { compute, docTotals, openingStock, poAmounts } from './engine';
-import { addDays, lastDayOfMonth, norm, weekday } from './format';
+import { BANK_MONTHS, addDays, addMonths, businessDays, lastDayOfMonth, monthsBetween, norm, weekday } from './format';
 import type {
   BankLine,
   CompanyId,
@@ -37,7 +39,8 @@ import type {
   WarehouseId,
 } from './types';
 
-export const STATE_VERSION = 3;
+/** Versión del estado guardado. La 3 no tenía fecha de trabajo (era siempre el 30 sep 2026). */
+export const STATE_VERSION = 4;
 
 function mulberry32(a: number) {
   return () => {
@@ -67,7 +70,12 @@ const EXPENSE_BANK_DESC: Record<ExpenseKind, string> = {
   unidentified: 'CONSIGNACION SIN REFERENCIA',
 };
 
-export function buildSeed(): ErpState {
+export function buildSeed(workDate: string = REFERENCE_WORK_DATE): ErpState {
+  const WORK_DATE = workDate;
+  const workMonth = workDate.slice(0, 7);
+  const startDate = historyStartFor(workDate);
+  /** Día hábil k días antes de la fecha de trabajo. */
+  const before = (k: number) => businessDayOnOrBefore(addDays(WORK_DATE, -k));
   const rand = mulberry32(20260930);
   const r = (a: number, b: number) => a + rand() * (b - a);
   const ri = (a: number, b: number) => Math.floor(r(a, b + 1));
@@ -115,7 +123,8 @@ export function buildSeed(): ErpState {
     if (kind !== 'depreciation') bankOut(company, date, EXPENSE_BANK_DESC[kind], ex.amount, 'expense', ex.id);
   };
 
-  const monthIdx = (d: string) => Number(d.slice(5, 7)) - 1;
+  /** Meses transcurridos desde el inicio de la historia (para la inflación de precios y costos). */
+  const monthIdx = (d: string) => monthsBetween(startDate, d);
   const priceIndex = (d: string) => 0.976 + 0.003 * monthIdx(d);
   const costIndex = (d: string) => 0.976 + 0.003 * monthIdx(d);
 
@@ -210,7 +219,7 @@ export function buildSeed(): ErpState {
 
   const replenishedOn: Record<string, boolean> = {};
 
-  for (let d = '2026-01-01'; d <= WORK_DATE; d = addDays(d, 1)) {
+  for (let d = startDate; d <= WORK_DATE; d = addDays(d, 1)) {
     const wd = weekday(d);
     const business = wd >= 1 && wd <= 5;
     const ym = d.slice(0, 7);
@@ -235,8 +244,8 @@ export function buildSeed(): ErpState {
 
     // Recaudos de clientes
     for (const p of custPays[d] || []) {
-      // Los últimos pagos de septiembre llegan al banco pero aún no se registran (para conciliar)
-      if (d >= '2026-09-24' && unmatchedReceipts.length < 3) {
+      // Los últimos pagos del mes llegan al banco pero aún no se registran (para conciliar)
+      if (d >= addDays(WORK_DATE, -6) && unmatchedReceipts.length < 3) {
         unmatchedReceipts.push({ sale: p.sale, amount: p.amount, date: d });
         continue;
       }
@@ -280,7 +289,7 @@ export function buildSeed(): ErpState {
       }
 
       // Producción los miércoles (tostión de café y empaque de panela en Bogotá)
-      if (wd === 3 && d < '2026-09-28') {
+      if (wd === 3 && d < addDays(WORK_DATE, -2)) {
         for (const it of ITEMS.filter((i) => i.kind === 'finished')) {
           if (st(it.sku, 'bog') >= it.target.bog! * 0.7) continue;
           let qty = Math.round((it.target.bog! * 1.2) / 50) * 50;
@@ -326,14 +335,16 @@ export function buildSeed(): ErpState {
         logRevenue[ym] = (logRevenue[ym] || 0) + docTotals(s.lines).subtotal;
       }
 
-      // Impuestos: IVA bimestral y retención mensual (día hábil desde el 12)
+      // Impuestos: retención mensual e IVA bimestral (ene-feb se paga en marzo,
+      // …, nov-dic en enero), el primer día hábil desde el 12
       if (day >= 12 && day <= 16 && !replenishedOn[`${ym}-tax`]) {
         replenishedOn[`${ym}-tax`] = true;
-        const m = monthIdx(d) + 1;
-        const prevEnd = lastDayOfMonth(m === 1 ? '2025-12' : `2026-${String(m - 1).padStart(2, '0')}`);
+        const m = Number(ym.slice(5, 7));
+        const k = monthIdx(d);
+        const prevEnd = lastDayOfMonth(addMonths(ym, -1));
         for (const company of ['com', 'log'] as CompanyId[]) {
-          if (m > 1) taxes.push({ id: `tx${taxes.length + 1}`, no: num('IM'), seq: nextSeq(), company, date: d, account: '2365', cutoff: prevEnd });
-          if ([3, 5, 7, 9].includes(m)) taxes.push({ id: `tx${taxes.length + 1}`, no: num('IM'), seq: nextSeq(), company, date: d, account: '2408', cutoff: prevEnd });
+          if (k >= 1) taxes.push({ id: `tx${taxes.length + 1}`, no: num('IM'), seq: nextSeq(), company, date: d, account: '2365', cutoff: prevEnd });
+          if (m % 2 === 1 && k >= 2) taxes.push({ id: `tx${taxes.length + 1}`, no: num('IM'), seq: nextSeq(), company, date: d, account: '2408', cutoff: prevEnd });
         }
       }
 
@@ -357,11 +368,11 @@ export function buildSeed(): ErpState {
     // Cierre de mes
     if (d === lastBusinessDay(ym)) {
       addExpense('log', d, 'opCost', (logRevenue[ym] || 0) * r(0.4, 0.45));
-      // Nómina: la de septiembre ya está pagada, pero falta transmitir la nómina electrónica
+      // Nómina: la del mes que se cierra ya está pagada, pero falta transmitir la nómina electrónica
       for (const company of ['com', 'log'] as CompanyId[]) {
         const staff = EMPLOYEES.filter((e) => e.company === company);
         const gross = staff.reduce((a, e) => a + e.salary, 0);
-        const p: Payroll = { id: `nm${payroll.length + 1}`, no: num('NM'), seq: nextSeq(), company, month: ym, date: d, gross, headcount: staff.length, eStatus: ym < '2026-09' ? 'accepted' : 'pending' };
+        const p: Payroll = { id: `nm${payroll.length + 1}`, no: num('NM'), seq: nextSeq(), company, month: ym, date: d, gross, headcount: staff.length, eStatus: ym < workMonth ? 'accepted' : 'pending' };
         payroll.push(p);
         bankOut(company, d, 'PAGO NOMINA Y PILA', Math.round(gross * (1 + PAYROLL_EMPLOYER_FACTOR)), 'payroll', p.id);
       }
@@ -369,31 +380,32 @@ export function buildSeed(): ErpState {
     if (d === lastDayOfMonth(ym)) {
       addExpense('com', d, 'depreciation', 4_000_000);
       addExpense('log', d, 'depreciation', 1_333_000);
-      if (ym < '2026-09') {
+      if (ym < workMonth) {
         addExpense('com', d, 'bankFee', 420_000 * r(0.9, 1.1));
         addExpense('log', d, 'bankFee', 150_000 * r(0.9, 1.1));
         addExpense('com', d, 'gmf', outflows.com * 0.004);
         addExpense('log', d, 'gmf', outflows.log * 0.004);
       } else {
-        // Septiembre: la comisión y el 4x1000 llegan en el extracto y se registran al conciliar
-        bank.push({ id: `bk-${bank.length + 1}`, company: 'com', date: d, desc: 'COMISION SERVICIO PSE SEPTIEMBRE', amount: -Math.round(420_000 * r(0.9, 1.1)) });
-        bank.push({ id: `bk-${bank.length + 1}`, company: 'com', date: d, desc: 'GMF 4X1000 SEPTIEMBRE', amount: -Math.round(outflows.com * 0.004) });
-        bank.push({ id: `bk-${bank.length + 1}`, company: 'log', date: d, desc: 'GMF 4X1000 SEPTIEMBRE', amount: -Math.round(outflows.log * 0.004) });
+        // Mes que se cierra: la comisión y el 4x1000 llegan en el extracto y se registran al conciliar
+        const monthName = BANK_MONTHS[Number(ym.slice(5, 7)) - 1];
+        bank.push({ id: `bk-${bank.length + 1}`, company: 'com', date: d, desc: `COMISION SERVICIO PSE ${monthName}`, amount: -Math.round(420_000 * r(0.9, 1.1)) });
+        bank.push({ id: `bk-${bank.length + 1}`, company: 'com', date: d, desc: `GMF 4X1000 ${monthName}`, amount: -Math.round(outflows.com * 0.004) });
+        bank.push({ id: `bk-${bank.length + 1}`, company: 'log', date: d, desc: `GMF 4X1000 ${monthName}`, amount: -Math.round(outflows.log * 0.004) });
       }
       outflows.com = 0;
       outflows.log = 0;
     }
   }
 
-  // Pagos de clientes que llegaron al banco en septiembre y aún no están registrados
+  // Pagos de clientes que llegaron al banco al final del mes y aún no están registrados
   unmatchedReceipts.forEach((u, i) => {
     const cname = bankName(CUSTOMER_BY_ID[u.sale.customerId].name);
     const desc = i === 1 ? `TRANSF ${cname}` : `PSE ${cname} REF ${u.sale.invoiceNo}`;
     bank.push({ id: `bk-${bank.length + 1}`, company: u.sale.company, date: u.date, desc, amount: u.amount });
   });
-  bank.push({ id: `bk-${bank.length + 1}`, company: 'com', date: '2026-09-29', desc: 'CONSIGNACION SIN REFERENCIA', amount: 2_350_000 });
+  bank.push({ id: `bk-${bank.length + 1}`, company: 'com', date: before(1), desc: 'CONSIGNACION SIN REFERENCIA', amount: 2_350_000 });
 
-  // Documentos abiertos al 30 de septiembre (para que pruebes el flujo)
+  // Documentos abiertos a la fecha de trabajo (para que pruebes el flujo)
   const quoteLines = (wh: WarehouseId, wanted: [string, number][]) =>
     wanted
       .map(([sku, q]) => {
@@ -402,33 +414,41 @@ export function buildSeed(): ErpState {
         return { sku, qty, price: it.price, vat: it.vat };
       })
       .filter((l) => l.qty >= 10);
-  sales.push({ id: `s${sales.length + 1}`, company: 'com', customerId: 'C01', warehouse: 'bog', lines: quoteLines('bog', [['ARR-5K', 400], ['ACE-3L', 240], ['CAF-500', 300], ['DET-3K', 120]]), status: 'quote', quoteNo: num('COT'), quoteDate: '2026-09-28' });
-  sales.push({ id: `s${sales.length + 1}`, company: 'com', customerId: 'C05', warehouse: 'med', lines: quoteLines('med', [['LEN-500', 600], ['HAR-1K', 800], ['JAB-3', 300]]), status: 'quote', quoteNo: num('COT'), quoteDate: '2026-09-29' });
-  sales.push({ id: `s${sales.length + 1}`, company: 'com', customerId: 'C08', warehouse: 'baq', lines: quoteLines('baq', [['AZU-25', 300], ['BOL-30', 500], ['ESP-6', 400]]), status: 'order', quoteNo: num('COT'), quoteDate: '2026-09-25', orderNo: num('PED'), orderDate: '2026-09-29' });
-  sales.push({ id: `s${sales.length + 1}`, company: 'log', customerId: 'C10', warehouse: 'bog', lines: [{ sku: 'SRV-ALM', qty: 420, price: 42000, vat: 19 }, { sku: 'SRV-ALI', qty: 2100, price: 3200, vat: 19 }], status: 'quote', quoteNo: num('COT'), quoteDate: '2026-09-29' });
+  sales.push({ id: `s${sales.length + 1}`, company: 'com', customerId: 'C01', warehouse: 'bog', lines: quoteLines('bog', [['ARR-5K', 400], ['ACE-3L', 240], ['CAF-500', 300], ['DET-3K', 120]]), status: 'quote', quoteNo: num('COT'), quoteDate: before(2) });
+  sales.push({ id: `s${sales.length + 1}`, company: 'com', customerId: 'C05', warehouse: 'med', lines: quoteLines('med', [['LEN-500', 600], ['HAR-1K', 800], ['JAB-3', 300]]), status: 'quote', quoteNo: num('COT'), quoteDate: before(1) });
+  sales.push({ id: `s${sales.length + 1}`, company: 'com', customerId: 'C08', warehouse: 'baq', lines: quoteLines('baq', [['AZU-25', 300], ['BOL-30', 500], ['ESP-6', 400]]), status: 'order', quoteNo: num('COT'), quoteDate: before(5), orderNo: num('PED'), orderDate: before(1) });
+  sales.push({ id: `s${sales.length + 1}`, company: 'log', customerId: 'C10', warehouse: 'bog', lines: [{ sku: 'SRV-ALM', qty: 420, price: 42000, vat: 19 }, { sku: 'SRV-ALI', qty: 2100, price: 3200, vat: 19 }], status: 'quote', quoteNo: num('COT'), quoteDate: before(1) });
 
   const supplierLines = (wanted: [string, number][]) =>
     wanted.map(([sku, qty]) => ({ sku, qty, price: ITEM_BY_SKU[sku].cost, vat: ITEM_BY_SKU[sku].vat }));
-  createPo('2026-09-29', 'S4', 'med', supplierLines([['LEN-500', 2000]]), { approve: false });
-  const po2 = createPo('2026-09-28', 'S3', 'bog', supplierLines([['ACE-3L', 1500]]), { approve: false });
-  po2.approvals.push({ level: 1, date: '2026-09-28' });
-  const po3 = createPo('2026-09-25', 'S5', 'baq', supplierLines([['DET-3K', 500], ['LIM-1L', 1200]]), { approve: false });
-  po3.approvals.push({ level: 1, date: '2026-09-25' });
-  if (po3.levels === 2) po3.approvals.push({ level: 2, date: '2026-09-26' });
+  createPo(before(1), 'S4', 'med', supplierLines([['LEN-500', 2000]]), { approve: false });
+  const po2 = createPo(before(2), 'S3', 'bog', supplierLines([['ACE-3L', 1500]]), { approve: false });
+  po2.approvals.push({ level: 1, date: before(2) });
+  const po3 = createPo(before(5), 'S5', 'baq', supplierLines([['DET-3K', 500], ['LIM-1L', 1200]]), { approve: false });
+  po3.approvals.push({ level: 1, date: before(5) });
+  if (po3.levels === 2) po3.approvals.push({ level: 2, date: before(4) });
   po3.status = 'approved';
 
-  production.push({ id: `op${production.length + 1}`, no: num('OP'), sku: 'CAF-500', qty: 1500, warehouse: 'bog', status: 'planned', date: '2026-09-29' });
+  production.push({ id: `op${production.length + 1}`, no: num('OP'), sku: 'CAF-500', qty: 1500, warehouse: 'bog', status: 'planned', date: before(1) });
 
+  // Vacaciones alrededor de la fecha de trabajo (de lunes a viernes; los días son hábiles)
+  const vacation = (id: string, employeeId: string, fromOffset: number, toOffset: number, status: Vacation['status']): Vacation => {
+    const from = businessDayOnOrAfter(addDays(WORK_DATE, fromOffset));
+    const to = businessDayOnOrBefore(addDays(WORK_DATE, toOffset));
+    return { id, employeeId, from, to, days: businessDays(from, to), status };
+  };
   const vacations: Vacation[] = [
-    { id: 'v1', employeeId: 'E06', from: '2026-09-21', to: '2026-10-02', days: 10, status: 'approved' },
-    { id: 'v2', employeeId: 'E07', from: '2026-10-13', to: '2026-10-23', days: 9, status: 'pending' },
-    { id: 'v3', employeeId: 'E12', from: '2026-10-19', to: '2026-10-30', days: 10, status: 'pending' },
-    { id: 'v4', employeeId: 'E19', from: '2026-11-03', to: '2026-11-13', days: 9, status: 'pending' },
-    { id: 'v5', employeeId: 'E13', from: '2026-08-10', to: '2026-08-21', days: 10, status: 'approved' },
+    vacation('v1', 'E06', -9, 2, 'approved'),
+    vacation('v2', 'E07', 13, 23, 'pending'),
+    vacation('v3', 'E12', 19, 30, 'pending'),
+    vacation('v4', 'E19', 34, 44, 'pending'),
+    vacation('v5', 'E13', -51, -40, 'approved'),
   ];
 
   const state: ErpState = {
     v: STATE_VERSION,
+    workDate: WORK_DATE,
+    startDate,
     seq,
     counters,
     sales,

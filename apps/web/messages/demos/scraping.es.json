@@ -8,14 +8,28 @@
       "breadcrumbDemos": "Demos",
       "company": "{company} · NIT {nit} · empresa ficticia",
       "sampleBadge": "Datos de ejemplo",
-      "sampleHint": "La empresa, las entidades, las tiendas, los proveedores y las cifras son ficticios. Fecha de corte: 8 oct. 2026.",
+      "sampleHint": "La empresa, las entidades, las tiendas, los proveedores y las cifras son ficticios. Las fechas se calculan con el día de hoy en Colombia.",
       "responsibleSeal": "Extracción responsable",
       "responsibleHint": "Abre la ficha de cumplimiento de la fuente",
       "running": "Actualizando {source}",
       "menu": "Abrir fuentes",
       "closeMenu": "Cerrar fuentes",
       "tabsLabel": "Secciones de la fuente",
-      "loading": "Cargando los datos de ejemplo…"
+      "loading": "Cargando los datos de ejemplo…",
+      "movedToToday": "Pusimos la demo al día de hoy: conservamos tu configuración y volvimos a armar las ejecuciones con la fecha de hoy."
+    },
+    "intro": {
+      "back": "Volver al catálogo de demos",
+      "guidedDemo": "Solicitar demo guiada",
+      "quote": "Cotizar",
+      "kicker": "Demo interactiva · Datos de la web y de documentos",
+      "subtitle": "Un tablero que vigila fuentes públicas y documentos por ti: procesos de contratación, precios de la competencia, normativa y documentos de proveedores. Detecta qué cambió, te avisa y te entrega los datos en Excel.",
+      "resetHint": "Borra lo que hiciste en este navegador y vuelve a los datos de ejemplo",
+      "forWhomLabel": "Para quién:",
+      "forWhom": "gerentes comerciales, de compras o de licitaciones que necesitan enterarse a tiempo de lo que pasa afuera, sin copiar datos a mano.",
+      "startLabel": "Por dónde empezar:",
+      "start": "sigue el recorrido de 5 pasos (abre un proceso del radar, crea un campo con un clic y mira qué cambió) o elige una fuente en «Mis fuentes».",
+      "startCta": "Empezar el recorrido"
     },
     "actions": {
       "runNow": "Actualizar ahora",
@@ -117,6 +131,8 @@
       "show": "Mostrar",
       "hide": "Ocultar",
       "done": "Hecho",
+      "nextLabel": "Siguiente paso",
+      "stepToast": "Paso {n} de {total}: {title}. {hint}",
       "steps": {
         "radar": {
           "title": "Radar de contratación",
@@ -139,12 +155,13 @@
           "hint": "Términos de uso, robots.txt y Ley 1581 por fuente."
         }
       },
-      "cta": "¿Qué fuente necesitas? Cuéntanos y revisamos si se puede extraer antes de cotizar."
+      "cta": "¿Qué fuente necesitas? Cuéntanos y revisamos si se puede extraer antes de cotizar.",
+      "completed": "¡Recorrido completo! Te mostramos la demo con tus fuentes o hacemos una extracción de prueba con la que necesites."
     },
     "overview": {
       "kpis": {
         "records": "Registros",
-        "newToday": "Nuevos hoy",
+        "newToday": "Nuevos",
         "otherChanges": "Otros cambios",
         "quality": "Calidad",
         "updated": "Última actualización"
@@ -153,12 +170,13 @@
         "fields": "campos obligatorios completos",
         "docs": "documentos validados sin revisión"
       },
+      "newHint": "frente al día anterior",
       "chartTitle": "Registros por ejecución (últimos 14 días)",
-      "chartHint": "Una ejecución programada al día; la barra de hoy es tu última ejecución.",
-      "chartAria": "Gráfico de barras de registros por día; hoy: {today}",
+      "chartHint": "Una ejecución programada al día; la última barra es tu última ejecución.",
+      "chartAria": "Gráfico de barras de registros por día; última ejecución: {today}",
       "barTitle": "{date}: {value} registros",
       "today": "Hoy",
-      "alertsTitle": "Alertas de hoy",
+      "alertsTitle": "Alertas de la última ejecución",
       "configureAlerts": "Configurar",
       "noAlerts": "Ninguna regla activa se cumple con la última ejecución.",
       "tableTitle": "Datos de la última ejecución",
@@ -175,7 +193,7 @@
         "sendAll": "Enviar pendientes al asistente ({count})",
         "send": "Enviar",
         "note": "Simulado en la demo: en tu proyecto, estos documentos se cargan a la base de conocimiento de tu asistente RAG para que responda con la norma citada.",
-        "chatbotLink": "Ver la demo del asistente RAG"
+        "chatbotLink": "Probar aparte la demo del asistente RAG"
       },
       "process": {
         "open": "Ver detalle del proceso {ref}",
@@ -387,7 +405,7 @@
       "departments": "Departamentos",
       "minAmount": "Cuantía mínima (COP)",
       "simulatedNote": "Los cambios se aplican en la próxima ejecución. Datos de ejemplo: entidades ficticias.",
-      "previewTitle": "Con estos criterios encajan {matched} de {total} procesos de hoy",
+      "previewTitle": "Con estos criterios encajan {matched} de {total} procesos del archivo del día",
       "previewHint": "Vista previa sobre el archivo de ejemplo del día.",
       "fits": "Encaja",
       "noFit": "No encaja",
@@ -428,7 +446,7 @@
     },
     "changes": {
       "title": "Cambios detectados",
-      "subtitle": "Comparación campo por campo entre la ejecución de ayer ({before}) y la última ({after}).",
+      "subtitle": "Comparación campo por campo entre la ejecución del día anterior ({before}) y la última ({after}).",
       "filterLabel": "Filtrar por tipo de cambio",
       "kinds": {
         "all": "Todos",
@@ -436,7 +454,7 @@
         "modified": "Modificados",
         "removed": "Retirados"
       },
-      "none": "Sin cambios desde la ejecución de ayer.",
+      "none": "Sin cambios desde la ejecución del día anterior.",
       "noneFiltered": "No hay cambios de este tipo.",
       "badge": {
         "added": "Nuevo",
@@ -479,7 +497,7 @@
       "nextRuns": "Próximas 5 ejecuciones",
       "noRuns": "Sin ejecuciones en los próximos dos años con esta expresión.",
       "pausedNote": "La fuente está pausada: estas ejecuciones no ocurrirán hasta que la reanudes.",
-      "demoClock": "Calculadas desde el reloj de la demo ({now}). En la demo nada corre solo: usa «Actualizar ahora».",
+      "demoClock": "Calculadas desde la hora de Colombia al abrir la demo ({now}). En la demo nada corre solo: usa «Actualizar ahora».",
       "rulesTitle": "Reglas de alerta",
       "rulesHint": "Se evalúan contra la última ejecución; el resultado aparece en el Resumen y en el mensaje de la derecha.",
       "noRules": "Esta fuente no tiene reglas.",
@@ -510,7 +528,7 @@
         "teams": "Microsoft Teams",
         "whatsapp": "WhatsApp Business"
       },
-      "previewTitle": "Mensaje de hoy ({count, plural, one {# alerta} other {# alertas}})",
+      "previewTitle": "Mensaje con las alertas de la última ejecución ({count, plural, one {# alerta} other {# alertas}})",
       "message": {
         "header": "{source} · {date}",
         "none": "Sin alertas con las reglas activas.",
@@ -560,12 +578,34 @@
         "runAt": "Fecha de la ejecución"
       },
       "api": {
-        "title": "API o webhook",
-        "text": "Después de cada ejecución, tu sistema recibe un aviso con los cambios (webhook) o consulta los datos por API."
+        "title": "API o aviso automático (webhook)",
+        "text": "Después de cada ejecución, tu sistema recibe un aviso con los cambios (webhook) o consulta los datos por API.",
+        "eventName": "ejecucion.completada",
+        "keys": {
+          "event": "evento",
+          "source": "fuente",
+          "runAt": "ejecucion",
+          "records": "registros",
+          "quality": "calidad",
+          "changes": "cambios",
+          "type": "tipo",
+          "key": "clave",
+          "title": "titulo",
+          "fields": "campos",
+          "field": "campo",
+          "before": "antes",
+          "after": "despues",
+          "sampleRecord": "ejemplo_registro"
+        },
+        "kinds": {
+          "added": "nuevo",
+          "modified": "modificado",
+          "removed": "retirado"
+        }
       },
       "notify": {
         "title": "Alertas por correo, Teams o WhatsApp",
-        "text": "Solo cuando se cumple una regla, no un log técnico.",
+        "text": "Solo cuando se cumple una regla, no un registro técnico.",
         "button": "Configurar alertas"
       }
     },
@@ -589,7 +629,7 @@
         "selectorApproved": "Un ingeniero aprobó el selector nuevo y la ejecución salió completa."
       },
       "repairTitle": "¿Qué pasa cuando una página cambia?",
-      "repairText": "El monitoreo de calidad detecta campos vacíos o menos registros de lo normal (mira el 5 de octubre en Precios). En tu proyecto, la IA propone el selector nuevo, un ingeniero lo aprueba y se vuelve a ejecutar; el tiempo de reparación depende del plan."
+      "repairText": "El monitoreo de calidad detecta campos vacíos o menos registros de lo normal (mira la ejecución del {date} en Precios). En tu proyecto, la IA propone el selector nuevo, un ingeniero lo aprueba y se vuelve a ejecutar; el tiempo de reparación depende del plan."
     },
     "compliance": {
       "title": "Cumplimiento de la fuente",
@@ -620,8 +660,7 @@
           "personalData": "No se extraen: solo entidad, objeto, cuantía, fechas y estado del proceso.",
           "legalBasis": "Información pública (Ley 1712 de 2014 de transparencia).",
           "retention": "24 meses.",
-          "owner": "Coordinación comercial (ejemplo).",
-          "reviewed": "1 sept. 2026"
+          "owner": "Coordinación comercial (ejemplo)."
         },
         "precios": {
           "sourceType": "Páginas públicas de tiendas en línea (en la demo, tres tiendas ficticias).",
@@ -632,8 +671,7 @@
           "personalData": "Excluidos: no se extraen reseñas, nombres ni datos de compradores.",
           "legalBasis": "Información comercial pública; sin datos personales.",
           "retention": "12 meses.",
-          "owner": "Gerencia comercial (ejemplo).",
-          "reviewed": "15 sept. 2026"
+          "owner": "Gerencia comercial (ejemplo)."
         },
         "normativa": {
           "sourceType": "Páginas públicas de normativa de entidades (ficticias en la demo).",
@@ -644,8 +682,7 @@
           "personalData": "Solo número, fecha, entidad, título y enlace al PDF público.",
           "legalBasis": "Información pública (Ley 1712 de 2014 de transparencia).",
           "retention": "Mientras la norma esté vigente.",
-          "owner": "Área jurídica (ejemplo).",
-          "reviewed": "20 sept. 2026"
+          "owner": "Área jurídica (ejemplo)."
         },
         "documentos": {
           "sourceType": "Documentos que entregan tus proveedores para su vinculación (RUT, certificados, facturas).",
@@ -656,8 +693,7 @@
           "personalData": "Solo el nombre del representante legal (si eliges extraerlo). No se extraen cédulas, teléfonos ni correos personales.",
           "legalBasis": "Autorización del proveedor y relación contractual (Ley 1581 de 2012).",
           "retention": "Según tu política de tratamiento de datos (ejemplo: mientras dure la relación comercial).",
-          "owner": "Compras (ejemplo).",
-          "reviewed": "28 sept. 2026"
+          "owner": "Compras (ejemplo)."
         }
       },
       "sheetTitle": "Ficha: {source}",
@@ -745,7 +781,7 @@
         "csv": "Excel o CSV",
         "sheets": "Google Sheets",
         "bi": "Power BI o base de datos",
-        "api": "API o webhook",
+        "api": "API o aviso automático (webhook)",
         "email": "Correo con resumen"
       },
       "reviewNote": "La fuente queda «en revisión». En un proyecto real revisamos términos de uso, robots.txt y datos personales antes de construir el extractor; si la fuente no lo permite, te lo decimos.",
@@ -755,7 +791,7 @@
     "review": {
       "summaryTitle": "Solicitud de extracción de prueba",
       "fields": "Datos que necesitas",
-      "subtitle": "Fuente en revisión desde {when}. Aún no se extrae.",
+      "subtitle": "Aún no se extrae: está en revisión desde el {when}",
       "checksTitle": "Revisión antes de extraer",
       "checks": {
         "terms": "Términos de uso de la fuente",

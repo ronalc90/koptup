@@ -1,13 +1,13 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import { ArrowDownTrayIcon, CheckCircleIcon, ExclamationTriangleIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import { ACCOUNTS, COMPANIES, INCOME_TAX_RATE } from '../lib/catalog';
-import { balance, inCompany, periodRange, pnl, trialBalance } from '../lib/engine';
+import { balance, entriesAsOf, inCompany, periodSlug, pnl, trialBalance } from '../lib/engine';
 import { csvMoney, downloadCsv } from '../lib/format';
 import { entryMatches } from '../lib/search';
 import { pad } from '../lib/seed';
@@ -61,13 +61,14 @@ function useAccountName() {
 function Journal() {
   const t = useTranslations('demoErp.accounting');
   const tc = useTranslations('demoErp.common');
-  const { computed, filters, locale } = useErp();
+  const tf = useTranslations('demoErp.files');
+  const { computed, filters, locale, state, dispatch } = useErp();
   const f = useFmt();
   const descOf = useEntryDesc();
   const acc = useAccountName();
   const [open, setOpen] = useState<Entry | null>(null);
   const [creating, setCreating] = useState(false);
-  const r = periodRange(filters.period);
+  const r = useErp().range;
   const list = useMemo(
     () =>
       computed.entries
@@ -80,12 +81,17 @@ function Journal() {
     [computed, filters.company, filters.search, r.start, r.end, locale],
   );
   const pager = usePager(list, 12);
+  // Paso 5 del recorrido: el asiento de una factura que emitiste quedó a la vista (o lo abriste)
+  const showsOwnEntry = pager.visible.some((e) => e.user && e.source === 'sale') || (!!open?.user && open.source === 'sale');
+  useEffect(() => {
+    if (showsOwnEntry && !state.seenOwnEntry) dispatch({ type: 'seenOwnEntry' });
+  }, [showsOwnEntry, state.seenOwnEntry, dispatch]);
   const totals = list.reduce((a, e) => ({ d: a.d + e.lines.reduce((s, l) => s + l.debit, 0), c: a.c + e.lines.reduce((s, l) => s + l.credit, 0) }), { d: 0, c: 0 });
 
   const exportCsv = () => {
-    const head = [t('cols.date'), t('cols.entry'), t('cols.company'), t('cols.account'), t('cols.description'), t('cols.third'), t('cols.debit'), t('cols.credit'), tc('currency')];
+    const head = [t('cols.date'), t('cols.entry'), t('cols.company'), t('cols.account'), t('cols.descriptionCsv'), t('cols.third'), t('cols.debit'), t('cols.credit'), tc('currency')];
     const data = list.flatMap((e) => e.lines.map((l) => [e.date, e.no, COMPANIES[e.company].name, acc(l.account), descOf(e), l.third || '', csvMoney(l.debit, filters.currency), csvMoney(l.credit, filters.currency), filters.currency]));
-    downloadCsv(`libro-diario-${filters.period}.csv`, [head, ...data], locale);
+    downloadCsv(`${tf('journal')}-${periodSlug(r)}.csv`, [head, ...data], locale);
     toast.success(tc('csvDone', { n: data.length }));
   };
 
@@ -240,7 +246,7 @@ function EntryModal({ entry: e, onClose }: { entry: Entry; onClose: () => void }
 function ManualEntryForm({ onClose }: { onClose: () => void }) {
   const t = useTranslations('demoErp.accounting');
   const tc = useTranslations('demoErp.common');
-  const { filters, dispatch, state, ensureOpenPeriod } = useErp();
+  const { filters, dispatch, state, ensureOpenPeriod, workDate, openMonthLabel } = useErp();
   const f = useFmt();
   const acc = useAccountName();
   const [company, setCompany] = useState<CompanyId>(filters.company === 'log' ? 'log' : 'com');
@@ -261,7 +267,7 @@ function ManualEntryForm({ onClose }: { onClose: () => void }) {
     if (d !== c || d === 0) return setError(t('manual.errorBalance'));
     const n = state.counters.AJ;
     dispatch({ type: 'manualEntry', company, desc: desc.trim().slice(0, 120), lines: valid });
-    if (ensureOpenPeriod()) toast(t('periodSwitched'));
+    ensureOpenPeriod();
     toast.success(t('manual.done', { doc: `AJ-${pad(n)}` }));
     onClose();
   };
@@ -293,7 +299,7 @@ function ManualEntryForm({ onClose }: { onClose: () => void }) {
         </label>
         <label className="block sm:col-span-2">
           <FieldLabel>{t('manual.desc')}</FieldLabel>
-          <input className={inputCls} value={desc} onChange={(e) => setDesc(e.target.value)} placeholder={t('manual.descPlaceholder')} />
+          <input className={inputCls} value={desc} onChange={(e) => setDesc(e.target.value)} placeholder={t('manual.descPlaceholder', { month: openMonthLabel })} />
         </label>
       </div>
       <div className="space-y-2">
@@ -333,7 +339,7 @@ function ManualEntryForm({ onClose }: { onClose: () => void }) {
         {t('manual.sums', { debit: f.cop(d), credit: f.cop(c), diff: f.cop(Math.abs(d - c)) })}
       </p>
       {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
-      <p className="mt-3 text-[11px] text-secondary-500">{t('manual.note')}</p>
+      <p className="mt-3 text-[11px] text-secondary-500">{t('manual.note', { date: f.date(workDate) })}</p>
     </Modal>
   );
 }
@@ -341,17 +347,19 @@ function ManualEntryForm({ onClose }: { onClose: () => void }) {
 function TrialBalance() {
   const t = useTranslations('demoErp.accounting');
   const tc = useTranslations('demoErp.common');
+  const tf = useTranslations('demoErp.files');
   const { computed, filters, locale } = useErp();
   const f = useFmt();
   const acc = useAccountName();
-  const r = periodRange(filters.period);
-  const rows = useMemo(() => trialBalance(computed.entries, filters.company, r), [computed, filters.company, r.start, r.end]); // eslint-disable-line react-hooks/exhaustive-deps
+  const r = useErp().range;
+  // Balance de prueba antes del cierre del ejercicio (si el período termina el 31 de diciembre)
+  const rows = useMemo(() => trialBalance(entriesAsOf(computed.entries, r.end), filters.company, r), [computed, filters.company, r]);
   const tot = rows.reduce((a, x) => ({ o: a.o + x.opening, d: a.d + x.debit, c: a.c + x.credit, cl: a.cl + x.closing }), { o: 0, d: 0, c: 0, cl: 0 });
   const ok = tot.d === tot.c && Math.round(tot.cl) === 0;
   const exportCsv = () => {
     const head = [t('cols.account'), t('trial.opening'), t('cols.debit'), t('cols.credit'), t('trial.closing'), tc('currency')];
     const data = rows.map((x) => [acc(x.account), csvMoney(x.opening, filters.currency), csvMoney(x.debit, filters.currency), csvMoney(x.credit, filters.currency), csvMoney(x.closing, filters.currency), filters.currency]);
-    downloadCsv(`balance-de-prueba-${filters.period}.csv`, [head, ...data], locale);
+    downloadCsv(`${tf('trial')}-${periodSlug(r)}.csv`, [head, ...data], locale);
     toast.success(tc('csvDone', { n: data.length }));
   };
   return (
@@ -406,15 +414,17 @@ function Statements() {
   const t = useTranslations('demoErp.accounting');
   const { computed, filters } = useErp();
   const f = useFmt();
-  const r = periodRange(filters.period);
+  const r = useErp().range;
   const p = useMemo(() => pnl(computed.entries, filters.company, r, INCOME_TAX_RATE), [computed, filters.company, r.start, r.end]); // eslint-disable-line react-hooks/exhaustive-deps
-  const bal = (pre: string[]) => balance(computed.entries, filters.company, pre, null, r.end);
+  // Al 31 de diciembre se muestra el resultado del año antes de trasladarlo a utilidades acumuladas
+  const entries = useMemo(() => entriesAsOf(computed.entries, r.end), [computed, r.end]);
+  const bal = (pre: string[]) => balance(entries, filters.company, pre, null, r.end);
   const current = bal(['11', '13', '14']);
   const fixed = bal(['15']);
   const assets = current + fixed;
   const liabilities = -bal(['2']);
   const capital = -bal(['3']);
-  const result = -balance(computed.entries, filters.company, ['4', '5', '6'], '2026-01-01', r.end);
+  const result = -balance(entries, filters.company, ['4', '5', '6'], `${r.end.slice(0, 4)}-01-01`, r.end);
   const equity = capital + result;
   const ok = Math.round(assets - liabilities - equity) === 0;
   return (

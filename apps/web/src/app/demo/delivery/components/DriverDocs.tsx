@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { DocumentArrowUpIcon, ShieldCheckIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import Button from '@/components/ui/Button';
-import { DEMO_DATE, daysUntil, docStatus, fmtDate } from './engine';
+import { daysUntil, docStatus, fmtDate, shiftDate } from './engine';
 import type { DriverDoc } from './types';
 import { Modal, useMonths } from './ui';
 import { useDelivery } from './store';
@@ -17,17 +17,18 @@ export default function DriverDocs({ driverId }: { driverId: string }) {
   const months = useMonths();
   const { state, dispatch, notify } = useDelivery();
   const docs = state.docs[driverId] ?? [];
+  const today = state.date;
   const [editing, setEditing] = useState<DriverDoc | null>(null);
   const [file, setFile] = useState<string>('');
   const [date, setDate] = useState('');
   const [error, setError] = useState('');
-  const issues = docs.filter((d) => docStatus(d.expires) !== 'valid').length;
+  const issues = docs.filter((d) => docStatus(d.expires, today) !== 'valid').length;
 
   const save = () => {
     if (!editing) return;
     if (!file) return setError(t('docs.needFile'));
     const needsDate = !NO_EXPIRY.includes(editing.id);
-    if (needsDate && (!/^\d{4}-\d{2}-\d{2}$/.test(date) || daysUntil(date) <= 0)) return setError(t('docs.needDate'));
+    if (needsDate && (!/^\d{4}-\d{2}-\d{2}$/.test(date) || daysUntil(date, today) <= 0)) return setError(t('docs.needDate'));
     dispatch({ type: 'doc', driverId, docId: editing.id, expires: needsDate ? date : undefined, fileName: file });
     notify(t('docs.savedToast', { doc: t(`docs.items.${editing.id}`) }));
     setEditing(null);
@@ -49,8 +50,8 @@ export default function DriverDocs({ driverId }: { driverId: string }) {
       </div>
       <ul className="space-y-1.5">
         {docs.map((d) => {
-          const st = docStatus(d.expires);
-          const days = d.expires ? daysUntil(d.expires) : null;
+          const st = docStatus(d.expires, today);
+          const days = d.expires ? daysUntil(d.expires, today) : null;
           return (
             <li key={d.id} className="flex items-center justify-between gap-2 rounded-lg bg-secondary-50 px-2 py-1.5 dark:bg-secondary-900">
               <span className="min-w-0">
@@ -77,7 +78,7 @@ export default function DriverDocs({ driverId }: { driverId: string }) {
           );
         })}
       </ul>
-      <p className="mt-2 text-[10px] text-secondary-500 dark:text-secondary-400">{t('docs.note', { date: fmtDate(DEMO_DATE, months) })}</p>
+      <p className="mt-2 text-[10px] text-secondary-500 dark:text-secondary-400">{t('docs.note', { date: fmtDate(today, months) })}</p>
 
       {editing && (
         <Modal
@@ -104,7 +105,7 @@ export default function DriverDocs({ driverId }: { driverId: string }) {
             {!NO_EXPIRY.includes(editing.id) && (
               <label className="block">
                 <span className="mb-1 block font-semibold">{t('docs.newDate')}</span>
-                <input type="date" value={date} min="2026-10-09" onChange={(e) => { setDate(e.target.value); setError(''); }} className="block w-full rounded-lg border border-secondary-300 bg-white px-2 py-1.5 dark:border-secondary-600 dark:bg-secondary-900" />
+                <input type="date" value={date} min={shiftDate(today, 1)} onChange={(e) => { setDate(e.target.value); setError(''); }} className="block w-full rounded-lg border border-secondary-300 bg-white px-2 py-1.5 dark:border-secondary-600 dark:bg-secondary-900" />
               </label>
             )}
             <p className="text-[10px] text-secondary-500 dark:text-secondary-400">{t('docs.privacy')}</p>

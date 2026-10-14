@@ -75,14 +75,6 @@ export interface DetalleFactura {
   glosas: Glosa[];
 }
 
-export interface Estadisticas {
-  totalFacturas: number;
-  facturasAuditadas: number;
-  estadoPorFactura: Array<{ _id: string; count: number; total: number }>;
-  totales: { valorTotal: number; totalGlosas: number; valorAceptado: number };
-  glosasPorTipo: Array<{ _id: string; count: number; valorTotal: number }>;
-}
-
 export interface FiltrosFacturas {
   estado: string;
   desde: string;

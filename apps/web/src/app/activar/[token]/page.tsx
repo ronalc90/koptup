@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import ActivateAccount from '@/components/demo-request/ActivateAccount';
+import { privatePageMetadata } from '@/lib/seo-config';
 
 /**
  * Activación de la cuenta con el enlace de un solo uso que se genera al
@@ -12,7 +13,8 @@ export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('activate');
-  return { title: t('metaTitle'), robots: { index: false, follow: false } };
+  // noindex y sin canonical: el segmento de la ruta es el token de un solo uso.
+  return privatePageMetadata(t('metaTitle'), null);
 }
 
 export default function ActivatePage({ params }: { params: { token: string } }) {

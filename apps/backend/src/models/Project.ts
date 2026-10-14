@@ -13,6 +13,10 @@ export interface IProject extends Document {
   estimated_hours?: number;
   actual_hours?: number;
   progress: number;
+  /** Moneda de `budget` (proyectos creados al convertir una propuesta). */
+  currency?: 'COP' | 'USD';
+  /** Propuesta de origen (conversión); único: una propuesta crea un solo proyecto. */
+  proposal_id?: Types.ObjectId;
   created_at: Date;
   updated_at: Date;
 }
@@ -71,6 +75,14 @@ const ProjectSchema: Schema = new Schema(
       min: 0,
       max: 100,
     },
+    currency: {
+      type: String,
+      enum: ['COP', 'USD'],
+    },
+    proposal_id: {
+      type: Schema.Types.ObjectId,
+      ref: 'Proposal',
+    },
   },
   {
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
@@ -82,5 +94,6 @@ ProjectSchema.index({ client_id: 1 });
 ProjectSchema.index({ manager_id: 1 });
 ProjectSchema.index({ status: 1 });
 ProjectSchema.index({ updated_at: -1 });
+ProjectSchema.index({ proposal_id: 1 }, { unique: true, partialFilterExpression: { proposal_id: { $type: 'objectId' } } });
 
 export default mongoose.model<IProject>('Project', ProjectSchema);

@@ -40,16 +40,19 @@ export interface ContactFormData {
   service: string;
   budget?: string;
   message: string;
-}
-
-export interface QuoteRequestData {
-  name: string;
-  email: string;
-  phone?: string;
-  company?: string;
-  serviceType: string;
-  description: string;
-  budget?: string;
+  /** ¿Cuándo quieres empezar? (`now`, `1m`, `3m` u `open`; vacío si no respondió). */
+  timeline?: string;
+  /** Autorización de tratamiento de datos (Ley 1581): el backend la exige. */
+  consentimiento?: boolean;
+  /** Campo trampa contra bots: una persona lo deja vacío. */
+  website?: string;
+  /** Plan RAG, o nivel y modalidad del catálogo, que se estaban cotizando (lib/contact-quote.ts). */
+  quote?: {
+    service: string;
+    plan?: string;
+    tier?: string;
+    modality?: string;
+  };
 }
 
 // ============================================================================
@@ -136,11 +139,10 @@ export interface InvoiceItem {
   total: number;
 }
 
-export interface PayInvoiceData {
-  paymentMethod: 'credit_card' | 'debit_card' | 'bank_transfer' | 'cash';
-  paymentReference?: string;
-  amount: number;
-  notes?: string;
+/** Método de pago configurado por el equipo (GET /api/invoices/payment-methods). */
+export interface InvoicePaymentMethod {
+  tipo: 'transferencia';
+  instrucciones: string;
 }
 
 // ============================================================================

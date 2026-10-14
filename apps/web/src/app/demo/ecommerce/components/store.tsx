@@ -12,7 +12,7 @@ import { useTranslations } from 'next-intl';
 import { PRODUCTS, totalStock, WAREHOUSE_IDS, type Product, type WarehouseId } from './products';
 import { DEFAULT_RULES, priceCart, COUPONS, type CartPricing, type PricingRules, type RuleId } from './pricing';
 import {
-  SAMPLE, CARRIERS, CARRIER_BY_ID, CITY_BY_ID, LAST_TRACKING_STEP, ORDER_FLOW, orderNumber,
+  SAMPLE, CARRIERS, CARRIER_BY_ID, CITY_BY_ID, LAST_TRACKING_STEP, ORDER_FLOW, LEGACY_CARRIERS, LEGACY_GUIDE_PREFIX, orderNumber,
   type CarrierId, type Order, type OrderStatus, type PaymentMethodId, type ReturnReason, type ReturnRequest,
 } from './data';
 import { AUTOMATION_IDS, type AutomationId, type Clock } from './analytics';
@@ -20,12 +20,14 @@ import { AUTOMATION_IDS, type AutomationId, type Clock } from './analytics';
 export const VIEW_IDS = ['storefront', 'checkout', 'vendor', 'operations', 'admin'] as const;
 export type ViewId = (typeof VIEW_IDS)[number];
 
+// La clave conserva el nombre de la versión 3 para no perder lo guardado: el
+// número de versión va dentro del valor y readStorage migra lo anterior.
 const STORAGE_KEY = 'koptup-demo-ecommerce-v3';
-const VERSION = 3;
+const VERSION = 4;
 
 export interface CartItem { productId: number; qty: number }
 
-interface PersistedState {
+export interface PersistedState {
   v: number;
   products: Product[];
   orders: Order[];
@@ -129,12 +131,43 @@ interface StoreValue {
 
 const StoreContext = createContext<StoreValue | null>(null);
 
+/**
+ * Lo guardado por la versión 3 de la demo usaba nombres de transportadoras
+ * reales y el café en la categoría Hogar: se pasa a las transportadoras
+ * ficticias (con sus prefijos de guía) y a la categoría Café, sin perder los
+ * pedidos, productos ni ajustes del visitante.
+ */
+export function migrateStored(parsed: unknown): PersistedState | null {
+  const s = parsed as (PersistedState & { v?: number }) | null;
+  if (!s || typeof s !== 'object' || !Array.isArray(s.orders) || !Array.isArray(s.products)) return null;
+  if (s.v === VERSION) return s;
+  if (s.v !== 3) return null;
+  const base = new Map(PRODUCTS.map((p) => [p.id, p]));
+  const carrierOf = (id: string | undefined) => (id ? LEGACY_CARRIERS[id] ?? (CARRIER_BY_ID[id as CarrierId] ? (id as CarrierId) : undefined) : undefined);
+  const guideOf = (g: string | undefined) => g?.replace(/^([A-Z]{3})-/, (_m, pre: string) => `${LEGACY_GUIDE_PREFIX[pre] ?? pre}-`);
+  const carriers = Object.fromEntries(CARRIERS.map((c) => [c.id, true])) as Record<CarrierId, boolean>;
+  Object.entries((s.carriers ?? {}) as Record<string, boolean>).forEach(([k, on]) => {
+    const id = carrierOf(k);
+    if (id) carriers[id] = !!on;
+  });
+  if (!Object.values(carriers).some(Boolean)) carriers[CARRIERS[0].id] = true;
+  return {
+    ...s,
+    v: VERSION,
+    products: s.products.map((p) => {
+      const b = p.custom ? undefined : base.get(p.id);
+      return b ? { ...p, category: b.category, sku: b.sku } : p;
+    }),
+    orders: s.orders.map((o) => (o.carrier ? { ...o, carrier: carrierOf(o.carrier), guide: guideOf(o.guide) } : o)),
+    carriers,
+  };
+}
+
 function readStorage(): PersistedState | null {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as PersistedState;
-    return parsed && parsed.v === VERSION && Array.isArray(parsed.orders) ? parsed : null;
+    return migrateStored(JSON.parse(raw));
   } catch {
     return null;
   }
@@ -194,7 +227,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const notify = useCallback((message: string, action?: Toast['action']) => {
     const id = ++toastSeq.current;
-    setToasts((prev) => [...prev.slice(-2), { id, message, action }]);
+    // Como máximo dos avisos a la vez, para no tapar el contenido.
+    setToasts((prev) => [...prev.slice(-1), { id, message, action }]);
     window.setTimeout(() => setToasts((prev) => prev.filter((x) => x.id !== id)), 5000);
   }, []);
   const dismissToast = useCallback((id: number) => setToasts((prev) => prev.filter((x) => x.id !== id)), []);

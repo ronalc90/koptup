@@ -1,6 +1,6 @@
 import { logger } from '../utils/logger';
 import { extractTextFromPDF } from './pdf.service';
-import { getOpenAI } from './openai.service';
+import { getOpenAIFor } from './openai.service';
 import {
   searchCUPS,
   searchMedicamentos,
@@ -206,7 +206,7 @@ export async function procesarCuentaMedicaHibrida(
  */
 async function extraerDatosConOpenAI(pdfText: string): Promise<any> {
   try {
-    const client = getOpenAI();
+    const client = getOpenAIFor('health');
     const response = await client.chat.completions.create({
       model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
       messages: [

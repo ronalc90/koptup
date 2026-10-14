@@ -4,6 +4,8 @@
  *
  *   GET    /status                        → habilitada, motivo y si se agotó el presupuesto (sin montos)
  *   POST   /documents                     → multipart: file + email + consent=true
+ *                                            (primero registra el lead con la prueba de la
+ *                                            autorización; si no se puede, no procesa el documento)
  *   GET    /documents/:docId              → estado del documento (preguntas usadas, vencimiento)
  *   POST   /documents/:docId/questions    → { question } → respuesta con citas
  *   DELETE /documents/:docId              → borra el documento de memoria antes del TTL
@@ -18,6 +20,11 @@ import rateLimit from 'express-rate-limit';
 import { body } from 'express-validator';
 import { logger } from '../utils/logger';
 import { registerLead } from '../services/lead.service';
+import Contact, { type IContact, type IContactConsent } from '../models/Contact';
+import { hashIp } from '../services/audit.service';
+import { resolveClientIp } from '../middleware/client-ip';
+import { isDbReady } from '../middleware/access';
+import { currentPrivacyPolicyVersion } from '../config/demos';
 import {
   DEMO_LIMITS,
   DemoRagError,
@@ -116,23 +123,38 @@ function clientIp(req: Request): string {
   return req.ip || req.socket?.remoteAddress || 'unknown';
 }
 
-/** Registra el lead por el mismo canal del formulario de contacto (origen demo-rag). */
-function registerDemoLead(email: string, doc: DemoDocumentInfo, consentAt: Date): void {
-  const unit = doc.pages === 1 ? 'página' : 'páginas';
-  const pagesText = `${doc.pages} ${unit}${doc.pagesEstimated ? (doc.pages === 1 ? ' estimada' : ' estimadas') : ''}`;
-  registerLead({
-    name: 'Lead de la demo RAG',
-    email,
-    service: 'Demo RAG: prueba con tu documento',
-    message: [
-      `Subió un documento ${doc.kind.toUpperCase()} (${pagesText}) en /demo/chatbot, opción "Prueba con tu documento".`,
-      `Autorizó el tratamiento de sus datos personales según la Ley 1581 de 2012 y la política de privacidad (${consentAt.toISOString()}).`,
-    ].join('\n'),
-    source: 'demo-rag',
-  }).catch((err) => {
-    // El visitante igual puede usar la demo; el error queda en el log.
+/**
+ * Registra el lead (origen demo-rag, mismo canal del formulario de contacto)
+ * con la prueba de la autorización ANTES de procesar el documento. Si no se
+ * puede guardar, no se procesa (DemoRagError `lead_unavailable`).
+ */
+async function registerDemoLead(email: string, kind: string, consentimiento: IContactConsent): Promise<IContact> {
+  if (!isDbReady()) throw new DemoRagError('lead_unavailable');
+  try {
+    return await registerLead({
+      name: 'Lead de la demo RAG',
+      email,
+      service: 'Demo RAG: prueba con tu documento',
+      message: `Subió un documento ${kind.toUpperCase()} en /demo/chatbot, opción "Prueba con tu documento".`,
+      source: 'demo-rag',
+      consentimiento,
+    });
+  } catch (err) {
     logger.error(`[demo-rag] No se pudo registrar el lead: ${(err as Error)?.message ?? err}`);
-  });
+    throw new DemoRagError('lead_unavailable');
+  }
+}
+
+/** Completa el mensaje del lead con el resultado del procesamiento (sin bloquear la demo). */
+function noteDocumentResult(contact: IContact, text: string): void {
+  Contact.updateOne({ _id: contact._id }, { $set: { message: `${contact.message}\n${text}` } }).catch((err) =>
+    logger.warn(`[demo-rag] No se pudo completar el lead: ${(err as Error)?.message ?? err}`),
+  );
+}
+
+function pagesText(doc: DemoDocumentInfo): string {
+  const unit = doc.pages === 1 ? 'página' : 'páginas';
+  return `${doc.pages} ${unit}${doc.pagesEstimated ? (doc.pages === 1 ? ' estimada' : ' estimadas') : ''}`;
 }
 
 // --- Endpoints ----------------------------------------------------------------
@@ -164,20 +186,37 @@ router.post('/documents', uploadRateLimiter, async (req: Request, res: Response)
     if (!emailCheck.isEmpty() || typeof req.body?.email !== 'string') throw new DemoRagError('invalid_email');
     const email: string = req.body.email;
     if (String(req.body?.consent) !== 'true') throw new DemoRagError('consent_required');
-    const consentAt = new Date();
+    // Prueba de la autorización como en las solicitudes de demo: versión de
+    // la política que fija el servidor, fecha, hash de la IP y navegador.
+    const consentimiento: IContactConsent = {
+      aceptado: true,
+      fecha: new Date(),
+      ipHash: hashIp(resolveClientIp(req)),
+      userAgent: req.get('user-agent')?.slice(0, 300),
+      versionPolitica: currentPrivacyPolicyVersion(),
+    };
 
     // 4) Cupo diario por IP (3 documentos). Se devuelve si el documento se rechaza.
     const releaseDailySlot = await reserveDailyUpload(clientIp(req));
-    let doc: DemoDocumentInfo;
+
+    // 5) Lead con la autorización. Si no se puede guardar, no se procesa el documento.
+    let contact: IContact;
     try {
-      doc = await ingestDocument({ buffer: file.buffer, kind, originalName: file.originalname });
+      contact = await registerDemoLead(email, kind, consentimiento);
     } catch (err) {
       await releaseDailySlot();
       throw err;
     }
 
-    // 5) Lead por el canal del formulario de contacto, sin bloquear la demo.
-    registerDemoLead(email, doc, consentAt);
+    let doc: DemoDocumentInfo;
+    try {
+      doc = await ingestDocument({ buffer: file.buffer, kind, originalName: file.originalname });
+    } catch (err) {
+      await releaseDailySlot();
+      noteDocumentResult(contact, `El documento no se pudo procesar (${err instanceof DemoRagError ? err.code : 'error'}).`);
+      throw err;
+    }
+    noteDocumentResult(contact, `Documento procesado: ${pagesText(doc)}.`);
 
     res.status(201).json({ success: true, document: doc, limits: PUBLIC_LIMITS });
   } catch (err) {

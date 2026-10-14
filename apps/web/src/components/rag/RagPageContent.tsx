@@ -32,15 +32,21 @@ import {
   ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 import {
-  RAG_DEMO_PATH,
   RAG_FAQ_KEYS,
   RAG_PAGE_PLANS_ANCHOR,
   RAG_PILOT_CONTACT_PATH,
   RAG_SECTORS,
+  RAG_UPLOAD_DEMO_PATH,
   getRagFaqValues,
 } from '@/lib/rag-page';
 
 type Icon = typeof DocumentTextIcon;
+
+/** Secciones del índice bajo el H1 (`ragPage.hero.navItems.<ancla>`), en orden. */
+const PAGE_ANCHORS = ['casos', 'como-funciona', 'seguridad', RAG_PAGE_PLANS_ANCHOR, 'preguntas-frecuentes'] as const;
+
+/** Margen para que el encabezado fijo no tape la sección a la que lleva un ancla. */
+const ANCHOR_OFFSET = 'scroll-mt-16 md:scroll-mt-20';
 
 /** Encabezado centrado de sección (H2 + bajada), mismo estilo de las landings del sitio. */
 function SectionHeader({ badge, title, subtitle }: { badge?: string; title: string; subtitle?: string }) {
@@ -64,7 +70,8 @@ function SectionHeader({ badge, title, subtitle }: { badge?: string; title: stri
  * los planes como Offer, FAQPage y breadcrumb) se declaran en
  * `src/app/rag/page.tsx`.
  *
- * Secciones, en el orden de la especificación:
+ * Secciones, en el orden de la especificación (bajo el H1 va un índice con
+ * anclas a sector, cómo funciona, tus datos, precios y preguntas):
  *  1. Qué es RAG (con el H1)  2. Casos por sector  3. Cómo funciona
  *  4. Seguridad y privacidad  5. Cómo evitamos respuestas inventadas
  *  6. Integraciones  7. Planes y precios  8. Preguntas frecuentes  9. CTA
@@ -133,13 +140,29 @@ export default function RagPageContent() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
-                <Link href={RAG_DEMO_PATH}>{t('hero.ctaDemo')}</Link>
+                <Link href={RAG_UPLOAD_DEMO_PATH}>{t('hero.ctaDemo')}</Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
                 <Link href={RAG_PILOT_CONTACT_PATH}>{t('hero.ctaPilot')}</Link>
               </Button>
             </div>
-            <p className="mt-4 text-sm text-secondary-500 dark:text-secondary-400">{t('hero.pilotNote', values)}</p>
+            <p className="mt-4 text-sm font-medium text-secondary-700 dark:text-secondary-300">{t('hero.pilotNote', values)}</p>
+
+            {/* Índice de la página: la información que más se busca, a un clic */}
+            <nav aria-label={t('hero.nav')} className="mt-8">
+              <ul className="flex flex-wrap justify-center gap-2">
+                {PAGE_ANCHORS.map((anchor) => (
+                  <li key={anchor}>
+                    <a
+                      href={`#${anchor}`}
+                      className="inline-flex items-center rounded-full border border-secondary-200 dark:border-secondary-700 bg-white/80 dark:bg-secondary-900/80 px-3 py-1.5 text-sm font-medium text-secondary-700 dark:text-secondary-200 hover:border-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
+                    >
+                      {t(`hero.navItems.${anchor}`)}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
           </div>
 
           <div className="mt-20 md:mt-24">
@@ -176,7 +199,7 @@ export default function RagPageContent() {
       </section>
 
       {/* 2. Casos por sector */}
-      <section id="casos" className="section-padding bg-white dark:bg-secondary-950">
+      <section id="casos" className={`${ANCHOR_OFFSET} section-padding bg-white dark:bg-secondary-950`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader title={t('sectors.title')} subtitle={t('sectors.subtitle')} />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -219,7 +242,7 @@ export default function RagPageContent() {
       </section>
 
       {/* 3. Cómo funciona (diagrama) */}
-      <section id="como-funciona" className="section-padding bg-secondary-50 dark:bg-black">
+      <section id="como-funciona" className={`${ANCHOR_OFFSET} section-padding bg-secondary-50 dark:bg-black`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader badge={t('how.badge')} title={t('how.title')} subtitle={t('how.subtitle')} />
 
@@ -280,7 +303,7 @@ export default function RagPageContent() {
       </section>
 
       {/* 4. Seguridad y privacidad */}
-      <section id="seguridad" className="section-padding bg-white dark:bg-secondary-950">
+      <section id="seguridad" className={`${ANCHOR_OFFSET} section-padding bg-white dark:bg-secondary-950`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader title={t('security.title')} subtitle={t('security.subtitle')} />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -383,7 +406,7 @@ export default function RagPageContent() {
       </section>
 
       {/* 8. Preguntas frecuentes (mismo texto que el JSON-LD FAQPage) */}
-      <section id="preguntas-frecuentes" className="section-padding bg-white dark:bg-secondary-950">
+      <section id="preguntas-frecuentes" className={`${ANCHOR_OFFSET} section-padding bg-white dark:bg-secondary-950`}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-bold text-secondary-900 dark:text-white mb-12 text-center">
             {t('faq.title')}
@@ -410,7 +433,7 @@ export default function RagPageContent() {
           <p className="text-xl text-primary-100 mb-10">{t('cta.subtitle', values)}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="bg-white text-primary-700 hover:bg-primary-50" asChild>
-              <Link href={RAG_DEMO_PATH}>{t('cta.demo')}</Link>
+              <Link href={RAG_UPLOAD_DEMO_PATH}>{t('cta.demo')}</Link>
             </Button>
             <Button size="lg" variant="outline" className="border-white/50 text-white hover:bg-white/10" asChild>
               <Link href={RAG_PILOT_CONTACT_PATH}>{t('cta.pilot')}</Link>

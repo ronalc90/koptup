@@ -18,23 +18,15 @@ import {
   PlusIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';
-import { CIE10, DEMO_DATE, IPS, LAB_ORDERS, MED_PRESETS, PROFESSIONAL } from './mockData';
-import { allergyConflicts, fmtDate, normalize, payerOf, tx } from './logic';
+import { CIE10, IPS, LAB_ORDERS, MED_PRESETS } from './mockData';
+import { allergyConflicts, fmtDate, normalize, payerOf, specOf, tx } from './logic';
 import { makePdf } from './pdf';
 import { SimTag, useDateNames, useLoc } from './ui';
-import type { Cie10, Patient, Prescription, RxMed } from './types';
-
-export interface ConsultDraft {
-  dx: Cie10 | null;
-  meds: RxMed[];
-  orders: string[];
-  rx: Prescription | null;
-  rxSent: boolean;
-}
-
-export const EMPTY_DRAFT: ConsultDraft = { dx: null, meds: [], orders: [], rx: null, rxSent: false };
+import type { Cie10, ConsultDraft, Patient, RxMed } from './types';
 
 interface Props {
+  /** Fecha de la jornada (para el PDF). */
+  day: string;
   patient: Patient;
   draft: ConsultDraft;
   onChange: (d: ConsultDraft) => void;
@@ -45,13 +37,13 @@ interface Props {
   notify: (text: string, tone?: 'ok' | 'warn') => void;
 }
 
-export default function PrescriptionEditor({ patient, draft, onChange, onSign, onUnsign, onSend, onDx, notify }: Props) {
+export default function PrescriptionEditor({ day, patient, draft, onChange, onSign, onUnsign, onSend, onDx, notify }: Props) {
   const t = useTranslations('demoTelemed');
   const loc = useLoc();
   const names = useDateNames();
   const [q, setQ] = useState('');
-  const [seq, setSeq] = useState(1);
   const locked = !!draft.rx;
+  const pro = specOf(patient.spec);
 
   const matches = useMemo(() => {
     const n = normalize(q.trim());
@@ -65,8 +57,8 @@ export default function PrescriptionEditor({ patient, draft, onChange, onSign, o
 
   function addMed(presetId?: string) {
     const p = MED_PRESETS.find((m) => m.id === presetId);
-    const id = `m${seq}`;
-    setSeq((s) => s + 1);
+    // Id único aunque la receta venga de una consulta recuperada al recargar.
+    const id = `m${draft.meds.reduce((max, m) => Math.max(max, Number(m.id.slice(1)) || 0), 0) + 1}`;
     onChange({
       ...draft,
       meds: [
@@ -91,7 +83,7 @@ export default function PrescriptionEditor({ patient, draft, onChange, onSign, o
     await makePdf({
       filename: `${draft.rx.number}.pdf`,
       title: t('rx.pdf.title'),
-      subtitle: `${draft.rx.number} · ${fmtDate(DEMO_DATE, loc, names, { year: true })} ${draft.rx.signedAt}`,
+      subtitle: `${draft.rx.number} · ${fmtDate(day, loc, names, { year: true })} ${draft.rx.signedAt}`,
       sample: t('pdf.sample'),
       ipsLine: t('pdf.ipsLine', { nit: IPS.nit, city: IPS.city[loc] }),
       sections: [
@@ -121,7 +113,7 @@ export default function PrescriptionEditor({ patient, draft, onChange, onSign, o
           ? [{ heading: t('rx.pdf.orders'), paragraphs: draft.orders.map((o) => `• ${tx(LAB_ORDERS.find((x) => x.id === o)?.label, loc)}`) }]
           : []),
       ],
-      signature: { name: PROFESSIONAL.name, detail: t('rx.pdf.signature', { reg: PROFESSIONAL.reg, time: draft.rx.signedAt }) },
+      signature: { name: pro.pro, detail: t('rx.pdf.signature', { reg: pro.reg, time: draft.rx.signedAt }) },
       footer: t('pdf.footer'),
     });
     notify(t('toasts.pdf', { name: `${draft.rx.number}.pdf` }));
@@ -204,19 +196,13 @@ export default function PrescriptionEditor({ patient, draft, onChange, onSign, o
                   </Button>
                 )}
               </div>
-              <div className="grid grid-cols-3 gap-1.5">
+              {/* El panel es angosto: dosis y duración comparten fila; la frecuencia va completa. */}
+              <div className="grid grid-cols-2 gap-1.5">
                 <Input
                   value={m.dose}
                   onChange={(e) => updateMed(m.id, 'dose', e.target.value)}
                   placeholder={t('rx.dose')}
                   aria-label={t('rx.dose')}
-                  disabled={locked}
-                />
-                <Input
-                  value={m.freq}
-                  onChange={(e) => updateMed(m.id, 'freq', e.target.value)}
-                  placeholder={t('rx.freq')}
-                  aria-label={t('rx.freq')}
                   disabled={locked}
                 />
                 <Input
@@ -226,6 +212,15 @@ export default function PrescriptionEditor({ patient, draft, onChange, onSign, o
                   aria-label={t('rx.duration')}
                   disabled={locked}
                 />
+                <div className="col-span-2">
+                  <Input
+                    value={m.freq}
+                    onChange={(e) => updateMed(m.id, 'freq', e.target.value)}
+                    placeholder={t('rx.freq')}
+                    aria-label={t('rx.freq')}
+                    disabled={locked}
+                  />
+                </div>
               </div>
               <Input
                 value={m.instructions}
@@ -295,11 +290,11 @@ export default function PrescriptionEditor({ patient, draft, onChange, onSign, o
           <div className="flex items-start justify-between gap-2">
             <p className="text-xs text-emerald-900 dark:text-emerald-100">
               <CheckBadgeIcon className="w-4 h-4 inline -mt-0.5 mr-1" />
-              {t('rx.signedBy', { number: draft.rx.number, name: PROFESSIONAL.name, time: draft.rx.signedAt })}
+              {t('rx.signedBy', { number: draft.rx.number, name: pro.pro, time: draft.rx.signedAt })}
             </p>
             <SimTag>{t('common.simulated')}</SimTag>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
+          <div className="flex flex-wrap gap-1.5">
             <Button size="sm" variant="outline" onClick={downloadPdf}>
               <ArrowDownTrayIcon className="w-4 h-4 mr-1" /> PDF
             </Button>

@@ -17,11 +17,14 @@ async function loadAggregate(locale: string, name: 'demos' | 'offerings'): Promi
   }
 }
 
+/**
+ * Idioma de la petición: la cookie `locale` (`es` por defecto). Es la misma
+ * regla que usa `src/app/layout.tsx`; no hay rutas por idioma ni cabecera.
+ */
 export default getRequestConfig(async () => {
   const h = headers();
-  const headerLocale = h.get('x-locale') || undefined;
   const cookieLocale = getLocaleFromCookie(h.get('cookie'));
-  const locale = headerLocale || cookieLocale || 'es';
+  const locale = cookieLocale === 'en' ? 'en' : 'es';
 
   let messages: Record<string, any>;
   try {

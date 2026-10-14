@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import {
   CheckBadgeIcon,
@@ -12,6 +13,8 @@ import {
   SparklesIcon,
 } from '@heroicons/react/24/outline';
 import Card, { CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
+import { RUTA_SOLICITAR_ACCESO } from './AccesoInactivo';
 import { TARIFARIO_DEMO } from '../lib/tarifarioDemo';
 import { formatearCOP } from '../lib/formato';
 
@@ -33,7 +36,7 @@ function normalizar(texto: string): string {
     .toLowerCase();
 }
 
-export default function ComoAudita() {
+export default function ComoAudita({ onAuditarEjemplo }: { onAuditarEjemplo: () => void }) {
   const t = useTranslations('demoMedicalAccounts');
   const locale = useLocale();
   const [busqueda, setBusqueda] = useState('');
@@ -99,6 +102,12 @@ export default function ComoAudita() {
               ))}
             </ul>
             <p className="mt-4 text-sm text-gray-700 dark:text-gray-300">{t('howItWorks.projectNote')}</p>
+            <Link
+              href={RUTA_SOLICITAR_ACCESO}
+              className="mt-2 inline-block rounded text-sm font-semibold text-primary-700 underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:text-primary-300"
+            >
+              {t('howItWorks.guidedDemo')}
+            </Link>
           </CardContent>
         </Card>
       </div>
@@ -145,6 +154,17 @@ export default function ComoAudita() {
             </div>
           )}
         </CardContent>
+      </Card>
+
+      <Card variant="bordered" className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="font-semibold text-gray-900 dark:text-white">{t('howItWorks.tryTitle')}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{t('howItWorks.tryBody')}</p>
+        </div>
+        <Button onClick={onAuditarEjemplo} className="flex-shrink-0 bg-green-600 hover:bg-green-700 focus:ring-green-500">
+          <SparklesIcon className="mr-2 h-5 w-5" aria-hidden="true" />
+          {t('dashboard.emptyCta')}
+        </Button>
       </Card>
     </div>
   );

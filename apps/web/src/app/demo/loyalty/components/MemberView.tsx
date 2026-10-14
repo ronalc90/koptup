@@ -26,7 +26,8 @@ import {
   ChatBubbleLeftRightIcon,
   UserCircleIcon,
 } from '@heroicons/react/24/outline';
-import { CLUB, DEMO_MONTH, DEMO_TODAY, LEADERBOARD_SAMPLE, REWARD_CATS, REWARDS, rewardById, type LedgerTx, type Member, type Mission, type Reward, type RewardCat } from './data';
+import { CLUB, LEADERBOARD_SAMPLE, REWARD_CATS, REWARDS, rewardById, type LedgerTx, type Member, type Mission, type Reward, type RewardCat } from './data';
+import { endOfMonth, monthKeyAgo, monthKeyOf, partsOf } from './dates';
 import {
   balanceOf,
   barsFor,
@@ -43,18 +44,17 @@ import {
   streakOf,
   tierFor,
   tierIndex,
-  yearPoints,
+  tierPoints,
 } from './engine';
-import { BIRTHDAY_GIFT, isFrozen, nowTime, useLoyalty, type Coupon } from './store';
-import { Modal, SectionTitle, TIER_THEME, selectCls, useFmt, useToast } from './ui';
-
-const TODAY_ISO = DEMO_TODAY;
+import { isFrozen, nowTime, useLoyalty, type Coupon } from './store';
+import { Modal, SectionTitle, TIER_THEME, focusRing, selectCls, useFmt, useToast } from './ui';
 
 export default function MemberView() {
   const t = useTranslations('demoLoyalty');
   const store = useLoyalty();
-  const { state, activeMember } = store;
+  const { state, activeMember, today } = store;
   const [coupon, setCoupon] = useState<Coupon | null>(null);
+  const birthday = activeMember.birthMonth === partsOf(today).m && state.rules.birthdayGift > 0;
 
   return (
     <div className="space-y-6">
@@ -76,7 +76,7 @@ export default function MemberView() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6 min-w-0">
           <MemberCard member={activeMember} />
-          {activeMember.birthMonth === DEMO_MONTH && <BirthdayBanner member={activeMember} onCoupon={setCoupon} />}
+          {birthday && <BirthdayBanner member={activeMember} onCoupon={setCoupon} />}
           <RewardsCatalog member={activeMember} onCoupon={setCoupon} />
           <Missions member={activeMember} />
           <Movements member={activeMember} />
@@ -100,9 +100,9 @@ export default function MemberView() {
 function MemberCard({ member }: { member: Member }) {
   const t = useTranslations('demoLoyalty');
   const f = useFmt();
-  const { state } = useLoyalty();
+  const { state, today } = useLoyalty();
   const balance = balanceOf(state.ledger, member.id);
-  const yp = yearPoints(state.ledger, member.id);
+  const yp = tierPoints(state.ledger, member.id, today);
   const th = state.rules.thresholds;
   const tier = tierFor(yp, th);
   const next = nextTierOf(tier);
@@ -136,7 +136,7 @@ function MemberCard({ member }: { member: Member }) {
           {isFrozen(state, member.id) && <p className="mt-2 inline-block rounded-full bg-red-600/90 px-2.5 py-1 text-xs font-medium">{t('member.frozen')}</p>}
           <p className="text-xs opacity-90 mt-2 flex items-center gap-1">
             <FireIcon className="h-4 w-4 shrink-0" />
-            {expiring > 0 ? t('member.expiring', { points: f.num(expiring), date: f.date('2026-10-31') }) : t('member.expiryRule', { months: state.rules.expiryMonths })}
+            {expiring > 0 ? t('member.expiring', { points: f.num(expiring), date: f.date(endOfMonth(today)) }) : t('member.expiryRule', { months: state.rules.expiryMonths })}
           </p>
         </div>
         <div>
@@ -170,7 +170,7 @@ function BirthdayBanner({ member, onCoupon }: { member: Member; onCoupon: (c: Co
   const t = useTranslations('demoLoyalty');
   const f = useFmt();
   const notify = useToast();
-  const { state, claimBirthday } = useLoyalty();
+  const { state, today, claimBirthday } = useLoyalty();
   const claimed = state.birthdayClaimed.includes(member.id);
   const code = state.coupons.find((c) => c.memberId === member.id && c.kind === 'birthday')?.code;
   return (
@@ -182,7 +182,7 @@ function BirthdayBanner({ member, onCoupon }: { member: Member; onCoupon: (c: Co
         <div className="flex-1 min-w-0">
           <p className="font-semibold">{t('member.birthday.title', { name: member.name.split(' ')[0] })}</p>
           <p className="text-sm opacity-90">
-            {claimed ? t('member.birthday.claimed', { code: code ?? '' }) : t('member.birthday.subtitle', { value: f.money(BIRTHDAY_GIFT) })}
+            {claimed ? t('member.birthday.claimed', { code: code ?? '' }) : t('member.birthday.subtitle', { value: f.money(state.rules.birthdayGift) })}
           </p>
         </div>
         <Button
@@ -190,7 +190,7 @@ function BirthdayBanner({ member, onCoupon }: { member: Member; onCoupon: (c: Co
           className="bg-white text-rose-600 hover:bg-white/90 shrink-0 self-start sm:self-auto"
           disabled={claimed}
           onClick={() => {
-            const c = claimBirthday(member.id, TODAY_ISO, nowTime());
+            const c = claimBirthday(member.id, today, nowTime());
             if (c) {
               onCoupon(c);
               notify(t('member.birthday.toast', { code: c.code }));
@@ -210,7 +210,7 @@ function RewardsCatalog({ member, onCoupon }: { member: Member; onCoupon: (c: Co
   const t = useTranslations('demoLoyalty');
   const f = useFmt();
   const notify = useToast();
-  const { state, redeemReward } = useLoyalty();
+  const { state, today, redeemReward } = useLoyalty();
   const [cat, setCat] = useState<'all' | RewardCat>('all');
   const [confirm, setConfirm] = useState<Reward | null>(null);
   const balance = balanceOf(state.ledger, member.id);
@@ -218,7 +218,7 @@ function RewardsCatalog({ member, onCoupon }: { member: Member; onCoupon: (c: Co
   const items = REWARDS.filter((r) => cat === 'all' || r.cat === cat);
 
   return (
-    <Card>
+    <Card id="ly-rewards">
       <SectionTitle icon={GiftIcon} title={t('member.rewards.title')} subtitle={t('member.rewards.subtitle', { value: f.money(state.rules.pointValue) })} />
       <div className="flex gap-2 my-4 overflow-x-auto pb-1" role="group" aria-label={t('member.rewards.filter')}>
         {(['all', ...REWARD_CATS] as const).map((c) => (
@@ -227,7 +227,7 @@ function RewardsCatalog({ member, onCoupon }: { member: Member; onCoupon: (c: Co
             type="button"
             aria-pressed={cat === c}
             onClick={() => setCat(c)}
-            className={`px-3 py-1.5 text-xs font-medium rounded-full whitespace-nowrap transition-colors ${
+            className={`px-3 py-1.5 text-xs font-medium rounded-full whitespace-nowrap transition-colors ${focusRing} ${
               cat === c ? 'bg-primary-600 text-white' : 'bg-secondary-100 dark:bg-secondary-800 text-secondary-700 dark:text-secondary-300 hover:bg-secondary-200 dark:hover:bg-secondary-700'
             }`}
           >
@@ -277,7 +277,7 @@ function RewardsCatalog({ member, onCoupon }: { member: Member; onCoupon: (c: Co
             </Button>
             <Button
               onClick={() => {
-                const res = redeemReward(member.id, confirm.id, TODAY_ISO, nowTime());
+                const res = redeemReward(member.id, confirm.id, today, nowTime());
                 setConfirm(null);
                 if (res.ok) {
                   onCoupon(res.coupon);
@@ -356,7 +356,7 @@ function MyCoupons({ member, onOpen }: { member: Member; onOpen: (c: Coupon) => 
               <button
                 type="button"
                 onClick={() => onOpen(c)}
-                className="w-full text-left rounded-lg border border-secondary-200 dark:border-secondary-800 p-2.5 hover:bg-secondary-50 dark:hover:bg-secondary-800"
+                className={`w-full text-left rounded-lg border border-secondary-200 dark:border-secondary-800 p-2.5 hover:bg-secondary-50 dark:hover:bg-secondary-800 ${focusRing}`}
               >
                 <span className="flex items-center justify-between gap-2">
                   <span className="text-sm font-medium text-secondary-900 dark:text-white truncate">{couponTitle(t, c, f.money)}</span>
@@ -386,7 +386,7 @@ function Missions({ member }: { member: Member }) {
   const t = useTranslations('demoLoyalty');
   const f = useFmt();
   const notify = useToast();
-  const { state, claimMission } = useLoyalty();
+  const { state, today, claimMission } = useLoyalty();
   const active = state.missions.filter((m) => m.active);
   return (
     <Card>
@@ -396,8 +396,8 @@ function Missions({ member }: { member: Member }) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
           {active.map((m) => {
-            const { current, done } = missionProgress(m, member, state.members, state.ledger);
-            const claimed = state.claims.includes(claimKey(member.id, m.id));
+            const { current, done } = missionProgress(m, member, state.members, state.ledger, today);
+            const claimed = state.claims.includes(claimKey(member.id, m.id, today));
             const Icon = MISSION_ICON[m.type];
             return (
               <div key={m.id} className="p-4 rounded-xl border border-secondary-200 dark:border-secondary-800 bg-white dark:bg-secondary-900">
@@ -423,7 +423,7 @@ function Missions({ member }: { member: Member }) {
                       variant="outline"
                       className="!py-1 text-xs"
                       onClick={() => {
-                        const pts = claimMission(member.id, m.id, TODAY_ISO, nowTime());
+                        const pts = claimMission(member.id, m.id, today, nowTime());
                         if (pts) notify(t('member.missions.toast', { pts: f.num(pts) }));
                       }}
                     >
@@ -444,6 +444,12 @@ function Missions({ member }: { member: Member }) {
 
 /* ------------------------------ Movimientos ------------------------------ */
 
+/** «nov 2025» a partir de AAAA-MM o AAAA-MM-DD (para textos fuera de componentes). */
+function monthLabel(t: ReturnType<typeof useTranslations>, key: string) {
+  const [y, m] = key.split('-').map(Number);
+  return t('fmt.month', { m: t(`months.${m}`), y });
+}
+
 export function txLabel(t: ReturnType<typeof useTranslations>, tx: LedgerTx, money: (n: number) => string, missions: Mission[]) {
   switch (tx.kind) {
     case 'opening':
@@ -451,9 +457,11 @@ export function txLabel(t: ReturnType<typeof useTranslations>, tx: LedgerTx, mon
     case 'earn':
       return t('tx.earn', { amount: money(tx.amount ?? 0), category: tx.category ? t(`categories.${tx.category}`) : '' });
     case 'summary':
-      return t('tx.summary');
+      return t('tx.summary', { from: monthLabel(t, monthKeyAgo(tx.date, 11)), to: monthLabel(t, tx.date) });
     case 'redeem':
-      return tx.rewardId ? t('tx.redeem', { name: t(`rewards.items.${tx.rewardId}.name`) }) : t('tx.redeemSummary');
+      return tx.rewardId
+        ? t('tx.redeem', { name: t(`rewards.items.${tx.rewardId}.name`) })
+        : t('tx.redeemSummary', { from: monthLabel(t, monthKeyAgo(tx.date, 11)), to: monthLabel(t, tx.date) });
     case 'welcome':
       return t('tx.welcome');
     case 'referral':
@@ -522,10 +530,10 @@ function Movements({ member }: { member: Member }) {
 function WalletPass({ member }: { member: Member }) {
   const t = useTranslations('demoLoyalty');
   const f = useFmt();
-  const { state } = useLoyalty();
+  const { state, today } = useLoyalty();
   const [flipped, setFlipped] = useState(false);
   const [preview, setPreview] = useState(false);
-  const tier = tierFor(yearPoints(state.ledger, member.id), state.rules.thresholds);
+  const tier = tierFor(tierPoints(state.ledger, member.id, today), state.rules.thresholds);
   const theme = TIER_THEME[tier];
   const code = memberCode(member);
   const balance = balanceOf(state.ledger, member.id);
@@ -538,7 +546,7 @@ function WalletPass({ member }: { member: Member }) {
         onClick={() => setFlipped((v) => !v)}
         aria-pressed={flipped}
         aria-label={t('member.wallet.flip')}
-        className={`mt-4 w-full aspect-[3/2] lg:aspect-[4/5] rounded-2xl bg-gradient-to-br ${theme.from} ${theme.to} text-white p-5 shadow-2xl ring-2 ${theme.ring} flex flex-col justify-between text-left transition-transform hover:scale-[1.02]`}
+        className={`mt-4 w-full aspect-[3/2] lg:aspect-[4/5] rounded-2xl bg-gradient-to-br ${theme.from} ${theme.to} text-white p-5 shadow-2xl ring-2 ${theme.ring} flex flex-col justify-between text-left transition-transform hover:scale-[1.02] focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-500`}
       >
         {!flipped ? (
           <>
@@ -693,11 +701,14 @@ function Referrals({ member }: { member: Member }) {
 
 function StreakAndBadges({ member }: { member: Member }) {
   const t = useTranslations('demoLoyalty');
-  const { state } = useLoyalty();
+  const f = useFmt();
+  const { state, today } = useLoyalty();
   const months = purchaseMonths(member, state.ledger);
-  const streak = streakOf(months);
+  const streak = streakOf(months, today);
   const txs = memberLedger(state.ledger, member.id);
-  const tier = tierFor(yearPoints(state.ledger, member.id), state.rules.thresholds);
+  const tier = tierFor(tierPoints(state.ledger, member.id, today), state.rules.thresholds);
+  // Últimos 12 meses, terminando en el mes de hoy.
+  const chart = Array.from({ length: 12 }, (_, i) => monthKeyAgo(today, 11 - i));
   const badges = [
     { id: 'first', on: txs.some((x) => x.kind === 'earn' || x.kind === 'summary') },
     { id: 'streak3', on: streak >= 3 },
@@ -715,15 +726,20 @@ function StreakAndBadges({ member }: { member: Member }) {
             <p className="text-sm opacity-90">{t('member.streak.title')}</p>
           </div>
         </div>
-        <p className="text-xs opacity-90 mt-3">{months.has(DEMO_MONTH) ? t('member.streak.kept') : t('member.streak.keep')}</p>
-        <div className="flex gap-1 mt-3" aria-label={t('member.streak.chart')}>
-          {Array.from({ length: DEMO_MONTH }, (_, i) => i + 1).map((m) => (
-            <div key={m} className="flex-1 text-center">
-              <div className={`h-2 rounded-full ${months.has(m) ? 'bg-white' : 'bg-white/25'}`} title={t(`monthsLong.${m}`)} />
-              <span className="block text-[9px] mt-1 opacity-80">{t(`months.${m}`).slice(0, 1)}</span>
-            </div>
+        <p className="text-xs opacity-90 mt-3">{months.has(monthKeyOf(today)) ? t('member.streak.kept') : t('member.streak.keep')}</p>
+        <ul className="flex gap-1 mt-3" aria-label={t('member.streak.chart')}>
+          {chart.map((key) => (
+            <li key={key} className="flex-1 text-center" title={`${f.monthLong(key)} ${key.slice(0, 4)}`}>
+              <div className={`h-2 rounded-full ${months.has(key) ? 'bg-white' : 'bg-white/25'}`} aria-hidden="true" />
+              <span className="block text-[9px] mt-1 opacity-80" aria-hidden="true">
+                {f.monthLong(key).slice(0, 1).toUpperCase()}
+              </span>
+              <span className="sr-only">
+                {f.monthLong(key)} {key.slice(0, 4)}: {months.has(key) ? t('member.streak.bought') : t('member.streak.notBought')}
+              </span>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
       <div className="p-5">
         <p className="text-sm font-semibold text-secondary-900 dark:text-white">{t('member.badges.title')}</p>
@@ -748,7 +764,7 @@ function StreakAndBadges({ member }: { member: Member }) {
 function Leaderboard({ member }: { member: Member }) {
   const t = useTranslations('demoLoyalty');
   const f = useFmt();
-  const { state } = useLoyalty();
+  const { state, today } = useLoyalty();
   if (!state.rules.showLeaderboard) {
     return (
       <Card>
@@ -757,7 +773,7 @@ function Leaderboard({ member }: { member: Member }) {
       </Card>
     );
   }
-  const mine = monthPoints(state.ledger, member.id);
+  const mine = monthPoints(state.ledger, member.id, monthKeyOf(today));
   const [first, last] = member.name.split(' ');
   const rows = [...LEADERBOARD_SAMPLE.map((r) => ({ ...r, you: false })), { name: last ? `${first} ${last[0]}.` : first, pts: mine, you: true }]
     .sort((a, b) => b.pts - a.pts)
@@ -766,7 +782,7 @@ function Leaderboard({ member }: { member: Member }) {
   const me = rows.find((r) => r.you);
   return (
     <Card>
-      <SectionTitle icon={TrophyIcon} title={t('member.leaderboard.title')} subtitle={t('member.leaderboard.subtitle', { month: t(`monthsLong.${DEMO_MONTH}`) })} />
+      <SectionTitle icon={TrophyIcon} title={t('member.leaderboard.title')} subtitle={t('member.leaderboard.subtitle', { month: f.monthLong(today) })} />
       <ol className="mt-3 space-y-1">
         {top.map((r) => (
           <li key={r.rank} className={`flex items-center gap-3 p-2 rounded-lg text-sm ${r.you ? 'bg-primary-50 dark:bg-primary-950 ring-1 ring-primary-300' : ''}`}>

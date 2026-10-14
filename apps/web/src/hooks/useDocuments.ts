@@ -179,14 +179,18 @@ export function useDocuments(view: ViewType = 'all', selectedFolder?: string) {
     [fetchDocuments, fetchFolders, fetchStats]
   );
 
+  /**
+   * Mueve un documento a la papelera (o lo borra con `{ permanent: true }`).
+   * Solo el dueño puede hacerlo (lo valida el backend). La confirmación la pide
+   * la interfaz antes de llamar. Por compatibilidad, un segundo argumento de
+   * texto (el PIN que pedía la versión anterior) se ignora.
+   */
   const deleteDocument = useCallback(
-    async (id: string, pin: string, permanent: boolean = false) => {
+    async (id: string, options?: { permanent?: boolean } | string) => {
+      const permanent = typeof options === 'object' && options !== null && options.permanent === true;
       try {
         await api.delete(`/api/documents/${id}`, {
-          params: {
-            permanent: permanent ? 'true' : 'false',
-            pin
-          },
+          params: { permanent: permanent ? 'true' : 'false' },
         });
         await Promise.all([fetchDocuments(), fetchFolders(), fetchStats()]);
       } catch (err: any) {

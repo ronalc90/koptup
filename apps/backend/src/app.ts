@@ -13,8 +13,9 @@ import compression from 'compression';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
 import swaggerUi from 'swagger-ui-express';
-import swaggerJsdoc from 'swagger-jsdoc';
 import passport from 'passport';
+import { buildSwaggerSpec } from './config/swagger';
+import { normalizeErrorResponses, sendError } from './utils/http-error';
 import { logger } from './utils/logger';
 import { CorsError, errorHandler } from './middleware/errorHandler';
 import { authMeRateLimiter, rateLimiter, chatbotRateLimiter } from './middleware/rateLimiter';
@@ -23,7 +24,6 @@ import authRoutes from './routes/auth.routes';
 import documentRoutes from './routes/document.routes';
 import chatRoutes from './routes/chat.routes';
 import contactRoutes from './routes/contact.routes';
-import quoteRoutes from './routes/quote.routes';
 import projectRoutes from './routes/project.routes';
 import ordersRoutes from './routes/orders.routes';
 import deliverablesRoutes from './routes/deliverables.routes';
@@ -50,7 +50,13 @@ import {
   adminDemoGrantsRouter,
   adminDemoRequestsRouter,
 } from './routes/admin-demos.routes';
+import { adminLeadsRouter } from './routes/admin-leads.routes';
+import { adminProposalsRouter } from './routes/admin-proposals.routes';
+import { adminSettingsRouter } from './routes/admin-settings.routes';
+import { adminPrivacyRouter } from './routes/admin-privacy.routes';
+import { meCommerceRouter, paymentsRouter, publicProposalsRouter } from './routes/proposals-public.routes';
 import { setDemoAccessResolver } from './middleware/access';
+import { isCommerceEnabled } from './config/commerce';
 import { demoGrantResolver } from './services/demo-access.service';
 
 /** Orígenes de producción siempre permitidos. */
@@ -111,6 +117,10 @@ export function createApp(): Express {
   );
   app.use(express.urlencoded({ extended: true, limit: JSON_LIMIT_DEFAULT }));
 
+  // Formato único de error: toda respuesta JSON 4xx/5xx sale con
+  // { success: false, code, message } (utils/http-error.ts).
+  app.use(normalizeErrorResponses);
+
   if (process.env.NODE_ENV !== 'test') {
     app.use(morgan('combined', { stream: { write: (message) => logger.info(message.trim()) } }));
   }
@@ -126,12 +136,14 @@ export function createApp(): Express {
   });
 
   // --- Salud -----------------------------------------------------------------
-  // /health/live: el proceso responde (siempre 200). Lo usa Railway como
-  // healthcheck del despliegue (railway.json).
+  // /health/live: el proceso responde (siempre 200, aunque no haya base de
+  // datos). Sirve para diagnosticar si el proceso arranca.
   app.get('/health/live', (_req: Request, res: Response) => {
     res.status(200).json({ status: 'alive', timestamp: new Date().toISOString() });
   });
-  // /health: listo para atender (MongoDB conectado). 503 si no.
+  // /health: listo para atender (MongoDB conectado). 503 si no. Es el
+  // healthcheck del despliegue en Railway (railway.json) y el que revisa el
+  // monitoreo de GitHub Actions (.github/workflows/monitor.yml).
   app.get('/health', (_req: Request, res: Response) => {
     const mongoReady = mongoose.connection.readyState === 1;
     res.status(mongoReady ? 200 : 503).json({
@@ -144,14 +156,7 @@ export function createApp(): Express {
 
   // --- Documentación de la API: solo fuera de producción o con API_DOCS_ENABLED.
   if (process.env.NODE_ENV !== 'production' || process.env.API_DOCS_ENABLED === 'true') {
-    const swaggerSpec = swaggerJsdoc({
-      definition: {
-        openapi: '3.0.0',
-        info: { title: 'KopTup API', version: '1.0.0' },
-        servers: [{ url: process.env.API_URL || `http://localhost:${process.env.PORT ?? 3001}` }],
-      },
-      apis: ['./src/routes/*.ts'],
-    });
+    const swaggerSpec = buildSwaggerSpec(process.env.API_URL || `http://localhost:${process.env.PORT ?? 3001}`);
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
   }
 
@@ -162,7 +167,6 @@ export function createApp(): Express {
   app.use('/api/documents', documentRoutes);
   app.use('/api/chat', chatRoutes);
   app.use('/api/contact', contactRoutes);
-  app.use('/api/quotes', quoteRoutes);
   app.use('/api/projects', projectRoutes);
   app.use('/api/orders', ordersRoutes);
   app.use('/api/deliverables', deliverablesRoutes);
@@ -193,10 +197,28 @@ export function createApp(): Express {
   app.use('/api/admin/demo-grants', adminDemoGrantsRouter);
   app.use('/api/admin/demo-catalog', adminDemoCatalogRouter);
   app.use('/api/admin/audit-log', adminAuditLogRouter);
+  // Flujo de compra (pipeline de leads, propuestas, anticipo y pagos): sigue en
+  // desarrollo y sin revisar, así que solo se monta con COMMERCE_ENABLED=true.
+  const commerceEnabled = isCommerceEnabled();
+  // Pipeline comercial, propuestas y configuración comercial (wiki 05 §8, §9
+  // y §21): también antes de /api/admin, porque `sales` los usa.
+  if (commerceEnabled) {
+    app.use('/api/admin/leads', adminLeadsRouter);
+    app.use('/api/admin/proposals', adminProposalsRouter);
+    app.use('/api/admin/settings', adminSettingsRouter);
+  }
+  // Derechos del titular (Ley 1581): buscar, exportar y suprimir (solo admin).
+  app.use('/api/admin/privacy', adminPrivacyRouter);
   app.use('/api/admin', adminRoutes);
+  // Propuesta pública por token, portal (Solicitar propuesta, Mis propuestas) y pagos.
+  if (commerceEnabled) {
+    app.use('/api/proposals/public', publicProposalsRouter);
+    app.use('/api/me', meCommerceRouter);
+    app.use('/api/payments', paymentsRouter);
+  }
   app.use('/api/linkedin-ads', linkedinAdsRoutes);
 
-  app.use((_req: Request, res: Response) => res.status(404).json({ success: false, message: 'Endpoint not found' }));
+  app.use((_req: Request, res: Response) => sendError(res, 404, 'not_found', 'Esta ruta no existe.'));
   app.use(errorHandler);
 
   return app;

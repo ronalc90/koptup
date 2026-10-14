@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import HomeContent from '@/components/home/HomeContent';
-import StructuredData, { FAQStructuredData } from '@/components/seo/StructuredData';
+import StructuredData from '@/components/seo/StructuredData';
 import { HOME_TITLE } from '@/lib/site';
 
 /**
@@ -21,7 +21,8 @@ export default function HomePage() {
       <StructuredData type="website" />
       <StructuredData type="softwareApplication" />
       <StructuredData type="localBusiness" />
-      <FAQStructuredData />
+      {/* Sin FAQPage: el inicio no muestra preguntas frecuentes, y Google exige
+          que el contenido marcado como FAQ sea visible en la página. */}
 
       <HomeContent />
     </>

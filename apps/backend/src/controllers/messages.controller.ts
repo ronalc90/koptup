@@ -258,26 +258,26 @@ export const markAsRead = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// Crear nueva conversación (admin only)
+// Crear nueva conversación (solo staff: la ruta exige requireStaff, con el rol
+// vigente leído de la BD).
 export const createConversation = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
     const user = req.user;
-    const { title, projectId, orderId, clientId } = req.body;
+    const { title, projectId, orderId, clientId } = req.body ?? {};
 
     if (!userId || !user) {
       res.status(401).json({ success: false, message: 'Usuario no autenticado' });
       return;
     }
 
-    // Verificar que es admin
-    if (user.role !== 'admin' && user.role !== 'project_manager') {
-      res.status(403).json({ success: false, message: 'No tienes permisos para crear conversaciones' });
+    if (!title || !clientId) {
+      res.status(400).json({ success: false, message: 'Título y clientId son requeridos' });
       return;
     }
 
-    if (!title || !clientId) {
-      res.status(400).json({ success: false, message: 'Título y clientId son requeridos' });
+    if (typeof title !== 'string' || !mongoose.Types.ObjectId.isValid(String(clientId))) {
+      res.status(400).json({ success: false, message: 'Título y clientId válidos son requeridos' });
       return;
     }
 
@@ -296,7 +296,8 @@ export const createConversation = async (req: AuthRequest, res: Response) => {
       participants: [
         {
           userId: new mongoose.Types.ObjectId(userId),
-          role: user.role === 'admin' ? 'admin' : 'project_manager',
+          // Rol dentro de la conversación: admin o, para el resto del equipo, support.
+          role: user.role === 'admin' ? 'admin' : 'support',
           name: user.name || user.email,
           email: user.email,
         },

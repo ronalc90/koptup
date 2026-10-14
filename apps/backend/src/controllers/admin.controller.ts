@@ -10,10 +10,36 @@ import mongoose from 'mongoose';
 import User from '../models/User';
 import { sendOrderStatusMessage } from '../utils/conversationHelper';
 import { recordAudit } from '../services/audit.service';
+import { asyncHandler } from '../middleware/errorHandler';
 
-export const adminGetOrders = async (req: AuthRequest, res: Response): Promise<void> => {
+/**
+ * Panel de administración. Cada controlador va envuelto en asyncHandler: si
+ * algo falla después de responder (o antes), el error llega al manejador de
+ * errores de Express en vez de quedar como una promesa rechazada sin manejar.
+ * Toda respuesta de error termina el controlador con `return`.
+ */
+
+type OrderStatus = 'pending' | 'in_progress' | 'shipped' | 'completed' | 'cancelled';
+const ORDER_STATUSES: string[] = ['pending', 'in_progress', 'shipped', 'completed', 'cancelled'];
+const CONTACT_STATUSES: string[] = ['new', 'read', 'responded'];
+
+/**
+ * Filtro de la query string: solo texto. Descarta arrays y objetos
+ * (`?status[$ne]=x` llega como objeto y se convertiría en un operador de
+ * MongoDB) y recorta el largo.
+ */
+function queryText(value: unknown, max = 100): string | undefined {
+  return typeof value === 'string' && value.trim() ? value.trim().slice(0, max) : undefined;
+}
+
+/** Texto literal para usar dentro de una expresión regular. */
+function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+export const adminGetOrders = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { status } = req.query as { status?: string };
+    const status = queryText(req.query.status);
     const query: any = {};
     if (status && status !== 'all') {
       query.status = status;
@@ -51,20 +77,22 @@ export const adminGetOrders = async (req: AuthRequest, res: Response): Promise<v
   } catch (error) {
     res.status(500).json({ success: false, message: 'Error al obtener pedidos' });
   }
-};
+});
 
-export const adminUpdateOrderStatus = async (req: AuthRequest, res: Response): Promise<void> => {
+export const adminUpdateOrderStatus = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { status } = req.body as { status: 'pending' | 'in_progress' | 'shipped' | 'completed' | 'cancelled' };
-    if (!status) {
-      res.status(400).json({ success: false, message: 'Estado requerido' });
+    const { status } = (req.body ?? {}) as { status?: unknown };
+    if (typeof status !== 'string' || !ORDER_STATUSES.includes(status)) {
+      res.status(400).json({ success: false, message: 'Estado requerido', validStatuses: ORDER_STATUSES });
+      return;
     }
-    const order = await Order.findOne({ orderId: id });
+    const order = await Order.findOne({ orderId: String(id) });
     if (!order) {
       res.status(404).json({ success: false, message: 'Pedido no encontrado' });
+      return;
     }
-    order.status = status;
+    order.status = status as OrderStatus;
     order.history.push({
       date: new Date(),
       status,
@@ -76,13 +104,13 @@ export const adminUpdateOrderStatus = async (req: AuthRequest, res: Response): P
   } catch (error) {
     res.status(500).json({ success: false, message: 'Error al actualizar estado' });
   }
-};
+});
 
 // Admin - Aprobar pedido
-export const adminApproveOrder = async (req: AuthRequest, res: Response): Promise<void> => {
+export const adminApproveOrder = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const order = await Order.findOne({ orderId: id });
+    const order = await Order.findOne({ orderId: String(id) });
 
     if (!order) {
       res.status(404).json({ success: false, message: 'Pedido no encontrado' });
@@ -123,15 +151,15 @@ export const adminApproveOrder = async (req: AuthRequest, res: Response): Promis
     console.error('Error approving order:', error);
     res.status(500).json({ success: false, message: 'Error al aprobar pedido' });
   }
-};
+});
 
 // Admin - Rechazar pedido
-export const adminRejectOrder = async (req: AuthRequest, res: Response): Promise<void> => {
+export const adminRejectOrder = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { reason } = req.body as { reason?: string };
 
-    const order = await Order.findOne({ orderId: id });
+    const order = await Order.findOne({ orderId: String(id) });
 
     if (!order) {
       res.status(404).json({ success: false, message: 'Pedido no encontrado' });
@@ -175,11 +203,11 @@ export const adminRejectOrder = async (req: AuthRequest, res: Response): Promise
     console.error('Error rejecting order:', error);
     res.status(500).json({ success: false, message: 'Error al rechazar pedido' });
   }
-};
+});
 
-export const adminGetInvoices = async (req: AuthRequest, res: Response): Promise<void> => {
+export const adminGetInvoices = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { status } = req.query as { status?: string };
+    const status = queryText(req.query.status);
     const query: any = {};
     if (status && status !== 'all') {
       query.status = status;
@@ -203,11 +231,16 @@ export const adminGetInvoices = async (req: AuthRequest, res: Response): Promise
   } catch (error) {
     res.status(500).json({ success: false, message: 'Error al obtener facturas' });
   }
-};
+});
 
-export const adminGetDeliverables = async (req: AuthRequest, res: Response): Promise<void> => {
+export const adminGetDeliverables = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { status, projectId } = req.query as { status?: string; projectId?: string };
+    const status = queryText(req.query.status);
+    const projectId = queryText(req.query.projectId);
+    if (projectId && !mongoose.Types.ObjectId.isValid(projectId)) {
+      res.status(400).json({ success: false, message: 'Proyecto no válido' });
+      return;
+    }
     const query: any = {};
     if (status && status !== 'all') query.status = status;
     if (projectId) query.projectId = projectId;
@@ -233,14 +266,15 @@ export const adminGetDeliverables = async (req: AuthRequest, res: Response): Pro
   } catch (error) {
     res.status(500).json({ success: false, message: 'Error al obtener entregables' });
   }
-};
+});
 
-export const adminCreateInvoiceFromOrder = async (req: AuthRequest, res: Response): Promise<void> => {
+export const adminCreateInvoiceFromOrder = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const order = await Order.findOne({ orderId: id }).lean();
+    const order = await Order.findOne({ orderId: String(id) }).lean();
     if (!order) {
       res.status(404).json({ success: false, message: 'Pedido no encontrado' });
+      return;
     }
     const user = await User.findById(order.userId).lean();
     const clientInfo = {
@@ -255,6 +289,7 @@ export const adminCreateInvoiceFromOrder = async (req: AuthRequest, res: Respons
     }));
     if (!items.length) {
       res.status(400).json({ success: false, message: 'El pedido no tiene ítems válidos' });
+      return;
     }
     const subtotal = items.reduce((sum: number, item: any) => sum + item.total, 0);
     const taxRate = 0.19;
@@ -291,12 +326,12 @@ export const adminCreateInvoiceFromOrder = async (req: AuthRequest, res: Respons
   } catch (error) {
     res.status(500).json({ success: false, message: 'Error al crear factura desde pedido' });
   }
-};
+});
 
 // Admin - Get all conversations
-export const adminGetConversations = async (req: AuthRequest, res: Response): Promise<void> => {
+export const adminGetConversations = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { status } = req.query as { status?: string };
+    const status = queryText(req.query.status);
     const query: any = {};
     if (status && status !== 'all') {
       query.status = status;
@@ -335,20 +370,21 @@ export const adminGetConversations = async (req: AuthRequest, res: Response): Pr
     console.error('Admin get conversations error:', error);
     res.status(500).json({ success: false, message: 'Error al obtener conversaciones' });
   }
-};
+});
 
 // Admin - Get conversation details with messages
-export const adminGetConversationDetails = async (req: AuthRequest, res: Response): Promise<void> => {
+export const adminGetConversationDetails = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
 
-    const conversation = await Conversation.findOne({ conversationId: id })
+    const conversation = await Conversation.findOne({ conversationId: String(id) })
       .populate('projectId', 'name description')
       .populate('participants.userId', 'name email avatar')
       .lean();
 
     if (!conversation) {
       res.status(404).json({ success: false, message: 'Conversación no encontrada' });
+      return;
     }
 
     // Get messages
@@ -391,12 +427,13 @@ export const adminGetConversationDetails = async (req: AuthRequest, res: Respons
     console.error('Admin get conversation details error:', error);
     res.status(500).json({ success: false, message: 'Error al obtener detalles de conversación' });
   }
-};
+});
 
 // Admin - Get all users
-export const adminGetUsers = async (req: AuthRequest, res: Response): Promise<void> => {
+export const adminGetUsers = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { role, search } = req.query as { role?: string; search?: string };
+    const role = queryText(req.query.role);
+    const search = queryText(req.query.search);
     const query: any = {};
 
     if (role && role !== 'all') {
@@ -404,9 +441,11 @@ export const adminGetUsers = async (req: AuthRequest, res: Response): Promise<vo
     }
 
     if (search) {
+      // Búsqueda literal (sin operadores de expresión regular del usuario).
+      const pattern = escapeRegex(search);
       query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
+        { name: { $regex: pattern, $options: 'i' } },
+        { email: { $regex: pattern, $options: 'i' } },
       ];
     }
 
@@ -431,10 +470,10 @@ export const adminGetUsers = async (req: AuthRequest, res: Response): Promise<vo
     console.error('Admin get users error:', error);
     res.status(500).json({ success: false, message: 'Error al obtener usuarios' });
   }
-};
+});
 
 // Admin - Update user role
-export const adminUpdateUserRole = async (req: AuthRequest, res: Response): Promise<void> => {
+export const adminUpdateUserRole = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { role } = (req.body ?? {}) as { role?: unknown };
@@ -486,12 +525,12 @@ export const adminUpdateUserRole = async (req: AuthRequest, res: Response): Prom
     console.error('Admin update user role error:', error);
     res.status(500).json({ success: false, message: 'Error al actualizar rol' });
   }
-};
+});
 
 // Admin - Get all contacts
-export const adminGetContacts = async (req: AuthRequest, res: Response): Promise<void> => {
+export const adminGetContacts = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { status } = req.query as { status?: string };
+    const status = queryText(req.query.status);
     const query: any = {};
     if (status && status !== 'all') {
       query.status = status;
@@ -509,10 +548,22 @@ export const adminGetContacts = async (req: AuthRequest, res: Response): Promise
       company: contact.company,
       service: contact.service,
       budget: contact.budget,
+      // Cuándo quiere empezar y qué plan/nivel/modalidad cotizaba (formulario de /contact).
+      plazo: contact.plazo ?? null,
+      cotizacion: contact.cotizacion ?? null,
       message: contact.message,
       status: contact.status,
       // Origen del lead: 'contact-form' (también los antiguos, sin el campo) o 'demo-rag'.
       source: contact.source ?? 'contact-form',
+      // Prueba de la autorización de datos (Ley 1581), sin el hash de la IP.
+      consentimiento: contact.consentimiento
+        ? {
+            aceptado: contact.consentimiento.aceptado === true,
+            fecha: contact.consentimiento.fecha ?? null,
+            versionPolitica: contact.consentimiento.versionPolitica ?? null,
+          }
+        : null,
+      anonimizado: !!contact.anonimizadoEn,
       createdAt: contact.created_at,
     }));
 
@@ -521,16 +572,22 @@ export const adminGetContacts = async (req: AuthRequest, res: Response): Promise
     console.error('Admin get contacts error:', error);
     res.status(500).json({ success: false, message: 'Error al obtener contactos' });
   }
-};
+});
 
 // Admin - Update contact status
-export const adminUpdateContactStatus = async (req: AuthRequest, res: Response): Promise<void> => {
+export const adminUpdateContactStatus = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { status } = req.body as { status: 'new' | 'read' | 'responded' };
+    const { status } = (req.body ?? {}) as { status?: unknown };
 
-    if (!status) {
-      res.status(400).json({ success: false, message: 'Estado requerido' });
+    if (typeof status !== 'string' || !CONTACT_STATUSES.includes(status)) {
+      res.status(400).json({ success: false, message: 'Estado requerido', validStatuses: CONTACT_STATUSES });
+      return;
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(404).json({ success: false, message: 'Contacto no encontrado' });
+      return;
     }
 
     const contact = await Contact.findByIdAndUpdate(
@@ -541,6 +598,7 @@ export const adminUpdateContactStatus = async (req: AuthRequest, res: Response):
 
     if (!contact) {
       res.status(404).json({ success: false, message: 'Contacto no encontrado' });
+      return;
     }
 
     res.json({
@@ -555,4 +613,4 @@ export const adminUpdateContactStatus = async (req: AuthRequest, res: Response):
     console.error('Admin update contact status error:', error);
     res.status(500).json({ success: false, message: 'Error al actualizar estado' });
   }
-};
+});

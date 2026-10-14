@@ -70,3 +70,8 @@ export function searchFaqs(query: string, docs: FaqDoc[]): SearchHit | null {
   }
   return best && best.score >= 2 ? best : null;
 }
+
+/** ¿La pregunta frecuente se publicó después de cargar los datos de ejemplo (en esta visita)? */
+export function publishedThisVisit(doc: Pick<FaqDoc, 'publishedAt'>, seededAt: string): boolean {
+  return !!doc.publishedAt && doc.publishedAt >= seededAt;
+}

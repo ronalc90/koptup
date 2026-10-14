@@ -7,7 +7,7 @@ export default function LinkedInAdsLayout({ children }: { children: React.ReactN
   const breadcrumbSchema = getBreadcrumbSchema([
     { name: 'Inicio', url: '/' },
     { name: 'Demos', url: '/demo' },
-    { name: 'Generador de Contenido LinkedIn', url: '/demo/linkedin-ads' },
+    { name: 'Generador de contenido para LinkedIn con IA', url: '/demo/linkedin-ads' },
   ]);
 
   return (

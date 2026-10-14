@@ -12,6 +12,22 @@
       "breadcrumbHome": "Inicio",
       "breadcrumbDemos": "Demos"
     },
+    "header": {
+      "back": "Volver al catálogo de demos",
+      "audience": "Para restaurantes, cadenas y comercios con domicilio propio que hoy dependen de los agregadores. Empieza con el recorrido sugerido: haz un pedido como cliente y síguelo hasta la entrega.",
+      "requestDemo": "Solicitar demo guiada",
+      "quote": "Cotizar tu app de domicilios",
+      "howTitle": "Qué es real y qué es simulado",
+      "show": "Ver",
+      "hide": "Ocultar",
+      "how": {
+        "real": "Real en tu navegador: el pedido pasa por las 4 apps con un solo estado; precios, domicilio por distancia, propina, puntos, indicadores, tiempos por etapa, comisión evitada y el CSV se calculan con los pedidos.",
+        "rules": "Reglas, no IA: la sugerencia del repartidor (el más cercano y libre), el orden de las paradas y la revisión de pedidos sospechosos.",
+        "clock": "Reloj de la demo: la jornada de ejemplo es la de hoy y empieza a las 7:05 p. m.; avanza en tiempo real y se adelanta cuando la cocina termina, el repartidor llega a la sede o entrega, para que los tiempos sean realistas.",
+        "simulated": "Simulado: pagos (siempre se aprueban, salvo que actives el rechazo de prueba), WhatsApp, llamada enmascarada, GPS, mapa y posición del repartidor. En tu proyecto se conectan con la pasarela, WhatsApp Business, telefonía y un servicio de mapas.",
+        "storage": "Lo que haces se guarda solo en este navegador; «Reiniciar demo» vuelve a los datos de ejemplo."
+      }
+    },
     "tabs": {
       "label": "Apps de la demo",
       "customer": "Cliente",
@@ -51,9 +67,9 @@
       },
       "next": {
         "order": "Empieza en Cliente: agrega platos al carrito y haz el pedido.",
-        "accept": "Siguiente: en Comercio acepta el pedido {id} antes de que se acaben los 45 s.",
+        "accept": "Siguiente: en Comercio acepta el pedido {id}. La sede tiene 45 s; si se pasan, igual puedes aceptarlo y Operaciones recibe una alerta.",
         "assign": "Siguiente: en Operaciones asigna un repartidor al pedido {id} (Despacho o Alertas).",
-        "deliver": "Siguiente: en Comercio marca el pedido {id} «Listo para recoger»; luego, en Repartidor, acepta la oferta, recógelo y confirma la entrega con el código que ve el cliente.",
+        "deliver": "Siguiente: en Comercio marca el pedido {id} «Listo para recoger» (el reloj se adelanta hasta el fin de la preparación); luego, en Repartidor, acepta la oferta, recógelo y confirma la entrega con el código que ve el cliente.",
         "rate": "Siguiente: en Cliente califica la entrega del pedido {id}."
       },
       "done": "¡Listo! Recorriste el pedido en las 4 apps. En Operaciones mira los tiempos por etapa y la comisión que no pagaste.",
@@ -63,7 +79,7 @@
     },
     "activity": {
       "title": "Actividad entre apps",
-      "hint": "Cada acción en una app se refleja en las demás. El reloj de la demo empezó a las 7:05 p. m. y avanza en tiempo real.",
+      "hint": "Cada acción en una app se refleja en las demás. El reloj de la demo empieza a las 7:05 p. m., avanza en tiempo real y se adelanta cuando la cocina termina, el repartidor llega a la sede o entrega.",
       "clockHint": "Reloj de la demo",
       "empty": "Aquí verás cómo tu pedido pasa de una app a otra.",
       "app": {
@@ -104,7 +120,9 @@
       "driverOffline": "{driver} se desconectó",
       "docUpdated": "Documento actualizado: {doc}",
       "autoOn": "Avance automático activado",
-      "autoOff": "Avance automático desactivado"
+      "autoOff": "Avance automático desactivado",
+      "clockJump": "Reloj de la demo adelantado {min} min: {why, select, prep {terminó la preparación de {id}} toSede {el repartidor llegó a la sede por {id}} other {el repartidor llegó a la dirección de {id}}}",
+      "paymentDeclined": "Pago con {method} rechazado (simulado): no se creó el pedido"
     },
     "common": {
       "back": "Volver",
@@ -121,8 +139,10 @@
       "yours": "Tuyo",
       "yes": "sí",
       "no": "no",
-      "mapHint": "Mapa ilustrativo, no a escala · posición simulada",
-      "mapHintOps": "Mapa ilustrativo de Bogotá, no a escala · posiciones simuladas"
+      "mapHint": "Mapa ilustrativo, no a escala · posición simulada y acelerada",
+      "mapHintOps": "Mapa ilustrativo de Bogotá, no a escala · posiciones simuladas",
+      "closeToast": "Cerrar aviso",
+      "stars": "{n, plural, one {# estrella} other {# estrellas}}"
     },
     "stage": {
       "pending": "Por confirmar",
@@ -362,7 +382,10 @@
       "needBoth": "Para entregar sin código necesitas la foto y la firma.",
       "privacy": "En la demo la foto y la firma no salen de tu navegador; en tu proyecto se guardan como evidencia de la entrega.",
       "confirm": "Confirmar entrega",
-      "done": "Pedido {id} entregado"
+      "done": "Pedido {id} entregado",
+      "doneJump": "Pedido {id} entregado · el reloj de la demo se adelantó {min} min (trayecto)",
+      "modeLabel": "Cómo confirmas la entrega",
+      "alreadyClosed": "El pedido {id} ya se cerró en la operación: no hay nada que confirmar."
     },
     "docs": {
       "title": "Documentos del repartidor",
@@ -416,7 +439,7 @@
         "popular": "Popular",
         "soldOut": "Agotado en esta sede",
         "add": "Agregar {item}",
-        "added": "{item} agregado al carrito",
+        "added": "Agregaste {item} al carrito",
         "myOrders": "Mis pedidos ({n})",
         "viewCart": "Ver carrito · {n} · {total}",
         "pickSede": "Elige la sede",
@@ -481,8 +504,11 @@
           "noSede": "Ninguna sede abierta cubre tu dirección.",
           "soldOut": "Hay productos agotados en la sede: quítalos del carrito.",
           "cash": "El efectivo con el que vas a pagar no alcanza para el total.",
-          "blocked": "Tu cuenta está bloqueada en la demo: desbloquéala en Operaciones."
-        }
+          "blocked": "Tu cuenta está bloqueada en la demo: desbloquéala en Operaciones.",
+          "declined": "El banco rechazó el pago con {method} (simulado): fondos insuficientes. No se creó el pedido ni se cobró nada; vuelve a intentarlo o elige otro medio de pago."
+        },
+        "simulateDecline": "Probar un pago rechazado: el banco rechaza el próximo pago (simulado).",
+        "declinedToast": "Pago rechazado por el banco (simulado). No se creó el pedido: vuelve a intentarlo o elige otro medio."
       },
       "tracking": {
         "title": "Pedido {id}",
@@ -500,7 +526,8 @@
         "sub": {
           "pending": "La sede tiene {s} s para responder.",
           "pendingLate": "La sede no respondió a tiempo: Operaciones ya recibió una alerta.",
-          "preparing": "La {sede} lo prepara en unos {min} min.",
+          "preparing": "La {sede} lo está preparando: listo en unos {min} min.",
+          "preparingLate": "La {sede} ya pasó el tiempo de preparación: está terminando tu pedido.",
           "readyDriver": "Esperando que {driver} lo recoja.",
           "readyNoDriver": "Operaciones está asignando un repartidor.",
           "pickedUp": "{driver} va hacia tu dirección.",
@@ -522,7 +549,8 @@
         "whatsapp": {
           "title": "Vista previa del WhatsApp que recibes",
           "message": "{brand}: tu pedido {id} fue confirmado y llega aprox. a las {time}\nSíguelo aquí: {link}\nCódigo de entrega: {code} (dáselo al repartidor)",
-          "note": "Simulado: no se envía nada. En tu proyecto se envía con WhatsApp Business; el enlace es de ejemplo."
+          "note": "Simulado: no se envía nada. En tu proyecto se envía con WhatsApp Business; el enlace es de ejemplo.",
+          "link": "tu-dominio.com/seguimiento/{id}"
         },
         "rated": "Gracias por calificar",
         "pointsEarned": "Ganaste {n} puntos con este pedido · ahora tienes {balance}.",
@@ -609,7 +637,9 @@
       "analytics": "Ventas de hoy",
       "topItems": "Más vendidos (unidades)",
       "salesByHour": "Ventas por hora",
-      "rating": "Calificación promedio ({n} opiniones)"
+      "rating": "Calificación promedio ({n} opiniones)",
+      "readyToastJump": "{id} listo para recoger · el reloj de la demo se adelantó {min} min (fin de la preparación)",
+      "readyJumpHint": "En la demo, al marcarlo listo el reloj se adelanta {min} min hasta el fin de la preparación elegida."
     },
     "driver": {
       "hello": "Hola, {name}",
@@ -646,6 +676,7 @@
       "pickup": "Recogí el pedido",
       "pickedToast": "{id} recogido: el cliente ya lo ve en camino",
       "waitingSede": "La sede aún lo prepara (faltan ~{min} min). Cuando lo marque listo podrás recogerlo.",
+      "waitingSedeLate": "La sede ya pasó el tiempo de preparación. Cuando lo marque listo podrás recogerlo.",
       "deliverAt": "Entrega a {name}: {address}",
       "collectCash": "Cobra {total} en efectivo.",
       "collectCashChange": "Cobra {total} en efectivo: paga con {with}, lleva {change} de cambio.",
@@ -663,11 +694,14 @@
       "stopDropoff": "Entregar {id} · {place}",
       "recentRatings": "Calificaciones recientes",
       "noRatings": "Todavía sin calificaciones.",
-      "footer": "Ganancias, calificaciones y documentos se calculan con los datos de ejemplo de esta demo."
+      "footer": "Ganancias, calificaciones y documentos se calculan con los datos de ejemplo de esta demo.",
+      "pickedToastJump": "{id} recogido · el reloj de la demo se adelantó {min} min (llegada a la sede)",
+      "pickupJumpHint": "Llegas a la sede en ~{min} min: al recogerlo, el reloj de la demo se adelanta.",
+      "deliverJumpHint": "El trayecto toma ~{min} min: al confirmar la entrega, el reloj de la demo se adelanta."
     },
     "ops": {
       "title": "Centro de operaciones · {brand}",
-      "subtitle": "Jornada de ejemplo del {date} · reloj de la demo {time}",
+      "subtitle": "Jornada de ejemplo de hoy ({date}) · reloj de la demo {time}",
       "exportCsv": "Exportar pedidos (CSV)",
       "csvToast": "CSV descargado con {n} pedidos",
       "kpis": {
@@ -836,7 +870,8 @@
         "payment": "medio_pago",
         "driver": "repartidor",
         "rating": "calificacion"
-      }
+      },
+      "csvFile": "pedidos-fogon-demo-{date}.csv"
     }
   }
 }

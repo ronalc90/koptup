@@ -8,6 +8,7 @@ import {
   CubeIcon,
   DocumentTextIcon,
   HomeIcon,
+  MapIcon,
   PaperAirplaneIcon,
   PhotoIcon,
   ShieldCheckIcon,
@@ -16,6 +17,7 @@ import { COMPANY } from '../lib/seed';
 import { useCms } from '../lib/store';
 import type { ViewId } from '../lib/types';
 import ApiView from './ApiView';
+import { BackToCatalog, CommercialLinks } from './Commercial';
 import Dashboard from './Dashboard';
 import EntriesView from './EntriesView';
 import EntryEditor from './EntryEditor';
@@ -42,16 +44,19 @@ function SampleBar() {
   const [confirm, setConfirm] = useState(false);
   return (
     <div className="px-4 sm:px-6 py-3 bg-white/90 dark:bg-slate-900/90 border-b border-slate-200 dark:border-slate-800">
+      <BackToCatalog />
       <div className="flex flex-wrap items-start gap-x-6 gap-y-3">
-        <div className="min-w-0 flex-1 basis-full lg:basis-auto">
+        <div className="min-w-0 flex-1 basis-full lg:basis-0">
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">{t('title')}</h1>
             <span title={t('sampleHint')} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200 border border-amber-200 dark:border-amber-900">
               {t('sample')}
+              <span className="sr-only">: {t('sampleHint')}</span>
             </span>
           </div>
-          <p className="text-sm text-slate-600 dark:text-slate-300 mt-0.5">{t('subtitle')}</p>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{t('company', { name: COMPANY.name })}</p>
+          <p className="text-sm text-slate-700 dark:text-slate-200 mt-0.5">{t('subtitle')}</p>
+          <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">{t('audience')}</p>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">{t('company', { name: COMPANY.name })}</p>
         </div>
         <div className="flex flex-wrap items-end gap-2">
           <div>
@@ -76,10 +81,19 @@ function SampleBar() {
             </select>
           </div>
           <button type="button" onClick={() => setConfirm(true)} className={btn.outline}>
-            <ArrowPathIcon className="w-4 h-4" />
+            <ArrowPathIcon className="w-4 h-4" aria-hidden="true" />
             {t('reset')}
           </button>
         </div>
+      </div>
+      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+        <p className="flex min-w-0 flex-1 basis-72 items-start gap-1.5 text-xs text-slate-700 dark:text-slate-300">
+          <MapIcon className="w-4 h-4 shrink-0 text-pink-600 dark:text-pink-400" aria-hidden="true" />
+          <span>{t('start')}</span>
+        </p>
+        <nav aria-label={t('ctaLabel')}>
+          <CommercialLinks />
+        </nav>
       </div>
       {!storageOk && (
         <div className="mt-2">
@@ -132,6 +146,13 @@ function Nav() {
   const { view, go } = useCms();
   const badges = useBadges();
   const active = (id: ViewId) => view === id || (id === 'entries' && view === 'editor');
+  // La sección activa lleva al contenido (útil en el celular, donde el menú queda arriba).
+  const open = (id: Exclude<ViewId, 'editor'>) => {
+    if (view !== id) return go(id);
+    const main = document.getElementById('cms-main');
+    main?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    main?.focus({ preventScroll: true });
+  };
   return (
     <>
       <aside className="hidden md:block md:w-56 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
@@ -140,13 +161,13 @@ function Nav() {
             <button
               key={id}
               type="button"
-              onClick={() => go(id)}
+              onClick={() => open(id)}
               aria-current={active(id) ? 'page' : undefined}
               className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 active(id) ? 'bg-pink-100 dark:bg-pink-900/30 text-pink-800 dark:text-pink-200' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
-              <Icon className="w-5 h-5 shrink-0" />
+              <Icon className="w-5 h-5 shrink-0" aria-hidden="true" />
               <span className="flex-1 text-left leading-snug">{t(id)}</span>
               {!!badges[id] && <span className="text-[11px] font-semibold px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">{badges[id]}</span>}
             </button>
@@ -158,13 +179,13 @@ function Nav() {
           <button
             key={id}
             type="button"
-            onClick={() => go(id)}
+            onClick={() => open(id)}
             aria-current={active(id) ? 'page' : undefined}
             className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${
               active(id) ? 'bg-pink-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200'
             }`}
           >
-            <Icon className="w-4 h-4" />
+            <Icon className="w-4 h-4" aria-hidden="true" />
             {t(id)}
           </button>
         ))}
@@ -180,7 +201,7 @@ export default function Shell() {
       <SampleBar />
       <div className="md:flex">
         <Nav />
-        <main className="flex-1 min-w-0 p-3 sm:p-6">
+        <main id="cms-main" tabIndex={-1} className="flex-1 min-w-0 p-3 sm:p-6 scroll-mt-20 focus:outline-none">
           {view === 'home' && <Dashboard />}
           {view === 'entries' && <EntriesView />}
           {view === 'editor' && editingId && <EntryEditor key={editingId} id={editingId} />}

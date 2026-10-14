@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { AuthRequest } from '../types';
-import { isStaffRole } from '../middleware/access';
+import { isStaffSession } from '../middleware/access';
 import Deliverable from '../models/Deliverable';
 import Project from '../models/Project';
 import User from '../models/User';
@@ -76,8 +76,8 @@ export const getDeliverableById = async (req: AuthRequest, res: Response) => {
       return;
     }
 
-    // Dueño del recurso o staff.
-    if (String(deliverable.userId) !== String(userId) && !isStaffRole(req.user?.role)) {
+    // Dueño del recurso o staff (rol vigente en la BD).
+    if (String(deliverable.userId) !== String(userId) && !(await isStaffSession(req))) {
       res.status(403).json({ success: false, message: 'No tienes permiso para ver este entregable' });
       return;
     }
@@ -197,8 +197,8 @@ export const approveDeliverable = async (req: AuthRequest, res: Response) => {
       return;
     }
 
-    // Dueño del recurso (el cliente) o staff.
-    if (deliverable.userId.toString() !== userId.toString() && !isStaffRole(user.role)) {
+    // Dueño del recurso (el cliente) o staff (rol vigente en la BD).
+    if (deliverable.userId.toString() !== userId.toString() && !(await isStaffSession(req))) {
       res.status(403).json({ success: false, message: 'No tienes permiso para revisar este entregable' });
       return;
     }
@@ -246,8 +246,8 @@ export const rejectDeliverable = async (req: AuthRequest, res: Response) => {
       return;
     }
 
-    // Dueño del recurso (el cliente) o staff.
-    if (deliverable.userId.toString() !== userId.toString() && !isStaffRole(user.role)) {
+    // Dueño del recurso (el cliente) o staff (rol vigente en la BD).
+    if (deliverable.userId.toString() !== userId.toString() && !(await isStaffSession(req))) {
       res.status(403).json({ success: false, message: 'No tienes permiso para revisar este entregable' });
       return;
     }

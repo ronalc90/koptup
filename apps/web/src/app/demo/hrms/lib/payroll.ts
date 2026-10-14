@@ -62,6 +62,22 @@ export function currentPeriod(base: ISODate): Period {
   return { id: `${month}-Q2`, kind: 'Q2', from: `${month}-16`, to, days: 15, payDate: to, month };
 }
 
+/** Quincena a partir de su identificador (AAAA-MM-Q1 | AAAA-MM-Q2). */
+export function periodFromId(id: string): Period {
+  const month = id.slice(0, 7);
+  return currentPeriod(id.endsWith('-Q2') ? `${month}-16` : `${month}-01`);
+}
+
+/** Quincena siguiente: la 2.ª del mismo mes o la 1.ª del mes siguiente. */
+export function nextPeriod(p: Period): Period {
+  return currentPeriod(addDays(p.to, 1));
+}
+
+/** Quincena anterior: la 1.ª del mismo mes o la 2.ª del mes anterior. */
+export function previousPeriod(p: Period): Period {
+  return currentPeriod(addDays(p.from, -1));
+}
+
 export function previousMonth(base: ISODate): string {
   const d = parseISO(`${base.slice(0, 7)}-01`);
   d.setUTCDate(0);

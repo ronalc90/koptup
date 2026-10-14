@@ -1,32 +1,39 @@
-version: '3.8'
+# MongoDB 7 y Redis 7 para desarrollo local (no es un despliegue).
+#
+#   npm run docker:up     # o: docker compose -f docker-compose.dev.yml up -d
+#   npm run docker:down
+#
+# Sin usuario ni contraseña y publicados solo en 127.0.0.1: nadie fuera de tu
+# computador puede conectarse. Con esto, los valores de apps/backend/.env.example
+# funcionan tal cual: MONGODB_URI=mongodb://localhost:27017/koptup_db y
+# REDIS_URL=redis://localhost:6379. Los datos quedan en volúmenes de Docker
+# (`docker compose -f docker-compose.dev.yml down -v` los borra).
+#
+# La web y el backend no corren en Docker: se despliegan con Vercel y Railway
+# (Nixpacks) y en local con `npm run dev` (ver SETUP.md).
+name: koptup-dev
 
 services:
-  # MongoDB Database
   mongo:
     image: mongo:7
     container_name: koptup-mongo
     restart: unless-stopped
     ports:
-      - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-mongo}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-changeme}
-      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE:-koptup}
+      - "127.0.0.1:27017:27017"
     volumes:
       - mongo_data:/data/db
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  # Redis Cache
   redis:
     image: redis:7-alpine
     container_name: koptup-redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     volumes:
       - redis_data:/data
     healthcheck:

@@ -1,6 +1,6 @@
 # Estado del trabajo y próximos pasos
 
-> Corte: 8 de octubre de 2026. El trabajo se pausó a pedido del dueño y continúa el martes. Esta página resume qué quedó integrado en `main`, qué falta y qué tiene que hacer el dueño.
+> Corte: 14 de octubre de 2026. El trabajo se pausó a pedido del dueño y continúa el martes. Esta página resume qué está en `main`, qué avanzó en la rama de trabajo `ccr-55ceecf7-dpc10i`, qué falta y qué tiene que hacer el dueño.
 
 ## Qué quedó en `main`
 
@@ -35,19 +35,44 @@ Valores iniciales: con solicitud → voice-ai, erp, delivery, hrms, lms, telemed
 
 chatbot, cuentas-medicas, sistema-experto, crm-ia, linkedin-ads, erp, pos, code-review-ia, helpdesk-ia, voice-ai, ecommerce, facturacion-electronica, hrms, loyalty, telemedicina, control-proyectos, delivery, dashboard-ejecutivo, lms, scraping, gestor-contenido.
 
+## Avance en la rama de trabajo (`ccr-55ceecf7-dpc10i`, todavía no en `main`)
+
+Se trabajó en dos pistas en paralelo. Cada paso tiene un implementador y un revisor adversarial que lo verifica antes de hacer commit.
+
+| Paso | Estado |
+|---|---|
+| Revisión de seguridad de las rutas heredadas | ✅ Revisado y con commit |
+| Privacidad y Ley 1581: Admin › Privacidad (exportar y suprimir los datos de una persona), plazo de conservación, autorización en el formulario de contacto, chatbot guardado en MongoDB, política de privacidad, cookies y términos reescritos | ✅ Revisado y con commit |
+| Sitio público: embudo RAG, SEO, contenido verificable e inglés completo | ✅ Revisado y con commit |
+| Operación: variables, monitoreo programado, CI de seguridad, errores uniformes y código sin uso eliminado | ✅ Revisado y con commit |
+| Portal del cliente y panel (facturas, entregables, pedidos, mensajes, usuarios, bitácora, sesiones) | ⏪ Revertido; pendiente de rehacer (el avance queda en el historial, commit `df42e67`). Para publicar solo se corrigió «Nuevo pedido», que ahora envía el pedido a la API configurada |
+| **Producto RAG (chatbot) verificado de punta a punta:** demo en sus 3 modos, "Prueba con tu documento", widget insertable, backend (bots en MongoDB, cupos, idioma), landings `/rag`, planes con textos verdaderos y pruebas (Jest backend 313/313, web 773/773 y la suite e2e completa, 212 pruebas, en verde dos veces seguidas contra las builds de producción) | ✅ Revisado y con commit (14 de octubre) |
+| Las 28 demos funcionales, honestas y claras (implementación) | ✅ Las 28 con commit |
+| Revisión adversarial de cada demo | 🟡 9 terminadas (chatbot, hrms, crm-ia, lms, erp, facturacion-electronica, pos, delivery, voice-ai). La de loyalty, gestor-contenido y dashboard-ejecutivo se revirtió (commit `2a15395`) y queda pendiente, igual que las otras 16 |
+| Flujo de compra (backend de la fase P7) | 🔒 Incluido pero apagado: `COMMERCE_ENABLED=false` por defecto. Sus rutas responden 404, su job no corre y ningún formulario ni acceso escribe leads ([Operación y despliegue › 4.3](Doc-11-Operacion-y-Despliegue.md#43-backend-railway)) |
+| Build del backend en Railway | ✅ Arreglado (`apps/backend/railway.json` instala lo necesario para compilar); mientras llega a `main`, el comando va configurado a mano en Railway |
+
+El historial de la rama trae los commits marcados `wip` y "NO FUSIONAR" (`ae60766`, `a897181`, `02fe0fa`, `df42e67` y `e2f8099`), pero su contenido ya no queda a medias en el código: las demos que traían se terminaron y revisaron en commits posteriores, el portal y el panel (`14658b7`) y la revisión a medias de 3 demos (`2a15395`) se revirtieron, y el flujo de compra quedó apagado con `COMMERCE_ENABLED`.
+
 ## Qué falta (martes)
 
-1. **Flujo de compra** (fases P7–P9): pipeline de leads, "Solicitar propuesta", propuestas con página pública para aceptarlas, anticipo (enlace de pago, transferencia o Wompi con claves) y conversión a proyecto y cliente. Hay avance sin revisar guardado en la rama `ccr-55ceecf7-dpc10i` (commit marcado `wip`); no está en `main`.
-2. **7 demos por revisar:** saas-boilerplate, sistema-reservas y wms-logistica (con avance guardado en el mismo commit `wip`); firma-electronica, gestor-documentos, automatizacion y moderacion-contenido (sin empezar).
-3. **Pendientes reportados por las fases:** escapar el HTML de los datos del formulario en el correo al admin; quitar la ruta pública `/test`; corregir cifras del README y el `docker-compose.yml`, que apunta a un `Dockerfile` del backend que no existe; error de `/api/expert/generar-excel` cuando la IA no devuelve procedimientos; permisos de la configuración del sistema experto para prospectos con acceso; achicar la lista de errores de hidratación conocidos.
-4. **Repaso de honestidad en todo el sitio:** textos del catálogo de "Otras soluciones a medida" (modalidad SaaS solo donde haya base real), `/about`, `/bienvenido-producthunt`, `/desarrollo-web-colombia`.
-5. **Diseño y animaciones:** investigación de motion design, sistema de movimiento, animación protagonista que explique RAG, microinteracciones, easter eggs (paleta Ctrl+K, código Konami, mensaje en consola, 404 ingeniosa) y revisión adversarial con video y medición de fluidez.
-6. Verificación final completa, actualización de la wiki, PR y merge.
+1. **Rehacer y revisar el portal del cliente y el panel** (el avance revertido está en el commit `df42e67` del 10 de octubre).
+2. **Flujo de compra** (fases P7–P9): pipeline de leads, "Solicitar propuesta", propuestas con página pública para aceptarlas, anticipo (enlace de pago, transferencia o Wompi con claves) y conversión a proyecto y cliente. El backend está incluido pero apagado (`COMMERCE_ENABLED=false` por defecto: sus rutas responden 404); falta revisarlo, hacer el frontend (P8) y sus pruebas de punta a punta (P9) antes de encenderlo.
+3. **Demos:** terminar la revisión adversarial de 19 demos (telemedicina, helpdesk-ia, cuentas-medicas, sistema-experto, linkedin-ads, ecommerce, loyalty, gestor-contenido, dashboard-ejecutivo, control-proyectos, scraping, code-review-ia, sistema-reservas, saas-boilerplate, firma-electronica, wms-logistica, gestor-documentos, automatizacion, moderacion-contenido); catálogo honesto (tarjetas del hub, páginas de producto y un solo nombre por demo); sonda final en las 28.
+4. **Pendientes reportados por las fases:** ninguno abierto. (Los permisos de la configuración del sistema experto, la lista de errores de hidratación conocidos —hoy vacía—, las cifras del README, el `docker-compose.yml` roto y el error de `/api/expert/generar-excel` sin procedimientos ya están corregidos en la rama de trabajo.)
+5. **Repaso de honestidad en todo el sitio:** quedan los textos del catálogo de "Otras soluciones a medida" (modalidad SaaS solo donde haya base real). `/about`, `/bienvenido-producthunt`, `/desarrollo-web-colombia`, las landings, el pie, el JSON-LD y `llms.txt` ya solo dicen lo que se puede comprobar; los datos que debe aportar el dueño están en [Páginas públicas › Limitaciones conocidas](Doc-03-Paginas-Publicas.md#16-limitaciones-conocidas).
+6. **Diseño y animaciones:** investigación de motion design, sistema de movimiento, animación protagonista que explique RAG, microinteracciones, easter eggs (paleta Ctrl+K, código Konami, mensaje en consola, 404 ingeniosa) y revisión adversarial con video y medición de fluidez.
+7. **Correcciones pendientes:** al documentar el sitio y dibujar sus diagramas contra el código y al recorrer las 28 demos aparecieron más de 200 puntos. Sin repetir y sin contar los detalles de cada demo, los que quedan están ordenados de P0 a P3 en [Correcciones pendientes](16-Correcciones-Pendientes.md) (la página lleva el conteo al día). Los más urgentes, además de volver a levantar el backend, son estos:
+   - no se pueden crear facturas, entregables ni conversaciones.
+8. Crítico de completitud, verificación final completa, actualización de la wiki, PR y merge.
 
 ## Acciones del dueño
 
+- **🔴 Backend de producción caído:** la URL configurada (`koptupbackend-production.up.railway.app`) responde "Application not found" de Railway, es decir, no hay ningún servicio en ese dominio. La web funciona, pero todo lo que necesita el backend falla: formulario de contacto, inicio de sesión y panel admin, solicitudes de demo, respuestas reales del chatbot y "Prueba con tu documento". Hay que revisar en Railway si el servicio se borró, se pausó por facturación o cambió de dominio, volver a desplegarlo desde `main` con sus variables y, si cambia el dominio, actualizar `NEXT_PUBLIC_API_URL` en Vercel y redesplegar la web.
 - **Urgente:** cambiar en Railway la contraseña de MongoDB de producción y los secretos `JWT_SECRET` y `JWT_REFRESH_SECRET`. Estuvieron en archivos del repositorio público; ya se quitaron, pero siguen en el historial.
-- **Variables del backend (Railway):** `JWT_REFRESH_SECRET` (necesaria para iniciar sesión), `ADMIN_EMAIL` (cuenta que se asegura como admin al arrancar), `FRONTEND_URL=https://www.koptup.com` (enlaces de los correos), `SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/`SMTP_PASS`/`EMAIL_FROM` (correos automáticos), `REDIS_URL` (límites y topes de gasto), `OPENAI_API_KEY`, y para encender la demo con documento propio `DEMO_UPLOAD_ENABLED=true`. Lista completa en el `README.md`.
+- **Variables del backend (Railway):** `JWT_REFRESH_SECRET` (necesaria para iniciar sesión), `ADMIN_EMAIL` (destino de los avisos al equipo y primer admin si no hay ninguno), `FRONTEND_URL=https://www.koptup.com` (enlaces de los correos), `SMTP_USER`/`SMTP_PASS` (sin ellas no sale ningún correo; `SMTP_HOST`, `SMTP_PORT` y `EMAIL_FROM` si no usas Gmail), `REDIS_URL` (límites y topes de gasto), `OPENAI_API_KEY`, `INTERNAL_API_KEY` (igual en Vercel) y, para encender la demo con documento propio, `DEMO_UPLOAD_ENABLED=true`. Al arrancar, el log avisa cuáles faltan. Lista completa en [Operación y despliegue › 4](Doc-11-Operacion-y-Despliegue.md#4-variables-de-entorno).
 - **Variables de la web (Vercel), opcionales:** `NEXT_PUBLIC_GA_ID`, `NEXT_PUBLIC_GOOGLE_ADS_ID`, `NEXT_PUBLIC_LINKEDIN_PARTNER_ID` (redesplegar después de crearlas).
-- **Wiki de GitHub:** activarla en Settings › Features › Wikis y crear una primera página; luego re-ejecutar el workflow "Publicar wiki".
+- **Wiki de GitHub:** ✅ activada. Cada cambio en `docs/wiki/` se publica solo con el workflow "Publicar wiki".
+- **Plataformas (GitHub, Vercel, Railway):** proteger `main` con CI obligatorio y que Railway espere a CI; dejar un solo proyecto de Vercel (`koptup`, el que tiene el dominio); montar un volumen en Railway para los archivos subidos; crear la variable `BACKEND_HEALTH_URL` para que el monitoreo revise también la API; y revisar las alertas de dependencias antes del 31 de diciembre de 2026. Paso a paso en [Operación y despliegue › Acciones pendientes del dueño](Doc-11-Operacion-y-Despliegue.md#10-acciones-pendientes-del-dueño).
+- **Privacidad (Ley 1581):** que un abogado revise `/privacy`, `/cookies` y `/terms` (hoy describen lo que hace el sistema, pero nadie los ha revisado legalmente); poner la razón social, el NIT y confirmar la dirección del responsable; confirmar en qué proveedor y país están MongoDB y Redis de producción para completar la sección de transferencias internacionales; validar el plazo de conservación de 24 meses (`DATA_RETENTION_MONTHS`) y cambiar `PRIVACY_POLICY_VERSION` cada vez que cambie la política. Detalle en [SEO, analítica y legal › 4](Doc-12-SEO-Analitica-y-Legal.md#4-legal).
 - **Pagos:** decidir la pasarela (Wompi, PayU o Stripe) para el cobro del anticipo en línea.

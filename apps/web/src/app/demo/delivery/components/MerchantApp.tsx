@@ -10,7 +10,7 @@ import { BRAND, MENU, SEDES } from './data';
 import { ACCEPT_WINDOW_S, computeKpis, fmtHour, fmtNum, fmtTime, salesByHour, topItems } from './engine';
 import type { Order, SedeId } from './types';
 import { Kpi, Modal, PhoneFrame, Stars, useMoney } from './ui';
-import { useDelivery } from './store';
+import { useDelivery, clockJumpMinutes } from './store';
 
 const PREP_OPTIONS = [15, 20, 30];
 export const REJECT_REASONS = ['soldOut', 'busy', 'outOfArea', 'closing'] as const;
@@ -98,20 +98,23 @@ export default function MerchantApp() {
           </button>
         </div>
 
-        <div className="grid grid-cols-3 gap-1 rounded-xl bg-secondary-200 p-1 dark:bg-secondary-800" role="tablist" aria-label={t('merchant.sedePicker')}>
+        <div className="grid grid-cols-3 gap-1 rounded-xl bg-secondary-200 p-1 dark:bg-secondary-800" role="group" aria-label={t('merchant.sedePicker')}>
           {SEDES.map((s) => {
             const n = state.orders.filter((o) => o.sedeId === s.id && o.stage === 'pending').length;
             return (
               <button
                 key={s.id}
                 type="button"
-                role="tab"
-                aria-selected={sedeId === s.id}
+                aria-pressed={sedeId === s.id}
                 onClick={() => dispatch({ type: 'set', patch: { merchantSede: s.id as SedeId } })}
                 className={`relative rounded-lg px-1 py-1.5 text-[11px] font-semibold ${sedeId === s.id ? 'bg-white text-secondary-900 shadow dark:bg-secondary-900 dark:text-white' : 'text-secondary-600 dark:text-secondary-300'}`}
               >
-                {t(`sedes.${s.id}`).replace(/^Sede\s/, '')}
-                {n > 0 && <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[9px] text-white">{n}</span>}
+                {t(`zones.${s.zone}`)}
+                {n > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-600 px-1 text-[9px] text-white">
+                    {n}<span className="sr-only"> · {t('tabs.count.merchant', { n })}</span>
+                  </span>
+                )}
               </button>
             );
           })}
@@ -151,7 +154,7 @@ export default function MerchantApp() {
                   <p className="mt-0.5 text-secondary-500 dark:text-secondary-400">{o.customer.name} · {money(o.pricing.total)} · {t(`payments.${o.payment}.name`)}</p>
                   <div className="mt-2 flex items-center gap-1.5">
                     <label className="sr-only" htmlFor={`prep-${o.id}`}>{t('merchant.prepTime')}</label>
-                    <select id={`prep-${o.id}`} value={p} onChange={(e) => setPrep((x) => ({ ...x, [o.id]: parseInt(e.target.value, 10) }))} className="rounded-lg border border-secondary-300 bg-white px-1 py-1 text-[11px] dark:border-secondary-600 dark:bg-secondary-900">
+                    <select id={`prep-${o.id}`} value={p} onChange={(e) => setPrep((x) => ({ ...x, [o.id]: parseInt(e.target.value, 10) }))} className="shrink-0 rounded-lg border border-secondary-300 bg-white py-1 pl-2 pr-7 text-[11px] dark:border-secondary-600 dark:bg-secondary-900">
                       {PREP_OPTIONS.map((m) => <option key={m} value={m}>{t('merchant.prepOption', { min: m })}</option>)}
                     </select>
                     <Button size="sm" variant="outline" className="flex-1 !px-2" onClick={() => { setReason('soldOut'); setRejecting(o); }}>{t('merchant.reject')}</Button>
@@ -170,6 +173,7 @@ export default function MerchantApp() {
             {preparing.map((o) => {
               const elapsed = Math.floor((state.now - (o.t.accepted ?? o.t.created)) / 60);
               const late = elapsed > (o.prepMin ?? 15);
+              const jump = clockJumpMinutes(state, 'ready', o.id);
               return (
                 <div key={o.id} className="rounded-lg border border-secondary-200 bg-white p-2 text-xs dark:border-secondary-700 dark:bg-secondary-800">
                   <div className="flex items-center justify-between gap-2">
@@ -179,9 +183,18 @@ export default function MerchantApp() {
                   <p className="mt-0.5 text-secondary-500 dark:text-secondary-400">
                     {o.driverId ? (o.driverStatus === 'accepted' ? t('merchant.driverComing', { driver: driverName(o) }) : t('merchant.driverOffered', { driver: driverName(o) })) : t('merchant.noDriver')}
                   </p>
-                  <Button size="sm" fullWidth className="mt-2" onClick={() => { dispatch({ type: 'ready', id: o.id }); notify(t('merchant.readyToast', { id: o.id })); }}>
+                  <Button
+                    size="sm"
+                    fullWidth
+                    className="mt-2"
+                    onClick={() => {
+                      dispatch({ type: 'ready', id: o.id });
+                      notify(jump > 0 ? t('merchant.readyToastJump', { id: o.id, min: jump }) : t('merchant.readyToast', { id: o.id }));
+                    }}
+                  >
                     <CheckCircleIcon className="mr-1 h-4 w-4" />{t('merchant.markReady')}
                   </Button>
+                  {jump > 0 && <p className="mt-1 text-[10px] text-secondary-600 dark:text-secondary-400">{t('merchant.readyJumpHint', { min: jump })}</p>}
                 </div>
               );
             })}

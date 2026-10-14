@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { ArrowUturnLeftIcon, CheckIcon, PencilSquareIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import Button from '@/components/ui/Button';
@@ -45,8 +45,16 @@ export default function TarjetaGlosa({ glosa, procedimiento, propuesto, maximo, 
   const [valor, setValor] = useState(String(glosa.valorGlosado));
   const [nota, setNota] = useState('');
   const [aviso, setAviso] = useState('');
+  const campoValor = useRef<HTMLInputElement>(null);
+  const campoNota = useRef<HTMLTextAreaElement>(null);
 
-  const etiquetas = { prestador: t('entities.provider'), pagador: t('entities.payer') };
+  // Al abrir el formulario, el foco va al primer campo.
+  useEffect(() => {
+    if (modo === 'ajustar') campoValor.current?.focus();
+    else if (modo === 'descartar') campoNota.current?.focus();
+  }, [modo]);
+
+  const etiquetas = { prestador: t('entities.provider'), pagador: t('entities.payer'), nit: t('entities.nit') };
   const decision = decisionDeGlosa(glosa, propuesto);
   const claveTipo = CLAVE_TIPO_GLOSA[glosa.tipo];
 
@@ -109,7 +117,7 @@ export default function TarjetaGlosa({ glosa, procedimiento, propuesto, maximo, 
           )}
           {glosa.descripcion && (
             <details className="mt-2 text-xs text-gray-600 dark:text-gray-400">
-              <summary className="cursor-pointer select-none">{t('denials.engineText')}</summary>
+              <summary className="cursor-pointer select-none rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">{t('denials.engineText')}</summary>
               <p className="mt-1 font-mono">{anonimizarTexto(glosa.descripcion, etiquetas)}</p>
             </details>
           )}
@@ -127,11 +135,17 @@ export default function TarjetaGlosa({ glosa, procedimiento, propuesto, maximo, 
       </div>
 
       {modo && (
-        <div className="mt-4 space-y-3 rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900">
+        <div
+          className="mt-4 space-y-3 rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900"
+          onKeyDown={(e) => {
+            if (e.key === 'Escape' && !ocupado) setModo(null);
+          }}
+        >
           {modo === 'ajustar' && (
             <label htmlFor={idValor} className="block text-sm font-medium text-gray-800 dark:text-gray-200">
               {t('denials.newValue')}
               <input
+                ref={campoValor}
                 id={idValor}
                 type="number"
                 inputMode="numeric"
@@ -145,13 +159,15 @@ export default function TarjetaGlosa({ glosa, procedimiento, propuesto, maximo, 
             </label>
           )}
           <label htmlFor={idNota} className="block text-sm font-medium text-gray-800 dark:text-gray-200">
-            {t('denials.note')}
+            {modo === 'descartar' ? t('denials.noteMandatory') : t('denials.noteOptional')}
             <textarea
+              ref={campoNota}
               id={idNota}
               value={nota}
               onChange={(e) => setNota(e.target.value)}
               rows={2}
               maxLength={500}
+              required={modo === 'descartar'}
               placeholder={t('denials.notePlaceholder')}
               className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
             />

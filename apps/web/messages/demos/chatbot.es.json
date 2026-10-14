@@ -1,8 +1,8 @@
 {
   "demoChatbot": {
     "pageTitle": "Demo RAG: IA que responde con documentos",
-    "pageSubtitle": "Busca en los documentos cargados, responde con un modelo de OpenAI y cita la fuente. Si la respuesta no está, te lo dice.",
-    "sampleDataBadge": "Datos de ejemplo",
+    "pageSubtitle": "Para empresas que quieren un asistente que responda con sus propios documentos (políticas, manuales, contratos). Busca en ellos, responde con IA y cita la fuente; si la respuesta no está, te lo dice.",
+    "sampleDataBadge": "Empresas de ejemplo",
     "sampleDataTooltip": "Las empresas y sus documentos son ficticios. Las respuestas sí las genera el servidor real de la demo.",
     "modes": {
       "ariaLabel": "Modos de la demo",
@@ -11,13 +11,13 @@
       "upload": "Prueba con tu documento",
       "uploadHint": "Sube tu PDF, DOCX o TXT y pregúntale: cada respuesta cita la fuente",
       "builder": "Configura el tuyo",
-      "builderHint": "Crea tu bot, súbele textos y llévalo a tu sitio con el código"
+      "builderHint": "Crea tu bot, súbele documentos y llévalo a tu sitio con el código"
     },
     "topBar": {
       "company": "Empresa de ejemplo",
       "companyTooltip": "Cambia la base de conocimiento: cada empresa ficticia tiene sus propios documentos y preguntas sugeridas.",
-      "model": "Modelo",
-      "modelTooltip": "Modelo de OpenAI que redacta la respuesta con los fragmentos encontrados. El servidor solo acepta estos tres.",
+      "model": "Modelo de IA",
+      "modelTooltip": "Modelo de OpenAI que redacta la respuesta con los fragmentos encontrados. Puedes dejar el recomendado; el servidor solo acepta estos tres.",
       "askSample": "Pregunta de ejemplo",
       "askSampleTooltip": "Envía la siguiente pregunta sugerida de la empresa elegida.",
       "device": {
@@ -27,7 +27,8 @@
         "switchToDesktop": "Ver en escritorio",
         "switchToMobile": "Ver en un teléfono",
         "mobileFrameLabel": "Así se ve en un teléfono"
-      }
+      },
+      "showTour": "Ver recorrido"
     },
     "models": {
       "providerRequires": "requiere clave de API",
@@ -38,7 +39,9 @@
       "extractiveMode": "Modo extractivo (sin clave de IA)",
       "extractiveModeTooltip": "El servidor no tiene clave de OpenAI: el asistente muestra los fragmentos encontrados, con su cita, sin redactar una respuesta.",
       "offline": "Servidor no disponible",
-      "offlineTooltip": "No pudimos conectar con el servidor de la demo. Revisa tu conexión e inténtalo de nuevo.",
+      "offlineTooltip": "No pudimos conectar con el servidor de la demo: puede ser tu conexión o que el servidor no esté disponible. Inténtalo de nuevo en unos minutos.",
+      "rateLimited": "Pausa por muchas consultas",
+      "rateLimitedTooltip": "Desde tu red llegaron muchas consultas seguidas y el servidor pidió una pausa. La demo vuelve a intentarlo sola en unos segundos; si sigue así, espera un minuto y recarga la página.",
       "degraded": "IA sin respuesta: modo extractivo",
       "degradedTooltip": "El servidor tiene clave de OpenAI, pero la última llamada al proveedor falló. Se muestran los fragmentos encontrados, con su cita."
     },
@@ -51,10 +54,18 @@
       "subtitle": "Esto es lo único que consulta el asistente. Haz clic en un documento para leerlo completo.",
       "preparing": "Indexando los documentos en el servidor…",
       "ready": "{count, plural, one {# documento indexado} other {# documentos indexados}} en el servidor",
-      "error": "No pudimos indexar los documentos. Revisa tu conexión.",
       "retry": "Reintentar",
       "sections": "{count, plural, one {# sección} other {# secciones}}",
-      "open": "Ver documento"
+      "open": "Ver documento",
+      "checking": "Revisando si ya están indexados…",
+      "idle": "{count, plural, one {# documento de ejemplo} other {# documentos de ejemplo}}: se preparan en el servidor con tu primera pregunta.",
+      "errors": {
+        "rateLimited": "Desde tu red se crearon muchos asistentes en la última hora y el servidor pausó la creación de nuevos. Intenta de nuevo más tarde (el límite se renueva cada hora) o prueba con tu documento.",
+        "capacity": "La demo llegó a su capacidad de asistentes en este momento. Intenta de nuevo más tarde o prueba con tu documento.",
+        "unavailable": "El chatbot no está disponible en este momento. Intenta de nuevo en unos minutos.",
+        "network": "No pudimos conectar con el servidor de la demo. Revisa tu conexión e inténtalo de nuevo.",
+        "generic": "No pudimos indexar los documentos. Inténtalo de nuevo."
+      }
     },
     "included": {
       "title": "Qué incluye hoy",
@@ -65,15 +76,15 @@
       "items": {
         "ingest": {
           "title": "Carga de documentos",
-          "summary": "Texto, PDF, DOCX y TXT según el modo de la demo.",
+          "summary": "Texto, PDF, DOCX, TXT y páginas web, según el modo de la demo.",
           "items": [
-            "Aquí: los documentos de la empresa ficticia se suben como texto al servidor al elegirla.",
+            "Aquí: con la primera pregunta, los documentos de la empresa ficticia se envían como texto al servidor, que los indexa una sola vez y reutiliza ese índice con todos los visitantes.",
             "«Prueba con tu documento»: PDF (con número de página), DOCX y TXT de hasta 5 MB y 30 páginas.",
-            "«Configura el tuyo»: archivos de texto (TXT, MD o CSV) para tu bot."
+            "«Configura el tuyo»: TXT, MD, CSV, PDF o DOCX de hasta 2 MB, y páginas web públicas, para tu bot."
           ]
         },
         "chunking": {
-          "title": "Fragmentación",
+          "title": "División en fragmentos",
           "summary": "Cada documento se parte por párrafos.",
           "items": [
             "Los párrafos de hasta unos 800 caracteres quedan como un fragmento.",
@@ -118,11 +129,16 @@
           "title": "Historial de conversaciones",
           "summary": "Preguntas, respuestas y fuentes de tu bot.",
           "items": [
-            "En «Configura el tuyo» ves las conversaciones de tu bot, cuántas tuvieron fuente y cuántas no se encontraron.",
-            "Puedes exportarlas a CSV o borrarlas."
+            "En «Configura el tuyo» ves lo que le preguntan a tu bot por el enlace directo o por el widget en tu sitio, cuántas preguntas tuvieron fuente y cuántas no se encontraron.",
+            "Puedes exportarlas a CSV o borrarlas. Cada pregunta guardada se borra sola a los 30 días.",
+            "Las preguntas de «Prueba el asistente» y de la vista previa de «Configura el tuyo» no se guardan."
           ]
         }
-      }
+      },
+      "ctaTitle": "¿Lo quieres con los documentos de tu empresa?",
+      "ctaBody": "Te mostramos la demo con tu caso en una sesión guiada y te proponemos el plan que encaja.",
+      "ctaButton": "Pedir una demo guiada",
+      "ctaQuote": "Cotizar el piloto"
     },
     "chat": {
       "title": "Conversación",
@@ -133,7 +149,7 @@
       "assistant": "Asistente RAG",
       "thinking": "Buscando en los documentos…",
       "preparing": "Indexando los documentos de la empresa…",
-      "sources": "Fuentes",
+      "sources": "Fragmentos consultados ({count})",
       "suggested": "Preguntas sugeridas",
       "outOfScopeTag": "no está en los documentos",
       "emptyTitle": "Prueba una pregunta",
@@ -142,31 +158,42 @@
       "regenerateTooltip": "Envía otra vez la misma pregunta al servidor y reemplaza esta respuesta.",
       "feedbackUp": "Respuesta útil",
       "feedbackDown": "Respuesta a mejorar",
-      "feedbackSaved": "Valoración guardada en las métricas de esta sesión",
+      "feedbackSaved": "Anotado en las métricas de esta sesión. Tu valoración no se envía al servidor.",
       "generatedBy": "Redactada por {model} con {count, plural, one {# fragmento} other {# fragmentos}}",
       "extractive": "Modo extractivo: fragmentos encontrados, citados tal cual",
       "providerError": "El proveedor de IA no respondió: se muestran los fragmentos encontrados (modo extractivo)",
       "notFound": "No está en los documentos: el asistente no inventa una respuesta.",
-      "errorNetwork": "No pudimos conectar con el servidor de la demo. Inténtalo de nuevo.",
+      "errorNetwork": "No pudimos conectar con el servidor de la demo. Revisa tu conexión e inténtalo de nuevo.",
       "errorGeneric": "Algo salió mal al responder. Inténtalo de nuevo.",
       "retry": "Reintentar",
       "citationTooltip": "Fragmento citado: haz clic para verlo completo",
-      "sourceButton": "Ver la fuente {n}: {name}"
+      "sourceButton": "Ver la fuente {n}: {name}",
+      "feedbackRemoved": "Valoración quitada de las métricas de esta sesión.",
+      "feedbackUpTooltip": "Respuesta útil · solo suma a las métricas de esta sesión (no se envía)",
+      "feedbackDownTooltip": "Respuesta a mejorar · solo suma a las métricas de esta sesión (no se envía)",
+      "errorRateLimited": "No pudimos preparar el asistente: desde tu red se crearon muchos asistentes en la última hora y el servidor pausó la creación de nuevos. Intenta de nuevo más tarde (el límite se renueva cada hora) o prueba con tu documento.",
+      "errorChatRateLimited": "Llegaron muchas preguntas seguidas desde tu red y el servidor pidió una pausa. Espera un minuto y vuelve a intentarlo.",
+      "errorCapacity": "No pudimos preparar el asistente: la demo llegó a su capacidad de asistentes en este momento. Intenta de nuevo más tarde o prueba con tu documento.",
+      "errorUnavailable": "El chatbot no está disponible en este momento. Intenta de nuevo en unos minutos.",
+      "useUpload": "Probar con tu documento",
+      "privacyNote": "Las preguntas de este modo no se guardan: el servidor las usa para buscar en los documentos y, con la IA activa, las envía con los fragmentos encontrados a OpenAI para redactar la respuesta.",
+      "cited": "citado",
+      "citedHint": "Los marcados como «citado» son los que la respuesta usa con [n]; los demás los encontró la búsqueda, pero la respuesta no se basó en ellos."
     },
     "pipeline": {
       "title": "Cómo se respondió",
-      "subtitle": "Los pasos que ejecutó el servidor para la última respuesta, con los datos que devolvió.",
+      "subtitle": "Para equipos técnicos: los pasos internos de la última respuesta. No necesitas mirarlos para usar el asistente.",
       "toggle": "Cómo se respondió",
       "idle": "Haz una pregunta para ver los pasos.",
       "running": "Esperando la respuesta del servidor…",
       "steps": {
         "chunking": {
-          "title": "1. Fragmentación",
+          "title": "1. División en fragmentos",
           "detail": "{docs, plural, one {# documento partido} other {# documentos partidos}} por párrafos al indexar"
         },
         "search": {
-          "title": "2. Búsqueda BM25 (top 5)",
-          "detail": "{count, plural, one {# fragmento encontrado} other {# fragmentos encontrados}} · mejor puntaje {score}",
+          "title": "2. Búsqueda por palabras (BM25)",
+          "detail": "{count, plural, one {# fragmento encontrado} other {# fragmentos encontrados}} (máximo 5) · mejor coincidencia {score}",
           "none": "Ningún fragmento coincide con las palabras de la pregunta"
         },
         "prompt": {
@@ -191,29 +218,29 @@
         "latencyHint": "Medido en tu navegador: desde que envías la pregunta hasta que llega la respuesta.",
         "tokens": "Tokens",
         "tokensHint": "Tokens de entrada y salida que reportó OpenAI. En modo extractivo no hay tokens.",
-        "cost": "Costo estimado",
-        "costHint": "Estimación del servidor en USD con el precio público del modelo.",
+        "cost": "Costo de IA (USD)",
+        "costHint": "Lo que KopTup le paga a OpenAI por esta respuesta (estimado con el precio público del modelo). No es un cobro para ti: la mensualidad de cada plan ya incluye la IA hasta su tope de preguntas al mes.",
         "notAvailable": "—"
       }
     },
     "stats": {
       "title": "Métricas de esta sesión",
-      "toggle": "Mostrar u ocultar las métricas de esta sesión",
-      "hint": "Se calculan con las respuestas reales de esta pestaña; se reinician al recargar.",
+      "hint": "Se calculan en tu navegador con las respuestas reales de esta pestaña; no se envían al servidor y se reinician al recargar.",
       "questions": "Preguntas",
       "withSources": "Con fuente",
       "notFound": "No encontré",
       "avgLatency": "Tiempo medio",
       "tokens": "Tokens",
-      "cost": "Costo (USD)",
-      "feedback": "Útil / a mejorar"
+      "cost": "Costo de IA (USD)",
+      "feedback": "Útil / a mejorar",
+      "summary": "{count, plural, one {# pregunta} other {# preguntas}} · {withSources} con fuente"
     },
     "sourcePanel": {
       "title": "Fragmento citado",
       "subtitle": "El texto exacto que el servidor encontró y entregó al modelo.",
       "document": "Documento",
       "position": "Cita",
-      "score": "Puntaje BM25",
+      "score": "Coincidencia de palabras (BM25)",
       "scoreHint": "Qué tanto coinciden las palabras de la pregunta con este fragmento (más alto = más relevante).",
       "openDocument": "Ver documento completo",
       "close": "Cerrar"
@@ -230,11 +257,11 @@
       "next": "Siguiente",
       "done": "Empezar",
       "step1Title": "Elige una empresa de ejemplo",
-      "step1Body": "Arriba cambias entre tres empresas ficticias (recursos humanos, tienda en línea y salud). Cada una tiene sus propios documentos.",
+      "step1Body": "Arriba cambias entre cuatro empresas ficticias (recursos humanos, tienda en línea, salud y una firma de abogados). Cada una tiene sus propios documentos.",
       "step2Title": "Haz una pregunta sugerida",
-      "step2Body": "El servidor busca en esos documentos y la respuesta trae citas [1], [2]… con la fuente.",
+      "step2Body": "Con tu primera pregunta, el asistente lee esos documentos, busca en ellos y te responde con citas [1], [2]… a la fuente.",
       "step3Title": "Abre la fuente",
-      "step3Body": "Haz clic en una cita para ver el fragmento exacto y el documento completo de donde salió.",
+      "step3Body": "Haz clic en una cita para ver el fragmento exacto y el documento completo de donde salió. En «Cómo se respondió» ves los pasos que hizo el servidor.",
       "step4Title": "Pregunta algo que no esté",
       "step4Body": "Si la información no está en los documentos, el asistente responde «No encontré esa información» en lugar de inventarla.",
       "step5Title": "Prueba con tu documento o configura el tuyo",
@@ -242,11 +269,11 @@
     },
     "builder": {
       "title": "Configura tu asistente",
-      "subtitle": "Crea tu bot, súbele documentos de texto, pruébalo aquí y llévalo a tu sitio con el código para insertar.",
+      "subtitle": "Para equipos técnicos: arma un bot de prueba, súbele documentos y llévalo a tu sitio con el código. En un proyecto, esta configuración la hacemos nosotros.",
       "configTitle": "Configuración",
       "myBots": {
         "label": "Mis bots",
-        "title": "Bots guardados en este navegador",
+        "title": "Tus bots en este navegador",
         "empty": "Aún no tienes bots guardados. Configura uno y toca «Guardar bot».",
         "create": "Nuevo bot",
         "delete": "Eliminar bot",
@@ -256,7 +283,10 @@
         "loadFailed": "No pudimos cargar el bot: puede que ya no exista en el servidor.",
         "removedMissing": "El bot «{name}» ya no existe en el servidor y se quitó de tu lista.",
         "newReady": "Bot nuevo listo: configúralo y guárdalo.",
-        "selected": "Bot cargado: {name}"
+        "selected": "Bot cargado: {name}",
+        "deleteAction": "Eliminar",
+        "cancel": "Cancelar",
+        "hint": "Se guardan en el servidor. Este navegador tiene la llave para editarlos, por eso desde otro equipo no aparecen aquí."
       },
       "actions": {
         "save": "Guardar bot",
@@ -268,7 +298,12 @@
         "copyLink": "Copiar enlace del chat",
         "linkCopied": "Enlace copiado: {url}",
         "copyFailed": "No pudimos copiar el enlace: {url}",
-        "openChat": "Abrir chat"
+        "openChat": "Abrir chat",
+        "saveRateLimited": "No pudimos guardar el bot: desde tu red se crearon muchos bots en la última hora y el servidor pausó la creación de nuevos. Intenta de nuevo más tarde (el límite se renueva cada hora).",
+        "saveCapacity": "No pudimos guardar el bot: la demo llegó a su capacidad de bots en este momento. Intenta de nuevo más tarde.",
+        "saveUnavailable": "No pudimos guardar el bot: el chatbot no está disponible en este momento. Intenta de nuevo en unos minutos.",
+        "saveNetwork": "No pudimos conectar con el servidor de la demo. Revisa tu conexión e inténtalo de nuevo.",
+        "rateLimited": "Hiciste muchas consultas seguidas y el servidor pidió una pausa. Espera un minuto y vuelve a intentarlo."
       },
       "sections": {
         "identity": "Identidad",
@@ -307,20 +342,47 @@
       "toneLine": "Tono de las respuestas: {tone}.",
       "knowledge": {
         "drop": "Arrastra archivos o haz clic para elegirlos",
-        "hint": "TXT, MD o CSV · máx. 2 MB por archivo",
-        "pdfHint": "¿PDF o DOCX? Pruébalos en «Prueba con tu documento».",
+        "hint": "TXT, MD, CSV, PDF o DOCX · máx. 2 MB por archivo",
+        "pdfHint": "De los PDF se lee el texto seleccionable (un PDF escaneado no sirve). Las citas muestran el documento y el fragmento; para citar la página, usa «Prueba con tu documento».",
         "uploading": "Subiendo archivos…",
-        "empty": "Aún no hay documentos. Sube archivos de texto o carga los de una empresa de ejemplo.",
+        "empty": "Aún no hay documentos. Sube tus archivos, agrega una página web o carga los de una empresa de ejemplo.",
+        "publicCount": "{count, plural, =0 {Este bot no tiene documentos.} one {Este bot tiene # documento (solo su dueño ve la lista).} other {Este bot tiene # documentos (solo su dueño ve la lista).}}",
         "remove": "Quitar documento",
         "uploaded": "{count, plural, one {# archivo subido} other {# archivos subidos}}",
         "uploadFailed": "No pudimos subir los archivos",
         "removed": "Documento eliminado",
         "removeFailed": "No pudimos eliminar el documento",
-        "unsupported": "{name}: formato no soportado aquí (usa TXT, MD o CSV)",
+        "unsupported": "{name}: formato no soportado (usa TXT, MD, CSV, PDF o DOCX)",
         "tooBig": "{name}: pesa más de 2 MB",
         "loadSample": "Cargar documentos de ejemplo",
         "loadSampleOf": "Documentos de {company}",
-        "sampleLoaded": "Documentos de ejemplo cargados"
+        "sampleLoaded": "Documentos de ejemplo cargados",
+        "sampleAlready": "Los documentos de {company} ya están cargados en este bot.",
+        "unreadable": "{name}: no pudimos leer su texto. Si es un PDF escaneado, usa uno con texto seleccionable.",
+        "noneReadable": "No pudimos leer el texto de los archivos. Si son PDF escaneados, usa versiones con texto seleccionable.",
+        "urlLabel": "O agrega una página web pública",
+        "urlPh": "https://www.tuempresa.com/preguntas-frecuentes",
+        "urlAdd": "Agregar",
+        "urlAdding": "Leyendo…",
+        "urlHint": "Se lee el texto de la página (HTML o texto, hasta 2 MB) y se cita con el nombre del sitio. Solo páginas públicas: no se leen direcciones internas ni páginas que piden iniciar sesión.",
+        "urlAdded": "Página indexada: {host}",
+        "urlFailed": "No pudimos agregar la página. Inténtalo de nuevo.",
+        "tooManyDocs": "Cada bot admite máximo 50 documentos.",
+        "urlErrors": {
+          "invalid_url": "{url}: no es una dirección web válida. Escríbela completa, por ejemplo https://www.tuempresa.com/preguntas-frecuentes.",
+          "blocked_address": "{url}: por seguridad no leemos direcciones privadas o internas. Usa una página pública.",
+          "blocked_port": "{url}: solo leemos páginas en los puertos estándar de http y https.",
+          "dns_failed": "{url}: no encontramos ese dominio. Revisa la dirección.",
+          "timeout": "{url}: la página tardó demasiado en responder. Inténtalo de nuevo o usa otra.",
+          "too_large": "{url}: la página pesa más de 2 MB.",
+          "too_many_redirects": "{url}: la página redirige demasiadas veces.",
+          "unsupported_content_type": "{url}: no es una página HTML ni de texto (por ejemplo, un PDF o una imagen). Si es un PDF, súbelo como archivo.",
+          "empty_content": "{url}: la página casi no tiene texto para leer (puede que su contenido se cargue con JavaScript).",
+          "bot_capacity": "{url}: el bot llegó a su límite de fragmentos.",
+          "fetch_failed": "{url}: no pudimos descargar la página. Revisa que esté en línea.",
+          "http": "{url}: la página respondió con un error ({status}).",
+          "generic": "{url}: no pudimos leer la página."
+        }
       },
       "preview": {
         "title": "Vista previa",
@@ -360,16 +422,17 @@
       },
       "conversations": {
         "title": "Conversaciones",
-        "subtitle": "Lo que le han preguntado a tu bot (aquí, en el enlace directo o en tu sitio).",
+        "subtitle": "Lo que le preguntan a tu bot por el enlace directo («Abrir chat») o por el widget en tu sitio. Cada pregunta se borra sola a los 30 días.",
         "refresh": "Actualizar",
         "export": "Exportar CSV",
         "clear": "Borrar historial",
         "clearConfirm": "¿Borrar todas las conversaciones de este bot?",
         "cleared": "Historial borrado",
         "exported": "CSV descargado",
-        "empty": "Todavía no hay conversaciones. Pregúntale algo en la vista previa.",
+        "empty": "Todavía no hay conversaciones guardadas. Las preguntas de la vista previa no se guardan: abre el bot con «Abrir chat» o pégalo en tu sitio y pregúntale algo.",
         "saveFirst": "Guarda el bot para ver sus conversaciones.",
         "loadFailed": "No pudimos cargar las conversaciones.",
+        "rateLimited": "Hiciste muchas consultas seguidas. Espera un minuto y vuelve a intentarlo.",
         "questions": "Preguntas",
         "withSources": "Con fuente",
         "notFound": "No encontré",
@@ -377,7 +440,24 @@
         "assistant": "Respuesta",
         "sources": "Fuentes",
         "date": "Fecha",
-        "notOwner": "Solo el dueño del bot puede ver sus conversaciones: este navegador no tiene su token."
+        "notOwner": "Solo el dueño del bot puede ver sus conversaciones: este navegador no tiene su token.",
+        "clearAction": "Borrar",
+        "cancel": "Cancelar"
+      },
+      "storageNote": "Tu bot y sus documentos se guardan en el servidor; un bot sin uso durante 12 meses se borra. Lo que le pregunten por «Abrir chat» o por el widget en tu sitio queda en «Conversaciones» y se borra solo a los 30 días; las preguntas de la vista previa no se guardan.",
+      "cta": {
+        "text": "¿Lo quieres con los documentos y el sitio de tu empresa?",
+        "plans": "Ver planes RAG",
+        "quotePilot": "Cotizar el piloto"
+      },
+      "readOnly": {
+        "title": "Este bot es de otro navegador.",
+        "body": "Puedes probarlo en la vista previa, pero solo su dueño (el navegador que lo creó) puede editarlo y ver sus documentos y conversaciones.",
+        "createOwn": "Crear mi propio bot"
+      },
+      "confidential": {
+        "title": "No subas información confidencial",
+        "body": "Los documentos de tu bot quedan en el servidor de la demo hasta que los quitas o eliminas el bot (o tras 12 meses sin uso), y cualquiera con el enlace del chat o que visite la página donde pegues el widget puede hacerle preguntas."
       }
     },
     "embedPage": {
@@ -391,9 +471,12 @@
       "close": "Cerrar chat",
       "poweredBy": "Con tecnología de KopTup",
       "errorNetwork": "No pudimos conectar con el servidor. Inténtalo de nuevo.",
+      "errorGeneric": "No pudimos responder tu pregunta. Inténtalo de nuevo.",
       "retry": "Reintentar",
       "sourceTitle": "Fuente [{n}] · {name}",
-      "hideSource": "Ocultar fuente"
+      "hideSource": "Ocultar fuente",
+      "errorRateLimited": "Llegaron muchas preguntas seguidas y el servidor pidió una pausa. Espera un minuto y vuelve a intentarlo.",
+      "errorUnavailable": "El asistente no está disponible en este momento. Intenta de nuevo en unos minutos."
     },
     "ragLink": "Sistemas RAG para empresas",
     "ragLinkShort": "¿Qué es RAG?",
@@ -403,9 +486,9 @@
       "loading": "Verificando disponibilidad…",
       "warning": {
         "title": "No subas información confidencial en la demo",
-        "body": "Usa un documento público o de prueba. Lo procesamos solo en memoria y se borra automáticamente en 1 hora."
+        "body": "Usa un documento público o de prueba. Lo procesamos solo en memoria y se borra automáticamente en 1 hora; los fragmentos que responden cada pregunta se envían a OpenAI para redactar la respuesta."
       },
-      "limits": "PDF, DOCX o TXT · máximo {maxMb} MB y {maxPages} páginas · {maxQuestions} preguntas por documento · {maxDocs} documentos al día",
+      "limits": "PDF, DOCX o TXT · máximo {maxMb} MB y {maxPages} páginas · {maxQuestions} preguntas por documento · {maxDocs} documentos al día por red",
       "form": {
         "fileLabel": "Tu documento",
         "fileCta": "Elige un archivo",
@@ -422,13 +505,14 @@
       },
       "unavailable": {
         "title": "La prueba con tu documento no está disponible en este momento",
-        "body": "Puedes seguir usando la demo con el documento de ejemplo, sin registro, o agendar una demo con nosotros para verla con tu caso.",
+        "body": "Puedes seguir usando la demo con el documento de ejemplo, sin registro, o pedir una demo guiada para verla con tu caso.",
         "budgetTitle": "Alcanzamos el cupo de pruebas de este mes",
-        "budgetBody": "La subida de documentos está desactivada por ahora. Agenda una demo con nosotros o usa la demo con el documento de ejemplo, sin registro."
+        "budgetBody": "La subida de documentos está desactivada por ahora. Pide una demo guiada o usa la demo con el documento de ejemplo, sin registro."
       },
       "cta": {
-        "schedule": "Agenda una demo con nosotros",
-        "sample": "Usar la demo con el documento de ejemplo"
+        "schedule": "Pide una demo guiada",
+        "sample": "Usar la demo con el documento de ejemplo",
+        "plans": "Ver planes RAG"
       },
       "chat": {
         "pages": "{count, plural, one {# página} other {# páginas}}",
@@ -462,23 +546,26 @@
         "invalid_format": "Formato no permitido. Sube un archivo PDF, DOCX o TXT.",
         "file_too_large": "El archivo pesa más de {maxMb} MB. Sube uno más liviano.",
         "too_many_pages": "El documento tiene más de {maxPages} páginas. Sube uno más corto.",
+        "too_much_text": "El documento tiene demasiado texto para esta demo (más de 400.000 caracteres). Sube una versión más corta o solo las páginas que quieres consultar.",
         "empty_document": "No pudimos extraer texto del documento. Si es un PDF escaneado, prueba con uno que tenga texto seleccionable.",
         "unreadable_document": "No pudimos leer el documento. Revisa que no esté dañado ni protegido con contraseña.",
         "missing_file": "Elige un documento para subir.",
         "invalid_email": "Escribe un email válido.",
         "consent_required": "Para subir el documento debes autorizar el tratamiento de tus datos personales.",
-        "daily_limit": "Llegaste al límite de {maxDocs} documentos por día. Vuelve mañana o agenda una demo con nosotros.",
+        "daily_limit": "Desde tu red ya se usaron los {maxDocs} documentos de hoy (el límite es por red, no por persona). Vuelve mañana o pide una demo guiada.",
         "question_limit": "Llegaste al límite de {maxQuestions} preguntas para este documento.",
         "invalid_question": "Escribe una pregunta de máximo {maxChars} caracteres.",
         "rate_limited": "Estás enviando muchas solicitudes. Espera unos minutos y vuelve a intentarlo.",
         "document_not_found": "Tu documento ya no está disponible: se borra 1 hora después de subirlo. Súbelo de nuevo para seguir probando.",
-        "budget_exhausted": "Alcanzamos el cupo de pruebas de este mes. Agenda una demo con nosotros.",
+        "budget_exhausted": "Alcanzamos el cupo de pruebas de este mes. Pide una demo guiada.",
         "demo_disabled": "La prueba con tu documento no está disponible en este momento.",
         "capacity": "La demo tiene mucha demanda en este momento. Intenta de nuevo en unos minutos.",
         "llm_error": "No pudimos generar la respuesta. Intenta de nuevo; esta pregunta no se descontó.",
         "network": "No pudimos conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.",
-        "generic": "Algo salió mal. Inténtalo de nuevo."
+        "generic": "Algo salió mal. Inténtalo de nuevo.",
+        "lead_unavailable": "No pudimos registrar tu prueba en este momento, así que no procesamos tu documento. Intenta de nuevo en unos minutos."
       }
-    }
+    },
+    "backToCatalog": "Volver al catálogo"
   }
 }

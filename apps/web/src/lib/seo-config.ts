@@ -75,9 +75,9 @@ export const seoConfig: Record<string, PageSEO> = {
 
   // About page
   about: {
-    title: 'Sobre Nosotros: Empresa de Software en Bogotá',
+    title: 'Nosotros: estudio de software a medida en Bogotá',
     description:
-      'Conoce al equipo de KopTup: empresa de desarrollo de software a medida en Bogotá, Colombia. Expertos en React, Next.js, Node.js, IA y cloud computing.',
+      `KopTup es un estudio de software a medida en Bogotá: sistemas RAG y software para empresas. Prueba ${DEMO_COUNT} demos y revisa nuestros planes y precios publicados.`,
     canonical: `${baseUrl}/about`,
   },
 
@@ -85,7 +85,7 @@ export const seoConfig: Record<string, PageSEO> = {
   demo: {
     title: 'Prototipos Interactivos: Prueba Antes de Contratar',
     description:
-      `Explora ${DEMO_COUNT} prototipos navegables que muestran el rango de soluciones que construimos. Dos usan OpenAI real (chatbot RAG y LinkedIn Ads); el resto son mockups interactivos con datos simulados. Las demos abiertas no piden registro; las demás se solicitan.`,
+      `Explora ${DEMO_COUNT} demos navegables del tipo de soluciones que construimos. Algunas usan IA real, como el chatbot RAG; la mayoría funcionan con datos de ejemplo y cada demo lo indica. Las abiertas no piden registro; las demás se solicitan.`,
     canonical: `${baseUrl}/demo`,
   },
 
@@ -93,7 +93,7 @@ export const seoConfig: Record<string, PageSEO> = {
   privacy: {
     title: 'Política de Privacidad',
     description:
-      'Política de privacidad de KopTup. Cómo recopilamos, usamos y protegemos tu información personal. Cumplimiento con la Ley 1581 de 2012 (Colombia) y GDPR.',
+      'Política de privacidad y tratamiento de datos de KopTup: qué datos recogemos, para qué, con quién los compartimos, cuánto los guardamos y cómo ejerces tus derechos (Ley 1581 de 2012).',
     canonical: `${baseUrl}/privacy`,
   },
 
@@ -117,7 +117,7 @@ export const seoConfig: Record<string, PageSEO> = {
   'desarrollo-web-colombia': {
     title: 'Desarrollo Web y Software a Medida en Colombia',
     description:
-      'Contrata a KopTup para desarrollar tu aplicación web, chatbot con IA, e-commerce o sistema empresarial. Empresa de desarrollo de software a medida en Colombia, trabajamos con clientes en todo el mundo. Cotización gratis.',
+      'Contrata a KopTup para desarrollar tu aplicación web, chatbot con IA, e-commerce o sistema empresarial. Estudio de software a medida en Bogotá, Colombia. Precios publicados y cotización gratis.',
     canonical: `${baseUrl}/desarrollo-web-colombia`,
   },
 
@@ -184,7 +184,7 @@ export const seoConfig: Record<string, PageSEO> = {
   'demo-cuentas-medicas': {
     title: 'Sistema experto para salud: auditar cuentas médicas',
     description:
-      'Sistema experto para salud que audita cuentas médicas con reglas, códigos CUPS y CIE-10 y tarifarios SOAT, ISS o de contrato, y señala posibles glosas.',
+      'Sistema experto para salud que audita cuentas médicas con reglas y un tarifario de ejemplo, y señala posibles glosas. La IA extrae los datos de la factura. Demo por invitación.',
     canonical: `${baseUrl}/demo/cuentas-medicas`,
   },
 
@@ -201,7 +201,7 @@ export const seoConfig: Record<string, PageSEO> = {
   'demo-linkedin-ads': {
     title: 'Generador de Contenido para LinkedIn con IA',
     description:
-      'Genera 30 días de posts para LinkedIn en minutos: calendario editorial, hooks, cuerpo, CTA y hashtags por demo. Plantillas visuales 1200×627 exportables a PNG y captura real del demo en foto/video. Para founders y equipos de marketing que necesitan publicar consistente sin contratar una agencia.',
+      'Así usamos IA para preparar nuestro contenido de LinkedIn: calendario de 30 días, posts, textos de anuncio y carruseles generados con IA, y capturas de las demos. No publica en LinkedIn: copias el texto y lo publicas tú.',
     canonical: `${baseUrl}/demo/linkedin-ads`,
   },
 
@@ -215,9 +215,9 @@ export const seoConfig: Record<string, PageSEO> = {
 
   // Demo: Gestor de Documentos
   'demo-gestor-documentos': {
-    title: 'Gestor Documental Médico para Archivos Clínicos',
+    title: 'Gestor documental con IA: resume y busca documentos',
     description:
-      'Sistema de gestión documental para instituciones de salud. Organiza historias clínicas, resultados de exámenes, consentimientos informados y documentos administrativos. Búsqueda inteligente, control de versiones, carpetas por paciente. Cumple normatividad de archivo clínico. Demo online.',
+      'Sube PDF, DOCX, TXT o CSV: la IA resume y etiqueta cada documento y puedes buscarlos por su significado y pedir que te los explique. Las funciones avanzadas muestran ejemplos fijos.',
     canonical: `${baseUrl}/demo/gestor-documentos`,
   },
 
@@ -233,9 +233,9 @@ export const seoConfig: Record<string, PageSEO> = {
 
   // Demo: Dashboard Ejecutivo
   'demo-dashboard-ejecutivo': {
-    title: 'Dashboard Ejecutivo con Datos en Tiempo Real',
+    title: 'Dashboard Ejecutivo: KPIs, Finanzas y Cartera',
     description:
-      'Dashboard ejecutivo con KPIs, métricas y análisis de datos en tiempo real. Visualización de indicadores clave, gráficos interactivos y reportes automáticos. Toma de decisiones basada en datos. Personalizable por sector. Demo interactivo.',
+      'Demo de tablero ejecutivo con datos de ejemplo: ventas frente a la meta, finanzas, cartera, flujo de caja y reportes. Muestra el tipo de tablero que conectamos a los datos de tu empresa.',
     canonical: `${baseUrl}/demo/dashboard-ejecutivo`,
   },
 
@@ -267,7 +267,7 @@ export const seoConfig: Record<string, PageSEO> = {
   'demo-automatizacion': {
     title: 'Automatización de Workflows y Procesos',
     description:
-      'Automatiza procesos de negocio sin código: orquesta workflows, conecta integraciones y elimina tareas repetitivas. Constructor visual de flujos, disparadores y acciones encadenadas. Ahorra horas de trabajo manual cada semana. Demo interactivo.',
+      'Maqueta interactiva de un editor de flujos de automatización con pasos de IA: nodos, historial de ejecuciones, plantillas y SDK, con datos de ejemplo. Muestra cómo se vería automatizar un proceso de tu empresa.',
     canonical: `${baseUrl}/demo/automatizacion`,
   },
 
@@ -289,9 +289,9 @@ export const seoConfig: Record<string, PageSEO> = {
 
   // Demo: App de Delivery
   'demo-delivery': {
-    title: 'App de Delivery con Tracking en Tiempo Real',
+    title: 'App de Domicilios: Pedidos y Repartidores',
     description:
-      'Aplicación de delivery completa con pedidos a domicilio, tracking en tiempo real y gestión de repartidores. Optimización de rutas, seguimiento GPS y notificaciones de estado. Plataforma escalable para restaurantes y comercios. Demo interactivo.',
+      'Demo de una plataforma de domicilios con datos de ejemplo: pedidos, asignación de repartidores y seguimiento simulado de la entrega. Muestra el tipo de app que construimos para restaurantes y comercios.',
     canonical: `${baseUrl}/demo/delivery`,
   },
 
@@ -299,7 +299,7 @@ export const seoConfig: Record<string, PageSEO> = {
   'demo-erp': {
     title: 'ERP: Finanzas, Inventario y Facturación DIAN',
     description:
-      'Sistema ERP modular para empresas: finanzas, inventario, contabilidad y facturación electrónica DIAN. Integra todas las áreas de tu negocio en una sola plataforma. Reportes en tiempo real y módulos escalables. Demo interactivo.',
+      'Demo de un ERP modular con datos de ejemplo: finanzas, inventario, contabilidad y facturación. Muestra el tipo de sistema que construimos para integrar las áreas de tu empresa.',
     canonical: `${baseUrl}/demo/erp`,
   },
 
@@ -313,9 +313,9 @@ export const seoConfig: Record<string, PageSEO> = {
 
   // Demo: Firma Electrónica
   'demo-firma-electronica': {
-    title: 'Firma Electrónica de Documentos con Validez Legal',
+    title: 'Firma electrónica de documentos: demo interactiva',
     description:
-      'Firma electrónica de documentos con validez legal. Define flujos de firmantes, envía solicitudes y rastrea el estado en tiempo real. Firma digital segura, auditable y con trazabilidad completa. Agiliza tus contratos. Demo interactivo.',
+      'Maqueta interactiva de una plataforma de firma electrónica: arma un sobre con documento, firmantes y campos, y mira la línea de tiempo de auditoría. Datos de ejemplo: no firma ni envía correos.',
     canonical: `${baseUrl}/demo/firma-electronica`,
   },
 
@@ -355,7 +355,7 @@ export const seoConfig: Record<string, PageSEO> = {
   'demo-moderacion-contenido': {
     title: 'Moderación de Contenido con IA: Trust & Safety',
     description:
-      'Moderación de contenido con inteligencia artificial para texto e imágenes. Filtrado automático de contenido inapropiado, trust & safety y detección de riesgos a escala. Protege tu comunidad y tu marca en tiempo real. Demo interactivo.',
+      'Consola de ejemplo para un equipo de moderación (trust & safety): cola priorizada de contenidos reportados, reglas por puntaje, apelaciones y auditoría. Datos de ejemplo en el navegador, sin modelo de IA.',
     canonical: `${baseUrl}/demo/moderacion-contenido`,
   },
 
@@ -363,15 +363,15 @@ export const seoConfig: Record<string, PageSEO> = {
   'demo-pos': {
     title: 'POS Multi-sucursal con Facturación DIAN',
     description:
-      'Sistema POS para retail con punto de venta ágil, gestión multi-sucursal e inventario en tiempo real. Facturación electrónica DIAN integrada y reportes de ventas centralizados. Ideal para tiendas y cadenas. Demo interactivo.',
+      'Demo de punto de venta con datos de ejemplo: ventas, varias sedes, inventario y cierre de caja. Muestra el tipo de POS que construimos para tiendas y restaurantes.',
     canonical: `${baseUrl}/demo/pos`,
   },
 
   // Demo: SaaS Multi-tenant Boilerplate
   'demo-saas-boilerplate': {
-    title: 'SaaS Multi-tenant: Auth y Billing con Stripe',
+    title: 'SaaS multiempresa: vitrina técnica de la base',
     description:
-      'Base SaaS multi-tenant lista para producción: autenticación, gestión de organizaciones y billing con Stripe. Arquitectura escalable para lanzar tu producto más rápido. Roles, suscripciones y aislamiento de datos por tenant. Demo interactivo.',
+      'Vitrina técnica de una base para construir un SaaS B2B multiempresa: aislamiento de datos por cliente, autenticación, planes y cobro, auditoría y feature flags. Datos y código de ejemplo: no cobra ni guarda nada.',
     canonical: `${baseUrl}/demo/saas-boilerplate`,
   },
 
@@ -395,7 +395,7 @@ export const seoConfig: Record<string, PageSEO> = {
   'demo-voice-ai': {
     title: 'Voice AI: Agentes de Voz con IA para Call Center',
     description:
-      'Agentes de voz con inteligencia artificial para call center: IVR inteligente, transcripción automática y telefonía automatizada. Atiende llamadas 24/7, resuelve consultas y deriva casos complejos. Reduce costos de operación. Demo interactivo.',
+      'Demo de un agente de voz con IA para call center, con llamadas de ejemplo: menú de voz, transcripción y paso a un asesor. Muestra el tipo de solución que implementamos con tu telefonía.',
     canonical: `${baseUrl}/demo/voice-ai`,
   },
 
@@ -403,7 +403,7 @@ export const seoConfig: Record<string, PageSEO> = {
   'demo-wms-logistica': {
     title: 'WMS: Logística de Bodegas, Picking e Inventario',
     description:
-      'Sistema WMS para la gestión de bodegas y logística: picking optimizado, control de inventario en tiempo real e integración con transportadoras. Mejora la precisión y la velocidad de tus operaciones de almacén. Demo interactivo.',
+      'Demo de un sistema WMS con datos de ejemplo: recepción, ubicaciones, picking, inventario y despachos. Muestra el tipo de sistema que construimos para tu bodega.',
     canonical: `${baseUrl}/demo/wms-logistica`,
   },
 };
@@ -452,7 +452,6 @@ export function generateMetadata(pageKey: string): Metadata {
       title: fullTitle,
       description: config.description,
       images: [config.ogImage || '/og-image.png'],
-      creator: '@koptup',
     },
     robots: {
       index: true,
@@ -465,6 +464,29 @@ export function generateMetadata(pageKey: string): Metadata {
         'max-snippet': -1,
       },
     },
+  };
+}
+
+/**
+ * Metadata de las páginas de cuenta y de los enlaces de un solo uso (login,
+ * registro, recuperación de contraseña, retorno de Google, activación,
+ * propuesta). No se indexan (`noindex`, además de `Disallow` en robots.txt) y
+ * no heredan la canonical, el og:url ni el título de la home:
+ *  - `path`: su propia ruta sin parámetros (el token de `/reset-password`
+ *    viaja en `?token=` y no entra en la canonical);
+ *  - `path: null` en las rutas cuyo segmento es el token (`/activar/<token>`,
+ *    `/propuesta/<token>`): sin canonical, para no repetir el token en el HTML.
+ * `title` ya viene traducido; la plantilla agrega " | KopTup".
+ */
+export function privatePageMetadata(title: string, path: string | null): Metadata {
+  const url = path ? `${baseUrl}${path}` : null;
+  const fullTitle = TITLE_TEMPLATE.replace('%s', title);
+  return {
+    title,
+    robots: { index: false, follow: false, googleBot: { index: false, follow: false } },
+    alternates: { canonical: url },
+    openGraph: { title: fullTitle, url: url ?? undefined, siteName: SITE_NAME, type: 'website' },
+    twitter: { card: 'summary', title: fullTitle },
   };
 }
 

@@ -13,7 +13,7 @@ import {
   CalculatorIcon, ChartBarIcon, IdentificationIcon,
 } from '@heroicons/react/24/outline';
 import {
-  tr, PENALTY, SEVERITY_ORDER, formatStamp, formatNumber, displayLineOf,
+  tr, PENALTY, SEVERITY_ORDER, formatNumber,
   type Locale, type PR, type ReviewComment, type CommentStatus, type Severity, type Category,
   type DisplayLine, type DiffRow, type Risk, type PREvent, type PRStatus, type Dependency,
 } from './analyzer';
@@ -61,6 +61,9 @@ export interface CommentActions {
 // ---------------------------------------------------------------------------
 // Utilidades visuales
 // ---------------------------------------------------------------------------
+
+/** Foco visible para los botones propios de la demo (fondo oscuro). */
+export const FOCUS = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900';
 
 export const sevBadge = (s: Severity): 'danger' | 'warning' | 'info' | 'default' =>
   s === 'blocking' ? 'danger' : s === 'warning' ? 'warning' : s === 'suggestion' ? 'info' : 'default';
@@ -111,7 +114,9 @@ export function EventText({ e, t }: { e: PREvent; t: T }) {
   // Acciones de quien visita la demo sobre su propio diff (se conjugan con "tú").
   if (e.who === '__you__' && YOU_EVENTS.includes(e.kind)) return <>{t(`events.you.${e.kind}`, { detail })}</>;
   const who = e.who === 'revisor-ia' ? t('events.bot') : e.who === 'revisor-local' ? t('events.localBot') : e.who;
-  return <>{t(`events.${e.kind}`, { who, detail })}</>;
+  // Las revisiones guardan el número de hallazgos en `detail` (para el plural).
+  const count = Number(detail) || 0;
+  return <>{t(`events.${e.kind}`, { who, detail, count })}</>;
 }
 
 // ---------------------------------------------------------------------------
@@ -119,9 +124,11 @@ export function EventText({ e, t }: { e: PREvent; t: T }) {
 // ---------------------------------------------------------------------------
 
 export function CommentCard({
-  cv, file, t, locale, actions, compact = false, highlight = false,
+  cv, file, t, locale, actions, compact = false, highlight = false, lineLabel = false,
 }: {
   cv: CommentView; file?: FileView; t: T; locale: Locale; actions: CommentActions; compact?: boolean; highlight?: boolean;
+  /** En la vista compacta, muestra "Línea N" (lado a lado, donde el comentario no está junto a su línea). */
+  lineLabel?: boolean;
 }) {
   const { c, status, line } = cv;
   const Icon = catIcon(c.category);
@@ -141,7 +148,7 @@ export function CommentCard({
   const done = !isPending(status);
   return (
     <div
-      id={compact ? `diff-comment-${c.id}` : `comment-${c.id}`}
+      id={compact && !lineLabel ? `diff-comment-${c.id}` : compact ? `split-comment-${c.id}` : `comment-${c.id}`}
       className={`rounded-lg border ${sevRing(c.severity)} p-3 transition-shadow ${done ? 'opacity-80' : ''} ${highlight ? 'ring-2 ring-violet-400/70' : ''}`}
     >
       <div className="flex items-start gap-3">
@@ -156,6 +163,7 @@ export function CommentCard({
               {c.origin === 'ai-sample' ? t('comments.originAi') : t('comments.originLocal')}
             </Badge>
             {!compact && <span className="text-[11px] text-zinc-500 font-mono break-all">{c.file}:{line}</span>}
+            {compact && lineLabel && <span className="text-[11px] text-zinc-400">{t('diff.lineLabel', { line })}</span>}
             {done && (
               <Badge variant={status === 'dismissed' ? 'default' : 'success'} size="sm">
                 <CheckCircleIcon className="w-3 h-3 mr-1" />{t(`comments.statuses.${status}`)}
@@ -182,30 +190,30 @@ export function CommentCard({
               <span className="text-[11px] text-zinc-500 self-center">{t('comments.lockedNote')}</span>
             )}
             {!actions.locked && status === 'open' && c.fix !== undefined && (
-              <Button size="sm" variant="primary" className="!bg-violet-600 hover:!bg-violet-700" onClick={() => actions.apply(c.id)}>
+              <Button size="sm" variant="primary" className="!bg-violet-600 hover:!bg-violet-700 focus:!ring-offset-zinc-900" onClick={() => actions.apply(c.id)}>
                 <SparklesIcon className="w-3.5 h-3.5 mr-1" />{t('comments.apply')}
               </Button>
             )}
             {!actions.locked && status === 'open' && c.fix === undefined && (
-              <Button size="sm" variant="primary" className="!bg-emerald-600 hover:!bg-emerald-700" onClick={() => actions.resolve(c.id)}>
+              <Button size="sm" variant="primary" className="!bg-emerald-600 hover:!bg-emerald-700 focus:!ring-offset-zinc-900" onClick={() => actions.resolve(c.id)}>
                 <CheckCircleIcon className="w-3.5 h-3.5 mr-1" />{t('comments.markResolved')}
               </Button>
             )}
             {!actions.locked && status === 'open' && (
-              <Button size="sm" variant="ghost" onClick={() => actions.dismiss(c.id)} className="!text-zinc-400">{t('comments.dismiss')}</Button>
+              <Button size="sm" variant="ghost" onClick={() => actions.dismiss(c.id)} className="!text-zinc-400 hover:!bg-zinc-800 focus:!ring-offset-zinc-900">{t('comments.dismiss')}</Button>
             )}
             {!actions.locked && done && status !== 'resolved' && (
-              <Button size="sm" variant="ghost" onClick={() => actions.reopen(c.id)} className="!text-zinc-400">
+              <Button size="sm" variant="ghost" onClick={() => actions.reopen(c.id)} className="!text-zinc-400 hover:!bg-zinc-800 focus:!ring-offset-zinc-900">
                 <ArrowUturnLeftIcon className="w-3.5 h-3.5 mr-1" />{t('comments.undo')}
               </Button>
             )}
             {!actions.locked && done && status === 'resolved' && c.category !== 'tests' && (
-              <Button size="sm" variant="ghost" onClick={() => actions.reopen(c.id)} className="!text-zinc-400">
+              <Button size="sm" variant="ghost" onClick={() => actions.reopen(c.id)} className="!text-zinc-400 hover:!bg-zinc-800 focus:!ring-offset-zinc-900">
                 <ArrowUturnLeftIcon className="w-3.5 h-3.5 mr-1" />{t('comments.undo')}
               </Button>
             )}
             {!compact && (
-              <Button size="sm" variant="ghost" onClick={() => actions.showInDiff(c.id)} className="!text-zinc-300">
+              <Button size="sm" variant="ghost" onClick={() => actions.showInDiff(c.id)} className="!text-zinc-300 hover:!bg-zinc-800 focus:!ring-offset-zinc-900">
                 <EyeIcon className="w-3.5 h-3.5 mr-1" />{t('comments.showInDiff')}
               </Button>
             )}
@@ -221,9 +229,11 @@ export function CommentCard({
 // ---------------------------------------------------------------------------
 
 export function SummaryTab({
-  view, t, locale, onGo, onOpenFile, onTryDiff,
+  view, t, locale, onOpenFile, fmtDate,
 }: {
-  view: PRView; t: T; locale: Locale; onGo: (tab: TabKey) => void; onOpenFile: (path: string) => void; onTryDiff: () => void;
+  view: PRView; t: T; locale: Locale; onOpenFile: (path: string) => void;
+  /** Formatea una fecha de la actividad (vacía hasta montar: las fechas de ejemplo se calculan con la de hoy). */
+  fmtDate: (at: string) => string;
 }) {
   const { pr } = view;
   const pending = view.comments.filter((x) => x.status === 'open');
@@ -284,7 +294,7 @@ export function SummaryTab({
               <button
                 type="button"
                 onClick={() => onOpenFile(f.path)}
-                className="w-full flex items-center justify-between gap-2 text-xs px-2 py-1.5 rounded border border-zinc-800 hover:bg-zinc-800/60 text-zinc-300"
+                className={`w-full flex items-center justify-between gap-2 text-xs px-2 py-1.5 rounded border border-zinc-800 hover:bg-zinc-800/60 text-zinc-300 ${FOCUS}`}
               >
                 <span className="truncate text-left font-mono">{f.path}</span>
                 <span className="shrink-0 flex items-center gap-2">
@@ -298,39 +308,16 @@ export function SummaryTab({
         </ul>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div>
-          <div className="text-[11px] uppercase tracking-wider text-zinc-500 mb-2">{t('summary.activity')}</div>
-          <ol className="space-y-2 border-l border-zinc-800 pl-3">
-            {view.events.map((e, i) => (
-              <li key={i} className="text-xs">
-                <div className="text-zinc-500">{formatStamp(e.at, locale)}</div>
-                <div className="text-zinc-200"><EventText e={e} t={t} /></div>
-              </li>
-            ))}
-          </ol>
-        </div>
-        <div className="rounded-lg border border-violet-500/30 bg-violet-500/5 p-3">
-          <div className="text-sm font-semibold text-zinc-100">{t('summary.tryTitle')}</div>
-          <ol className="mt-2 space-y-2 text-xs text-zinc-300">
-            <li className="flex items-start justify-between gap-2">
-              <span>1. {t('summary.try1')}</span>
-              <Button size="sm" variant="ghost" className="!text-violet-300 shrink-0 !px-2 !py-1" onClick={() => onGo('comments')}>{t('summary.go')}</Button>
+      <div>
+        <div className="text-[11px] uppercase tracking-wider text-zinc-500 mb-2">{t('summary.activity')}</div>
+        <ol className="space-y-2 border-l border-zinc-800 pl-3">
+          {view.events.map((e, i) => (
+            <li key={i} className="text-xs">
+              <div className="text-zinc-500 min-h-[1rem]">{fmtDate(e.at)}</div>
+              <div className="text-zinc-200"><EventText e={e} t={t} /></div>
             </li>
-            <li className="flex items-start justify-between gap-2">
-              <span>2. {t('summary.try2')}</span>
-              <Button size="sm" variant="ghost" className="!text-violet-300 shrink-0 !px-2 !py-1" onClick={() => onGo('diff')}>{t('summary.go')}</Button>
-            </li>
-            <li className="flex items-start justify-between gap-2">
-              <span>3. {t('summary.try3')}</span>
-              <Button size="sm" variant="ghost" className="!text-violet-300 shrink-0 !px-2 !py-1" onClick={() => onGo('repo')}>{t('summary.go')}</Button>
-            </li>
-            <li className="flex items-start justify-between gap-2">
-              <span>4. {t('summary.try4')}</span>
-              <Button size="sm" variant="ghost" className="!text-violet-300 shrink-0 !px-2 !py-1" onClick={onTryDiff}>{t('summary.go')}</Button>
-            </li>
-          </ol>
-        </div>
+          ))}
+        </ol>
       </div>
     </div>
   );
@@ -370,7 +357,7 @@ export function CommentsTab({
             type="button"
             aria-pressed={filter === f}
             onClick={() => setFilter(f)}
-            className={`text-xs px-2.5 py-1 rounded-full border ${filter === f ? 'border-neutral-300 text-neutral-100 bg-neutral-500/10' : 'border-zinc-700 text-zinc-400 hover:text-zinc-200'}`}
+            className={`text-xs px-2.5 py-1 rounded-full border ${FOCUS} ${filter === f ? 'border-neutral-300 text-neutral-100 bg-neutral-500/10' : 'border-zinc-700 text-zinc-400 hover:text-zinc-200'}`}
           >
             {t(`comments.filters.${f}`)} ({count(f)})
           </button>
@@ -407,9 +394,9 @@ export function DiffTab({
 
   useEffect(() => {
     if (!focusId) return;
-    const el = document.getElementById(`diff-comment-${focusId}`);
+    const el = document.getElementById(`diff-comment-${focusId}`) ?? document.getElementById(`split-comment-${focusId}`);
     if (el && typeof el.scrollIntoView === 'function') el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, [focusId, current?.path]);
+  }, [focusId, current?.path, mode]);
 
   if (!current) return <p className="text-xs text-zinc-400">{t('diff.noFile')}</p>;
 
@@ -423,6 +410,10 @@ export function DiffTab({
   const commentedNumbers = new Set(
     view.comments.filter((x) => x.c.file === current.path && x.status === 'open').map((x) => x.line),
   );
+  // En "Lado a lado" los comentarios del archivo van debajo, ordenados por línea.
+  const splitComments = view.comments
+    .filter((x) => x.c.file === current.path && x.status !== 'dismissed')
+    .sort((a, b) => a.line - b.line);
 
   return (
     <div className="space-y-4">
@@ -434,7 +425,7 @@ export function DiffTab({
             type="button"
             aria-pressed={current.path === f.path}
             onClick={() => setFile(f.path)}
-            className={`px-2.5 py-1 rounded border font-mono max-w-full truncate ${current.path === f.path ? 'border-neutral-300 text-neutral-100 bg-neutral-500/10' : 'border-zinc-700 text-zinc-300 hover:border-zinc-500'}`}
+            className={`px-2.5 py-1 rounded border font-mono max-w-full truncate ${FOCUS} ${current.path === f.path ? 'border-neutral-300 text-neutral-100 bg-neutral-500/10' : 'border-zinc-700 text-zinc-300 hover:border-zinc-500'}`}
           >
             {f.path}
           </button>
@@ -454,7 +445,7 @@ export function DiffTab({
               type="button"
               aria-pressed={mode === m}
               onClick={() => setMode(m)}
-              className={`px-2.5 py-1 ${mode === m ? 'bg-zinc-700 text-zinc-100' : 'text-zinc-400 hover:text-zinc-200'}`}
+              className={`px-2.5 py-1 ${FOCUS} ${mode === m ? 'bg-zinc-700 text-zinc-100' : 'text-zinc-400 hover:text-zinc-200'}`}
             >
               {t(`diff.${m}`)}
             </button>
@@ -499,7 +490,17 @@ export function DiffTab({
           )}
         </div>
       ) : (
-        <SplitDiff file={current} t={t} marked={commentedNumbers} />
+        <>
+          <SplitDiff file={current} t={t} marked={commentedNumbers} />
+          {splitComments.length > 0 && (
+            <div className="space-y-2">
+              <div className="text-[11px] uppercase tracking-wider text-zinc-500">{t('diff.splitComments', { count: splitComments.length })}</div>
+              {splitComments.map((cv) => (
+                <CommentCard key={cv.c.id} cv={cv} t={t} locale={locale} actions={actions} compact lineLabel highlight={focusId === cv.c.id} />
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -624,7 +625,7 @@ export function SecurityTab({
                       {!d.advisory ? null : d.resolved ? (
                         <Badge variant="success" size="sm">{t('security.resolved')}</Badge>
                       ) : d.fixCommentId && !actions.locked ? (
-                        <Button size="sm" variant="primary" className="!bg-emerald-600 hover:!bg-emerald-700 whitespace-nowrap" onClick={() => actions.apply(d.fixCommentId as string)}>
+                        <Button size="sm" variant="primary" className="!bg-emerald-600 hover:!bg-emerald-700 whitespace-nowrap focus:!ring-offset-zinc-900" onClick={() => actions.apply(d.fixCommentId as string)}>
                           {t('security.applyUpgrade', { version: d.fixedTo ?? d.advisory.fixedIn })}
                         </Button>
                       ) : (
@@ -640,11 +641,11 @@ export function SecurityTab({
       )}
 
       <div className="flex flex-wrap gap-2">
-        <Button size="sm" variant="outline" className="!border-zinc-700 !text-zinc-200" onClick={onExportCsv}>
+        <Button size="sm" variant="outline" className="!border-zinc-700 !text-zinc-200 hover:!bg-zinc-800 focus:!ring-offset-zinc-900" onClick={onExportCsv}>
           <ArrowDownTrayIcon className="w-4 h-4 mr-1.5" />{t('security.exportCsv')}
         </Button>
         {view.deps.length > 0 && (
-          <Button size="sm" variant="outline" className="!border-zinc-700 !text-zinc-200" onClick={onSbom}>
+          <Button size="sm" variant="outline" className="!border-zinc-700 !text-zinc-200 hover:!bg-zinc-800 focus:!ring-offset-zinc-900" onClick={onSbom}>
             <ArrowDownTrayIcon className="w-4 h-4 mr-1.5" />{t('security.sbom')}
           </Button>
         )}
@@ -692,15 +693,15 @@ export function TestsTab({
                   <div className="mt-2"><CodeBlock text={tt.code} tone="neutral" /></div>
                   <div className="flex gap-2 mt-2 flex-wrap">
                     {added && view.status === 'merged' ? null : added ? (
-                      <Button size="sm" variant="ghost" className="!text-zinc-300" onClick={() => onRemove(tt.id)}>
+                      <Button size="sm" variant="ghost" className="!text-zinc-300 hover:!bg-zinc-800 focus:!ring-offset-zinc-900" onClick={() => onRemove(tt.id)}>
                         <MinusIcon className="w-4 h-4 mr-1" />{t('tests.remove')}
                       </Button>
                     ) : (
-                      <Button size="sm" variant="primary" className="!bg-violet-600 hover:!bg-violet-700" onClick={() => onAdd(tt.id)} disabled={view.status === 'merged'}>
+                      <Button size="sm" variant="primary" className="!bg-violet-600 hover:!bg-violet-700 focus:!ring-offset-zinc-900" onClick={() => onAdd(tt.id)} disabled={view.status === 'merged'}>
                         <PlusIcon className="w-4 h-4 mr-1" />{t('tests.add')}
                       </Button>
                     )}
-                    <Button size="sm" variant="ghost" className="!text-zinc-300" onClick={() => onCopy(tt.code)}>
+                    <Button size="sm" variant="ghost" className="!text-zinc-300 hover:!bg-zinc-800 focus:!ring-offset-zinc-900" onClick={() => onCopy(tt.code)}>
                       <ClipboardDocumentIcon className="w-4 h-4 mr-1" />{t('tests.copy')}
                     </Button>
                   </div>
@@ -760,7 +761,7 @@ export function RepoTab({
             type="button"
             aria-pressed={platform === p}
             onClick={() => setPlatform(p)}
-            className={`text-xs px-3 py-1.5 rounded-md border flex items-center gap-1.5 ${platform === p ? 'border-neutral-300 text-neutral-100 bg-neutral-500/10' : 'border-zinc-700 text-zinc-400 hover:text-zinc-200'}`}
+            className={`text-xs px-3 py-1.5 rounded-md border flex items-center gap-1.5 ${FOCUS} ${platform === p ? 'border-neutral-300 text-neutral-100 bg-neutral-500/10' : 'border-zinc-700 text-zinc-400 hover:text-zinc-200'}`}
           >
             <CodeBracketIcon className="w-4 h-4" />{t(`repo.platforms.${p}`)}
           </button>
@@ -823,7 +824,7 @@ export function RepoTab({
                     <div className="px-2 py-1 text-[11px] text-zinc-400 border-b border-zinc-800">{t(`repo.suggestionHeader.${platform}`)}</div>
                     <div className="p-2"><CodeBlock text={inline.c.fix} tone="new" /></div>
                     <div className="px-2 pb-2">
-                      <Button size="sm" variant="primary" className="!bg-emerald-600 hover:!bg-emerald-700" onClick={() => actions.apply(inline.c.id)}>
+                      <Button size="sm" variant="primary" className="!bg-emerald-600 hover:!bg-emerald-700 focus:!ring-offset-zinc-900" onClick={() => actions.apply(inline.c.id)}>
                         {t(`repo.applyLabel.${platform}`)}
                       </Button>
                     </div>
@@ -841,10 +842,10 @@ export function RepoTab({
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Button size="sm" variant="outline" className="!border-zinc-700 !text-zinc-200" onClick={() => onCopy(botMarkdown(view, t, locale))}>
+        <Button size="sm" variant="outline" className="!border-zinc-700 !text-zinc-200 hover:!bg-zinc-800 focus:!ring-offset-zinc-900" onClick={() => onCopy(botMarkdown(view, t, locale))}>
           <ClipboardDocumentIcon className="w-4 h-4 mr-1.5" />{t('repo.copyMarkdown')}
         </Button>
-        <Button size="sm" variant="ghost" className="!text-zinc-300" asChild>
+        <Button size="sm" variant="ghost" className="!text-zinc-300 hover:!bg-zinc-800 focus:!ring-offset-zinc-900" asChild>
           <Link href="/services#otras-soluciones">{t('repo.viewPlans')}</Link>
         </Button>
       </div>
@@ -974,7 +975,7 @@ export function MetricsTab({
           </tbody>
         </table>
       </div>
-      <Button size="sm" variant="outline" className="!border-zinc-700 !text-zinc-200" onClick={onExportCsv}>
+      <Button size="sm" variant="outline" className="!border-zinc-700 !text-zinc-200 hover:!bg-zinc-800 focus:!ring-offset-zinc-900" onClick={onExportCsv}>
         <ArrowDownTrayIcon className="w-4 h-4 mr-1.5" />{t('metrics.exportCsv')}
       </Button>
 

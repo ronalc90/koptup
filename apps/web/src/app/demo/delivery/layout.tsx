@@ -3,10 +3,9 @@ import { getTranslations } from 'next-intl/server';
 import { generateMetadata as metadataBase, getBreadcrumbSchema } from '@/lib/seo-config';
 
 /**
- * Metadata propia: la entrada compartida de seo-config para esta ruta promete
- * "tracking en tiempo real", "seguimiento GPS" y "optimización de rutas" como
- * si fueran reales. Aquí se describe lo que la demo hace de verdad (datos de
- * ejemplo, pago, mapa y seguimiento simulados).
+ * Metadata propia (título y descripción en el idioma del visitante) que dice lo
+ * que la demo hace de verdad: datos de ejemplo, pago, mapa y seguimiento
+ * simulados. Toma la URL canónica y el resto de la entrada de seo-config.
  */
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('demoDelivery.meta');

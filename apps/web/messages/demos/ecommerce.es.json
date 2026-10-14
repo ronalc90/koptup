@@ -3,9 +3,21 @@
     "meta": {
       "title": "Tienda en línea",
       "seoTitle": "Demo de tienda en línea: catálogo, carrito, pago simulado y reportes",
-      "seoDescription": "Prueba una tienda en línea de ejemplo para Colombia: catálogo con búsqueda y favoritos, carrito con reglas de precio y cupones, pago simulado con tarjeta, PSE, Nequi, Daviplata, contraentrega y Addi, panel de pedidos e inventario, guías de envío simuladas, devoluciones y reportes de ventas en COP exportables a CSV. Funciona con datos de ejemplo.",
+      "seoDescription": "Prueba una tienda en línea de ejemplo para Colombia: catálogo con búsqueda y favoritos, carrito con reglas de precio y cupones, pago simulado con tarjeta, PSE, Nequi, Daviplata, contraentrega o a cuotas, panel de pedidos e inventario, guías de envío simuladas, devoluciones y reportes de ventas en COP exportables a CSV. Funciona con datos de ejemplo.",
       "breadcrumbHome": "Inicio",
       "breadcrumbDemos": "Demos"
+    },
+    "intro": {
+      "back": "Volver al catálogo de demos",
+      "guidedDemo": "Solicitar demo guiada",
+      "quote": "Cotizar tu tienda",
+      "kicker": "Demo · Comercio electrónico",
+      "subtitle": "Una tienda de ejemplo para Colombia vista de punta a punta: el cliente compra y paga (pago simulado) y el mismo pedido llega al panel de la tienda, a logística y a los reportes.",
+      "forWhomLabel": "Para quién:",
+      "forWhom": "marcas, comercios y distribuidoras que quieren vender en línea con su catálogo, su inventario, sus pagos y sus envíos conectados.",
+      "startLabel": "Por dónde empezar:",
+      "start": "sigue el recorrido de 5 pasos: compra, paga, prepara, despacha y mira los reportes. Cada paso se marca solo cuando lo haces.",
+      "startCta": "Empezar el recorrido"
     },
     "viewSelector": "Vistas de la demo",
     "views": {
@@ -16,7 +28,7 @@
       "admin": "Reportes"
     },
     "sampleData": "Datos de ejemplo",
-    "sampleDataHint": "Tienda de ejemplo: productos, clientes, pedidos y cifras son ficticios; los pagos, la factura y las guías son simulados. Lo que haces se guarda solo en este navegador.",
+    "sampleDataHint": "Tienda de ejemplo: productos, clientes, pedidos, transportadoras y cifras son ficticios; los pagos, la factura y las guías son simulados. Lo que haces se guarda solo en este navegador.",
     "footerNote": "Demo con datos de ejemplo. Los pedidos, el inventario y los reportes se calculan en tu navegador y se guardan solo en él (puedes restablecerlos). En tu proyecto se conectan la pasarela de pagos, el proveedor de factura electrónica, las transportadoras y tu ERP.",
     "reset": {
       "button": "Restablecer",
@@ -27,6 +39,7 @@
     },
     "tour": {
       "title": "Recorrido sugerido",
+      "subtitle": "Cada paso se marca solo cuando lo haces. Toca un paso para ir a su vista.",
       "show": "Ver recorrido sugerido ({done}/{total})",
       "hide": "Ocultar",
       "steps": {
@@ -37,7 +50,14 @@
         "reports": "Mira tu pedido sumado en los reportes"
       },
       "here": "Este paso se hace en esta vista: {step}.",
-      "doneHere": "Ya completaste este paso."
+      "doneHere": "Ya completaste este paso.",
+      "next": "Siguiente paso",
+      "stateDone": "hecho",
+      "stateNext": "siguiente",
+      "statePending": "pendiente",
+      "complete": "¡Recorrido completo! Viste cómo un pedido viaja de la tienda a los reportes. ¿Lo quieres con tus productos, tus medios de pago y tus transportadoras?",
+      "startToast": "Paso {n} de {total}: {step}.",
+      "startDone": "Ya hiciste los 5 pasos del recorrido. Puedes repetirlos o solicitar una demo guiada."
     },
     "common": {
       "close": "Cerrar",
@@ -64,13 +84,13 @@
       "nequi": "Nequi",
       "daviplata": "Daviplata",
       "cod": "Contraentrega",
-      "addi": "Addi (a cuotas)"
+      "addi": "A cuotas"
     },
     "carriers": {
-      "coordinadora": "Coordinadora",
-      "servientrega": "Servientrega",
-      "interrapidisimo": "Interrapidísimo",
-      "tcc": "TCC"
+      "andino": "Rápido Andino",
+      "condor": "Envíos Cóndor",
+      "ceiba": "Mensajería Ceiba",
+      "macondo": "Carga Macondo"
     },
     "warehouses": {
       "bog": "Bodega Bogotá",
@@ -118,8 +138,8 @@
     },
     "hero": {
       "badge": "Tienda de ejemplo",
-      "title": "Tu tienda en línea, de punta a punta",
-      "subtitle": "Compra en la tienda, paga con un pago simulado y sigue el pedido en el panel, en logística y en los reportes.",
+      "title": "Tecnología, moda, hogar, café y más",
+      "subtitle": "Enviamos a 11 ciudades desde nuestras bodegas de Bogotá, Medellín y Cali. Paga con tarjeta, PSE, Nequi, Daviplata, contraentrega o a cuotas (en esta demo, el pago es simulado).",
       "freeShipping": "Envío gratis desde {amount}",
       "shippingFlat": "Envío con tarifa fija",
       "pricesNote": "Precios en COP con IVA incluido",
@@ -135,6 +155,7 @@
       "tech": "Tecnología",
       "fashion": "Moda",
       "home": "Hogar",
+      "coffee": "Café",
       "sports": "Deportes",
       "beauty": "Belleza",
       "wines": "Vinos",
@@ -279,7 +300,9 @@
         "walletPhone": "Celular registrado en {wallet}",
         "walletHint": "En tu tienda real te llega una notificación de {wallet} para aprobar el pago. Aquí la aprobación es simulada.",
         "codHint": "Pagas en efectivo cuando recibes el pedido. El pedido queda pendiente de pago hasta la entrega.",
-        "addiHint": "Pago a cuotas: en tu tienda real Addi estudia y aprueba el crédito. Aquí es simulado y aplica para compras desde {min}.",
+        "addiHint": "Compra ahora y paga a cuotas: en tu tienda real, la financiera aliada que elijas estudia y aprueba el crédito en línea. Aquí la aprobación es simulada y aplica para compras desde {min}.",
+        "addiFrom": "desde {min}",
+        "addiBelowMin": "Tu compra es de {amount} y el pago a cuotas aplica desde {min}. Agrega productos o elige otro medio de pago.",
         "declined": "Pago rechazado por la pasarela simulada (tarjeta de prueba rechazada). Prueba con otra tarjeta u otro medio de pago.",
         "processing": "Procesando pago simulado…",
         "stockChanged": "Las existencias cambiaron: revisa tu carrito antes de pagar."
@@ -403,7 +426,7 @@
         "hint": "Calculado con los pedidos de ejemplo y los tuyos. La variación compara con el promedio diario de los 7 días anteriores.",
         "sales": "Ventas (sin envío)",
         "orders": "Pedidos",
-        "ticket": "Ticket promedio",
+        "ticket": "Pedido promedio",
         "units": "Unidades vendidas",
         "deltaHint": "Frente al promedio diario de los 7 días anteriores"
       },
@@ -544,7 +567,7 @@
       },
       "dispatch": {
         "title": "Por despachar ({n})",
-        "hint": "Pedidos ya alistados. {n, plural, =0 {No hay pedidos nuevos por confirmar.} one {# pedido nuevo espera confirmación en el panel.} other {# pedidos nuevos esperan confirmación en el panel.}}",
+        "hint": "Pedidos ya alistados: los tuyos van primero y después del más antiguo al más nuevo. {n, plural, =0 {No hay pedidos nuevos por confirmar.} one {# pedido nuevo espera confirmación en el panel.} other {# pedidos nuevos esperan confirmación en el panel.}}",
         "empty": "No hay pedidos alistados. Pasa un pedido a preparación en el panel de la tienda.",
         "units": "{n, plural, one {# unidad} other {# unidades}}",
         "from": "Sale de {warehouse}"
@@ -555,8 +578,8 @@
         "empty": "No hay envíos en camino."
       },
       "carriers": {
-        "title": "Transportadoras nacionales",
-        "hint": "Tarifas de ejemplo para un paquete estándar a Bogotá; no son cotizaciones reales. Las desactivadas no aparecen al generar guías.",
+        "title": "Transportadoras de ejemplo",
+        "hint": "Transportadoras ficticias con tarifas, tiempos y calificaciones de ejemplo para un paquete estándar a Bogotá (no son cotizaciones reales). En tu proyecto se conectan las transportadoras que uses, por su API o por un agregador de envíos. Las desactivadas no aparecen al generar guías.",
         "carrier": "Transportadora",
         "sla": "Tiempo de entrega",
         "cost": "Tarifa de ejemplo",
@@ -612,7 +635,7 @@
       "kpis": {
         "sales": "Ventas netas",
         "orders": "Pedidos",
-        "ticket": "Ticket promedio",
+        "ticket": "Pedido promedio",
         "customers": "Clientes únicos",
         "repeat": "Recompra",
         "units": "Unidades",

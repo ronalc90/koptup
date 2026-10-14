@@ -6,11 +6,14 @@ import { ExclamationTriangleIcon, LockClosedIcon } from '@heroicons/react/24/out
 import Button from '@/components/ui/Button';
 import type { EstadoServidor } from '../_lib/useServidor';
 
-const RUTA_DEMO = '/demo/sistema-experto';
+const SLUG = 'sistema-experto';
+const RUTA_DEMO = `/demo/${SLUG}`;
 
 /**
  * Mensaje claro cuando el servidor responde 401/403/429 o no está disponible.
- * La demo sigue siendo usable (simulador y catálogo de ejemplo).
+ * La demo sigue siendo usable (simulador y catálogo de ejemplo). Sin sesión o
+ * sin acceso solo pasa si el acceso vence con la demo abierta (al cargar, el
+ * middleware ya muestra la pantalla de acceso).
  */
 export default function AvisoAcceso({
   estado,
@@ -52,7 +55,7 @@ export default function AvisoAcceso({
         )}
         {estado === 'sin-acceso' && (
           <Button size="sm" asChild>
-            <Link href="/contact">{t('request')}</Link>
+            <Link href={`/solicitar-demo?demos=${encodeURIComponent(SLUG)}`}>{t('request')}</Link>
           </Button>
         )}
         <Button size="sm" variant="outline" onClick={onReintentar}>

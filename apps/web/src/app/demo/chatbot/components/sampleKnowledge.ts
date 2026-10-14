@@ -1,11 +1,14 @@
 /**
  * Base de conocimiento de ejemplo del Playground (datos de ejemplo).
  *
- * Tres empresas FICTICIAS de Colombia (el nombre lleva "Ejemplo" para que no
+ * Cuatro empresas FICTICIAS de Colombia (el nombre lleva "Ejemplo" para que no
  * se confunda con ninguna empresa real), cada una con sus documentos internos.
- * El Playground sube estos textos de verdad al backend
- * (`POST /api/chatbot/bots/:id/docs`) y las preguntas se responden con el
- * pipeline real: fragmentación por párrafos → búsqueda BM25 → modelo de
+ * Las landings por sector abren la demo con su empresa ya elegida
+ * (`/demo/chatbot?empresa=salud|tienda|legal`, ver `RAG_SECTORS` en
+ * src/lib/rag-page.ts), y sus "Ejemplo ilustrativo" citan estos mismos textos.
+ * El Playground envía estos textos de verdad al backend
+ * (`POST /api/chatbot/sample-bots`, bot de ejemplo compartido) y las
+ * preguntas se responden con el pipeline real: fragmentación por párrafos → búsqueda BM25 → modelo de
  * OpenAI (o modo extractivo si no hay clave) → citas.
  *
  * Cada párrafo empieza con el número y el nombre de la sección para que el
@@ -18,11 +21,11 @@
  * funcione en el idioma de la interfaz.
  */
 
-export type SampleCompanyKey = 'rrhh' | 'tienda' | 'salud';
+export type SampleCompanyKey = 'rrhh' | 'tienda' | 'salud' | 'legal';
 export type SampleLocale = 'es' | 'en';
 
 /** Cambia este valor si cambian los textos: obliga a reindexar los bots de ejemplo. */
-export const SAMPLE_KB_VERSION = '2026-10-v1';
+export const SAMPLE_KB_VERSION = '2026-10-v2';
 
 export interface SampleDocument {
   /** Nombre del archivo que se sube al backend (aparece en las citas). */
@@ -48,7 +51,12 @@ export interface SampleCompany {
   outOfScope: string;
 }
 
-export const SAMPLE_COMPANY_KEYS: readonly SampleCompanyKey[] = ['rrhh', 'tienda', 'salud'];
+export const SAMPLE_COMPANY_KEYS: readonly SampleCompanyKey[] = ['rrhh', 'tienda', 'salud', 'legal'];
+
+/** ¿Es una empresa de ejemplo? (valida `?empresa=` de la URL). */
+export function isSampleCompanyKey(value: string | null | undefined): value is SampleCompanyKey {
+  return !!value && (SAMPLE_COMPANY_KEYS as readonly string[]).includes(value);
+}
 
 const ES: Record<SampleCompanyKey, SampleCompany> = {
   rrhh: {
@@ -149,9 +157,9 @@ const ES: Record<SampleCompanyKey, SampleCompany> = {
     city: 'Cali',
     sector: 'Salud',
     welcome:
-      'Hola, soy el asistente de atención al paciente de IPS Ejemplo Salud (IPS ficticia). Respondo con sus guías de preparación de exámenes, citas y autorizaciones, y derechos y deberes del paciente, y te cito la fuente.',
+      'Hola, soy el asistente de IPS Ejemplo Salud (IPS ficticia). A los pacientes les respondo con las guías de preparación de exámenes, citas y autorizaciones, y derechos y deberes del paciente; al área de cuentas médicas, con su manual de radicación y glosas. Siempre te cito la fuente.',
     systemPrompt:
-      'Eres el asistente de atención al paciente de IPS Ejemplo Salud, una IPS ficticia en Cali. Responde con un tono cálido y claro. No des diagnósticos ni recomendaciones médicas que no estén en los documentos.',
+      'Eres el asistente de IPS Ejemplo Salud, una IPS ficticia en Cali: atiendes a los pacientes y al área de cuentas médicas. Responde con un tono cálido y claro. No des diagnósticos ni recomendaciones médicas que no estén en los documentos.',
     docs: [
       {
         fileName: 'Preparación de exámenes.txt',
@@ -179,14 +187,64 @@ const ES: Record<SampleCompanyKey, SampleCompany> = {
           '3. PQRS. Puedes radicar una petición, queja, reclamo o sugerencia en el buzón de cada sede, en la página web o en la oficina de atención al usuario. Te respondemos en máximo 15 días hábiles.',
         ].join('\n\n'),
       },
+      {
+        fileName: 'Manual de cuentas médicas (ejemplo).txt',
+        text: [
+          '1. Radicación de facturas. El área de cuentas médicas radica cada factura ante la EPS con sus soportes (orden médica, autorización y resumen de la atención) dentro de los 5 días hábiles siguientes al egreso del paciente.',
+          '2. Glosa por falta de autorización. Si la EPS glosa una factura por falta de autorización, el auditor busca la autorización en el sistema de admisiones y la adjunta a la respuesta. Si no la encuentra, escala el caso a la coordinación de admisiones.',
+          '3. Glosa por tarifa. Si la glosa es por diferencia de tarifa, el auditor compara el valor facturado con el tarifario pactado en el contrato vigente con esa EPS y adjunta a la respuesta la página del contrato.',
+          '4. Plazo interno para responder una glosa. El equipo de cuentas médicas responde cada glosa dentro de los 10 días hábiles siguientes a su recepción, para cumplir con holgura los plazos del contrato con la EPS.',
+          '5. Conciliación. Las glosas que no se aceptan ni se levantan pasan a la mesa de conciliación mensual con la EPS, que coordina la jefatura de cuentas médicas.',
+        ].join('\n\n'),
+      },
     ],
     questions: [
       '¿Qué preparación necesito para una colonoscopia?',
       '¿Cuántas horas de ayuno necesito para la glicemia?',
       '¿Qué documentos llevo a la cita?',
-      '¿Cuánto tardan los resultados de laboratorio?',
+      '¿Cuál es el plazo interno para responder una glosa?',
     ],
     outOfScope: '¿Atienden urgencias pediátricas?',
+  },
+  legal: {
+    key: 'legal',
+    name: 'Firma Ejemplo Abogados S.A.S.',
+    city: 'Bogotá',
+    sector: 'Legal',
+    welcome:
+      'Hola, soy el asistente interno de Firma Ejemplo Abogados (firma ficticia). Respondo con su contrato modelo de prestación de servicios y su manual interno de expedientes, y te cito la cláusula o la sección.',
+    systemPrompt:
+      'Eres el asistente interno de Firma Ejemplo Abogados, una firma ficticia en Bogotá. Responde a los abogados de la firma en frases cortas y cita la cláusula. No des opiniones jurídicas que no estén en los documentos.',
+    docs: [
+      {
+        fileName: 'Contrato de prestación de servicios (modelo).txt',
+        text: [
+          'Cláusula 1. Objeto. El contratista presta al cliente servicios de asesoría en gestión documental, según la propuesta técnica anexa, que hace parte del contrato.',
+          'Cláusula 2. Duración y renovación. El contrato dura 12 meses desde la firma del acta de inicio. Se renueva por periodos iguales si ninguna de las partes avisa por escrito su intención de no renovarlo con al menos 30 días calendario de anticipación.',
+          'Cláusula 3. Valor y forma de pago. El cliente paga una suma mensual fija dentro de los 30 días calendario siguientes a la radicación de la factura electrónica.',
+          'Cláusula 4. Confidencialidad. Las partes guardan reserva de la información que conozcan por causa del contrato. Esta obligación se mantiene durante el contrato y hasta 3 años después de su terminación.',
+          'Cláusula 5. Cláusula penal. Si una de las partes incumple sus obligaciones, paga a la otra, a título de pena, una suma equivalente al 20 % del valor total del contrato, sin perjuicio de la indemnización de los perjuicios que se prueben.',
+          'Cláusula 6. Terminación anticipada. Cualquiera de las partes puede terminar el contrato antes de su vencimiento avisando por escrito con 60 días calendario de anticipación. El cliente paga los servicios prestados hasta la fecha de terminación.',
+          'Cláusula 7. Solución de controversias. Las diferencias se intentan resolver primero en una reunión de arreglo directo dentro de los 15 días hábiles siguientes a la reclamación escrita; si no hay acuerdo, las partes acuden a un centro de conciliación de Bogotá.',
+        ].join('\n\n'),
+      },
+      {
+        fileName: 'Manual interno de expedientes.txt',
+        text: [
+          '1. Apertura del expediente. Cada asunto nuevo se abre en el sistema documental de la firma el mismo día en que se firma el poder o el contrato con el cliente, con un número consecutivo por año.',
+          '2. Acceso. Solo el socio a cargo, los abogados asignados y el área de archivo pueden consultar un expediente. Los practicantes acceden con la autorización escrita del socio a cargo.',
+          '3. Términos. El abogado asignado registra cada término en el calendario compartido el mismo día en que recibe la notificación, con una alerta 5 días hábiles antes del vencimiento.',
+          '4. Conservación. Los expedientes cerrados se conservan en el archivo digital durante 10 años desde el cierre del asunto. Después se revisan con el socio a cargo antes de eliminarlos.',
+        ].join('\n\n'),
+      },
+    ],
+    questions: [
+      '¿Cuál es el valor de la cláusula penal del contrato?',
+      '¿Cuánto dura la obligación de confidencialidad?',
+      '¿Con cuánta anticipación se avisa la terminación anticipada?',
+      '¿Cuánto tiempo se conservan los expedientes cerrados?',
+    ],
+    outOfScope: '¿Qué dice la Corte Suprema en sentencias recientes?',
   },
 };
 
@@ -294,9 +352,9 @@ const EN: Record<SampleCompanyKey, SampleCompany> = {
     city: 'Cali',
     sector: 'Healthcare',
     welcome:
-      'Hi, I am the patient care assistant of IPS Ejemplo Salud (a fictitious healthcare provider). I answer with its exam preparation guides, appointments and authorizations, and patient rights and duties, and I cite the source.',
+      'Hi, I am the assistant of IPS Ejemplo Salud (a fictitious healthcare provider). I answer patients with its exam preparation guides, appointments and authorizations, and patient rights and duties, and the medical claims team with its filing and denials manual. I always cite the source.',
     systemPrompt:
-      'You are the patient care assistant of IPS Ejemplo Salud, a fictitious healthcare provider in Cali. Answer warmly and clearly. Do not give diagnoses or medical advice that is not in the documents.',
+      'You are the assistant of IPS Ejemplo Salud, a fictitious healthcare provider in Cali: you help patients and the medical claims team. Answer warmly and clearly. Do not give diagnoses or medical advice that is not in the documents.',
     docs: [
       {
         fileName: 'Exam preparation.txt',
@@ -324,14 +382,64 @@ const EN: Record<SampleCompanyKey, SampleCompany> = {
           '3. PQRS. Requests, complaints, claims or suggestions can be filed in the box at each site, on the website or at the patient service office. Responses are given within 15 working days.',
         ].join('\n\n'),
       },
+      {
+        fileName: 'Medical claims manual (sample).txt',
+        text: [
+          '1. Filing invoices. The medical claims team files each invoice with the EPS together with its supporting documents (medical order, authorization and care summary) within 5 working days after the patient is discharged.',
+          '2. Denial for missing authorization. When the EPS denies an invoice for missing authorization, the auditor looks for the authorization in the admissions system and attaches it to the reply. If it cannot be found, the case is escalated to the admissions coordinator.',
+          '3. Denial for rates. When the denial is about a rate difference, the auditor compares the billed amount with the fee schedule agreed in the current contract with that EPS and attaches the contract page to the reply.',
+          '4. Internal deadline to answer a denial. The medical claims team answers each denial within 10 working days of receiving it, to meet the deadlines in the EPS contract with time to spare.',
+          '5. Reconciliation. Denials that are neither accepted nor lifted go to the monthly reconciliation meeting with the EPS, coordinated by the head of medical claims.',
+        ].join('\n\n'),
+      },
     ],
     questions: [
       'What preparation is needed for a colonoscopy?',
       'How many hours of fasting for the glucose test?',
       'Which documents to bring to the appointment?',
-      'How long do laboratory results take?',
+      'What is the internal deadline to answer a denial?',
     ],
     outOfScope: 'Pediatric emergencies?',
+  },
+  legal: {
+    key: 'legal',
+    name: 'Firma Ejemplo Abogados S.A.S.',
+    city: 'Bogotá',
+    sector: 'Legal',
+    welcome:
+      'Hi, I am the internal assistant of Firma Ejemplo Abogados (a fictitious law firm). I answer with its model service agreement and its internal case file manual, and I cite the clause or section.',
+    systemPrompt:
+      'You are the internal assistant of Firma Ejemplo Abogados, a fictitious law firm in Bogotá. Answer the firm’s lawyers in short sentences and cite the clause. Do not give legal opinions that are not in the documents.',
+    docs: [
+      {
+        fileName: 'Service agreement (model).txt',
+        text: [
+          'Clause 1. Purpose. The contractor provides the client with document management advisory services, as described in the attached technical proposal, which is part of the agreement.',
+          'Clause 2. Term and renewal. The agreement lasts 12 months from the signing of the start record. It renews for equal periods unless either party gives written notice of non-renewal at least 30 calendar days in advance.',
+          'Clause 3. Fee and payment terms. The client pays a fixed monthly amount within 30 calendar days after the electronic invoice is filed.',
+          'Clause 4. Confidentiality. The parties keep confidential the information they learn because of the agreement. This obligation lasts for the term of the agreement and for 3 years after its termination.',
+          'Clause 5. Penalty clause. If a party breaches its obligations, it pays the other party, as a penalty, an amount equal to 20% of the total value of the agreement, without prejudice to compensation for proven damages.',
+          'Clause 6. Early termination. Either party may terminate the agreement before its expiry with 60 calendar days of written notice. The client pays for the services provided up to the termination date.',
+          'Clause 7. Dispute resolution. Disagreements are first addressed in a direct settlement meeting within 15 working days after the written claim; if there is no agreement, the parties go to a conciliation center in Bogotá.',
+        ].join('\n\n'),
+      },
+      {
+        fileName: 'Internal case file manual.txt',
+        text: [
+          '1. Opening a case file. Each new matter is opened in the firm’s document system on the same day the power of attorney or the client agreement is signed, with a consecutive number per year.',
+          '2. Access. Only the partner in charge, the assigned lawyers and the records team can view a case file. Interns need written authorization from the partner in charge.',
+          '3. Deadlines. The assigned lawyer records each deadline in the shared calendar on the same day the notice is received, with an alert 5 working days before it expires.',
+          '4. Retention. Closed case files are kept in the digital archive for 10 years after the matter closes. After that, they are reviewed with the partner in charge before deletion.',
+        ].join('\n\n'),
+      },
+    ],
+    questions: [
+      'What is the penalty clause amount?',
+      'How long does the confidentiality obligation last?',
+      'How much notice for early termination?',
+      'How long are closed case files kept?',
+    ],
+    outOfScope: 'Recent Supreme Court rulings?',
   },
 };
 

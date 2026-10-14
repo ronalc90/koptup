@@ -7,10 +7,11 @@ import {
   ArrowUturnLeftIcon, BeakerIcon, CursorArrowRaysIcon, PlusIcon, SparklesIcon, TrashIcon, XMarkIcon,
 } from '@heroicons/react/24/outline';
 import {
-  DEPARTMENTS, NORMS_TODAY, NORM_ENTITIES, PROCESSES_TODAY, SIMULATED_STORE_CHANGES, STORES, SUPPLIER_DOCS, catalogToday, storeHtml, type Store,
+  DEPARTMENTS, NORMS_TODAY, NORM_ENTITIES, PROCESSES_TODAY, SIMULATED_STORE_CHANGES, STORES, SUPPLIER_DOCS, catalogToday, normsFor, processesFor, storeHtml,
+  type Store,
 } from '../lib/data';
 import { OPTIONAL_DOC_COLUMNS, docStatus, matchProcess } from '../lib/engine';
-import { cop, norm, num, pct, type Loc } from '../lib/format';
+import { cop, dayShift, norm, num, pct, type Loc } from '../lib/format';
 import { buildSelector, extract, guessField, highlight, isValidSelector, quality, sanitizeHtml, type ExtractResult } from '../lib/selectors';
 import { useDemo } from '../lib/store';
 import { FIELD_TYPES, type Column, type Field, type FieldType, type SourceId } from '../lib/types';
@@ -467,7 +468,7 @@ function RadarConfigPanel() {
   const { s, loc, update } = useDemo();
   const [kw, setKw] = useState('');
   const radar = s.radar;
-  const results = PROCESSES_TODAY.map((p) => ({ p, m: matchProcess(p, radar) }));
+  const results = processesFor(PROCESSES_TODAY, dayShift(s.day)).map((p) => ({ p, m: matchProcess(p, radar) }));
   const matched = results.filter((x) => x.m.ok).length;
   const setRadar = (patch: Partial<typeof radar>) => update((p) => ({ ...p, radar: { ...p.radar, ...patch } }));
   const addKw = () => {
@@ -558,7 +559,7 @@ function NormConfigPanel() {
   const { s, update } = useDemo();
   const cfg = s.normativa;
   const kw = norm(cfg.keyword.trim());
-  const docs = NORMS_TODAY.map((d) => ({ d, ok: cfg.entities.includes(d.entity) && (!kw || norm(`${d.title} ${d.number}`).includes(kw)) }));
+  const docs = normsFor(NORMS_TODAY, dayShift(s.day)).map((d) => ({ d, ok: cfg.entities.includes(d.entity) && (!kw || norm(`${d.title} ${d.number}`).includes(kw)) }));
   const setCfg = (patch: Partial<typeof cfg>) => update((p) => ({ ...p, normativa: { ...p.normativa, ...patch } }));
   return (
     <Section title={t('norm.title')} subtitle={t('norm.subtitle')}>

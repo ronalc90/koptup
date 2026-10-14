@@ -4,7 +4,7 @@ import { useMemo, useState, type MouseEvent, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 import { ChatBubbleLeftRightIcon, ComputerDesktopIcon, DevicePhoneMobileIcon, PaperAirplaneIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { mediaSrc } from '../lib/art';
-import { assistantDocs, searchFaqs, type SearchHit } from '../lib/assistant';
+import { assistantDocs, publishedThisVisit, searchFaqs, type SearchHit } from '../lib/assistant';
 import { pathOf, titleOf, typeOf } from '../lib/models';
 import { COMPANY } from '../lib/seed';
 import { useCms } from '../lib/store';
@@ -88,7 +88,8 @@ function SiteAssistant({ locale, onClose }: { locale: Locale; onClose: () => voi
     const hit = searchFaqs(question, docs);
     setLog((l) => [...l, { q: question.trim(), hit }]);
     setQ('');
-    if (hit) act({ type: 'tour.mark', step: 'rag' });
+    // Paso 5 del recorrido: el asistente cita una pregunta frecuente publicada en esta visita.
+    if (hit && publishedThisVisit(hit.doc, state.seededAt)) act({ type: 'tour.mark', step: 'rag' });
   };
   return (
     <div className="absolute bottom-3 right-3 left-3 sm:left-auto sm:w-80 rounded-xl border border-slate-200 bg-white shadow-2xl text-slate-800 flex flex-col max-h-[80%]">
@@ -147,7 +148,7 @@ function SiteAssistant({ locale, onClose }: { locale: Locale; onClose: () => voi
 }
 
 /** Vista previa del sitio y de la app de ejemplo con el contenido de la entrada. */
-export default function SitePreview({ entry, content, mode }: { entry: Entry; content: EntryContent; mode: 'draft' | 'live' }) {
+export default function SitePreview({ entry, content, mode, upToDate = false }: { entry: Entry; content: EntryContent; mode: 'draft' | 'live'; upToDate?: boolean }) {
   const t = useTranslations('demoCms.preview');
   const tNav = useTranslations('demoCms.preview.nav');
   const { state, contentLocale: locale, toast } = useCms();
@@ -330,7 +331,7 @@ export default function SitePreview({ entry, content, mode }: { entry: Entry; co
             })}
           </div>
         )}
-        <span className="text-[11px] text-slate-500 dark:text-slate-400">{mode === 'draft' ? t('draftMode') : t('liveMode')}</span>
+        <span className="text-[11px] text-slate-600 dark:text-slate-400">{mode === 'draft' ? t('draftMode') : upToDate ? t('upToDate') : t('liveMode')}</span>
       </div>
 
       {channel === 'web' ? (

@@ -30,7 +30,7 @@
 | Demo | Existe. **Maqueta** 100 % en el navegador, la más interactiva de las tres de atención | `apps/web/src/app/demo/helpdesk-ia/page.tsx` es `'use client'`; sin `fetch`, `axios` ni llamadas a `/api` |
 | Pantallas | Cabecera con selector de marca y departamento · 5 métricas SLA · columna izquierda (canales, prioridad, base de conocimiento) · bandeja de tickets · detalle (conversación, respuestas sugeridas, respuesta, notas internas) · fila inferior (Auto-respuesta IA, Macros, CSAT) · modal de encuesta CSAT · animación de enrutamiento · avisos (toast) | Todo en `page.tsx` |
 | Datos | Constantes en el mismo archivo: 8 tickets (`INITIAL_TICKETS`), 6 artículos (`KB_ARTICLES`), registro de auto-respuesta, CSAT por agente; marcas "Alpha Retail / Beta Telecom / Gamma Banking" | `page.tsx`, `apps/web/messages/demos/helpdesk-ia.es.json` |
-| Backend | Módulo en memoria `apps/backend/src/modules/helpdesk/` (tickets, agentes, asignación; 191 líneas con test) **no montado** en `apps/backend/src/index.ts` | `helpdesk.service.ts`, `helpdesk.types.ts` |
+| Backend | Módulo en memoria `apps/backend/src/modules/helpdesk/` (retirado del repositorio en octubre de 2026, está en el historial de git; tickets, agentes, asignación; 191 líneas con test) **no montado** en `apps/backend/src/index.ts` | `helpdesk.service.ts`, `helpdesk.types.ts` |
 | Base reutilizable | El backend real del chatbot RAG (`apps/backend/src/routes/chatbot.routes.ts`) sirve para base de conocimiento y respuestas sugeridas reales | Ver [Sistemas RAG](Producto-chatbot-rag-ia.md) |
 | i18n ES/EN | UI en `helpdesk-ia.{es,en}.json` (240 líneas c/u). Fijos en código: notas internas en español ("Cliente VIP, dos reembolsos previos OK.") e intenciones del registro de auto-respuesta en inglés ("FAQ: password reset", "Shipping status", "Refund request", "Greeting") | `page.tsx` |
 | Tests | 1 smoke test (`__tests__/page.test.tsx`) que hoy no se ejecuta | |
@@ -158,7 +158,7 @@ Sin código, desde **Admin › Solicitudes de demo › Aprobar** (campo `persona
 - Encuesta CSAT/NPS post-resolución y tablero de métricas.
 - **Integraciones típicas en Colombia:** WhatsApp Business, Gmail/Outlook, Messenger/Instagram (Profesional), Shopify/VTEX/WooCommerce (estado del pedido), Siigo/Alegra (consulta de facturas electrónicas), Wompi/PayU (estado de pagos y reembolsos), Jira/Linear, CRM.
 - Roles y permisos con autorización en servidor, auditoría, retención de datos y registro de autorización de tratamiento (Ley 1581).
-- **Base técnica:** reutilizar `apps/backend/src/modules/helpdesk/` (Ticket, Agent, `assign`) migrado a Mongoose con autenticación y `tenantId`.
+- **Base técnica:** reutilizar `apps/backend/src/modules/helpdesk/` (retirado del repositorio en octubre de 2026, está en el historial de git; Ticket, Agent, `assign`) migrado a Mongoose con autenticación y `tenantId`.
 
 **SaaS (DECISIÓN 7):** hoy se muestra **"SaaS: lista de espera"**. Por compartir RAG, widget y canales con el chatbot, es el **segundo candidato** a SaaS en la Fase 4 (después del chatbot). Requisitos: core multi-tenant y cobro recurrente (Wompi/PayU en COP, Stripe en USD), alta autoservicio de WhatsApp por cliente (cada cliente con su propia cuenta de WhatsApp Business), medición de tickets/mes contra el plan, copias de seguridad por cliente, acuerdo de encargo de tratamiento de datos.
 

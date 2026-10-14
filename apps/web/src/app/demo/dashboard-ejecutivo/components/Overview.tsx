@@ -9,11 +9,11 @@ import {
   ClipboardDocumentIcon,
   ClockIcon,
   CurrencyDollarIcon,
+  LightBulbIcon,
   ShoppingBagIcon,
-  SparklesIcon,
   UsersIcon,
 } from '@heroicons/react/24/outline';
-import { yearSeries } from '../lib/engine';
+import { trailingSeries } from '../lib/engine';
 import { useDashboard } from '../lib/store';
 import { Donut, GoalBars, SalesChart, type Slice } from './charts';
 import { useNarrative } from './narrative';
@@ -32,8 +32,8 @@ export function KpiCards() {
       color: 'from-green-500 to-emerald-600',
       title: t('sales.title'),
       value: fmt.moneyM(k.sales),
-      delta: k.compliance !== null ? <Delta value={k.compliance - 1} text={t('sales.badge', { pct: fmt.pct(k.compliance, 0) })} title={t('sales.badgeHint')} /> : null,
-      note: k.compliance !== null ? t('sales.note', { pct: fmt.pct(k.compliance, 0), budget: fmt.moneyM(k.budget ?? 0) }) : t('sales.noGoal'),
+      delta: k.compliance !== null ? <Delta value={k.compliance - 1} text={t('sales.badge', { pct: fmt.compliance(k.compliance) })} title={t('sales.badgeHint')} /> : null,
+      note: k.compliance !== null ? t('sales.note', { pct: fmt.compliance(k.compliance), budget: fmt.moneyM(k.budget ?? 0) }) : t('sales.noGoal'),
       sub: k.salesYoy !== null ? t('yoyVs', { pct: fmt.signedPct(k.salesYoy), year: prevYear }) : null,
     },
     k.margin !== null
@@ -123,7 +123,10 @@ export default function Overview() {
   const { ctx, period, findings, setView, dataset, notify } = useDashboard();
   const { findingText } = useNarrative();
   const [table, setTable] = useState(false);
-  const series = useMemo(() => yearSeries(ctx.idx, period.year, ctx.params.goalGrowth, ctx.fc), [ctx, period.year]);
+  const end = period.months[period.months.length - 1];
+  const series = useMemo(() => trailingSeries(ctx.idx, end, ctx.params.goalGrowth, ctx.fc), [ctx, end]);
+  const first = series[0]?.month ?? end;
+  const last = series[series.length - 1]?.month ?? end;
   const slices: Slice[] = useMemo(() => {
     const top = ctx.lines.slice(0, 4).map((l) => ({
       key: l.key,
@@ -153,11 +156,11 @@ export default function Overview() {
       <div className="grid grid-cols-1 xl:grid-cols-5 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <section className={`${card} p-5 sm:p-6 xl:col-span-3 min-w-0`} aria-labelledby="ov-sales">
           <SectionTitle
-            title={<span id="ov-sales">{t('salesTitle', { year: period.year })}</span>}
+            title={<span id="ov-sales">{t('salesTitle', { from: fmt.month(first, true), to: fmt.month(last, true) })}</span>}
             subtitle={
-              ctx.fc.method !== 'none'
-                ? t('salesSubtitle', { goal: fmt.num(ctx.params.goalGrowth, 1), prev: period.year - 1, method: t(`method.${ctx.fc.method}`) })
-                : t('salesSubtitleNoForecast', { goal: fmt.num(ctx.params.goalGrowth, 1), prev: period.year - 1 })
+              series.some((p) => p.forecast)
+                ? t('salesSubtitle', { goal: fmt.param(ctx.params.goalGrowth), method: t(`method.${ctx.fc.method}`) })
+                : t('salesSubtitleNoForecast', { goal: fmt.param(ctx.params.goalGrowth) })
             }
             actions={
               <button type="button" className={btn.small} onClick={() => setTable((v) => !v)} aria-pressed={table}>
@@ -197,8 +200,8 @@ export default function Overview() {
           )}
         </section>
         <section className={`${card} p-5 sm:p-6 xl:col-span-2 min-w-0`} aria-labelledby="ov-city">
-          <SectionTitle title={<span id="ov-city">{t('cityTitle', { dim: labels.cityDimPlural.toLowerCase() })}</span>} subtitle={t('citySubtitle')} />
-          <GoalBars items={cityItems} fmt={fmt} />
+          <SectionTitle title={<span id="ov-city">{t('cityTitle', { dim: labels.cityDimPlural.toLowerCase() })}</span>} subtitle={t('citySubtitle', { gap: fmt.param(ctx.params.thresholds.goalGap) })} />
+          <GoalBars items={cityItems} fmt={fmt} gap={ctx.params.thresholds.goalGap / 100} />
         </section>
       </div>
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
@@ -206,11 +209,11 @@ export default function Overview() {
           <SectionTitle title={<span id="ov-lines">{t('linesTitle')}</span>} subtitle={t('linesSubtitle')} />
           <Donut slices={slices} fmt={fmt} centerLabel={t('total')} />
         </section>
-        <section className={`${card} p-5 sm:p-6 min-w-0`} aria-labelledby="ov-findings">
+        <section className={`${card} p-5 sm:p-6 min-w-0 scroll-mt-64`} aria-labelledby="ov-findings" id="ov-findings-section">
           <SectionTitle
             title={
               <span id="ov-findings" className="inline-flex items-center gap-2">
-                <SparklesIcon className="w-6 h-6 text-purple-600" aria-hidden="true" />
+                <LightBulbIcon className="w-6 h-6 text-purple-600" aria-hidden="true" />
                 {t('findingsTitle')}
               </span>
             }
@@ -227,7 +230,7 @@ export default function Overview() {
           {findings.length ? (
             <ul className="space-y-3">
               {findings.map((f) => {
-                const Icon = f.tone === 'good' ? ArrowTrendingUpIcon : f.tone === 'bad' ? ArrowTrendingDownIcon : SparklesIcon;
+                const Icon = f.tone === 'good' ? ArrowTrendingUpIcon : f.tone === 'bad' ? ArrowTrendingDownIcon : LightBulbIcon;
                 const tone =
                   f.tone === 'good'
                     ? 'text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40'

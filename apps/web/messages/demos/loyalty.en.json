@@ -9,30 +9,22 @@
     },
     "pageTitle": "Loyalty program",
     "pageBrand": "Example: {club}, by {brand} (fictitious drugstore)",
-    "pageSubtitle": "Enroll customers at checkout, award points with rules by category, day and channel, redeem the store's own rewards and measure what the program costs. Everything works on this page with sample data.",
+    "pageSubtitle": "See a points club end to end: the cashier enrolls the customer and adds points, the customer redeems in the app, and the marketing team adjusts the rules and measures what the program costs.",
     "sampleBadge": "Sample data",
     "sampleHint": "{brand} (NIT {nit}), {club}, its stores, members, ID numbers, phone numbers, partners and all figures are made up.",
     "howItWorks": {
-      "title": "What is real in this demo",
-      "real": "Calculated for real in your browser: the points for each purchase (base rule plus multipliers by category, day and channel), the balance as the sum of the points ledger, tiers, redemptions with coupons and checkout discounts, missions, referrals, fraud rules, allowed campaign hours, the cost simulator, the points liability and the CSV export. Your changes are saved only in this browser.",
-      "simulated": "Simulated: sending WhatsApp, email or SMS (you see the preview, no message is sent), the Apple Wallet and Google Wallet pass (preview), sweepstakes, and the figures for the 29,200-member base (KPIs, cohorts, mission results, A/B tests and partners). The WhatsApp and email buttons in “Invite friends” do open your app with the message ready.",
-      "project": "In your project, the checkout connects to your POS or online store through an API, points live in a points ledger in your database, messages go out through WhatsApp Business with approved templates, the pass is issued for Apple Wallet and Google Wallet with your brand, and reports come from your real data."
-    },
-    "tour": {
-      "title": "Suggested walkthrough (3 minutes)",
-      "steps": {
-        "1": "Checkout: search 300 555 0142 (Laura) and record $185,000 in Personal care on Tuesday: she earns 370 points thanks to double points on Tuesdays. You can also enroll someone new with their consent.",
-        "2": "Record another purchase, for example $420,000 in Dermocosmetics: Laura moves up to Gold and completes the “Buy 2 times this month” mission.",
-        "3": "Member app: check the balance and activity, claim the mission and redeem “Free delivery” (600 points): the balance drops and you get a coupon.",
-        "4": "Settings › Points: change the day rule to ×3 and see in the simulator how many points the same purchase earns and what the program costs.",
-        "5": "Results: review the points liability and what you did in the demo, export the activity as CSV and create a campaign from a segment within the hours allowed by Law 2300."
-      }
+      "title": "What is real and what is simulated in this demo",
+      "real": "Calculated for real in your browser: the points for each purchase (base rule plus multipliers by category, day and channel), the balance as the sum of the points ledger, tiers, redemptions with coupons and checkout discounts, missions, referrals, fraud rules, allowed campaign hours (including Colombian public holidays), the cost simulator, the points liability and the CSV export.",
+      "simulated": "Simulated: sending WhatsApp, email or SMS (you see the preview, no message is sent), the Apple Wallet and Google Wallet pass (preview), sweepstakes, and the figures for the 29,200-member base (KPIs, cohorts, mission results, A/B tests and partners). Segments come from rules: there is no AI model in this demo. The WhatsApp and email buttons in “Invite friends” do open your app with the message ready.",
+      "project": "In your project, the checkout connects to your POS or online store through an API, points live in a points ledger in your database, messages go out through WhatsApp Business with approved templates, the pass is issued for Apple Wallet and Google Wallet with your brand, and reports come from your real data.",
+      "dates": "The demo works with today's date in Colombia: sample purchases, expirations and reports are built backwards from today, and what you record gets Colombia's date and time. Your changes are saved only in this browser."
     },
     "reset": {
       "button": "Reset data",
       "confirm": "Delete your purchases, redemptions and changes in this demo?",
       "yes": "Yes, reset",
-      "done": "Sample data restored"
+      "done": "Sample data restored",
+      "hint": "Deletes your purchases, redemptions and changes and goes back to today's sample data"
     },
     "common": {
       "show": "Show",
@@ -117,7 +109,8 @@
       "6": "Saturdays"
     },
     "fmt": {
-      "date": "{m} {d}, {y}"
+      "date": "{m} {d}, {y}",
+      "month": "{m} {y}"
     },
     "segments": {
       "all": "All members",
@@ -152,16 +145,46 @@
     },
     "rewards": {
       "items": {
-        "voucher10": { "name": "$10,000 voucher", "desc": "Discount on your next purchase" },
-        "voucher25": { "name": "$25,000 voucher", "desc": "Discount on your next purchase" },
-        "handCream": { "name": "Hand cream 60 ml", "desc": "Store brand; pick it up at any store" },
-        "travelKit": { "name": "Personal care travel kit", "desc": "Toothbrush, toothpaste and hand sanitizer" },
-        "bottle": { "name": "Club water bottle 500 ml", "desc": "Limited edition" },
-        "delivery": { "name": "Free delivery", "desc": "One free delivery on your next order" },
-        "pressure": { "name": "Blood pressure check", "desc": "In store, by appointment" },
-        "dermoAdvice": { "name": "Dermocosmetic advice", "desc": "30 minutes with an advisor in store" },
-        "foodBank": { "name": "Donation to a food bank", "desc": "$5,000 for a partner foundation (fictitious)" },
-        "schoolKits": { "name": "School supplies donation", "desc": "$10,000 for school kits from a partner foundation (fictitious)" }
+        "voucher10": {
+          "name": "$10,000 voucher",
+          "desc": "Discount on your next purchase"
+        },
+        "voucher25": {
+          "name": "$25,000 voucher",
+          "desc": "Discount on your next purchase"
+        },
+        "handCream": {
+          "name": "Hand cream 60 ml",
+          "desc": "Store brand; pick it up at any store"
+        },
+        "travelKit": {
+          "name": "Personal care travel kit",
+          "desc": "Toothbrush, toothpaste and hand sanitizer"
+        },
+        "bottle": {
+          "name": "Club water bottle 500 ml",
+          "desc": "Limited edition"
+        },
+        "delivery": {
+          "name": "Free delivery",
+          "desc": "One free delivery on your next order"
+        },
+        "pressure": {
+          "name": "Blood pressure check",
+          "desc": "In store, by appointment"
+        },
+        "dermoAdvice": {
+          "name": "Dermocosmetic advice",
+          "desc": "30 minutes with an advisor in store"
+        },
+        "foodBank": {
+          "name": "Donation to a food bank",
+          "desc": "$5,000 for a partner foundation (fictitious)"
+        },
+        "schoolKits": {
+          "name": "School supplies donation",
+          "desc": "$10,000 for school kits from a partner foundation (fictitious)"
+        }
       }
     },
     "coupons": {
@@ -191,11 +214,11 @@
       }
     },
     "tx": {
-      "opening": "Balance carried over from 2025",
+      "opening": "Balance carried over",
       "earn": "Purchase of {amount} · {category}",
-      "summary": "Purchases from January to September 2026",
+      "summary": "Purchases from {from} to {to}",
       "redeem": "Redemption: {name}",
-      "redeemSummary": "Redemptions from January to September 2026",
+      "redeemSummary": "Redemptions from {from} to {to}",
       "welcome": "Welcome bonus",
       "referral": "Referral: {name}",
       "mission": "Mission: {name}",
@@ -283,7 +306,7 @@
         "subtitle": "Points are calculated with the Settings rules and reach the {club} member app.",
         "sede": "Store",
         "day": "Purchase day",
-        "dayHint": "Simulated week of October 5–11, 2026.",
+        "dayHint": "Today by default. You can record purchases from the last 7 days.",
         "channel": "Channel",
         "lines": "Products by category",
         "category": "Category",
@@ -315,7 +338,9 @@
           "insufficient": "The balance is not enough for that voucher.",
           "couponInvalid": "That coupon is no longer valid.",
           "frozen": "This customer's points are frozen by a fraud alert: record the purchase without redemption."
-        }
+        },
+        "today": "Today · ",
+        "yesterday": "Yesterday · "
       },
       "result": {
         "title": "Sale {id} recorded · +{points} points",
@@ -358,7 +383,7 @@
       "toNext": "{points} points to {tier}",
       "topTier": "You are at the top tier",
       "progressLabel": "Progress to the next tier",
-      "yearPoints": "{points} purchase points in 2026 (they count toward your tier)",
+      "yearPoints": "{points} purchase points in the last 12 months (they count toward your tier)",
       "birthday": {
         "title": "Happy birthday month, {name}!",
         "subtitle": "Your gift: a {value} voucher to use this month.",
@@ -449,18 +474,35 @@
         "title": "in a row with purchases",
         "kept": "You already bought this month: the streak continues.",
         "keep": "Buy this month to keep your streak.",
-        "chart": "Months of 2026 with purchases"
+        "chart": "Months with purchases (last 12)",
+        "bought": "with purchases",
+        "notBought": "no purchases"
       },
       "badges": {
         "title": "Badges",
         "earned": "earned",
         "locked": "locked",
         "items": {
-          "first": { "name": "First purchase", "how": "Buy with your club account" },
-          "streak3": { "name": "Regular customer", "how": "3 months in a row with purchases" },
-          "ambassador": { "name": "Ambassador", "how": "Invite someone who joins" },
-          "solidarity": { "name": "Big heart", "how": "Donate points to a foundation" },
-          "gold": { "name": "Gold tier", "how": "Reach Gold this year" }
+          "first": {
+            "name": "First purchase",
+            "how": "Buy with your club account"
+          },
+          "streak3": {
+            "name": "Regular customer",
+            "how": "3 months in a row with purchases"
+          },
+          "ambassador": {
+            "name": "Ambassador",
+            "how": "Invite someone who joins"
+          },
+          "solidarity": {
+            "name": "Big heart",
+            "how": "Donate points to a foundation"
+          },
+          "gold": {
+            "name": "Gold tier",
+            "how": "Reach Gold with your purchases from the last 12 months"
+          }
         }
       },
       "leaderboard": {
@@ -523,12 +565,18 @@
         "costIssued": "Points issued per month",
         "costGross": "Value of those points",
         "costNet": "Estimated monthly cost",
-        "costNote": "Formula: sales ÷ base rule × point value × (1 − % expired). Multipliers and bonuses increase it depending on how much they are used."
+        "costNote": "Formula: sales ÷ base rule × point value × (1 − % expired). Multipliers and bonuses increase it depending on how much they are used.",
+        "dayRuleHint": "In the demo it starts on today’s weekday so you can try it at checkout without changing the purchase date.",
+        "simToday": "{day} (today)",
+        "birthday": "Birthday gift",
+        "birthdayHint": "Voucher in pesos that members claim in the app during their birthday month.",
+        "birthdayNone": "No gift",
+        "birthdayOption": "{amount} voucher"
       },
       "tiers": {
         "title": "Tiers",
-        "subtitle": "Purchase points accumulated in the year to enter each tier.",
-        "from": "From (points in the year)",
+        "subtitle": "Purchase points in the last 12 months needed to enter each tier.",
+        "from": "From (points in 12 months)",
         "members": "{n} members",
         "invalid": "Thresholds must increase: Silver < Gold < Diamond, and Silver above 0.",
         "save": "Save tiers",
@@ -610,14 +658,21 @@
         "create": "Create sweepstakes",
         "created": "Sweepstakes created",
         "items": {
-          "basket": { "name": "October sweepstakes", "prize": "Personal care gift basket" },
-          "skincare": { "name": "September sweepstakes", "prize": "Dermocosmetic kit" }
-        }
+          "basket": {
+            "name": "{month} sweepstakes",
+            "prize": "Personal care gift basket"
+          },
+          "skincare": {
+            "name": "{month} sweepstakes",
+            "prize": "Dermocosmetic kit"
+          }
+        },
+        "noTickets": "No tickets yet: nobody enters new sweepstakes in the demo."
       },
       "campaigns": {
         "title": "Campaigns",
         "subtitle": "WhatsApp, email, SMS or in-app messages for a segment.",
-        "defaultMessage": "Hi '{name}'. This weekend you get double points at {club}. Your balance: '{points}' points.",
+        "defaultMessage": "Hi '{name}'. This week you get double points on Personal care at {club}. Your balance: '{points}' points.",
         "name": "Campaign",
         "namePh": "E.g.: Double points on vitamins",
         "audience": "Audience",
@@ -625,8 +680,8 @@
         "channel": "Channel",
         "status": "Status",
         "action": "Action",
-        "daily": "Monday to Saturday, {time}",
-        "weekly": "{day}, {time}",
+        "daily": "Monday to Saturday · {time}",
+        "weekly": "{day} · {time}",
         "channels": {
           "whatsapp": "WhatsApp",
           "email": "Email",
@@ -647,23 +702,25 @@
         "resume": "Schedule",
         "audienceNote": "Audience = segment members who authorized that channel (sample percentages). It changes with tier thresholds and with the members you enroll.",
         "newTitle": "New campaign",
-        "newSubtitle": "The demo checks the allowed hours and calculates the audience.",
+        "newSubtitle": "The demo checks the allowed hours (including Colombian public holidays) and calculates the audience.",
         "segment": "Segment",
-        "day": "Send day",
+        "day": "Send date",
         "time": "Time",
         "legalOk": "Allowed time.",
         "legal": {
           "sunday": "Commercial messages cannot be sent on Sundays.",
           "weekday": "Monday to Friday only between 7:00 a.m. and 7:00 p.m.",
-          "saturday": "Saturdays only between 8:00 a.m. and 3:00 p.m."
+          "saturday": "Saturdays only between 8:00 a.m. and 3:00 p.m.",
+          "holiday": "{date} is a public holiday ({name}): commercial messages cannot be sent.",
+          "time": "Enter a valid time."
         },
-        "legalRule": "Colombian Law 2300 of 2023: Monday to Friday 7:00 a.m. to 7:00 p.m.; Saturdays 8:00 a.m. to 3:00 p.m.; never on Sundays or public holidays (the demo does not check holidays).",
+        "legalRule": "Colombian Law 2300 of 2023: Monday to Friday 7:00 a.m. to 7:00 p.m.; Saturdays 8:00 a.m. to 3:00 p.m.; never on Sundays or public holidays. The demo calculates the Colombian public holidays for each year.",
         "audienceCalc": "It would reach {n} members by {channel}.",
         "message": "Message",
         "messageHint": "Variables: '{name}' and '{points}'.",
-        "preview": "Preview",
+        "preview": "Preview with {name}'s data",
         "save": "Schedule campaign",
-        "saved": "Campaign scheduled for {n} members",
+        "saved": "Campaign scheduled for {date} at {time}: {n} members",
         "test": "Send test (simulated)",
         "testSent": "Simulated test via {channel}: no message is sent in the demo",
         "sendNote": "Simulated: the demo sends no messages. In your project they go out through WhatsApp Business (approved templates), your email or SMS provider, and only to people who authorized the channel.",
@@ -672,7 +729,29 @@
           "winback": "We miss you: comeback voucher",
           "birthday": "Happy birthday (automatic)",
           "dermoLaunch": "Dermocosmetics launch"
-        }
+        },
+        "once": "{date} · {time}",
+        "yours": "yours",
+        "holidayTag": "public holiday",
+        "fromSegment": {
+          "vip": {
+            "name": "Early access to launches",
+            "message": "Hi '{name}'. As a VIP customer of {club} you are the first to see our dermocosmetics launches: you get early access this week. Your balance: '{points}' points."
+          },
+          "atRisk": {
+            "name": "300-point comeback bonus",
+            "message": "Hi '{name}'. We miss you at {club}: buy within the next 15 days and we will give you 300 points. Your balance: '{points}' points."
+          },
+          "nearTier": {
+            "name": "Almost at the next tier",
+            "message": "Hi '{name}'. You are less than 500 points away from the next tier at {club}. Your balance: '{points}' points."
+          },
+          "dormant": {
+            "name": "Reactivation with free delivery",
+            "message": "Hi '{name}'. We have not seen you at {club} in a while: your next delivery order is free. Your balance: '{points}' points."
+          }
+        },
+        "nameHint": "Required to schedule it."
       },
       "allies": {
         "title": "Partners (coalition)",
@@ -736,33 +815,33 @@
           "f1": {
             "detail": "5 purchases in 10 minutes with the same phone at 2 stores in different cities.",
             "events": {
-              "0": "Oct 6, 2026 10:02 · Chapinero · $96,000 · +96 pts",
-              "1": "Oct 6, 2026 10:05 · Chapinero · $88,000 · +88 pts",
-              "2": "Oct 6, 2026 10:11 · Laureles · $102,000 · +102 pts"
+              "0": "{date} 10:02 · Chapinero · $96,000 · +96 pts",
+              "1": "{date} 10:05 · Chapinero · $88,000 · +88 pts",
+              "2": "{date} 10:11 · Laureles · $102,000 · +102 pts"
             }
           },
           "f2": {
             "detail": "3 accounts with the same ID number and different phones.",
             "events": {
-              "0": "Account 1 · enrolled in Chapinero on Sep 14, 2026",
-              "1": "Account 2 · enrolled in Granada on Sep 21, 2026",
-              "2": "Account 3 · enrolled in Laureles on Oct 2, 2026"
+              "0": "Account 1 · enrolled in Chapinero on {date}",
+              "1": "Account 2 · enrolled in Granada on {date}",
+              "2": "Account 3 · enrolled in Laureles on {date}"
             }
           },
           "f3": {
             "detail": "8 referrals enrolled from the same device in one day.",
             "events": {
-              "0": "Oct 5, 2026 18:40 · 3 enrollments in 6 minutes",
-              "1": "Oct 5, 2026 19:02 · 3 enrollments in 4 minutes",
-              "2": "Oct 5, 2026 19:30 · 2 enrollments without purchases"
+              "0": "{date} 18:40 · 3 enrollments in 6 minutes",
+              "1": "{date} 19:02 · 3 enrollments in 4 minutes",
+              "2": "{date} 19:30 · 2 enrollments without purchases"
             }
           },
           "f4": {
             "detail": "Redemption of 6,000 points 2 minutes after earning them.",
             "events": {
-              "0": "Oct 4, 2026 16:20 · purchase of $612,000 · +612 pts",
-              "1": "Oct 4, 2026 16:21 · manual adjustment +5,400 pts",
-              "2": "Oct 4, 2026 16:22 · redemption of 6,000 pts"
+              "0": "{date} 16:20 · purchase of $612,000 · +612 pts",
+              "1": "{date} 16:21 · manual adjustment +5,400 pts",
+              "2": "{date} 16:22 · redemption of 6,000 pts"
             }
           }
         },
@@ -789,14 +868,14 @@
         "finished": "Finished",
         "running": "Running · {days} days",
         "finish": "Finish and apply the winner",
-        "note": "Sample results. In your project groups are assigned at random and measured with your sales.",
+        "note": "Sample results. When you finish a test, the winning variant is applied to the program rules. In your project groups are assigned at random and measured with your sales.",
         "items": {
           "tripleTuesday": {
-            "name": "Double vs. triple points on Tuesdays",
-            "metric": "Members who buy Personal care on Tuesday",
+            "name": "Double vs. triple points on the day rule",
+            "metric": "Members who buy Personal care on the rule day",
             "a": "A · double points",
             "b": "B · triple points",
-            "result": "Double points stays: triple only adds 0.7 percentage points and costs 50% more."
+            "result": "Double points wins: the day rule stays at ×2 in Settings › Points (triple only adds 0.7 percentage points and costs 50% more)."
           },
           "welcome300": {
             "name": "Welcome bonus of 100 vs. 300 points",
@@ -810,7 +889,7 @@
             "metric": "Members who buy in their birthday month",
             "a": "A · greeting only",
             "b": "B · greeting and $15,000 voucher",
-            "result": "Greeting with voucher wins: it is the gift you already see in the app."
+            "result": "Greeting with voucher wins: the birthday gift is set to $15,000 in Settings › Points."
           }
         }
       }
@@ -881,6 +960,78 @@
         "month": "Enrolled in",
         "after": "Month {n}"
       }
+    },
+    "header": {
+      "back": "Back to the demo catalog",
+      "guidedDemo": "Request a guided demo",
+      "quote": "Get a quote for your program",
+      "kicker": "Interactive demo · Loyalty program",
+      "forWhomLabel": "Who it is for:",
+      "forWhom": "pharmacy chains, supermarkets, fashion or beauty stores and restaurants with several locations that want their customers to come back.",
+      "simBadge": "Simulated messages, passes and draws · no AI",
+      "localBadge": "Saved only in this browser",
+      "loading": "Loading the demo with today's date…"
+    },
+    "notice": {
+      "newMonth": "The month changed since your last visit: the demo went back to the sample data with today's date (missions, streaks and expirations depend on the month).",
+      "updated": "We updated the demo: it now works with today's date and went back to the sample data."
+    },
+    "guide": {
+      "title": "Getting started",
+      "progress": "{done} of {total} done",
+      "show": "Show the steps",
+      "hide": "Hide",
+      "intro": "Five steps, about 3 minutes. Each button takes you to the right place in the demo and the step is checked off when you do it.",
+      "step": "Step {n}",
+      "done": "Done",
+      "finished": "You went through the whole demo! Want to see it with your brand, your stores and your rules?",
+      "steps": {
+        "s1": {
+          "title": "Add points at checkout",
+          "text": "Laura is already at checkout with $185,000 in Personal care. Record the purchase: the day rule gives her double points.",
+          "go": "Go to checkout"
+        },
+        "s2": {
+          "title": "Move up a tier",
+          "text": "Record another purchase for Laura: $420,000 in Dermocosmetics (×1.5). She moves from Silver to Gold and completes the month's 2-purchase mission.",
+          "go": "Prepare the purchase"
+        },
+        "s3": {
+          "title": "Redeem in the app",
+          "text": "In Laura's app, claim the missions and redeem “Free delivery”: the balance goes down and you get a coupon.",
+          "go": "Go to the catalog"
+        },
+        "s4": {
+          "title": "Adjust a rule",
+          "text": "In Settings › Points raise the day rule to ×3 and see in the simulator how many points it gives and what the program costs.",
+          "go": "Go to the rules"
+        },
+        "s5": {
+          "title": "Measure and act",
+          "text": "In Results check the points liability, export the CSV and create a campaign from a segment at an allowed time.",
+          "go": "Go to Results"
+        }
+      }
+    },
+    "holidays": {
+      "newYear": "New Year's Day",
+      "epiphany": "Epiphany",
+      "saintJoseph": "Saint Joseph's Day",
+      "holyThursday": "Maundy Thursday",
+      "goodFriday": "Good Friday",
+      "labour": "Labour Day",
+      "ascension": "Ascension Day",
+      "corpusChristi": "Corpus Christi",
+      "sacredHeart": "Sacred Heart",
+      "saintsPeterPaul": "Saints Peter and Paul",
+      "independence": "Independence Day",
+      "boyaca": "Battle of Boyacá",
+      "assumption": "Assumption Day",
+      "raceDay": "Columbus Day",
+      "allSaints": "All Saints' Day",
+      "cartagena": "Independence of Cartagena",
+      "immaculate": "Immaculate Conception",
+      "christmas": "Christmas Day"
     }
   }
 }

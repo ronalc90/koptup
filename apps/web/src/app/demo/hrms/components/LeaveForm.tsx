@@ -3,9 +3,9 @@
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
-import { addDays, endOfBusinessDays, nextBusinessDay, type ISODate } from '../lib/dates';
+import { addDays, endOfBusinessDays, firstBusinessDay, nextBusinessDay, type ISODate } from '../lib/dates';
 import { useHr } from '../lib/store';
-import { active, vacationBalance } from '../lib/selectors';
+import { active, overlappingLeave, vacationBalance } from '../lib/selectors';
 import type { LeaveType } from '../lib/types';
 import { Field, btn, inputCls, useFmt } from './ui';
 
@@ -40,8 +40,10 @@ export default function LeaveForm({
   const emp = people.find((p) => p.id === who);
   const bal = emp ? vacationBalance(state, emp) : null;
   const available = bal ? Math.floor((bal.balance - bal.pending) * 10) / 10 : 0;
-  const to = type === 'vacation' ? endOfBusinessDays(from, Math.max(1, days)) : addDays(from, Math.max(1, days) - 1);
-  const ret = type === 'vacation' ? nextBusinessDay(to) : addDays(to, 1);
+  // Las vacaciones empiezan el primer día hábil desde la fecha elegida (un sábado pasa al lunes hábil).
+  const start = from ? (type === 'vacation' ? firstBusinessDay(from) : from) : from;
+  const to = start ? (type === 'vacation' ? endOfBusinessDays(start, Math.max(1, days)) : addDays(start, Math.max(1, days) - 1)) : start;
+  const ret = to ? (type === 'vacation' ? nextBusinessDay(to) : addDays(to, 1)) : to;
 
   let error = '';
   if (!emp) error = t('errors.employee');
@@ -49,6 +51,7 @@ export default function LeaveForm({
   else if (!Number.isFinite(days) || days < 1 || days > 30) error = t('errors.days');
   else if (type === 'vacation' && emp.contract === 'apprentice') error = t('errors.apprentice');
   else if (type === 'vacation' && days > available) error = t('errors.balance', { n: f.num(available) });
+  else if (overlappingLeave(state, emp.id, start, to)) error = t('errors.overlap');
 
   const submit = () => {
     if (error || !emp) return;
@@ -57,7 +60,7 @@ export default function LeaveForm({
       leave: {
         employeeId: emp.id,
         type,
-        from,
+        from: start,
         to,
         days,
         status: type === 'sick' ? 'approved' : 'pending',
@@ -113,7 +116,7 @@ export default function LeaveForm({
       )}
       {from && days > 0 && (
         <p className="text-xs text-secondary-600 dark:text-secondary-300">
-          {t('range', { from: f.date(from), to: f.date(to), back: f.date(ret) })}
+          {t('range', { from: f.date(start), to: f.date(to), back: f.date(ret) })}
         </p>
       )}
       {!appMode && (

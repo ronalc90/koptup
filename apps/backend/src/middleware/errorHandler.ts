@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 import { logger } from '../utils/logger';
+import { defaultErrorCode } from '../utils/http-error';
 
 export class AppError extends Error {
   statusCode: number;
@@ -49,7 +50,8 @@ export function classifyError(err: unknown): {
     return {
       status: err.statusCode,
       message: err.message,
-      code: err instanceof CorsError ? 'cors_forbidden' : err.code ?? (err.statusCode < 500 ? 'bad_request' : 'internal_error'),
+      // Sin código propio, el del estado HTTP (401 unauthorized, 404 not_found…).
+      code: err instanceof CorsError ? 'cors_forbidden' : err.code ?? defaultErrorCode(err.statusCode),
       operational: err.isOperational,
       details: err.details,
     };
@@ -69,6 +71,21 @@ export function classifyError(err: unknown): {
       status: 400,
       message: messages[err.code] ?? 'Archivo inválido.',
       code: `upload_${err.code.toLowerCase()}`,
+      operational: true,
+    };
+  }
+
+  // El cliente de OpenAI de una función con tope rechazó la llamada
+  // (services/openai.service.ts: budgetedFetch): se responde 503 honesto.
+  const aiError = err as { status?: unknown; code?: unknown } | null;
+  if (aiError && typeof aiError === 'object' && aiError.status === 429 && (aiError.code === 'budget_exhausted' || aiError.code === 'ai_unavailable')) {
+    return {
+      status: 503,
+      message:
+        aiError.code === 'budget_exhausted'
+          ? 'Alcanzamos el cupo mensual de IA de esta función. Escríbenos y te ayudamos con tu caso.'
+          : 'La IA no está disponible en este momento. Intenta de nuevo en unos minutos.',
+      code: aiError.code,
       operational: true,
     };
   }
@@ -94,7 +111,7 @@ export function classifyError(err: unknown): {
     }
   }
 
-  return { status: 500, message: 'Internal server error', code: 'internal_error', operational: false };
+  return { status: 500, message: 'Ocurrió un error inesperado. Intenta de nuevo.', code: 'internal_error', operational: false };
 }
 
 export const errorHandler = (

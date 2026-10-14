@@ -4,8 +4,8 @@
  * navegador), así no hay diferencias de hidratación y las cifras se pueden
  * verificar con pruebas.
  */
-import { addDays, daysInMonth, monthNum, monthRange } from './dates';
-import { PRESETS, SAMPLE_CUTOFF, SAMPLE_FROM, SAMPLE_TO, type CustomerSeed, type Preset } from './presets';
+import { addDays, addMonths, daysInMonth, lastDay, monthNum, monthRange, yearOf } from './dates';
+import { PRESETS, SAMPLE_MONTHS, type CustomerSeed, type Preset } from './presets';
 import type { Dataset, ExpenseRow, MonthKey, SaleRow, SectorId } from './types';
 
 /** PRNG mulberry32 con semilla de texto. */
@@ -38,11 +38,11 @@ function pick<T extends string>(r: () => number, weights: Record<T, number>): T 
   return entries[entries.length - 1][0];
 }
 
-function shockFactor(p: Preset, month: MonthKey, city: string, line: string) {
+function shockFactor(p: Preset, month: MonthKey, anchor: MonthKey, city: string, line: string) {
   let sales = 1;
   let margin = 0;
   for (const s of p.shocks) {
-    if (month < s.from || month > s.to) continue;
+    if (month > anchor || month < addMonths(anchor, 1 - s.lastMonths)) continue;
     if (s.city && s.city !== city) continue;
     if (s.line && s.line !== line) continue;
     if (s.sales) sales *= s.sales;
@@ -58,11 +58,17 @@ function lineWeights(p: Preset, c: CustomerSeed): Record<string, number> {
 
 const round100 = (n: number) => Math.round(n / 100) * 100;
 
-/** Genera las facturas y gastos de ejemplo de un sector. */
-export function buildSample(sector: SectorId): Dataset {
+/**
+ * Genera las facturas y gastos de ejemplo de un sector: los 24 meses que
+ * terminan en `anchor` (el mes de corte). Con el mismo mes de corte la salida
+ * es siempre la misma; cada mes nuevo los datos se corren un mes.
+ */
+export function buildSample(sector: SectorId, anchor: MonthKey): Dataset {
   const p = PRESETS[sector];
-  const r = rng(`koptup-bi-${sector}`);
-  const months = monthRange(SAMPLE_FROM, SAMPLE_TO);
+  const r = rng(p.seed);
+  const months = monthRange(addMonths(anchor, 1 - SAMPLE_MONTHS), anchor);
+  const cutoff = lastDay(anchor);
+  const since = (c: CustomerSeed) => (c.since ? addMonths(anchor, -c.since) : null);
   const baseSize = p.customers.filter((c) => !c.since).reduce((s, c) => s + c.size, 0);
   const margins = Object.fromEntries(p.lines.map((l) => [l.id, l.margin]));
   const draft: Omit<SaleRow, 'id'>[] = [];
@@ -71,13 +77,16 @@ export function buildSample(sector: SectorId): Dataset {
     const season = p.season[monthNum(month) - 1];
     const dim = daysInMonth(month);
     for (const c of p.customers) {
-      if (c.since && month < c.since) continue;
+      const first = since(c);
+      if (first && month < first) continue;
       let ramp = 1;
-      if (c.since) {
-        const age = months.indexOf(month) - months.indexOf(c.since);
+      if (first) {
+        const age = months.indexOf(month) - months.indexOf(first);
         ramp = age === 0 ? 0.55 : age === 1 ? 0.8 : 1;
       }
-      const trend = Math.pow(1 + p.growth, t / 12) * Math.pow(1 + c.trend, t / 12);
+      // Tendencia anual del sector y del cliente; el nivel base (`monthlyBase`) es el de hace 12 meses.
+      const years = (t - 12) / 12;
+      const trend = Math.pow(1 + p.growth, years) * Math.pow(1 + c.trend, years);
       const total = (p.monthlyBase * c.size) / baseSize * season * trend * ramp * between(r, 0.92, 1.08);
       const weights = lineWeights(p, c);
       for (const [line, w] of Object.entries(weights)) {
@@ -89,7 +98,7 @@ export function buildSample(sector: SectorId): Dataset {
             : Object.entries(c.city).map(([city, cw]) => ({ city, share: cw * between(r, 0.9, 1.1) }));
         const shareSum = splits.reduce((s, x) => s + x.share, 0);
         for (const { city, share } of splits) {
-          const shock = shockFactor(p, month, city, line);
+          const shock = shockFactor(p, month, anchor, city, line);
           const value = round100((lineTotal * share) / shareSum * shock.sales);
           if (value <= 0) continue;
           const bigDiscount = c.size >= 8 ? 0.012 : 0;
@@ -103,7 +112,7 @@ export function buildSample(sector: SectorId): Dataset {
           else if (c.pay === 'lento') paid = addDays(due, intBetween(r, 8, 42));
           else paid = addDays(due, r() < 0.6 ? intBetween(r, 40, 120) : intBetween(r, 120, 260));
           if (paid < date) paid = date;
-          if (paid > SAMPLE_CUTOFF) paid = null;
+          if (paid > cutoff) paid = null;
           draft.push({
             date,
             customer: c.name,
@@ -128,15 +137,16 @@ export function buildSample(sector: SectorId): Dataset {
     const m = row.date.slice(0, 7);
     salesByMonth.set(m, (salesByMonth.get(m) ?? 0) + row.value);
   }
-  const er = rng(`koptup-bi-gastos-${sector}`);
+  const er = rng(`${p.seed}-gastos`);
   const expenses: ExpenseRow[] = [];
-  months.forEach((month, t) => {
+  months.forEach((month) => {
     for (const e of p.expenses) {
       let amount: number;
       if (e.variable) amount = (salesByMonth.get(month) ?? 0) * e.variable * between(er, 0.95, 1.05);
       else {
-        const year = t >= 12 ? 1 : 0;
-        amount = (e.monthly ?? 0) * Math.pow(1 + e.growth, year) * between(er, 0.97, 1.03);
+        // Los gastos fijos suben en enero de cada año (como el salario mínimo); `monthly` es el valor del año anterior al corte.
+        const years = yearOf(month) - (yearOf(anchor) - 1);
+        amount = (e.monthly ?? 0) * Math.pow(1 + e.growth, years) * between(er, 0.97, 1.03);
       }
       expenses.push({ month, category: e.id, amount: round100(amount) });
     }
@@ -149,7 +159,7 @@ export function buildSample(sector: SectorId): Dataset {
     rows,
     expenses,
     months,
-    cutoff: SAMPLE_CUTOFF,
+    cutoff,
     cashStart: p.cashStart,
     supplierDays: p.supplierDays,
     hasCost: true,

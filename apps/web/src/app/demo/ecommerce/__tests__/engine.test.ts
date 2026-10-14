@@ -4,10 +4,13 @@
  */
 import { priceCart, DEFAULT_RULES, FREE_SHIPPING_FROM, SHIPPING_FEE } from '../components/pricing';
 import { PRODUCTS, COFFEE_ID, totalStock } from '../components/products';
-import { SAMPLE, generateSampleData, nitCheckDigit, formatNit, CITY_BY_ID } from '../components/data';
+import { SAMPLE, generateSampleData, nitCheckDigit, formatNit, CITY_BY_ID, CARRIERS } from '../components/data';
+import { migrateStored } from '../components/store';
+import es from '../../../../../messages/demos/ecommerce.es.json';
+import en from '../../../../../messages/demos/ecommerce.en.json';
 import {
   computeKpis, inWindow, dailySeries, salesByProduct, salesByCategory, computeInsights, riskQueue,
-  automationAudience, luhnValid, expiryValid, mobileValid, toCsv, DAY, type Clock,
+  automationAudience, luhnValid, expiryValid, mobileValid, toCsv, localStamp, DAY, type Clock,
 } from '../components/analytics';
 
 const clock: Clock = { start: null, now: null };
@@ -100,7 +103,71 @@ describe('validaciones y utilidades', () => {
     expect(formatNit('901555010')).toBe('901.555.010-4');
   });
 
+  it('fecha los archivos con la hora de Colombia (UTC−5), sin importar la zona del navegador', () => {
+    expect(localStamp(Date.UTC(2026, 9, 14, 3, 5))).toBe('2026-10-13 22:05');
+    expect(localStamp(Date.UTC(2026, 9, 14, 17, 0))).toBe('2026-10-14 12:00');
+  });
+
   it('escapa el CSV', () => {
     expect(toCsv([['a', 'b,c', 'd"e']])).toBe('﻿a,"b,c","d""e"');
+  });
+});
+
+describe('datos sin marcas ni empresas reales', () => {
+  const REAL = /coordinadora|servientrega|interrapid|\btcc\b|addi/i;
+
+  it('usa transportadoras ficticias en el código y en los textos', () => {
+    CARRIERS.forEach((c) => {
+      expect(es.demoEcommerce2.carriers[c.id]).toBeTruthy();
+      expect(en.demoEcommerce2.carriers[c.id]).toBeTruthy();
+    });
+    expect(JSON.stringify(es.demoEcommerce2.carriers)).not.toMatch(REAL);
+    expect(es.demoEcommerce2.paymentMethods.addi).not.toMatch(REAL);
+    SAMPLE.orders.filter((o) => o.guide).forEach((o) => expect(o.guide).toMatch(/^(RAN|CON|CEI|MAC)-/));
+  });
+
+  it('pone el café y la prensa francesa en la categoría Café', () => {
+    const coffee = PRODUCTS.filter((p) => p.category === 'coffee').map((p) => p.id).sort((a, b) => a - b);
+    expect(coffee).toEqual([COFFEE_ID, 15]);
+    expect(es.demoEcommerce2.categories.coffee).toBe('Café');
+  });
+});
+
+describe('migración de lo guardado', () => {
+  const v3 = () => ({
+    v: 3,
+    products: PRODUCTS.map((p) => (p.id === COFFEE_ID ? { ...p, category: 'home', sku: 'HOG-CAF-ORI' } : p)),
+    orders: [
+      { ...SAMPLE.orders[0], id: 'TDA-9001', carrier: 'servientrega', guide: 'SER-SIM-000004', status: 'shipped' },
+      { ...SAMPLE.orders[1], id: 'TDA-9002', carrier: undefined, guide: undefined },
+    ],
+    returns: [],
+    rules: {},
+    carriers: { coordinadora: false, servientrega: true, interrapidisimo: true, tcc: false },
+    automations: {},
+    wishlist: [],
+    cart: [],
+    coupon: null,
+    seq: { order: 9003, product: 101, guide: 5, ret: 305 },
+    tour: { open: true, reportsSeen: false },
+  });
+
+  it('pasa la versión 3 a transportadoras ficticias y a la categoría Café sin perder pedidos', () => {
+    const m = migrateStored(v3())!;
+    expect(m.v).toBe(4);
+    expect(m.orders).toHaveLength(2);
+    expect(m.orders[0].carrier).toBe('condor');
+    expect(m.orders[0].guide).toBe('CON-SIM-000004');
+    expect(m.orders[1].carrier).toBeUndefined();
+    expect(m.carriers).toEqual({ andino: false, condor: true, ceiba: true, macondo: false });
+    const coffee = m.products.find((p) => p.id === COFFEE_ID)!;
+    expect(coffee.category).toBe('coffee');
+    expect(coffee.sku).toBe('CAF-ORI-500');
+  });
+
+  it('descarta lo que no reconoce', () => {
+    expect(migrateStored(null)).toBeNull();
+    expect(migrateStored({ v: 2, orders: [], products: [] })).toBeNull();
+    expect(migrateStored({ v: 4 })).toBeNull();
   });
 });

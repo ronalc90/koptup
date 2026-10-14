@@ -127,8 +127,22 @@ export function slugTaken(state: AppState, e: Pick<Entry, 'id' | 'type' | 'conte
   return state.entries.some((x) => x.id !== e.id && x.type === e.type && (x.content.slug === e.content.slug || x.live?.slug === e.content.slug));
 }
 
+/**
+ * ¿La entrada pasó por el flujo completo en esta visita? Desde su última
+ * publicación tiene un envío a revisión hecho después de cargar los datos de
+ * ejemplo y una aprobación posterior (las de ejemplo no cuentan).
+ */
+export function wentThroughReview(state: Pick<AppState, 'seededAt'>, e: Pick<Entry, 'versions'>): boolean {
+  const lastPublished = e.versions.map((v) => v.reason).lastIndexOf('published');
+  const since = e.versions.slice(lastPublished + 1);
+  const submitted = since.findIndex((v) => v.reason === 'submitted' && v.at >= state.seededAt);
+  return submitted >= 0 && since.slice(submitted + 1).some((v) => v.reason === 'approved');
+}
+
 function publish(state: AppState, e: Entry, now: string, auto: boolean): AppState {
   if (blockingIssues(state, e).length > 0) return state;
+  // Paso 4 del recorrido: solo cuando la entrada se envió, se aprobó y se publicó en esta visita.
+  const tourPublish = !auto && wentThroughReview(state, e);
   const by = auto ? (e.versions.find((v) => v.reason === 'approved')?.by ?? state.currentUserId) : state.currentUserId;
   const published: Entry = {
     ...e,
@@ -146,7 +160,7 @@ function publish(state: AppState, e: Entry, now: string, auto: boolean): AppStat
     ...next,
     deliveries: deliveries(next, published, 'entry.published', now, auto),
     activity: log(next, auto ? 'autoPublished' : 'published', now, published),
-    tour: !auto ? { ...next.tour, publish: true } : next.tour,
+    tour: tourPublish ? { ...next.tour, publish: true } : next.tour,
   };
 }
 
@@ -401,7 +415,9 @@ export function reducer(state: AppState, action: Action): AppState {
       const field: FieldDef = { ...action.field, custom: action.field.custom ?? { label: { es: action.field.id, en: action.field.id } } };
       const types: ContentType[] = state.types.map((x) => (x.id === t.id ? { ...x, fields: [...x.fields, field] } : x));
       const empty = field.localized && (field.kind === 'text' || field.kind === 'longText') ? { es: '', en: '' } : field.kind === 'boolean' ? false : field.kind === 'number' ? null : '';
-      const entries = state.entries.map((e) => (e.type === t.id ? { ...e, content: { ...e.content, fields: { ...e.content.fields, [field.id]: empty } } } : e));
+      // El campo nuevo llega vacío al borrador y a la versión publicada: cambiar el modelo no deja cambios sin publicar.
+      const withField = (c: EntryContent): EntryContent => ({ ...c, fields: { ...c.fields, [field.id]: empty } });
+      const entries = state.entries.map((e) => (e.type === t.id ? { ...e, content: withField(e.content), live: e.live ? withField(e.live) : null } : e));
       const next = { ...state, types, entries, tour: { ...state.tour, model: true } };
       return { ...next, activity: log(next, 'fieldAdded', action.now, undefined, `${t.id}.${field.custom?.label.es ?? field.id}`) };
     }

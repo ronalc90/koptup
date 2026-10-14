@@ -2,13 +2,17 @@
   "demoHrms": {
     "meta": {
       "title": "HR and Payroll",
-      "subtitle": "Digital employee records, vacation and leave, recruiting, onboarding and offboarding, performance, Colombian semi-monthly payroll and training, with the employee app and an AI policy assistant.",
+      "subtitle": "Employee records, vacation and leave, recruiting, onboarding and offboarding, performance, Colombian semi-monthly payroll and training, with an employee app and an AI policy assistant.",
       "sampleBadge": "Sample data",
       "sampleHint": "Alimentos Valdeora S.A.S. is a fictitious company: people, tax ID, providers and figures are made up.",
       "seoTitle": "Colombian HR and payroll demo",
       "seoDescription": "Interactive demo with sample data: digital employee records, vacation in business days with Colombian holidays, recruiting with a rule-based fit score, onboarding and offboarding with final settlement, performance reviews, semi-monthly payroll with contributions and accruals, simulated electronic payroll and social security filing, and an AI policy assistant.",
       "breadcrumbHome": "Home",
-      "breadcrumbDemos": "Demos"
+      "breadcrumbDemos": "Demos",
+      "back": "Back to the demo catalog",
+      "audience": "For HR managers, payroll leads and owners of small and mid-sized companies with operational staff. Everything runs in your browser with sample data from a fictitious company; only the policy assistant uses real AI.",
+      "requestDemo": "Request a guided demo",
+      "quote": "Get a quote for this system"
     },
     "header": {
       "openApp": "Open employee app",
@@ -29,7 +33,46 @@
       "talent": "Recruiting",
       "performance": "Performance",
       "payroll": "Payroll",
-      "learning": "Training"
+      "learning": "Training",
+      "pendingCount": "{n} pending"
+    },
+    "guide": {
+      "title": "Suggested walkthrough: the full cycle in 5 steps",
+      "subtitle": "You act as HR and as the direct manager; the employee app shows Camila Rojas Parra, a packer in Funza. Each step is checked off when you do it.",
+      "progress": "{done} of {total} done",
+      "hide": "Hide",
+      "show": "Show steps",
+      "done": "Done",
+      "steps": {
+        "request": {
+          "title": "Request vacation from the app",
+          "text": "As Camila, pick the start date and business days; the app works out the return date with Colombian holidays.",
+          "action": "Open the app"
+        },
+        "approve": {
+          "title": "Approve it as HR",
+          "text": "In Vacation and leave, approve or reject the request and see the balance change.",
+          "action": "Go to Vacation"
+        },
+        "hire": {
+          "title": "Hire a candidate",
+          "text": "In Recruiting, move someone from Offer to Hired and complete their onboarding checklist.",
+          "action": "Go to Recruiting"
+        },
+        "pay": {
+          "title": "Calculate and pay the period",
+          "text": "In Payroll: add a change, calculate, approve and pay (downloads the payment file).",
+          "action": "Go to Payroll"
+        },
+        "assistant": {
+          "title": "Ask the assistant",
+          "text": "In the app, check the payslip and ask about the internal rules (real AI with sources).",
+          "action": "Open the assistant"
+        }
+      },
+      "finished": "You went through the full cycle. Want to see it with your company's positions, sites and rules?",
+      "finishedDemo": "Request a guided demo",
+      "finishedQuote": "Get a quote for this system"
     },
     "common": {
       "loading": "Loading sample data…",
@@ -328,7 +371,8 @@
         "past": "The start date cannot be earlier than today.",
         "days": "Enter between 1 and 30 days.",
         "apprentice": "Apprentices have no vacation balance in this demo.",
-        "balance": "Exceeds the available balance ({n} days)."
+        "balance": "Exceeds the available balance ({n} days).",
+        "overlap": "There is already an approved or pending absence that overlaps those dates."
       },
       "submit": "Send request",
       "submitSick": "Record sick leave",
@@ -437,6 +481,7 @@
       "noEnd": "No end date",
       "tenure": "Tenure",
       "tenureValue": "{y} years and {m} months",
+      "tenureFuture": "Starts on {date}",
       "probation": "Probation period",
       "probationUntil": "Until {date}",
       "probationDone": "Completed",
@@ -594,7 +639,9 @@
         "shifts": "Available for rotating shifts",
         "cancel": "Cancel",
         "save": "Add"
-      }
+      },
+      "restore": "Return to the process",
+      "restoredToast": "{name} is back in the process at {stage}"
     },
     "processes": {
       "title": "Onboarding and offboarding",
@@ -632,7 +679,7 @@
         "deregister": "Social security deregistration (filing change)"
       },
       "activate": "Activate employee",
-      "activated": "{name} now appears in the directory and in payroll",
+      "activated": "{name} now appears in the directory and joins payroll from their start date ({date})",
       "activateHint": "{n, plural, one {# task left} other {# tasks left}}",
       "lastDay": "last day {date}",
       "closedOut": "Exited",
@@ -646,9 +693,10 @@
         "vacation": "Unused vacation",
         "vacDays": "{n} business days",
         "indemnity": "Indemnity",
+        "indemnityDays": "{n} days of salary",
         "title": "Estimated final settlement",
         "total": "Total to pay",
-        "note": "Simplified sample calculation (360-day year; severance and bonus include the transport allowance). Indemnity only applies to dismissal without just cause on a permanent contract."
+        "note": "Simplified sample calculation (360-day year; severance and service bonus include the transport allowance). Indemnity applies to dismissal without just cause (art. 64 of the Colombian Labor Code): on a permanent contract, 30 days of salary for the first year and 20 for each additional year (20 and 15 from 10 minimum wages); on a fixed-term contract, the salary for the rest of the term; on a contract for a specific job, at least 15 days."
       },
       "finish": "Complete offboarding",
       "closedToast": "{name}'s offboarding completed: removed from the directory and counted in turnover"
@@ -739,7 +787,8 @@
         "journal": "Journal entry downloaded as CSV",
         "liquidated": "Pay period calculated: {n} employees, net pay {total}",
         "reopened": "The pay period is back in draft: you can edit changes",
-        "approved": "Payroll approved; you can now pay it"
+        "approved": "Payroll approved; you can now pay it",
+        "nextOpened": "{period} is open: it starts with no changes"
       },
       "csv": {
         "name": "Employee",
@@ -822,7 +871,8 @@
         "liquidate": "Calculate pay period",
         "reopen": "Back to draft",
         "approve": "Approve payroll",
-        "pay": "Pay: download payment file"
+        "pay": "Pay: download payment file",
+        "next": "Open the next pay period"
       },
       "paidBadge": "Paid",
       "stepsAria": "Pay period status",
@@ -875,7 +925,9 @@
         "value": "Amount",
         "remove": "Remove change",
         "hoursValue": "{n} h",
-        "removed": "Change removed"
+        "removed": "Change removed",
+        "find": "Search by name or ID",
+        "matches": "{n, plural, =0 {No results} one {# result: pick it} other {# results: pick one}}"
       },
       "benefits": {
         "title": "Benefits",
@@ -892,6 +944,11 @@
         "people": "{n} beneficiaries",
         "monthly": "{value} per month",
         "note": "Sample values. Non-salary benefits are agreed in writing and configured in your project."
+      },
+      "nextHint": "The next one is {period}. In the demo you can open it early to repeat the cycle: it includes the staff active on those dates (including anyone you hired) and starts with no changes.",
+      "history": {
+        "title": "Pay periods paid in the demo",
+        "row": "{n} employees · net {net} · total cost {cost}"
       }
     },
     "filings": {
@@ -983,7 +1040,8 @@
       "reminded": "Reminder sent today (simulated)",
       "remindedToast": "Reminder sent to {n, plural, one {# person} other {# people}} (simulated delivery)",
       "remind": "Remind pending people",
-      "note": "Reminders are simulated; in your project they arrive through the app, email or WhatsApp."
+      "note": "Reminders are simulated; in your project they arrive through the app, email or WhatsApp.",
+      "lmsHint": "The training platform is a separate demo with its own access: if it is not enabled for you, you can request it there."
     },
     "app": {
       "inactive": "This employee is no longer active. Reset the data to see her again.",
@@ -1007,6 +1065,7 @@
         "approved": "Approved",
         "rejected": "Rejected"
       },
+      "rejectedBecause": "Reason: {reason}",
       "requestsHint": "Your manager approves or rejects from the HR view (Home or Vacation and leave).",
       "earned": "Earnings",
       "deductions": "Deductions",
@@ -1014,7 +1073,7 @@
       "slipCurrent": "Current pay period, already paid.",
       "slipPrevious": "Last paid period. The current one appears here when HR pays it in the Payroll tab.",
       "downloadPdf": "Download PDF",
-      "certIntro": "Download your employment certificate signed by HR, without having to ask anyone.",
+      "certIntro": "Download your employment certificate as a PDF without having to ask anyone. In the demo it is a sample document with no legal validity.",
       "withSalary": "Include salary",
       "courseDone": "Completed",
       "courseLate": "Overdue",
@@ -1033,7 +1092,7 @@
       "back": "Back",
       "close": "Close app",
       "title": "Employee app",
-      "footer": "Sample view of the employee web app (works on a phone without installing anything)."
+      "footer": "Sample view of the employee app. In your project it is a web app that opens on a phone without installing anything."
     },
     "assistant": {
       "persona": "You are the HR assistant of Alimentos Valdeora S.A.S., a fictitious company in a demo. You answer employees in English, in at most 4 clear sentences. Use only the sample internal rules and policy documents and mention the article or item that applies. If the answer is not in the documents, say so and suggest writing to HR.",
@@ -1047,15 +1106,20 @@
       },
       "sources": "Sources ({n})",
       "modeLlm": "AI-generated answer ({model}) based on the documents",
-      "modeProviderError": "The AI provider did not respond: showing the passages found",
-      "modeExtractive": "No-AI mode: the server has no provider key and shows the passages found",
       "thinking": "Searching the internal rules…",
       "placeholder": "Type your question",
       "send": "Send",
       "errors": {
         "network": "I could not connect to the assistant server. Check your connection and try again.",
         "rateLimited": "Too many questions in a row. Wait a moment and try again.",
-        "server": "The assistant server is not available right now. Try again later."
+        "server": "The assistant server is not available right now. Try again later.",
+        "unavailable": "The assistant is not available right now (the server is busy or under maintenance). Try again in a few minutes."
+      },
+      "noAi": {
+        "noKey": "No-AI mode: the server has no provider key and shows the passages found",
+        "budgetExhausted": "No-AI mode: the demo's monthly AI quota is used up; showing the passages found",
+        "budgetUnavailable": "No-AI mode: we could not check the AI quota; showing the passages found",
+        "providerError": "The AI provider did not respond: showing the passages found"
       }
     },
     "pdf": {

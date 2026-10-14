@@ -41,7 +41,7 @@ export default function PerformanceTab() {
         [t('csv.name'), t('csv.position'), t('csv.evaluator'), ...COMPETENCIES.map((c) => t(`competencies.${c}`)), t('csv.average'), t('csv.status')],
         ...state.reviews.map((r) => {
           const e = byId.get(r.employeeId)!;
-          return [e.name, pos(e), byId.get(e.managerId ?? '')?.name ?? '', ...COMPETENCIES.map((c) => r.scores[c] ?? ''), r.status === 'done' ? avg(r).toFixed(1) : '', t(`status.${r.status}`)];
+          return [e.name, pos(e), byId.get(e.managerId ?? '')?.name ?? '', ...COMPETENCIES.map((c) => r.scores[c] ?? ''), r.status === 'done' ? f.csvDec(avg(r)) : '', t(`status.${r.status}`)];
         }),
       ]),
     );

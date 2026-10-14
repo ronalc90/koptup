@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { BeakerIcon, CheckCircleIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
+import { BeakerIcon, CheckCircleIcon, InformationCircleIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
@@ -11,6 +11,7 @@ import type { ManualTarifario } from '../_lib/datos-ejemplo';
 import { ErrorApi, type TipoErrorApi } from '../_lib/api';
 import { conPorcentaje, horaActual } from '../_lib/formato';
 import type { EstadoServidor } from '../_lib/useServidor';
+import type { Permiso } from '../_lib/usePermisos';
 import { VARIANTE_SEVERIDAD } from './severidad';
 
 export function Interruptor({
@@ -29,7 +30,7 @@ export function Interruptor({
       aria-checked={activo}
       aria-label={etiqueta}
       onClick={onCambiar}
-      className={`relative h-6 w-12 shrink-0 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${
+      className={`relative h-6 w-12 shrink-0 rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-secondary-800 ${
         activo ? 'bg-green-600' : 'bg-secondary-300 dark:bg-secondary-600'
       }`}
     >
@@ -47,6 +48,7 @@ export default function ReglasTab({
   estado,
   cargada,
   actualizado,
+  puedeGuardar,
   manuales,
   borrador,
   guardada,
@@ -58,6 +60,8 @@ export default function ReglasTab({
   estado: EstadoServidor;
   cargada: boolean;
   actualizado: string | null;
+  /** Solo el equipo (admin, manager, sales) puede guardar: la configuración es compartida. */
+  puedeGuardar: Permiso;
   manuales: ManualTarifario[];
   borrador: ConfigMotor;
   guardada: ConfigMotor;
@@ -76,6 +80,7 @@ export default function ReglasTab({
   const [errorGuardar, setErrorGuardar] = useState<TipoErrorApi | null>(null);
 
   const hayCambios = !mismaConfig(borrador, guardada);
+  const soloEquipo = puedeGuardar === 'no';
   const esDefecto = mismaConfig(borrador, CONFIG_DEFECTO);
   const activas = CODIGOS_REGLAS.filter((c) => borrador.reglasHabilitadas.includes(c)).length;
 
@@ -213,9 +218,25 @@ export default function ReglasTab({
             </div>
 
             <div className="flex flex-col gap-2">
-              <Button onClick={guardar} disabled={!cargada || !hayCambios || guardando} isLoading={guardando}>
+              <Button
+                onClick={guardar}
+                disabled={!cargada || !hayCambios || guardando || soloEquipo || puedeGuardar === 'cargando'}
+                isLoading={guardando}
+                aria-describedby="nota-guardar"
+              >
+                {soloEquipo && <LockClosedIcon className="mr-2 h-4 w-4" aria-hidden="true" />}
                 {guardando ? t('saving') : t('save')}
               </Button>
+              <p
+                id="nota-guardar"
+                className={`text-xs ${
+                  soloEquipo
+                    ? 'rounded-lg border border-amber-300 bg-amber-50 p-2 text-amber-900 dark:border-amber-700 dark:bg-amber-900/20 dark:text-amber-100'
+                    : 'text-secondary-500 dark:text-secondary-400'
+                }`}
+              >
+                {soloEquipo ? t('teamOnly') : t('sharedNote')}
+              </p>
               <Button variant="outline" onClick={onProbar}>
                 <BeakerIcon className="mr-2 h-5 w-5" aria-hidden="true" />
                 {t('test')}

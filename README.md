@@ -21,8 +21,12 @@
 
 Koptup es el portafolio comercial de un estudio de desarrollo a medida. Construimos software para empresas en LATAM — web, mobile, integraciones, IA aplicada. Este repo contiene:
 
-- **2 aplicaciones reales** que puedes usar hoy: un chatbot RAG con OpenAI y un generador de copy para LinkedIn Ads.
-- **24 prototipos navegables** que muestran cómo se ve y se siente cada solución antes de que la construyamos para ti.
+- **28 demos** en [`/demo`](https://www.koptup.com/demo):
+  - **9 con IA o backend reales:** el chatbot RAG (producto principal), el sistema experto de cuentas médicas, el motor de reglas del auditor, el generador de contenido para LinkedIn, el gestor documental y una función con IA real en las demos de mesa de ayuda, gestión humana, LMS y gestor de contenido.
+  - **19 con datos de ejemplo:** corren en el navegador, muestran el flujo completo y lo dicen en pantalla.
+  - Qué es real y qué es simulado en cada una, y su estado de revisión: [Guía de demos](docs/wiki/Doc-07-Guia-de-Demos.md).
+- **Sistema de solicitud y acceso a demos:** el visitante pide una demo, el equipo la aprueba desde el panel y la persona entra con su cuenta (ver más abajo).
+- **Panel de administración y portal del cliente** (`/admin` y `/dashboard`).
 - **Sitio comercial** (planes RAG con precios fijos en COP y USD, catálogo de otras soluciones a medida en COP con referencia en USD a una TRM fija de 3.300, sobre nosotros, contacto).
 
 No es un SaaS ni un producto. Es la vitrina de un equipo que cobra por construir cosas a medida.
@@ -31,10 +35,10 @@ No es un SaaS ni un producto. Es la vitrina de un equipo que cobra por construir
 
 ### [Chatbot RAG con IA](https://www.koptup.com/demo/chatbot)
 
-Plataforma RAG end-to-end. Ingesta PDF/Word/Excel/CSV/HTML/URLs, chunking, retrieval BM25 con TF·IDF, llamadas a OpenAI Chat Completions (GPT-4o-mini por defecto, configurable) con citas inline `[1] [2]` clickeables. Builder visual para personalizar avatar/color/posición, 3 modos de preview (desktop/móvil/bubble) y generación de embed code (iframe / script / componente React).
+Plataforma RAG de punta a punta. Ingesta de PDF, Word (DOCX), texto (TXT, CSV, Markdown, HTML, JSON) y páginas web por URL; fragmentación, búsqueda BM25 y llamadas a OpenAI Chat Completions (`gpt-4o-mini` por defecto, configurable) con citas `[1] [2]` que se pueden abrir. Builder visual para personalizar avatar, color y posición, vista previa en tres modos (sitio web, celular y enlace directo) y código para insertarlo en tu sitio (`<script>` o `<iframe>`).
 
-**Stack real:** Next.js · TypeScript · Express · OpenAI SDK · BM25 implementado a mano · persistencia en archivos JSON.
-**Código:** [`apps/backend/src/routes/chatbot.routes.ts`](apps/backend/src/routes/chatbot.routes.ts) — 11 endpoints REST, 940+ líneas.
+**Stack real:** Next.js · TypeScript · Express · OpenAI SDK · BM25 implementado a mano · bots, documentos y conversaciones en MongoDB.
+**Código:** [`apps/backend/src/routes/chatbot.routes.ts`](apps/backend/src/routes/chatbot.routes.ts).
 
 ### [Generador de LinkedIn Ads](https://www.koptup.com/demo/linkedin-ads)
 
@@ -43,9 +47,9 @@ Generador de copies para campañas de LinkedIn con OpenAI server-side. Calendari
 **Stack real:** Express (backend) con OpenAI, límite por cuenta (o por IP sin sesión) en Redis y tope de gasto mensual · ruta de Next como proxy · UI con preview LinkedIn-style.
 **Código:** [`apps/backend/src/routes/linkedin-ads.routes.ts`](apps/backend/src/routes/linkedin-ads.routes.ts) y el proxy [`apps/web/src/app/api/linkedin-ads/generate/route.ts`](apps/web/src/app/api/linkedin-ads/generate/route.ts).
 
-## Prototipos navegables
+## Demos con datos de ejemplo
 
-El resto (24 vistas: CRM, ERP, POS, HRMS, WMS, LMS, helpdesk, telemedicina, facturación electrónica, voice AI, e-commerce, automatización de workflows, scraping, etc.) son **mockups interactivos con datos simulados realistas**. Cubren el flujo de UI completo — tabs, formularios validados, gráficas, drag-and-drop, modales — pero los datos son fixtures, no provienen de un backend de producción. Sirven para que un cliente potencial vea cómo se vería un ERP o un CRM moderno antes de contratarnos para construirlo.
+Las otras demos (CRM, ERP, POS, WMS, telemedicina, facturación electrónica, agente de voz, e-commerce, automatización, extracción de datos, entre otras) son **interfaces interactivas con datos de ejemplo**: cubren el flujo de la pantalla — pestañas, formularios validados, gráficas, modales —, pero los datos no vienen de un backend de producción y cada demo lo dice. Las que tienen una función con IA real (mesa de ayuda, gestión humana, LMS, gestor de contenido) la marcan en su guía. Sirven para que un cliente potencial vea cómo se vería la solución antes de contratarnos para construirla.
 
 Catálogo filtrable por categoría: **<https://www.koptup.com/demo>**
 
@@ -65,31 +69,36 @@ Tecnologías que realmente usamos en este repo:
 
 **Frontend:** Next.js 14 (App Router) · React 18 · TypeScript · TailwindCSS · next-intl (ES/EN) · next-themes · Framer Motion · React Hook Form + Zod · SWR · Axios · Recharts · date-fns
 
-**Backend:** Node.js 20.9+ · Express · TypeScript · Mongoose (MongoDB 7) · OpenAI SDK · JWT · bcryptjs · Multer · Helmet · Swagger (OpenAPI 3)
+**Backend:** Node.js 20.9+ · Express · TypeScript · Mongoose (MongoDB 7) · Redis (sesiones, cupos y topes de gasto de IA) · OpenAI SDK · Zod · JWT · bcryptjs · Multer · Helmet · Nodemailer · Swagger (OpenAPI 3, solo fuera de producción)
 
-**Storage & infra:** AWS S3 (uploads) · Docker · Vercel (web) · Railway (API)
+**Datos e infraestructura:** MongoDB · Redis · AWS S3 (opcional, documentos del portal) · Vercel (web) · Railway (API, con Nixpacks)
 
-**Testing & calidad:** Jest (ts-jest en el backend, next/jest en la web) · React Testing Library · Playwright · ESLint · TypeScript (modo `strict` en la web) · GitHub Actions
-
-Eso es ~25 tecnologías que dominamos. Conocemos y trabajamos cuando el proyecto lo pide con: Python (FastAPI/Django), Java (Spring Boot), .NET, Postgres + pgvector, Redis, Pinecone, Anthropic, Kubernetes, Terraform, GraphQL, gRPC, WebSockets, React Native, Flutter. Si necesitas algo fuera de esta lista, lo evaluamos antes de comprometernos.
+**Pruebas y calidad:** Jest (ts-jest en el backend, next/jest en la web) · React Testing Library · Playwright · ESLint · TypeScript (modo `strict` en la web) · GitHub Actions (CI, seguridad con `npm audit` y gitleaks, monitoreo de disponibilidad)
 
 ## Quick start
+
+Requisitos: **Node.js 20.9 o superior**, npm 9+, y MongoDB 7 y Redis 7 (con Docker o instalados). La guía paso a paso, con problemas comunes, está en [`SETUP.md`](SETUP.md).
 
 ```bash
 git clone https://github.com/ronalc90/koptup.git
 cd koptup
 NODE_ENV=development npm install
+npm run docker:up                                  # MongoDB y Redis locales (docker-compose.dev.yml)
 
-# Levantar backend (terminal A)
-docker run -d --name koptup-mongo -p 27017:27017 mongo:7
-cp apps/backend/.env.example apps/backend/.env   # editar con OPENAI_API_KEY
-cd apps/backend && npm run dev                    # http://localhost:3001
+# Backend (terminal A)
+cp apps/backend/.env.example apps/backend/.env    # cambia JWT_SECRET y JWT_REFRESH_SECRET; agrega OPENAI_API_KEY si la tienes
+cd apps/backend && npm run dev                     # http://localhost:3001 (salud: /health)
 
-# Levantar frontend (terminal B)
-cd apps/web && npm run dev                        # http://localhost:3000
+# Web (terminal B)
+cp apps/web/.env.example apps/web/.env.local      # apunta a http://localhost:3001
+cd apps/web && npm run dev                         # http://localhost:3000
 ```
 
-El chatbot RAG funciona sin `OPENAI_API_KEY` (fallback extractivo BM25). Con la key activa el modo LLM completo.
+**No golpees producción en desarrollo:** `next dev` usa `http://localhost:3001` si no defines `NEXT_PUBLIC_API_URL`; la URL pública de la API solo está en `apps/web/.env.production`, que Next carga en `next build`/`next start`. No la copies a `.env.local`: lo que pruebes crearía cuentas, solicitudes y leads reales.
+
+**Tu cuenta admin:** regístrate en `http://localhost:3000/register` y, desde `apps/backend`, corre `npx ts-node --transpile-only src/scripts/set-admin.ts <tu-email>` (lee `apps/backend/.env`). Cierra sesión y vuelve a entrar.
+
+El chatbot RAG funciona sin `OPENAI_API_KEY` (modo extractivo con BM25, y lo dice). Con la clave, responde con el modelo. Para no gastar, usa el mock de OpenAI del repositorio: `node apps/web/e2e/support/openai-mock.js` y `OPENAI_BASE_URL=http://127.0.0.1:3999/v1` en el backend.
 
 ## Variables de entorno
 
@@ -114,7 +123,7 @@ Las tres son opcionales: si una no existe, su etiqueta no se carga. Aunque exist
   | `generate_lead` | Formulario de [`/contact`](https://www.koptup.com/contact) o de [`/solicitar-demo`](https://www.koptup.com/solicitar-demo) enviado con éxito | `lead_source` (`contact_form` o `demo-request`); en contacto, `service` y `plan_id` (si viene de un plan RAG); en solicitud de demo, `demos_count` y `demo_slugs` |
   | `demo_start` | Primera pregunta en [`/demo/chatbot`](https://www.koptup.com/demo/chatbot) en cada carga de la página | `demo_mode` (`sample`: documento de ejemplo; `upload`: documento propio) |
   | `demo_upload` | Documento subido con éxito en "Prueba con tu documento" | `file_type` (`pdf`, `docx` o `txt`), `pages` |
-  | `whatsapp_click` | Clic en el botón de WhatsApp de `/contact` | `link_location` |
+  | `whatsapp_click` | Clic en un botón de WhatsApp: el de `/contact` y los de [`/solicitar-demo`](https://www.koptup.com/solicitar-demo) (en el formulario y en la confirmación) | `link_location` (`contact_page`, `solicitar_demo` o `solicitar_demo_gracias`) |
   | `plan_click` | Clic en el botón de un plan RAG (`/services#planes-rag`, `/rag` y "Agenda un piloto" de `/chatbots-ia`) o en los botones de las tarjetas de "Otras soluciones a medida" | `plan_name` (en el idioma del visitante; para agrupar usa `plan_id`), `plan_id`, `plan_group` (`planes_rag` u `otras_soluciones`), `cta` (`quote`, `details` o `demo`) y, en el detalle de una solución, `plan_tier` y `modality` |
 
 - **Conversiones de Google Ads:** el código no tiene etiquetas de conversión propias de Ads. Vincula GA4 con Google Ads, marca en GA4 como *eventos clave* los que quieras optimizar (por ejemplo `generate_lead` y `demo_upload`) e impórtalos en Google Ads como conversiones de Google Analytics 4.
@@ -133,34 +142,41 @@ La subida de documentos en `/demo/chatbot` (`/api/demo-rag`) queda **apagada** h
 | `DEMO_MONTHLY_BUDGET_USD` | por defecto `50` | Tope de gasto mensual (USD, mes UTC) en OpenAI de esta demo, calculado con los tokens de cada respuesta. Al alcanzarlo se desactivan la subida y las preguntas. Un valor inválido o negativo la deja desactivada. |
 | `OPENAI_API_KEY` | obligatoria | Clave de OpenAI (la demo usa `gpt-4o-mini`). La usan también el chatbot y otros módulos del backend. |
 | `REDIS_URL` | obligatoria para la demo | Redis de Railway (plugin Redis). Guarda el límite de 3 documentos por IP al día y el contador de gasto. |
-| `MONGODB_URI` | recomendada | Base de datos donde se guardan los leads: los del formulario de contacto y el email de la demo (origen `demo-rag`). Si falla, la demo sigue funcionando y el error queda en el log. |
+| `MONGODB_URI` | obligatoria para la demo | Base de datos donde se guardan los leads: los del formulario de contacto y el email de la demo (origen `demo-rag`) con la prueba de la autorización. Si no se puede guardar el lead, el documento no se procesa (`503 lead_unavailable`). |
 | `TRUST_PROXY_HOPS` | `1` en Railway | Cantidad de proxies delante del backend; define la IP real del visitante para los límites por IP. |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM`, `ADMIN_EMAIL`, `WHATSAPP_PROVIDER` y las de su proveedor | las que ya usa el formulario de contacto | Avisos por email y WhatsApp de cada lead (mismo canal que el formulario de contacto). |
 | `DEMO_RAG_TTL_SECONDS` | **no la definas en Railway** | Solo para pruebas locales: baja el tiempo de vida de 1 hora de los documentos. Se ignora con `NODE_ENV=production`. |
 
 ### Backend (Railway): seguridad y topes de IA
 
-Al arrancar, el backend valida sus variables con zod (`apps/backend/src/config/env.ts`): en producción **no arranca** si falta `MONGODB_URI`, `JWT_SECRET` o `JWT_REFRESH_SECRET`; las opcionales que faltan solo quedan como aviso en el log. La lista completa, con su efecto, está en [`apps/backend/.env.example`](apps/backend/.env.example).
+Al arrancar, el backend valida sus variables con zod (`apps/backend/src/config/env.ts`): en producción **no arranca** si falta `MONGODB_URI` o `JWT_SECRET`. Sin `JWT_REFRESH_SECRET` **sí arranca**, pero nadie puede iniciar sesión: el log lo avisa. Las opcionales que faltan dejan un aviso `[env] …` que dice qué función queda apagada (por ejemplo `SMTP_USER` y `SMTP_PASS`, que son las que deciden si sale correo, `DEMO_UPLOAD_ENABLED`, `INTERNAL_API_KEY` y `ADMIN_EMAIL`). La lista completa, con su efecto, está en [`apps/backend/.env.example`](apps/backend/.env.example) y en [Operación y despliegue](docs/wiki/Doc-11-Operacion-y-Despliegue.md#4-variables-de-entorno).
 
 | Variable | Valor | Qué hace |
 |---|---|---|
 | `JWT_SECRET`, `JWT_REFRESH_SECRET` | obligatorias, largas y distintas | Firman los tokens de sesión y de renovación. |
+| `JWT_REFRESH_EXPIRES_IN` | por defecto `7d` (máximo 7 días) | Vida de la sesión renovable: la misma cifra firma el token y vence su copia en Redis. Un valor mayor o inválido usa 7 días (lo que dura la cookie de la web). |
 | `CHATBOT_MONTHLY_BUDGET_USD` | por defecto `50` | Tope de gasto mensual en OpenAI del chatbot (Builder, Playground y chat por sesión). Al alcanzarlo, el chat responde en modo extractivo y lo dice. |
 | `LINKEDIN_ADS_MONTHLY_BUDGET_USD` | por defecto `20` | Tope mensual del generador de LinkedIn Ads (además, 5 generaciones cada 10 minutos y 30 al día por cuenta, o por IP si no hay sesión). |
 | `CONTENT_MONTHLY_BUDGET_USD` | por defecto `20` | Tope mensual del gestor de contenido con IA. |
+| `DOCUMENTS_MONTHLY_BUDGET_USD` | por defecto `10` | Tope mensual del gestor de documentos (`/api/documents`: análisis, búsqueda semántica y explicaciones). Sin cupo, una subida se guarda sin análisis y lo dice; las demás funciones con IA responden 503. |
+| `HEALTH_MONTHLY_BUDGET_USD` | por defecto `30` | Tope mensual de las APIs de salud (cuentas médicas, auditoría, sistema experto, CUPS y reglas de facturación). |
+| `DOCUMENTS_AI_DAILY_LIMIT_PER_USER`, `HEALTH_AI_DAILY_LIMIT_PER_USER` | por defecto `30` y `20` | Solicitudes con IA por cuenta y por día en esas dos funciones (429 al pasarlo). El equipo de KopTup solo tiene el tope mensual. |
 | `INTERNAL_API_KEY` | opcional, igual en Vercel y Railway | Permite que la web (middleware de `/admin`, `/dashboard` y `/demo/<slug>`, proxy de LinkedIn Ads) informe la IP real del visitante para los límites por IP (sin ella, esas peticiones cuentan por la IP de salida de Vercel). |
-| `ADMIN_EMAIL` | opcional | Si existe, el arranque asegura el rol admin de esa cuenta (solo si ya está registrada). Sin ella, el arranque no cambia roles; también se puede usar `src/scripts/set-admin.ts`. |
+| `ADMIN_EMAIL` | recomendada | Destino de los avisos al equipo por correo (sin ella no salen y el log lo avisa; no hay dirección fija en el código). Además, al arrancar da el rol admin a esa cuenta **solo si existe, está activa y no hay ningún otro admin** (primer admin o recuperación), y lo deja en la bitácora. Si ya hay otro admin no cambia roles: usa Admin › Usuarios o `src/scripts/set-admin.ts`. |
 | `API_DOCS_ENABLED` | `false` en producción | `/api-docs` solo existe fuera de producción o con este valor en `true`. |
 | `RATE_LIMIT_WINDOW_MS`, `RATE_LIMIT_MAX_REQUESTS` | por defecto 15 min y `100` | Límite general de la API, por cuenta (con sesión) o por IP. |
 | `AUTH_ME_RATE_LIMIT_MAX` | por defecto `120` por minuto | Cupo propio de `GET /api/auth/me` y `GET /api/demo-access/<slug>`, que el middleware de la web consulta en cada navegación del panel, del portal y de las demos con acceso. |
-| `CHATBOT_RATE_LIMIT_MAX` | por defecto `60` por minuto | Peticiones por IP a `/api/chatbot`. |
+| `CHATBOT_RATE_LIMIT_MAX` | por defecto `60` por minuto | Preguntas por IP al chat de los bots (`POST /api/chatbot/bots/:id/chat`). |
+| `CHATBOT_API_RATE_LIMIT_MAX` | por defecto `180` por minuto | Resto de peticiones por IP a `/api/chatbot` (`GET /models` no cuenta). |
+| `LOGIN_RATE_LIMIT_MAX`, `LOGIN_IP_RATE_LIMIT_MAX`, `REGISTER_RATE_LIMIT_MAX`, `FORGOT_PASSWORD_RATE_LIMIT_MAX`, `RESET_PASSWORD_RATE_LIMIT_MAX`, `ACTIVATION_RATE_LIMIT_MAX`, `CHANGE_PASSWORD_RATE_LIMIT_MAX` | por defecto `10`, `30`, `5`, `3`, `10`, `10` y `5` | Límites propios de cada ruta de cuenta (cada una con su contador). Login por IP + email y por IP cada 15 min; registro por IP por hora; recuperación por IP + email (además, 10 por IP), restablecer y activación por IP cada 15 min; cambio de contraseña por cuenta cada 15 min. El correo se cuenta normalizado (mayúsculas, puntos y `+etiqueta` de Gmail no abren un contador nuevo). |
 | `CHATBOT_CREATE_LIMIT_PER_HOUR` | por defecto `30` | Bots nuevos por IP cada hora en el Builder del chatbot. |
 | `CHATBOT_EXAMPLE_BOT_IDS` | opcional | IDs, separados por coma, de los bots de ejemplo que todos ven en `GET /api/chatbot/bots` (el resto solo lo ve su dueño). |
-| `CHATBOT_STATE_DIR` | por defecto `./data/chatbots` | Carpeta del estado en disco del chatbot (en Railway el disco es efímero). |
+| `CHATBOT_CONVERSATION_TTL_DAYS` | por defecto `30` | Días que se guarda cada pregunta al widget de un bot de usuario (los bots y sus conversaciones viven en MongoDB). Las de "Prueba el asistente", la vista previa y los bots de ejemplo no se guardan. |
+| `CHATBOT_STATE_DIR` | por defecto `./data/chatbots` | Carpeta del archivo heredado `state.json`: si existe al arrancar, se migra una vez a MongoDB y se borra. |
 | `CUPS_IMPORT_DIR` | por defecto `./data/imports` | Única carpeta desde la que el admin puede importar CUPS, solo por nombre de archivo. |
 | `OPENAI_BASE_URL` | **no la definas en Railway** | Solo para pruebas locales y CI: apunta el backend al mock de OpenAI (ver [Pruebas y CI](#pruebas-y-ci)). |
 
-Railway revisa `GET /health/live` (el proceso responde) al desplegar; `GET /health` responde 503 si MongoDB no está conectado.
+Railway revisa `GET /health` al desplegar (`apps/backend/railway.json`): responde 503 si MongoDB no está conectado, así que un despliegue sin base de datos no entra en servicio y el anterior sigue atendiendo. `GET /health/live` solo dice que el proceso responde.
 
 ### Backend (Railway): solicitud y acceso a demos
 
@@ -169,7 +185,7 @@ El modo de acceso de cada demo (abierta, requiere acceso o solo por invitación)
 | Variable | Valor | Qué hace |
 |---|---|---|
 | `FRONTEND_URL` | URL pública de la web (`https://www.koptup.com`) | Base de los enlaces que arma el backend: activación (`/activar/<token>`), Mis demos, restablecer contraseña y los correos. Sin ella usa `http://localhost:3000`. |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM` | opcionales | Acuse a quien pide la demo, correo de aprobación con el enlace de activación y recordatorio 3 días antes de que venza el acceso. Sin SMTP no se envía ningún correo y el panel muestra siempre el enlace para copiarlo o enviarlo por WhatsApp. |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM` | opcionales | Acuse a quien pide la demo, correo de aprobación con el enlace de activación y recordatorio 3 días antes de que venza el acceso. El correo sale solo si están `SMTP_USER` y `SMTP_PASS` (sin `SMTP_HOST` se usa Gmail). Sin ellas no se envía ningún correo y el panel muestra siempre el enlace para copiarlo o enviarlo por WhatsApp. |
 | `ADMIN_EMAIL`, `WHATSAPP_PROVIDER` y las de su proveedor | opcionales | Aviso al equipo de cada solicitud nueva, por el mismo canal del formulario de contacto. |
 | `PRIVACY_POLICY_VERSION` | por defecto `2026-10` | Versión de la política de tratamiento de datos que se guarda con cada autorización (Ley 1581). Cámbiala cuando publiques una política nueva. |
 | `DEMO_REQUEST_LIMIT_PER_HOUR` | por defecto `5` | Solicitudes válidas por IP cada hora en `/solicitar-demo` (las que tienen errores de formulario no cuentan). |
@@ -181,14 +197,14 @@ El modo de acceso de cada demo (abierta, requiere acceso o solo por invitación)
 
 ```
 apps/
-  web/                    # Next.js — sitio + demos en /demo
-    e2e/                  # pruebas end-to-end (Playwright)
-  backend/                # Express — APIs reales (chatbot) + mocks (resto)
-packages/
-  database/               # init.sql heredado (la app usa MongoDB)
+  web/                    # Next.js — sitio, demos en /demo, panel /admin y portal /dashboard
+    e2e/                  # pruebas end-to-end (Playwright) y mock de OpenAI
+  backend/                # Express — API (MongoDB, Redis, OpenAI, correo)
 docs/
   wiki/                   # fuente de la wiki del proyecto
-.github/workflows/        # CI (ci.yml) y publicación de la wiki (wiki-sync.yml)
+scripts/                  # audit-check.mjs (npm audit en CI) y uptime-check.sh (monitoreo)
+.github/workflows/        # CI (ci.yml), monitoreo (monitor.yml) y publicación de la wiki (wiki-sync.yml)
+docker-compose.dev.yml    # MongoDB 7 y Redis 7 para desarrollo local
 ```
 
 ## Pruebas y CI
@@ -220,13 +236,15 @@ npm run test:e2e       # Playwright contra un sitio ya levantado (ver "E2E en lo
 | Archivo | Qué comprueba |
 |---|---|
 | `smoke.spec.ts` | Home, `/rag` y `/services#planes-rag`: 200, título, un solo H1, el ancla de planes a la vista y cero errores de consola (incluidos los de hidratación de React). |
-| `demos.spec.ts` | El catálogo `/demo` y cada demo: 200, sin textos de error y sin errores de consola. Las demos con un error ya conocido están en [`e2e/support/known-issues.ts`](apps/web/e2e/support/known-issues.ts) con su motivo: la prueba falla si aparece cualquier otro error y también si el conocido deja de ocurrir (la lista solo se achica). |
+| `demos.spec.ts` | El catálogo `/demo` y cada demo: 200, sin textos de error y sin errores de consola. Si una demo tiene un error ya conocido, se anota en [`e2e/support/known-issues.ts`](apps/web/e2e/support/known-issues.ts) con su motivo (hoy la lista está vacía: todas las demos deben cargar sin errores): la prueba falla si aparece cualquier otro error y también si el conocido deja de ocurrir (la lista solo se achica). |
 | `demo-access.spec.ts` | Lo que ve un visitante: badges del catálogo, pantalla de acceso de una demo por solicitud o privada, formulario `/solicitar-demo` (este último registra una solicitud de verdad: solo con `E2E_API_URL`). |
 | `demo-flow.spec.ts` | El flujo completo con la interfaz de cada persona: el visitante pide una demo → el admin la aprueba en el panel y copia el enlace → el prospecto activa su cuenta, ve Mis demos y abre la demo → el admin revoca → la demo vuelve a pedir acceso. |
 | `permissions.spec.ts` | Autorización en el servidor: un prospecto no entra a `/admin`, un visitante sin sesión no entra a `/dashboard` y una demo privada sin acceso muestra la pantalla de acceso (también con sesión). |
 | `access-mode.spec.ts` | El admin cambia el modo de acceso de una demo en Admin › Catálogo de demos y el sitio lo aplica (espera hasta 90 s por la caché de 60 s del middleware). Corre una vez, en escritorio, cuando terminan las demás (proyecto `catalogo`; si alguna falló, Playwright la marca como no ejecutada) y deja la demo como estaba. |
 | `contact.spec.ts` | El formulario de `/contact` envía el lead y queda guardado (lo lista Admin › Contactos). |
+| `public-seo.spec.ts` | Sitio público y SEO: `noindex` y canonical de las páginas de cuenta, 404, `/pricing` (308), sitemap, `robots.txt`, `llms.txt` y cabeceras; el embudo RAG ("Prueba con tu documento", caso de salud con invitación, "Cotizar este tier" con nivel, modalidad y plazo guardados en el lead); el cambio de idioma conserva la URL; menú, pie y textos verificables de `/about`, inicio y landings, en español e inglés; títulos del panel. |
 | `rag-upload.spec.ts` | `/demo/chatbot` › "Prueba con tu documento": sube un PDF de 2 páginas ([`e2e/fixtures`](apps/web/e2e/fixtures)), pregunta, ve la cita de la página y el contador de preguntas pasa de 0/10 a 1/10. |
+| `embed-chatbot.spec.ts` | `/embed/chatbot/<id>` (el chat de `widget.js` y del iframe): solo el chat, sin menú, pie ni banner de cookies; responde con la fuente y canal `widget`; un 429 pide esperar y un 503 dice que el asistente no está disponible. |
 | `api-health.spec.ts` | `GET /health` del backend. |
 
 Las pruebas de la plataforma siembran sus datos por la API del backend ([`e2e/support/backend.ts`](apps/web/e2e/support/backend.ts): cuentas, invitaciones, activación, catálogo) con emails únicos en el dominio reservado `.test`. La única excepción es la cuenta admin de pruebas: [`e2e/global-setup.ts`](apps/web/e2e/global-setup.ts) la registra por la API con una contraseña al azar de cada corrida y le da el rol con el script del backend `src/scripts/set-admin.ts` (la API no deja que nadie se asigne el rol admin). Cada visitante de prueba se presenta con su propia IP en `X-Forwarded-For`, como haría el proxy de Railway, para que los cupos por IP (login, contacto, solicitudes, documentos de la demo RAG) se apliquen igual que en producción sin que varias corridas seguidas los agoten.
@@ -246,9 +264,8 @@ Las pruebas de la plataforma siembran sus datos por la API del backend ([`e2e/su
 Igual que el job de CI: MongoDB 7, Redis 7, el mock de OpenAI ([`apps/web/e2e/support/openai-mock.js`](apps/web/e2e/support/openai-mock.js), sin clave ni costo: responde "Respuesta simulada (mock de OpenAI)…" y cita el primer extracto que recibe), el backend y la web compilados.
 
 ```bash
-# 0. MongoDB y Redis
-docker run -d --name koptup-mongo -p 27017:27017 mongo:7
-docker run -d --name koptup-redis -p 6379:6379 redis:7
+# 0. MongoDB y Redis (o instalados en esos puertos)
+npm run docker:up                                        # docker-compose.dev.yml
 
 # 1. Mock de OpenAI (terminal A)
 node apps/web/e2e/support/openai-mock.js                 # http://127.0.0.1:3999/v1
@@ -290,15 +307,34 @@ El workflow [`ci.yml`](.github/workflows/ci.yml) corre en cada pull request y en
 | Pruebas unitarias | Jest del backend (con MongoDB y Redis, así que también corren las de integración) y de la web |
 | Build | `tsc` del backend y `next build` de la web (apuntando a un backend local, nunca al de producción) |
 | E2E | Levanta MongoDB 7, Redis 7, el mock de OpenAI versionado, el backend (`DEMO_UPLOAD_ENABLED=true`) y la web compilados (`next start`) y corre toda la suite de Playwright, incluido el flujo de solicitud → aprobación → activación → acceso → revocación |
+| Seguridad | `npm audit` de las dependencias de producción (falla con una alerta alta o crítica que no esté revisada en [`.github/audit-allowlist.json`](.github/audit-allowlist.json), con fecha de revisión) y gitleaks (secretos en los archivos y en los commits nuevos; [`.gitleaks.toml`](.gitleaks.toml)) |
+
+El workflow [`monitor.yml`](.github/workflows/monitor.yml) revisa cada 15 minutos que `https://www.koptup.com` y la salud de la API respondan; la URL de la API va en la variable del repositorio `BACKEND_HEALTH_URL`. Si algo cae, la corrida falla y GitHub avisa por correo (ver [Operación y despliegue › 7](docs/wiki/Doc-11-Operacion-y-Despliegue.md#7-salud-del-sistema-monitoreo-y-registros)).
+
+### Cómo probar todo antes de un PR
+
+```bash
+npm run lint && npm run typecheck                  # ESLint y TypeScript de web y backend
+MONGODB_URI_TEST=mongodb://127.0.0.1:27017/koptup_test REDIS_URL_TEST=redis://127.0.0.1:6379/15 \
+  npm test                                         # Jest de los dos, con las pruebas de integración
+NEXT_PUBLIC_API_URL=http://localhost:3001 npm run build   # tsc del backend y next build de la web (apuntando a tu backend local)
+npm run test:e2e                                   # Playwright (ver "E2E en local, paso a paso")
+node scripts/audit-check.mjs                       # dependencias de producción, igual que el job Seguridad
+scripts/uptime-check.sh http://localhost:3000 http://localhost:3001/health   # el chequeo del monitoreo, contra tu entorno local
+```
+
+Para gitleaks en local instala su binario (por ejemplo `go install github.com/zricethezav/gitleaks/v8@v8.30.1`) y corre `gitleaks dir . --config .gitleaks.toml` en una copia limpia del repositorio (sin `node_modules`).
 
 ## Despliegue
 
 GitHub Actions **no despliega**: el workflow de CI solo verifica. El despliegue lo hacen las integraciones de cada plataforma con el repositorio de GitHub:
 
 - **Web:** Vercel (proyecto conectado al repositorio).
-- **API:** Railway, que construye con Nixpacks según [`apps/backend/railway.json`](apps/backend/railway.json) (`npm install && npm run build` y arranca con `npm run start`). Nixpacks elige la versión de Node con `engines.node` de [`apps/backend/package.json`](apps/backend/package.json) (`>=20.9.0`; si el servicio no define `NIXPACKS_NODE_VERSION`, hoy resuelve a Node 24 LTS) e instala también las `devDependencies` para compilar (`NPM_CONFIG_PRODUCTION=false`): TypeScript y los `@types/*` están ahí.
+- **API:** Railway, que construye con Nixpacks según [`apps/backend/railway.json`](apps/backend/railway.json) (`npm install && npm run build`, arranca con `npm run start`, una sola instancia y chequeo de salud en `/health`). Nixpacks elige la versión de Node con `engines.node` de [`apps/backend/package.json`](apps/backend/package.json) (`>=20.9.0`; si el servicio no define `NIXPACKS_NODE_VERSION`, hoy resuelve a Node 24 LTS) e instala también las `devDependencies` para compilar (`NPM_CONFIG_PRODUCTION=false`): TypeScript y los `@types/*` están ahí.
 
-Las variables de cada entorno se configuran en esas plataformas (ver [Variables de entorno](#variables-de-entorno)). Los secretos nunca van en el repositorio: el único archivo de entorno versionado, `apps/web/.env.production`, solo tiene las URL públicas del sitio y de la API.
+Las variables de cada entorno se configuran en esas plataformas (ver [Variables de entorno](#variables-de-entorno)). Los secretos nunca van en el repositorio: el único archivo de entorno versionado, `apps/web/.env.production`, solo tiene la URL pública de la API.
+
+No hay imágenes de Docker para desplegar: `docker-compose.dev.yml` solo levanta MongoDB y Redis para desarrollo. Lo que falta configurar en las plataformas (proteger `main` con CI obligatorio, dejar un solo proyecto de Vercel, el volumen de Railway para archivos subidos y la variable del monitoreo) está en [Operación y despliegue](docs/wiki/Doc-11-Operacion-y-Despliegue.md#10-acciones-pendientes-del-dueño).
 
 ## Documentación y plan de producto
 
@@ -307,9 +343,9 @@ El plan para convertir Koptup en un producto vendible (flujo del cliente, sistem
 ## Estado del proyecto
 
 - **Producción:** [www.koptup.com](https://www.koptup.com) (Vercel) + API en Railway.
-- **Chatbot RAG:** integración real con OpenAI, persistencia en disco, multi-tenant.
-- **24 prototipos restantes:** UI completa, datos simulados, no production-ready sin trabajo adicional.
-- **Roadmap inmediato:** S3 real para uploads del RAG, autenticación de tenants, métricas de uso.
+- **Chatbot RAG:** integración real con OpenAI, bots y conversaciones en MongoDB, un bot por cliente con su propio token de dueño.
+- **Demos con datos de ejemplo:** pantalla completa con datos ficticios; no están listas para producción sin el proyecto a medida.
+- **Lo que falta y lo que está en curso:** [Estado y próximos pasos](docs/wiki/15-Estado-y-Proximos-Pasos.md) y [Correcciones pendientes](docs/wiki/16-Correcciones-Pendientes.md).
 
 ## ¿Quieres contratarnos?
 

@@ -15,6 +15,7 @@ export type ProductCategory =
   | 'tech'
   | 'fashion'
   | 'home'
+  | 'coffee'
   | 'sports'
   | 'beauty'
   | 'wines';
@@ -104,10 +105,10 @@ const CATALOG: ProductInput[] = [
   { id: 10, sku: 'MOD-CHA-CUE', nameKey: 'leatherJacket',  category: 'fashion', price: 699900,  originalPrice: 859900,  rating: 4.8, reviews: 214,  photoId: 'photo-1727515546577-f7d82a47b51d', badges: [],             warehouses: { bog: 14, mde: 12, cli: 6  }, demand: 2.5 },
   { id: 11, sku: 'MOD-MOR-URB', nameKey: 'urbanBackpack',  category: 'fashion', price: 219900,                          rating: 4.5, reviews: 267,  photoId: 'photo-1680039211156-66c721b87625', badges: ['eco'],        warehouses: { bog: 50, mde: 35, cli: 25 }, demand: 6   },
   { id: 12, sku: 'MOD-GAF-SOL', nameKey: 'sunglasses',     category: 'fashion', price: 249900,                          rating: 4.7, reviews: 345,  photoId: 'photo-1785672021160-29cccd65500d', badges: ['new'],        warehouses: { bog: 25, mde: 18, cli: 13 }, demand: 4   },
-  // Hogar
-  { id: 13, sku: 'HOG-CAF-ORI', nameKey: 'coffeeBeans',    category: 'home',    price: 38900,                           rating: 4.9, reviews: 1842, photoId: 'photo-1776176623816-c4fd0e55f61c', badges: ['eco'],        warehouses: { bog: 60, mde: 40, cli: 22 }, demand: 26  },
+  // Café (13 y 15) y hogar (14 y 16). El orden por id no cambia: de él dependen los pedidos de ejemplo.
+  { id: 13, sku: 'CAF-ORI-500', nameKey: 'coffeeBeans',    category: 'coffee',    price: 38900,                           rating: 4.9, reviews: 1842, photoId: 'photo-1776176623816-c4fd0e55f61c', badges: ['eco'],        warehouses: { bog: 60, mde: 40, cli: 22 }, demand: 26  },
   { id: 14, sku: 'HOG-LMP-ESC', nameKey: 'deskLamp',       category: 'home',    price: 149900,  originalPrice: 189900,  rating: 4.5, reviews: 198,  photoId: 'photo-1570974802254-4b0ad1a755f5', badges: [],             warehouses: { bog: 40, mde: 30, cli: 22 }, demand: 5   },
-  { id: 15, sku: 'HOG-PRE-FRA', nameKey: 'frenchPress',    category: 'home',    price: 89900,                           rating: 4.6, reviews: 421,  photoId: 'photo-1708127368781-cd5f069a90a5', badges: [],             warehouses: { bog: 4,  mde: 2,  cli: 2  }, demand: 6   },
+  { id: 15, sku: 'CAF-PRE-FRA', nameKey: 'frenchPress',    category: 'coffee',    price: 89900,                           rating: 4.6, reviews: 421,  photoId: 'photo-1708127368781-cd5f069a90a5', badges: [],             warehouses: { bog: 4,  mde: 2,  cli: 2  }, demand: 6   },
   { id: 16, sku: 'HOG-OLL-SET', nameKey: 'cookwareSet',    category: 'home',    price: 449900,  originalPrice: 549900,  rating: 4.4, reviews: 156,  photoId: 'photo-1584990347449-fd98bc063110', badges: [],             warehouses: { bog: 22, mde: 15, cli: 10 }, demand: 2.5 },
   // Deportes
   { id: 17, sku: 'DEP-TEN-RUN', nameKey: 'runningShoes',   category: 'sports',  price: 429900,                          rating: 4.7, reviews: 612,  photoId: 'photo-1726133731483-d4b8bcabeb43', badges: [],             warehouses: { bog: 38, mde: 28, cli: 18 }, demand: 7   },
@@ -128,6 +129,7 @@ export const CATEGORY_IDS: ProductCategory[] = [
   'tech',
   'fashion',
   'home',
+  'coffee',
   'sports',
   'beauty',
   'wines',

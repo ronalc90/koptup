@@ -147,20 +147,59 @@ function weekday(iso: string): number {
   return new Date(Date.UTC(y, m - 1, d)).getUTCDay();
 }
 
-/** Festivos de Colombia que caen en el horizonte de la simulación (oct 2026 – ene 2027). */
-export const CO_HOLIDAYS = new Set([
-  '2026-10-12',
-  '2026-11-02',
-  '2026-11-16',
-  '2026-12-08',
-  '2026-12-25',
-  '2027-01-01',
-  '2027-01-11',
-]);
+const isoOf = (y: number, m: number, d: number) => new Date(Date.UTC(y, m - 1, d)).toISOString().slice(0, 10);
+
+/** Domingo de Pascua (algoritmo anónimo gregoriano). */
+function easter(year: number): string {
+  const a = year % 19;
+  const b = Math.floor(year / 100);
+  const c = year % 100;
+  const d = Math.floor(b / 4);
+  const e = b % 4;
+  const f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4);
+  const k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31);
+  const day = ((h + l - 7 * m + 114) % 31) + 1;
+  return isoOf(year, month, day);
+}
+
+/** Lunes siguiente (o el mismo día si ya es lunes): festivos trasladables de la Ley 51 de 1983. */
+function nextMonday(iso: string): string {
+  const w = weekday(iso);
+  return w === 1 ? iso : addDays(iso, (8 - w) % 7);
+}
+
+const holidayCache = new Map<number, Set<string>>();
+
+/** Festivos de Colombia de un año: fijos, trasladables al lunes y los que dependen de la Pascua. */
+export function coHolidays(year: number): Set<string> {
+  const cached = holidayCache.get(year);
+  if (cached) return cached;
+  const e = easter(year);
+  const fixed = [isoOf(year, 1, 1), isoOf(year, 5, 1), isoOf(year, 7, 20), isoOf(year, 8, 7), isoOf(year, 12, 8), isoOf(year, 12, 25)];
+  const moved = [
+    [1, 6],
+    [3, 19],
+    [6, 29],
+    [8, 15],
+    [10, 12],
+    [11, 1],
+    [11, 11],
+  ].map(([m, d]) => nextMonday(isoOf(year, m, d)));
+  const easterBased = [addDays(e, -3), addDays(e, -2), addDays(e, 43), addDays(e, 64), addDays(e, 71)];
+  const set = new Set([...fixed, ...moved, ...easterBased]);
+  holidayCache.set(year, set);
+  return set;
+}
 
 export function isBusinessDay(iso: string): boolean {
   const w = weekday(iso);
-  return w !== 0 && w !== 6 && !CO_HOLIDAYS.has(iso);
+  return w !== 0 && w !== 6 && !coHolidays(Number(iso.slice(0, 4))).has(iso);
 }
 
 /** Suma días hábiles (lunes a viernes, sin festivos). */
@@ -172,6 +211,33 @@ export function addBusinessDays(iso: string, n: number): string {
     if (isBusinessDay(cur)) left--;
   }
   return cur;
+}
+
+/** Resta días hábiles: el n-ésimo día hábil antes de `iso`. */
+export function subBusinessDays(iso: string, n: number): string {
+  let cur = iso;
+  let left = n;
+  while (left > 0) {
+    cur = addDays(cur, -1);
+    if (isBusinessDay(cur)) left--;
+  }
+  return cur;
+}
+
+/** "2026-10" → "2026-09" */
+export function addMonthsYm(ym: string, n: number): string {
+  const [y, m] = ym.split('-').map(Number);
+  const idx = y * 12 + (m - 1) + n;
+  return `${Math.floor(idx / 12)}-${String((idx % 12) + 1).padStart(2, '0')}`;
+}
+
+/**
+ * Fecha y hora actuales de Colombia (UTC−5 todo el año, sin horario de verano).
+ * Solo se usa después de montar o en acciones del usuario, nunca en el primer render.
+ */
+export function colombiaNow(): { date: string; time: string } {
+  const iso = new Date(Date.now() - 5 * 3600000).toISOString();
+  return { date: iso.slice(0, 10), time: iso.slice(11, 19) };
 }
 
 /** Días hábiles que faltan desde `from` (exclusivo) hasta `to` (inclusivo). */

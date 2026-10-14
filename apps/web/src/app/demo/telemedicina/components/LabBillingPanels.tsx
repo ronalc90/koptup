@@ -12,8 +12,8 @@ import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import Input from '@/components/ui/Input';
 import { ArrowDownTrayIcon, CheckCircleIcon, DocumentTextIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
-import { DEMO_DATE, IPS, LAB_ORDERS } from './mockData';
-import { billingTotals, fileSlug, fmtCOP, fmtDate, payerOf, ripsFor, toCsv, tx } from './logic';
+import { IPS, LAB_ORDERS } from './mockData';
+import { billingTotals, fileSlug, fmtCOP, fmtDate, fmtTimer, payerOf, ripsFor, specOf, toCsv, tx } from './logic';
 import { downloadText, makePdf } from './pdf';
 import { Modal, SimTag, useDateNames, useLoc } from './ui';
 import type { LogFn, TelemedStore } from './store';
@@ -223,7 +223,7 @@ export function BillingPanel({ store, notify }: { store: TelemedStore; notify: (
       a.invoice ?? '',
       a.rips ? t('billing.ripsYes') : t('billing.ripsNo'),
     ]);
-    downloadText(`${t('billing.fileName')}-${DEMO_DATE}.csv`, toCsv([head, ...body]), 'text/csv;charset=utf-8');
+    downloadText(`${t('billing.fileName')}-${store.state.day}.csv`, toCsv([head, ...body]), 'text/csv;charset=utf-8');
     store.log('billing', 'csvExported', { count: String(body.length) });
     notify(t('toasts.csv', { count: String(body.length) }));
   }
@@ -270,7 +270,7 @@ export function BillingPanel({ store, notify }: { store: TelemedStore; notify: (
             <div className="min-w-0">
               <CardTitle>{t('billing.title')}</CardTitle>
               <p className="text-sm text-secondary-500 dark:text-secondary-400 mt-1">
-                {t('billing.subtitle', { date: fmtDate(DEMO_DATE, loc, names, { weekday: true, year: true }) })}
+                {t('billing.subtitle', { date: fmtDate(store.state.day, loc, names, { weekday: true, year: true }) })}
               </p>
             </div>
             <Button variant="outline" size="sm" onClick={exportCsv}>
@@ -280,7 +280,7 @@ export function BillingPanel({ store, notify }: { store: TelemedStore; notify: (
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
-            <div className="relative sm:w-72">
+            <div className="relative sm:w-96">
               <MagnifyingGlassIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-secondary-400 pointer-events-none" />
               <Input className="pl-9" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('billing.search')} aria-label={t('billing.search')} />
             </div>
@@ -480,7 +480,12 @@ function AttentionDetail({ a, log, notify }: { a: Attention; log: LogFn; notify:
         {(
           [
             [t('billing.cols.patient'), `${a.patientName} · ${a.docType} ${a.doc}`],
-            [t('billing.cols.service'), a.kind === 'referral' ? t('billing.referral') : `${t(`specialties.${a.spec}`)} · ${t('summary.modalityValue')}`],
+            [
+              t('billing.cols.service'),
+              a.kind === 'referral'
+                ? t('billing.referral')
+                : `${t(`specialties.${a.spec}`)} · ${specOf(a.spec).pro} · ${t('summary.modalityValue')} · ${t('billing.duration', { time: fmtTimer(a.durationSec ?? a.durationMin * 60) })}`,
+            ],
             [t('billing.cols.payer'), tx(payerOf(a.payerId).name, loc)],
             [t('billing.cols.dx'), a.dx ? `${a.dx.code} · ${tx(a.dx.label, loc)}` : '—'],
             [t('billing.cols.value'), fmtCOP(a.value, loc)],

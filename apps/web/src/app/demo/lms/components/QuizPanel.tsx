@@ -79,7 +79,7 @@ export default function QuizPanel({
 
   if (view === 'intro') {
     return (
-      <Card variant="elevated" id="lms-quiz">
+      <Card variant="elevated" id="lms-quiz" className="scroll-mt-48">
         <CardContent className="p-0 space-y-3">
           <h3 className="text-lg font-bold text-secondary-900 dark:text-white">{t('quiz.title')}</h3>
           <p className="text-sm text-secondary-600 dark:text-secondary-300">{t('quiz.intro', { count: total, pct: PASS_PCT })}</p>
@@ -95,22 +95,24 @@ export default function QuizPanel({
     const attempt = enr.quiz;
     const pct = quizPct(attempt.score, attempt.total);
     const g = gradeQuiz(questions, attempt.answers);
+    // Cuenta el mejor intento: si ya aprobaste, un intento posterior más bajo no te «desaprueba».
+    const passedBest = quizPct(attempt.best, attempt.total) >= PASS_PCT;
     const cert = enr.certificateId ? state.certificates.find((c) => c.id === enr.certificateId) : undefined;
     const lessons = lessonsOf(course);
     const pending = lessons.filter((x) => x.kind !== 'quiz' && !enr.completed[x.id]);
     return (
-      <Card variant="elevated" id="lms-quiz">
+      <Card variant="elevated" id="lms-quiz" className="scroll-mt-48">
         <CardContent className="p-0 text-center space-y-3">
           <div
             className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto ${
-              g.passed ? 'bg-gradient-to-br from-amber-400 to-orange-500' : 'bg-gradient-to-br from-secondary-400 to-secondary-500'
+              passedBest ? 'bg-gradient-to-br from-amber-400 to-orange-500' : 'bg-gradient-to-br from-secondary-400 to-secondary-500'
             }`}
           >
             <TrophyIcon className="w-8 h-8 text-white" />
           </div>
-          <h3 className="text-xl font-bold text-secondary-900 dark:text-white">{g.passed ? t('quiz.passed') : t('quiz.failed')}</h3>
+          <h3 className="text-xl font-bold text-secondary-900 dark:text-white">{passedBest ? t('quiz.passed') : t('quiz.failed')}</h3>
           <p className="text-sm text-secondary-500 dark:text-secondary-400">
-            {t('quiz.scoreLine', { score: attempt.score, total: attempt.total, pct: f.pct(pct) })}
+            {t(attempt.best > attempt.score ? 'quiz.lastLine' : 'quiz.scoreLine', { score: attempt.score, total: attempt.total, pct: f.pct(pct) })}
             {attempt.best > attempt.score ? ` · ${t('quiz.best', { best: attempt.best, total: attempt.total })}` : ''}
           </p>
           {attempt.score === attempt.total && (
@@ -140,11 +142,11 @@ export default function QuizPanel({
                 {t('quiz.seeCert')}
               </button>
             </div>
-          ) : g.passed && pending.length > 0 ? (
+          ) : passedBest && pending.length > 0 ? (
             <p className="text-xs text-secondary-600 dark:text-secondary-300">{t('quiz.pendingLessons', { count: pending.length })}</p>
           ) : null}
           <div>
-            <Button variant="outline" size="sm" onClick={start}>
+            <Button variant="outline" size="sm" className="dark:text-primary-300 dark:border-primary-400" onClick={start}>
               <ArrowPathIcon className="w-4 h-4 mr-1" />
               {t('quiz.retry')}
             </Button>
@@ -155,7 +157,7 @@ export default function QuizPanel({
   }
 
   return (
-    <Card variant="elevated" id="lms-quiz">
+    <Card variant="elevated" id="lms-quiz" className="scroll-mt-48">
       <CardContent className="p-0">
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -206,7 +208,7 @@ export default function QuizPanel({
                       : isWrong
                         ? 'bg-red-500 text-white'
                         : isSelected
-                          ? 'bg-primary-500 text-white'
+                          ? 'bg-primary-600 text-white'
                           : 'bg-secondary-100 dark:bg-secondary-700 text-secondary-700 dark:text-secondary-200'
                   }`}
                 >

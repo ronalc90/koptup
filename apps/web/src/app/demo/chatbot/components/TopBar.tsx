@@ -1,7 +1,9 @@
 'use client';
 
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import {
+  ArrowLeftIcon,
   BuildingOffice2Icon,
   CpuChipIcon,
   PlayCircleIcon,
@@ -12,6 +14,7 @@ import {
   ArrowPathIcon,
   NoSymbolIcon,
   BeakerIcon,
+  QuestionMarkCircleIcon,
 } from '@heroicons/react/24/outline';
 import { FALLBACK_MODELS } from './data';
 import type { SampleCompany, SampleCompanyKey } from './sampleKnowledge';
@@ -21,7 +24,8 @@ import type { RemoteModelMeta } from './builder/api';
 
 /** Estado de la IA según `GET /api/chatbot/models`. */
 /** `degraded`: hay clave de IA, pero la última llamada al proveedor falló (modo extractivo). */
-export type AiStatus = 'checking' | 'generative' | 'degraded' | 'extractive' | 'offline';
+/** `rateLimited`: el servidor pidió una pausa (429) por muchas consultas desde la misma red. */
+export type AiStatus = 'checking' | 'generative' | 'degraded' | 'extractive' | 'offline' | 'rateLimited';
 
 interface TopBarProps {
   aiStatus: AiStatus;
@@ -37,6 +41,8 @@ interface TopBarProps {
   askDisabled: boolean;
   device: DeviceKind;
   onDeviceChange: (d: DeviceKind) => void;
+  /** Vuelve a abrir el recorrido de bienvenida. */
+  onShowTour: () => void;
 }
 
 const fieldClass =
@@ -63,9 +69,13 @@ export default function TopBar({
   askDisabled,
   device,
   onDeviceChange,
+  onShowTour,
 }: TopBarProps) {
   const t = useTranslations('demoChatbot');
 
+  // Mientras se consulta el servidor (o si no responde) se muestran los tres
+  // modelos sin marcas: "requiere clave de API" solo cuando el servidor dice
+  // que no tiene clave (modo extractivo).
   const modelOptions: RemoteModelMeta[] =
     models.length > 0
       ? models
@@ -73,10 +83,12 @@ export default function TopBar({
           id: m.id,
           name: m.name,
           provider: 'openai' as const,
-          enabled: false,
+          enabled: true,
+          recommended: m.id === 'gpt-4o-mini',
           costInputUSDper1M: 0,
           costOutputUSDper1M: 0,
         }));
+  const noKey = aiStatus === 'extractive';
 
   const status = (() => {
     switch (aiStatus) {
@@ -98,6 +110,13 @@ export default function TopBar({
         return {
           label: t('models.extractiveMode'),
           tip: t('models.extractiveModeTooltip'),
+          Icon: ExclamationTriangleIcon,
+          cls: 'bg-amber-50 text-amber-700 ring-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:ring-amber-800/40',
+        };
+      case 'rateLimited':
+        return {
+          label: t('models.rateLimited'),
+          tip: t('models.rateLimitedTooltip'),
           Icon: ExclamationTriangleIcon,
           cls: 'bg-amber-50 text-amber-700 ring-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:ring-amber-800/40',
         };
@@ -125,16 +144,34 @@ export default function TopBar({
           K
         </span>
         <div className="min-w-0">
+          <Link
+            href="/demo"
+            className="mb-0.5 inline-flex items-center gap-1 rounded text-[11px] font-medium text-secondary-500 transition hover:text-primary-700 dark:text-secondary-400 dark:hover:text-primary-300"
+          >
+            <ArrowLeftIcon className="h-3 w-3" aria-hidden="true" />
+            {t('backToCatalog')}
+          </Link>
           <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
             <h1 className="text-[15px] font-bold leading-tight tracking-tight text-secondary-900 dark:text-white">
               {t('pageTitle')}
             </h1>
-            <Tooltip content={t('sampleDataTooltip')} side="bottom">
-              <span className="inline-flex items-center gap-1 rounded-full bg-secondary-100 px-2 py-0.5 text-[10px] font-semibold text-secondary-600 ring-1 ring-secondary-200 dark:bg-secondary-800 dark:text-secondary-300 dark:ring-secondary-700">
-                <BeakerIcon className="h-3 w-3" aria-hidden="true" />
-                {t('sampleDataBadge')}
-              </span>
-            </Tooltip>
+            {/* Solo en "Prueba el asistente": con tu documento o tu bot, los datos son tuyos. */}
+            {showPlaygroundControls ? (
+              <Tooltip content={t('sampleDataTooltip')} side="bottom">
+                <span className="inline-flex items-center gap-1 rounded-full bg-secondary-100 px-2 py-0.5 text-[10px] font-semibold text-secondary-600 ring-1 ring-secondary-200 dark:bg-secondary-800 dark:text-secondary-300 dark:ring-secondary-700">
+                  <BeakerIcon className="h-3 w-3" aria-hidden="true" />
+                  {t('sampleDataBadge')}
+                </span>
+              </Tooltip>
+            ) : null}
+            <button
+              type="button"
+              onClick={onShowTour}
+              className="inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold text-primary-700 transition hover:bg-primary-50 dark:text-primary-300 dark:hover:bg-primary-950/40"
+            >
+              <QuestionMarkCircleIcon className="h-3.5 w-3.5" aria-hidden="true" />
+              {t('topBar.showTour')}
+            </button>
           </div>
           <p className="mt-0.5 hidden max-w-2xl text-[11px] leading-snug text-secondary-500 dark:text-secondary-400 sm:block">
             {t('pageSubtitle')}
@@ -143,7 +180,7 @@ export default function TopBar({
       </div>
 
       <div className="flex min-w-0 flex-wrap items-center gap-2">
-        <Tooltip content={status.tip} side="bottom">
+        <Tooltip content={status.tip} side="bottom" align={showPlaygroundControls ? 'center' : 'end'}>
           <span
             className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ${status.cls}`}
             data-ai-status={aiStatus}
@@ -176,8 +213,9 @@ export default function TopBar({
               </label>
             </Tooltip>
 
+            {/* En el celular se oculta: el recomendado queda elegido y la conversación sube. */}
             <Tooltip content={t('topBar.modelTooltip')} side="bottom">
-              <label className={fieldClass}>
+              <label className={`${fieldClass} !hidden sm:!inline-flex`}>
                 <CpuChipIcon className="h-3.5 w-3.5 shrink-0 text-secondary-500" aria-hidden="true" />
                 <span className="hidden text-[10px] uppercase tracking-wide text-secondary-500 dark:text-secondary-400 xl:inline">
                   {t('topBar.model')}
@@ -189,10 +227,10 @@ export default function TopBar({
                   aria-label={t('topBar.model')}
                 >
                   {modelOptions.map((m) => (
-                    <option key={m.id} value={m.id} disabled={!m.enabled}>
+                    <option key={m.id} value={m.id} disabled={noKey && !m.enabled}>
                       {m.name}
                       {m.recommended ? ` (${t('models.recommended')})` : ''}
-                      {!m.enabled ? ` · ${t('models.providerRequires')}` : ''}
+                      {noKey && !m.enabled ? ` · ${t('models.providerRequires')}` : ''}
                     </option>
                   ))}
                 </select>

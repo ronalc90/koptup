@@ -1,28 +1,17 @@
 /**
- * chatbot-store.ts — persistencia file-based (JSON) del estado del chatbot.
+ * chatbot-store.ts — lectura del archivo heredado del chatbot
+ * (`data/chatbots/state.json`, o `CHATBOT_STATE_DIR`).
  *
- * SRP: única responsabilidad → serializar/deserializar las estructuras
- * in-memory del módulo `chatbot.routes.ts` a disco para que sobrevivan
- * reinicios del proceso.
- *
- * No conoce la forma exacta de cada Map (usa `any[]` en los valores) porque
- * eso es responsabilidad de chatbot.routes.ts; este módulo sólo persiste.
- *
- * Las escrituras son síncronas para que el endpoint pueda garantizar que
- * el cliente recibe el 2xx sólo después de que el cambio quedó persistido.
- * Para los volúmenes del demo (decenas/cientos de bots) es perfectamente
- * razonable; si crece, se reemplaza por una BBDD real sin tocar las rutas.
+ * Los bots y sus conversaciones ahora viven en MongoDB
+ * (services/chatbot-store.service.ts). Este módulo solo lee el archivo que
+ * dejaron las versiones anteriores para migrarlo una vez y luego lo retira
+ * (lo borra cuando todo quedó en la base): así las preguntas guardadas sin
+ * vencimiento no se quedan en el disco.
  */
 import fs from 'fs';
 import path from 'path';
 
-// CHATBOT_STATE_DIR permite aislar el estado (p. ej. en pruebas).
-const DATA_DIR = process.env.CHATBOT_STATE_DIR
-  ? path.resolve(process.env.CHATBOT_STATE_DIR)
-  : path.join(process.cwd(), 'data', 'chatbots');
-const STATE_FILE = path.join(DATA_DIR, 'state.json');
-
-export interface PersistShape {
+export interface LegacyChatbotState {
   bots: Array<[string, any]>;
   docs: Array<[string, any[]]>;
   chunks: Array<[string, any[]]>;
@@ -30,20 +19,26 @@ export interface PersistShape {
   updatedAt: string;
 }
 
-function ensureDir(): void {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-  }
+/** Carpeta del archivo heredado (se lee en cada llamada: las pruebas la cambian). */
+export function legacyStateDir(): string {
+  return process.env.CHATBOT_STATE_DIR ? path.resolve(process.env.CHATBOT_STATE_DIR) : path.join(process.cwd(), 'data', 'chatbots');
 }
 
-export function load(): PersistShape {
-  ensureDir();
-  if (!fs.existsSync(STATE_FILE)) {
-    return { bots: [], docs: [], chunks: [], conversations: [], updatedAt: '' };
-  }
+export function legacyStateFile(): string {
+  return path.join(legacyStateDir(), 'state.json');
+}
+
+/**
+ * Lee el archivo heredado. `null` si no existe; `'corrupt'` si no se puede
+ * leer como JSON (no rompe el arranque y el archivo NO se borra: se deja para
+ * que el equipo lo revise, porque borrarlo perdería los bots que tenga).
+ */
+export function readLegacyState(): LegacyChatbotState | 'corrupt' | null {
+  const file = legacyStateFile();
+  if (!fs.existsSync(file)) return null;
   try {
-    const raw = fs.readFileSync(STATE_FILE, 'utf-8');
-    const parsed = JSON.parse(raw) as Partial<PersistShape>;
+    const parsed = JSON.parse(fs.readFileSync(file, 'utf-8')) as Partial<LegacyChatbotState> | null;
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return 'corrupt';
     return {
       bots: Array.isArray(parsed.bots) ? parsed.bots : [],
       docs: Array.isArray(parsed.docs) ? parsed.docs : [],
@@ -52,21 +47,18 @@ export function load(): PersistShape {
       updatedAt: typeof parsed.updatedAt === 'string' ? parsed.updatedAt : '',
     };
   } catch {
-    // Estado corrupto: no rompemos el arranque, simplemente arrancamos vacío.
-    return { bots: [], docs: [], chunks: [], conversations: [], updatedAt: '' };
+    return 'corrupt';
   }
 }
 
-export function persist(state: PersistShape): void {
-  ensureDir();
-  const payload = JSON.stringify(
-    { ...state, updatedAt: new Date().toISOString() },
-    null,
-    2,
-  );
-  // Escritura atómica: archivo tmp + rename para evitar lecturas parciales si
-  // el proceso muere a la mitad.
-  const tmp = STATE_FILE + '.tmp';
-  fs.writeFileSync(tmp, payload, 'utf-8');
-  fs.renameSync(tmp, STATE_FILE);
+/** Borra el archivo heredado (y su temporal, si quedó). */
+export function retireLegacyStateFile(): void {
+  const file = legacyStateFile();
+  for (const f of [file, `${file}.tmp`]) {
+    try {
+      if (fs.existsSync(f)) fs.unlinkSync(f);
+    } catch {
+      /* sin permiso de escritura: se reintenta en el próximo arranque */
+    }
+  }
 }

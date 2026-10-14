@@ -123,7 +123,7 @@ function OnCard({ p }: { p: Onboarding }) {
             disabled={p.done.length < ON_TASKS.length}
             onClick={() => {
               dispatch({ type: 'process.close', id: p.id });
-              toast.success(t('activated', { name: p.name }));
+              toast.success(t('activated', { name: p.name, date: f.date(p.startDate) }));
             }}
           >
             {t('activate')}
@@ -159,7 +159,7 @@ function OffCard({ p }: { p: Offboarding }) {
     [t('settle.interest'), s.interest],
     [t('settle.prima'), s.prima, t('settle.days', { n: s.primaDays })],
     [t('settle.vacation'), s.vacation, t('settle.vacDays', { n: f.num(s.vacationDays) })],
-    [t('settle.indemnity'), s.indemnity],
+    [t('settle.indemnity'), s.indemnity, s.indemnityDays ? t('settle.indemnityDays', { n: f.num(s.indemnityDays) }) : undefined],
   ];
   return (
     <div className="p-4 rounded-lg bg-secondary-50 dark:bg-secondary-800">

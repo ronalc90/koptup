@@ -87,6 +87,27 @@ export async function startOpenAiMock(): Promise<{
         /* cuerpo vacío */
       }
       calls.push({ model: body.model, responseFormat: body.response_format?.type });
+      if ((req.url ?? '').endsWith('/embeddings')) {
+        // 1M de tokens de entrada por llamada (USD 0,02 con text-embedding-3-small).
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(
+          JSON.stringify({
+            object: 'list',
+            model: body.model,
+            // El SDK pide base64 por defecto (Float32 little-endian).
+            data: [
+              {
+                object: 'embedding',
+                index: 0,
+                embedding:
+                  body.encoding_format === 'base64' ? Buffer.from(new Float32Array([0.1, 0.2, 0.3]).buffer).toString('base64') : [0.1, 0.2, 0.3],
+              },
+            ],
+            usage: { prompt_tokens: 1_000_000, total_tokens: 1_000_000 },
+          }),
+        );
+        return;
+      }
       let content = 'Respuesta de prueba [1].';
       if (body.response_format?.type === 'json_schema' || body.response_format?.type === 'json_object') {
         content = JSON.stringify({

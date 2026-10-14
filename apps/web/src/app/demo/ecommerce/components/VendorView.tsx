@@ -75,7 +75,7 @@ export default function VendorView() {
   return (
     <div className="mx-auto max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
       <header>
-        <h1 className="text-2xl font-bold text-secondary-900 dark:text-white sm:text-3xl">{t('vendor.title')}</h1>
+        <h2 className="text-2xl font-bold text-secondary-900 dark:text-white sm:text-3xl">{t('vendor.title')}</h2>
         <p className="text-sm text-secondary-500">{t('vendor.subtitle')}</p>
       </header>
 
@@ -109,13 +109,12 @@ export default function VendorView() {
               </Button>
             </div>
           </div>
-          <div className="-mx-1 mb-3 flex gap-2 overflow-x-auto px-1 pb-1" role="tablist" aria-label={t('vendor.orders.statusFilter')}>
+          <div className="-mx-1 mb-3 flex gap-2 overflow-x-auto px-1 pb-1" role="group" aria-label={t('vendor.orders.statusFilter')}>
             {STATUS_FILTERS.map((s) => (
               <button
                 key={s}
                 type="button"
-                role="tab"
-                aria-selected={statusFilter === s}
+                aria-pressed={statusFilter === s}
                 onClick={() => { setStatusFilter(s); setLimit(PAGE); }}
                 className={`whitespace-nowrap rounded-full px-3 py-1 text-xs font-medium ${statusFilter === s ? 'bg-primary-600 text-white' : 'bg-secondary-100 text-secondary-700 hover:bg-secondary-200 dark:bg-secondary-800 dark:text-secondary-300'}`}
               >

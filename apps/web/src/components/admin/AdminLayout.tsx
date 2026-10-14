@@ -20,6 +20,7 @@ import {
   KeyIcon,
   Squares2X2Icon,
   HomeIcon,
+  ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 import { api } from '@/lib/api';
 import { ADMIN_PANEL_ROLES, DEMO_ADMIN_ROLES, adminRolesFor, hasRole, homePathForRole } from '@/lib/auth-roles';
@@ -88,6 +89,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { name: t('conversations'), href: '/admin/conversations', icon: ChatBubbleLeftRightIcon },
         { name: t('users'), href: '/admin/users', icon: UserGroupIcon },
         { name: t('contacts'), href: '/admin/contacts', icon: EnvelopeIcon },
+        // Derechos del titular (Ley 1581): solo el rol admin.
+        ...(user?.role === 'admin' ? [{ name: t('privacy'), href: '/admin/privacidad', icon: ShieldCheckIcon }] : []),
       ]
     : [];
 

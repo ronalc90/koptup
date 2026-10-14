@@ -2,13 +2,17 @@
   "demoHrms": {
     "meta": {
       "title": "Gestión Humana y Nómina",
-      "subtitle": "Expediente digital, vacaciones y ausencias, selección, ingresos y retiros, desempeño, nómina quincenal colombiana y formación, con la app del colaborador y un asistente de políticas con IA.",
+      "subtitle": "Expediente, vacaciones y ausencias, selección, ingresos y retiros, desempeño, nómina quincenal colombiana y formación, con la app del colaborador y un asistente de políticas con IA.",
       "sampleBadge": "Datos de ejemplo",
       "sampleHint": "Alimentos Valdeora S.A.S. es una empresa ficticia: personas, NIT, entidades y cifras son inventados.",
       "seoTitle": "Demo de gestión humana y nómina colombiana",
       "seoDescription": "Demo interactiva con datos de ejemplo: expediente digital, vacaciones en días hábiles con festivos de Colombia, selección con puntaje por reglas, ingresos y retiros con liquidación, evaluación de desempeño, nómina quincenal con aportes y provisiones, nómina electrónica y planilla de aportes simuladas, y asistente de políticas con IA.",
       "breadcrumbHome": "Inicio",
-      "breadcrumbDemos": "Demos"
+      "breadcrumbDemos": "Demos",
+      "back": "Volver al catálogo de demos",
+      "audience": "Para gerentes de gestión humana, jefes de nómina y dueños de pymes con personal operativo. Todo corre en tu navegador con datos de ejemplo de una empresa ficticia; solo el asistente de políticas usa IA real.",
+      "requestDemo": "Solicitar demo guiada",
+      "quote": "Cotizar este sistema"
     },
     "header": {
       "openApp": "Ver app del colaborador",
@@ -29,7 +33,46 @@
       "talent": "Selección",
       "performance": "Desempeño",
       "payroll": "Nómina",
-      "learning": "Formación"
+      "learning": "Formación",
+      "pendingCount": "{n, plural, one {# pendiente} other {# pendientes}}"
+    },
+    "guide": {
+      "title": "Recorrido sugerido: el ciclo completo en 5 pasos",
+      "subtitle": "Tú haces de Gestión Humana y de jefe inmediato; la app del colaborador muestra a Camila Rojas Parra, operaria de empaque en Funza. Cada paso se marca solo al hacerlo.",
+      "progress": "{done} de {total} hechos",
+      "hide": "Ocultar",
+      "show": "Mostrar pasos",
+      "done": "Hecho",
+      "steps": {
+        "request": {
+          "title": "Pide vacaciones desde la app",
+          "text": "Como Camila, elige la fecha y los días hábiles; la app calcula el regreso con los festivos.",
+          "action": "Abrir la app"
+        },
+        "approve": {
+          "title": "Apruébalas como Gestión Humana",
+          "text": "En Vacaciones y ausencias, aprueba o rechaza la solicitud y mira cómo cambia el saldo.",
+          "action": "Ir a Vacaciones"
+        },
+        "hire": {
+          "title": "Contrata a un candidato",
+          "text": "En Selección, pasa a alguien de Oferta a Contratados y completa su lista de ingreso.",
+          "action": "Ir a Selección"
+        },
+        "pay": {
+          "title": "Liquida y paga la quincena",
+          "text": "En Nómina: agrega una novedad, liquida, aprueba y paga (descarga el archivo de dispersión).",
+          "action": "Ir a Nómina"
+        },
+        "assistant": {
+          "title": "Pregúntale al asistente",
+          "text": "En la app, consulta el desprendible y haz una pregunta sobre el reglamento (IA real con fuentes).",
+          "action": "Abrir el asistente"
+        }
+      },
+      "finished": "Recorriste el ciclo completo. ¿Quieres verlo con los cargos, sedes y reglas de tu empresa?",
+      "finishedDemo": "Solicitar demo guiada",
+      "finishedQuote": "Cotizar este sistema"
     },
     "common": {
       "loading": "Cargando los datos de ejemplo…",
@@ -328,7 +371,8 @@
         "past": "La fecha de inicio no puede ser anterior a hoy.",
         "days": "Ingresa entre 1 y 30 días.",
         "apprentice": "Los aprendices no tienen saldo de vacaciones en esta demo.",
-        "balance": "Supera el saldo disponible ({n} días)."
+        "balance": "Supera el saldo disponible ({n} días).",
+        "overlap": "Ya hay una ausencia aprobada o pendiente que se cruza con esas fechas."
       },
       "submit": "Enviar solicitud",
       "submitSick": "Registrar incapacidad",
@@ -437,6 +481,7 @@
       "noEnd": "Sin fecha de terminación",
       "tenure": "Antigüedad",
       "tenureValue": "{y} años y {m} meses",
+      "tenureFuture": "Ingresa el {date}",
       "probation": "Periodo de prueba",
       "probationUntil": "Hasta el {date}",
       "probationDone": "Superado",
@@ -594,7 +639,9 @@
         "shifts": "Tiene disponibilidad para turnos rotativos",
         "cancel": "Cancelar",
         "save": "Agregar"
-      }
+      },
+      "restore": "Devolver al proceso",
+      "restoredToast": "{name} volvió al proceso en {stage}"
     },
     "processes": {
       "title": "Ingresos y retiros",
@@ -632,7 +679,7 @@
         "deregister": "Retiro de seguridad social (novedad en la planilla)"
       },
       "activate": "Activar colaborador",
-      "activated": "{name} ya aparece en el directorio y en la nómina",
+      "activated": "{name} ya aparece en el directorio; entra a la nómina desde su fecha de ingreso ({date})",
       "activateHint": "{n, plural, one {Falta # tarea} other {Faltan # tareas}}",
       "lastDay": "último día {date}",
       "closedOut": "Retirado",
@@ -646,9 +693,10 @@
         "vacation": "Vacaciones no disfrutadas",
         "vacDays": "{n} días hábiles",
         "indemnity": "Indemnización",
+        "indemnityDays": "{n} días de salario",
         "title": "Liquidación estimada",
         "total": "Total a pagar",
-        "note": "Cálculo simplificado de ejemplo (año de 360 días; cesantías y prima con auxilio de transporte). La indemnización solo aplica al despido sin justa causa en contrato indefinido."
+        "note": "Cálculo simplificado de ejemplo (año de 360 días; cesantías y prima con auxilio de transporte). La indemnización aplica al despido sin justa causa (art. 64 del C.S.T.): en contrato indefinido, 30 días de salario por el primer año y 20 por cada año adicional (20 y 15 desde 10 salarios mínimos); a término fijo, los salarios del tiempo que falta del plazo; por obra o labor, mínimo 15 días."
       },
       "finish": "Finalizar retiro",
       "closedToast": "Retiro de {name} finalizado: salió del directorio y cuenta en la rotación"
@@ -739,7 +787,8 @@
         "journal": "Se descargó el asiento contable en CSV",
         "liquidated": "Quincena liquidada: {n} colaboradores, neto a pagar {total}",
         "reopened": "La quincena volvió a borrador: puedes editar novedades",
-        "approved": "Nómina aprobada; ya puedes pagarla"
+        "approved": "Nómina aprobada; ya puedes pagarla",
+        "nextOpened": "Se abrió la {period}: empieza sin novedades"
       },
       "csv": {
         "name": "Colaborador",
@@ -822,7 +871,8 @@
         "liquidate": "Liquidar quincena",
         "reopen": "Volver a borrador",
         "approve": "Aprobar nómina",
-        "pay": "Pagar: descargar archivo de dispersión"
+        "pay": "Pagar: descargar archivo de dispersión",
+        "next": "Abrir la siguiente quincena"
       },
       "paidBadge": "Pagada",
       "stepsAria": "Estado de la quincena",
@@ -875,7 +925,9 @@
         "value": "Valor",
         "remove": "Quitar novedad",
         "hoursValue": "{n} h",
-        "removed": "Novedad quitada"
+        "removed": "Novedad quitada",
+        "find": "Buscar por nombre o cédula",
+        "matches": "{n, plural, =0 {Sin resultados} one {# resultado: elígelo} other {# resultados: elige uno}}"
       },
       "benefits": {
         "title": "Beneficios",
@@ -892,6 +944,11 @@
         "people": "{n} beneficiarios",
         "monthly": "{value} al mes",
         "note": "Valores de ejemplo. Los beneficios no salariales se pactan por escrito y se configuran en tu proyecto."
+      },
+      "nextHint": "La siguiente es la {period}. En la demo puedes adelantarla para repetir el ciclo: entra el personal activo a esa fecha (también quien contrataste) y empieza sin novedades.",
+      "history": {
+        "title": "Quincenas pagadas en la demo",
+        "row": "{n} colaboradores · neto {net} · costo total {cost}"
       }
     },
     "filings": {
@@ -983,7 +1040,8 @@
       "reminded": "Recordatorio enviado hoy (simulado)",
       "remindedToast": "Recordatorio enviado a {n, plural, one {# persona} other {# personas}} (envío simulado)",
       "remind": "Recordar a pendientes",
-      "note": "Los recordatorios están simulados; en tu proyecto llegan por la app, correo o WhatsApp."
+      "note": "Los recordatorios están simulados; en tu proyecto llegan por la app, correo o WhatsApp.",
+      "lmsHint": "La plataforma de formación es otra demo con su propio acceso: si no la tienes habilitada, allí mismo puedes solicitarla."
     },
     "app": {
       "inactive": "Esta colaboradora ya no está activa. Restablece los datos para volver a verla.",
@@ -1007,6 +1065,7 @@
         "approved": "Aprobada",
         "rejected": "Rechazada"
       },
+      "rejectedBecause": "Motivo: {reason}",
       "requestsHint": "Tu jefe aprueba o rechaza desde la vista de Gestión Humana (Inicio o Vacaciones y ausencias).",
       "earned": "Devengado",
       "deductions": "Deducciones",
@@ -1014,7 +1073,7 @@
       "slipCurrent": "Quincena actual, ya pagada.",
       "slipPrevious": "Última quincena pagada. La actual aparece aquí cuando Gestión Humana la paga en la pestaña Nómina.",
       "downloadPdf": "Descargar PDF",
-      "certIntro": "Descarga tu certificado laboral firmado por Gestión Humana, sin escribirle a nadie.",
+      "certIntro": "Descarga tu certificado laboral en PDF sin escribirle a nadie. En la demo es un documento de ejemplo, sin validez.",
       "withSalary": "Incluir salario",
       "courseDone": "Completado",
       "courseLate": "Vencido",
@@ -1033,7 +1092,7 @@
       "back": "Volver",
       "close": "Cerrar app",
       "title": "App del colaborador",
-      "footer": "Vista de ejemplo de la app web del colaborador (funciona en el celular sin instalar nada)."
+      "footer": "Vista de ejemplo de la app del colaborador. En tu proyecto es una app web que se abre en el celular sin instalar nada."
     },
     "assistant": {
       "persona": "Eres el asistente de Gestión Humana de Alimentos Valdeora S.A.S., una empresa ficticia de una demo. Respondes a los colaboradores en español de Colombia, tuteando, en máximo 4 frases claras. Usa solo los documentos del reglamento y las políticas de ejemplo y menciona el artículo o el punto que aplica. Si la respuesta no está en los documentos, dilo y sugiere escribir a Gestión Humana.",
@@ -1047,15 +1106,20 @@
       },
       "sources": "Fuentes ({n})",
       "modeLlm": "Respuesta generada con IA ({model}) a partir de los documentos",
-      "modeProviderError": "El proveedor de IA no respondió: se muestran los fragmentos encontrados",
-      "modeExtractive": "Modo sin IA: el servidor no tiene clave del proveedor y muestra los fragmentos encontrados",
       "thinking": "Buscando en el reglamento…",
       "placeholder": "Escribe tu pregunta",
       "send": "Enviar",
       "errors": {
         "network": "No me pude conectar con el servidor del asistente. Revisa tu conexión e inténtalo de nuevo.",
         "rateLimited": "Hay muchas preguntas seguidas. Espera un momento e inténtalo de nuevo.",
-        "server": "El servidor del asistente no está disponible en este momento. Inténtalo más tarde."
+        "server": "El servidor del asistente no está disponible en este momento. Inténtalo más tarde.",
+        "unavailable": "El asistente no está disponible en este momento (el servidor está ocupado o en mantenimiento). Inténtalo en unos minutos."
+      },
+      "noAi": {
+        "noKey": "Modo sin IA: el servidor no tiene clave del proveedor y muestra los fragmentos encontrados",
+        "budgetExhausted": "Modo sin IA: se agotó el cupo mensual de IA de la demo; se muestran los fragmentos encontrados",
+        "budgetUnavailable": "Modo sin IA: no pudimos verificar el cupo de IA; se muestran los fragmentos encontrados",
+        "providerError": "El proveedor de IA no respondió: se muestran los fragmentos encontrados"
       }
     },
     "pdf": {

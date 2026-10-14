@@ -3,7 +3,7 @@
 import { Fragment, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { ChevronDownIcon, ChevronRightIcon, WrenchScrewdriverIcon } from '@heroicons/react/24/outline';
-import { dateTime, num, pct } from '../lib/format';
+import { addDays, dateTime, num, pct, shortDate } from '../lib/format';
 import { useDemo } from '../lib/store';
 import type { SourceId } from '../lib/types';
 import { LOG_COLORS, logText } from './RunNotice';
@@ -11,7 +11,7 @@ import { Chip, Panel, Section } from './ui';
 
 export default function History({ sourceId }: { sourceId: SourceId }) {
   const t = useTranslations('demoScraping');
-  const { loc, fullHistory } = useDemo();
+  const { s, loc, fullHistory } = useDemo();
   const [all, setAll] = useState(false);
   const [open, setOpen] = useState<string | null>(null);
   const list = fullHistory.filter((h) => all || h.sourceId === sourceId);
@@ -89,7 +89,7 @@ export default function History({ sourceId }: { sourceId: SourceId }) {
         <WrenchScrewdriverIcon className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />
         <div>
           <h3 className="text-sm font-semibold text-white">{t('history.repairTitle')}</h3>
-          <p className="text-xs text-secondary-400">{t('history.repairText')}</p>
+          <p className="text-xs text-secondary-400">{t('history.repairText', { date: shortDate(addDays(s.day, -3), loc) })}</p>
         </div>
       </Panel>
     </Section>

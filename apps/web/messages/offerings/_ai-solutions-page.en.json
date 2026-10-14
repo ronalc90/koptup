@@ -58,17 +58,19 @@
         },
         "decisions": {
           "title": "Smarter Business Decisions",
-          "desc": "Real-time data analysis for better business decisions."
+          "desc": "AI summarizes and cross-references your data and documents so you decide with sources, not assumptions."
         },
         "advantage": {
-          "title": "Real Competitive Advantage",
-          "desc": "Companies that adopt AI today will lead their industry in the coming years."
+          "title": "Faster Answers",
+          "desc": "Your team finds the answer in seconds with the source cited, without waiting for someone to look up the document."
         }
       }
     },
     "tech": {
       "title": "AI Technologies We Implement",
-      "subtitle": "We work with the most advanced AI platforms on the market",
+      "subtitle": "The RAG demo uses the OpenAI API; we choose the other platforms with you based on your project.",
+      "inDemo": "In the RAG demo",
+      "perProject": "Depending on your project",
       "orchestration": "AI orchestration",
       "automation": "Automation"
     },
@@ -81,7 +83,7 @@
         },
         "cost": {
           "q": "How much does it cost to implement artificial intelligence in my company?",
-          "a": "It depends on the solution and the scope. RAG systems have published prices: a {pilotWeeks}-week pilot for {pilotPrice} and the Essential plan with a {essentialSetup} implementation plus {essentialMonthly} per month, plus VAT where applicable. Other solutions are quoted for your case; you'll find reference prices on the services page."
+          "a": "It depends on the solution and the scope. RAG systems have published prices: a {pilotWeeks}-week pilot for {pilotPrice} and the Essential plan with a {essentialSetup} implementation plus {essentialMonthly} per month, plus VAT if applicable. Other solutions are quoted for your case; you'll find reference prices on the services page."
         },
         "howTo": {
           "q": "How do I implement artificial intelligence in my business in Colombia?",

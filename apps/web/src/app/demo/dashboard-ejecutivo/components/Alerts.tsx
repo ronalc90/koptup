@@ -11,7 +11,7 @@ export default function Alerts() {
   const t = useTranslations(`${NS}.alerts`);
   const tw = useTranslations(`${NS}.weekly`);
   const fmt = useFmt();
-  const { alerts, setView, ctx, settings, notify, company } = useDashboard();
+  const { alerts, setView, setSegment, ctx, settings, notify, company } = useDashboard();
   const { alertTitle, alertText, weekly, recipientName } = useNarrative();
   const [channel, setChannel] = useState<'whatsapp' | 'email'>('whatsapp');
   const th = ctx.params.thresholds;
@@ -19,8 +19,10 @@ export default function Alerts() {
   const [pageUrl, setPageUrl] = useState('');
   useEffect(() => setPageUrl(`${window.location.origin}${window.location.pathname}`), []);
   const recipients = settings.recipients.filter((r) => r.channel === channel);
-  const fullText = [...weekly, tw('link', { link: pageUrl })].join('\n');
-  const waText = [`*${weekly[0]}*`, ...weekly.slice(1), tw('link', { link: pageUrl })].join('\n');
+  // El enlace del texto es el de esta demo (se conoce después de montar); la vista previa muestra el mismo.
+  const linkLine = pageUrl ? tw('link', { link: pageUrl }) : tw('linkPlaceholder');
+  const fullText = [...weekly, linkLine].join('\n');
+  const waText = [`*${weekly[0]}*`, ...weekly.slice(1), linkLine].join('\n');
   // Sin número: WhatsApp deja elegir el contacto (así nunca se escribe a un número de ejemplo).
   const waHref = `https://wa.me/?text=${encodeURIComponent(waText)}`;
   const mailHref = `mailto:${recipients.map((r) => r.address).join(',')}?subject=${encodeURIComponent(tw('emailSubject', { company: company.name }))}&body=${encodeURIComponent(fullText)}`;
@@ -60,7 +62,14 @@ export default function Alerts() {
                   <h4 className="font-semibold text-slate-900 dark:text-white">{alertTitle(a)}</h4>
                 </div>
                 <p className="text-sm text-slate-700 dark:text-slate-300">{alertText(a)}</p>
-                <button type="button" className={`${btn.link} mt-2`} onClick={() => setView(a.view)}>
+                <button
+                  type="button"
+                  className={`${btn.link} mt-2`}
+                  onClick={() => {
+                    if (a.kind === 'customersRisk') setSegment('riesgo');
+                    setView(a.view, a.kind === 'cashFloor' ? 'fin-cash-section' : undefined);
+                  }}
+                >
                   {t(`goTo.${a.view}`)}
                 </button>
               </li>
@@ -72,11 +81,11 @@ export default function Alerts() {
         <div className="mt-4">
           <Note>
             {t('rules', {
-              goalGap: fmt.num(th.goalGap, 1),
-              marginDrop: fmt.num(th.marginDrop, 1),
-              overdueGrowth: fmt.num(th.overdueGrowth, 1),
+              goalGap: fmt.param(th.goalGap),
+              marginDrop: fmt.param(th.marginDrop),
+              overdueGrowth: fmt.param(th.overdueGrowth),
               cashFloor: fmt.moneyM(th.cashFloor * 1e6),
-              riskDrop: fmt.num(th.riskDrop, 1),
+              riskDrop: fmt.param(th.riskDrop),
             })}
           </Note>
         </div>
@@ -84,13 +93,12 @@ export default function Alerts() {
 
       <section className={`${card} p-5 sm:p-6`} aria-labelledby="weekly-title">
         <SectionTitle title={<span id="weekly-title">{tw('previewTitle')}</span>} subtitle={tw('previewSubtitle')} />
-        <div role="tablist" aria-label={tw('channel')} className="inline-flex rounded-lg border border-slate-200 dark:border-slate-700 p-1 mb-4">
+        <div role="group" aria-label={tw('channel')} className="inline-flex rounded-lg border border-slate-200 dark:border-slate-700 p-1 mb-4">
           {(['whatsapp', 'email'] as const).map((c) => (
             <button
               key={c}
               type="button"
-              role="tab"
-              aria-selected={channel === c}
+              aria-pressed={channel === c}
               onClick={() => setChannel(c)}
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium ${channel === c ? 'bg-purple-600 text-white' : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
             >
@@ -107,7 +115,7 @@ export default function Alerts() {
                 {weekly.slice(1).map((l, i) => (
                   <p key={i}>{l}</p>
                 ))}
-                <p className="text-blue-700 dark:text-blue-300 underline">{tw('linkPlaceholder')}</p>
+                <p className="text-blue-700 dark:text-blue-300 underline break-all">{linkLine}</p>
                 <p className="text-right text-[10px] text-slate-500 dark:text-slate-400 mt-1">{tw('mondayTime')}</p>
               </div>
             </div>
@@ -126,7 +134,7 @@ export default function Alerts() {
                 {weekly.slice(1).map((l, i) => (
                   <p key={i}>{l}</p>
                 ))}
-                <p className="text-blue-700 dark:text-blue-300 underline">{tw('linkPlaceholder')}</p>
+                <p className="text-blue-700 dark:text-blue-300 underline break-all">{linkLine}</p>
               </div>
             </div>
           )}

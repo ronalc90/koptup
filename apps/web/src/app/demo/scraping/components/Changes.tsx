@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { notify } from '../lib/notify';
 import { BellAlertIcon, CheckIcon } from '@heroicons/react/24/outline';
-import { DEMO_YESTERDAY, cop, date as fmtDate, dateTime, num, signedPct, type Loc } from '../lib/format';
+import { addDays, cop, date as fmtDate, dateTime, num, signedPct, type Loc } from '../lib/format';
 import { scheduledTime } from '../lib/engine';
 import { useDemo } from '../lib/store';
 import type { Change, Column, FieldDiff, Rule, RuleType, SourceId } from '../lib/types';
@@ -62,7 +62,7 @@ export default function Changes({ sourceId }: { sourceId: SourceId }) {
     <Section
       id="scraping-changes"
       title={t('changes.title')}
-      subtitle={t('changes.subtitle', { before: dateTime(`${DEMO_YESTERDAY}T${scheduledTime(sourceId)}`, loc), after: dateTime(r.at, loc) })}
+      subtitle={t('changes.subtitle', { before: dateTime(`${addDays(s.day, -1)}T${scheduledTime(sourceId)}`, loc), after: dateTime(r.at, loc) })}
     >
       <div className="flex flex-wrap gap-1.5" role="group" aria-label={t('changes.filterLabel')}>
         {(['all', 'added', 'modified', 'removed'] as KindFilter[]).map((k) => (

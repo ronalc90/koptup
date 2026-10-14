@@ -59,14 +59,8 @@ export default function DesarrolloWebColombiaPage() {
     { q: t('q6q'), a: t('q6a', { count: DEMO_COUNT }) },
   ];
 
-  const techStack = [
-    { category: 'Frontend', techs: ['React', 'Next.js', 'Vue.js', 'TypeScript', 'Tailwind CSS'] },
-    { category: 'Backend', techs: ['Node.js', 'Python', 'FastAPI', 'NestJS', 'Express'] },
-    { category: 'Bases de datos', techs: ['MongoDB', 'PostgreSQL', 'MySQL', 'Redis'] },
-    { category: 'IA & ML', techs: ['OpenAI GPT-4', 'Claude AI', 'LangChain', 'RAG'] },
-    { category: 'Cloud & DevOps', techs: ['AWS', 'Google Cloud', 'Docker', 'Vercel', 'Railway'] },
-    { category: 'Mobile', techs: ['React Native', 'Flutter', 'Expo'] },
-  ];
+  // Primero lo que usa este sitio (comprobable); luego lo que se define por proyecto.
+  const techStack = (t.raw('techGroups') as Array<{ category: string; techs: string[] }>) ?? [];
 
   return (
     <>
@@ -85,9 +79,7 @@ export default function DesarrolloWebColombiaPage() {
               {t('hero.subtitle')}
             </p>
             {/* Geographic reach */}
-            <p className="text-base md:text-lg text-primary-200 mb-10 max-w-2xl mx-auto">
-              Trabajamos con clientes en <strong className="text-white">cualquier parte del mundo</strong> — Colombia, México, Argentina, España, Estados Unidos y más. 100% remoto.
-            </p>
+            <p className="text-base md:text-lg text-primary-200 mb-10 max-w-2xl mx-auto">{t('hero.reach')}</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-white text-primary-700 hover:bg-primary-50" asChild>
                 <Link href="/contact">{t('hero.cta1')}</Link>
@@ -196,8 +188,8 @@ export default function DesarrolloWebColombiaPage() {
             <p className="text-xl text-secondary-600 dark:text-secondary-400">{t('techSubtitle')}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {techStack.map((cat, i) => (
-              <Card key={i} variant="bordered">
+            {techStack.map((cat) => (
+              <Card key={cat.category} variant="bordered">
                 <CardContent className="p-5">
                   <h3 className="font-bold text-secondary-900 dark:text-white mb-3 text-sm uppercase tracking-wider">{cat.category}</h3>
                   <div className="flex flex-wrap gap-2">
@@ -243,7 +235,7 @@ export default function DesarrolloWebColombiaPage() {
               <Link href="/contact">{t('ctaButton')}</Link>
             </Button>
             <Button size="lg" variant="outline" className="border-white/50 text-white hover:bg-white/10" asChild>
-              <Link href="/services#planes-rag">{useTranslations('common')('requestQuote')}</Link>
+              <Link href="/services">{t('ctaPlans')}</Link>
             </Button>
           </div>
         </div>

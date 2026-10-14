@@ -47,3 +47,20 @@ export function absoluteUrl(path = ''): string {
   if (!path || path === '/') return SITE_URL;
   return `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`;
 }
+
+/**
+ * Perfiles públicos de KopTup: una sola fuente para el pie de página,
+ * /contact y el JSON-LD (`sameAs`). Solo van perfiles comprobados o que el
+ * dueño debe confirmar:
+ *  - LinkedIn `company/koptup` es la página de la empresa (la numérica pide
+ *    iniciar sesión).
+ *  - Instagram no se puede comprobar sin sesión (pendiente de confirmar con el
+ *    dueño).
+ *  - Se quitaron `x.com/koptup` (no existe) y `github.com/koptup` (es una
+ *    cuenta personal sin relación comprobable con KopTup).
+ * `public/llms.txt` repite estas URL a mano.
+ */
+export const SOCIAL_LINKS = {
+  linkedin: 'https://www.linkedin.com/company/koptup',
+  instagram: 'https://www.instagram.com/koptup',
+} as const;

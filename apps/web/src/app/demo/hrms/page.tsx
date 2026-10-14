@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { HrProvider, useHr } from './lib/store';
 import { Banner, HeaderActions, TabBar } from './components/Header';
+import GettingStarted from './components/GettingStarted';
 import HomeTab from './components/HomeTab';
 import PeopleTab from './components/PeopleTab';
 import AbsencesTab from './components/AbsencesTab';
@@ -45,8 +46,9 @@ function HrmsDemo() {
   return (
     <>
       <Banner actions={<HeaderActions />} />
+      <GettingStarted />
       <TabBar active={tab} onSelect={setTab} counts={{ absences: pending }} />
-      <section id="hrms-panel" role="tabpanel" aria-label={t(`tabs.${tab}`)}>
+      <section id="hrms-panel" role="tabpanel" aria-labelledby={`hrms-tab-${tab}`} tabIndex={-1} className="outline-none">
         {tab === 'home' && <HomeTab />}
         {tab === 'people' && <PeopleTab />}
         {tab === 'absences' && <AbsencesTab />}

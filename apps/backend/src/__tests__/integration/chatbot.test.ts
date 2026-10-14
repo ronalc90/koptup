@@ -3,16 +3,18 @@
  * público solo para bots existentes, límites, lista blanca de modelos,
  * ingesta real de PDF/DOCX y bloqueo de URLs internas (SSRF).
  *
- * No necesita MongoDB ni Redis: el estado del chatbot vive en memoria y en
- * un archivo JSON (CHATBOT_STATE_DIR aislado por prueba).
+ * Los bots viven en MongoDB (necesita MONGODB_URI_TEST). El archivo heredado
+ * `state.json` (CHATBOT_STATE_DIR aislado por prueba) se migra al primer uso.
  */
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
+import mongoose from 'mongoose';
 import request from 'supertest';
 import type { Express } from 'express';
 // jszip viene con mammoth (dependencia del backend).
 import JSZip from 'jszip';
+import { connectTestDb, describeDb, disconnectTestDb } from './helpers';
 
 const OWNER_HEADER = 'X-Bot-Owner-Token';
 const LEGACY_BOT_ID = 'kbot_legacy0000000001';
@@ -60,12 +62,13 @@ async function makeDocx(text: string): Promise<Buffer> {
 
 const b64 = (buf: Buffer) => buf.toString('base64');
 
-describe('chatbot: propiedad, límites e ingesta (integración)', () => {
+describeDb('chatbot: propiedad, límites e ingesta (integración)', () => {
   let app: Express;
   let stateDir: string;
   const prevKey = process.env.OPENAI_API_KEY;
 
   beforeAll(async () => {
+    await connectTestDb('chatbot');
     // Estado previo con un bot creado ANTES del control de propiedad (sin hash).
     stateDir = fs.mkdtempSync(path.join(os.tmpdir(), 'koptup-chatbot-it-'));
     process.env.CHATBOT_STATE_DIR = stateDir;
@@ -90,6 +93,7 @@ describe('chatbot: propiedad, límites e ingesta (integración)', () => {
     if (prevKey === undefined) delete process.env.OPENAI_API_KEY;
     else process.env.OPENAI_API_KEY = prevKey;
     fs.rmSync(stateDir, { recursive: true, force: true });
+    await disconnectTestDb();
   });
 
   async function createBot(body: Record<string, unknown> = {}, headers: Record<string, string> = {}) {
@@ -163,22 +167,26 @@ describe('chatbot: propiedad, límites e ingesta (integración)', () => {
     expect(own.body.owned).toBe(true);
   });
 
-  it('migración: un bot sin token guardado queda del primer token que lo usa', async () => {
+  it('bot heredado sin dueño registrado: ningún token lo reclama (solo el equipo lo administra)', async () => {
     const claimer = 'a'.repeat(43);
     const first = await request(app).patch(`/api/chatbot/bots/${LEGACY_BOT_ID}`).set(OWNER_HEADER, claimer).send({ name: 'Reclamado' });
-    expect(first.status).toBe(200);
-    const intruder = await request(app).patch(`/api/chatbot/bots/${LEGACY_BOT_ID}`).set(OWNER_HEADER, 'b'.repeat(43)).send({ name: 'Intruso' });
-    expect(intruder.status).toBe(403);
-    // Persistido en disco: solo el hash, nunca el token.
-    const saved = fs.readFileSync(path.join(stateDir, 'state.json'), 'utf-8');
-    expect(saved).not.toContain(claimer);
-    expect(saved).toMatch(/ownerTokenHash/);
+    expect(first.status).toBe(403);
+    expect(first.body).toMatchObject({ success: false, code: 'legacy_bot_staff_only' });
+    // Tampoco por la vía de "crear con el mismo botId" ni sin token.
+    expect((await request(app).post('/api/chatbot/bots').set(OWNER_HEADER, claimer).send({ botId: LEGACY_BOT_ID, name: 'Reclamado' })).status).toBe(403);
+    expect((await request(app).delete(`/api/chatbot/bots/${LEGACY_BOT_ID}`)).status).toBe(403);
+    expect((await request(app).get(`/api/chatbot/bots/${LEGACY_BOT_ID}/conversations`).set(OWNER_HEADER, claimer)).status).toBe(403);
+    // Sigue sin dueño y con su nombre original.
+    const pub = await request(app).get(`/api/chatbot/bots/${LEGACY_BOT_ID}`).set(OWNER_HEADER, claimer);
+    expect(pub.body).toMatchObject({ name: 'Bot antiguo', owned: false });
+    const saved = await mongoose.connection.collection('chatbot_bots').findOne({ botId: LEGACY_BOT_ID });
+    expect(saved?.ownerTokenHash ?? null).toBeNull();
   });
 
   it('valida campos de configuración', async () => {
     const res = await request(app).post('/api/chatbot/bots').send({ systemPrompt: 'x'.repeat(4001) });
     expect(res.status).toBe(400);
-    expect(res.body).toMatchObject({ error: 'field_too_long', field: 'systemPrompt' });
+    expect(res.body).toMatchObject({ success: false, code: 'field_too_long', field: 'systemPrompt', message: expect.any(String) });
     expect((await request(app).post('/api/chatbot/bots').send({ color: 'red; background:url(x)' })).status).toBe(400);
   });
 

@@ -7,7 +7,7 @@ export default function GestorDocumentosLayout({ children }: { children: React.R
   const breadcrumbSchema = getBreadcrumbSchema([
     { name: 'Inicio', url: '/' },
     { name: 'Demos', url: '/demo' },
-    { name: 'Gestor Documental Médico', url: '/demo/gestor-documentos' },
+    { name: 'Gestor documental con IA', url: '/demo/gestor-documentos' },
   ]);
 
   return (

@@ -12,8 +12,10 @@ import {
   ExclamationTriangleIcon,
   CheckBadgeIcon,
   NoSymbolIcon,
+  CpuChipIcon,
 } from '@heroicons/react/24/outline';
 import type { ChatMessage, SourceChunk } from './data';
+import { suggestsUpload } from './errors';
 import Tooltip from './ui/Tooltip';
 
 interface ChatPanelProps {
@@ -33,6 +35,30 @@ interface ChatPanelProps {
   busy: boolean;
   /** La base de conocimiento todavía se está indexando. */
   preparing: boolean;
+  /** Cambia al modo "Prueba con tu documento" (alternativa cuando se llegó a un límite). */
+  onUseUpload: () => void;
+  /** Abre "Cómo se respondió" en pantallas sin la columna derecha. */
+  onShowPipeline: () => void;
+}
+
+/** Números `[n]` que la respuesta cita en su texto. */
+export function citedIndexes(text: string): Set<number> {
+  const out = new Set<number>();
+  for (const m of text.matchAll(/\[(\d+)\]/g)) out.add(Number(m[1]));
+  return out;
+}
+
+/**
+ * Fragmentos consultados con la marca "citado": primero los que la respuesta
+ * cita con `[n]` (en su orden), después los que encontró la búsqueda pero la
+ * respuesta no usó.
+ */
+export function orderByCited<T extends { index: number }>(
+  sources: T[],
+  cited: Set<number>,
+): Array<{ source: T; cited: boolean }> {
+  const marked = sources.map((source) => ({ source, cited: cited.has(source.index) }));
+  return [...marked.filter((m) => m.cited), ...marked.filter((m) => !m.cited)];
 }
 
 /**
@@ -105,6 +131,8 @@ export default function ChatPanel({
   onRegenerate,
   busy,
   preparing,
+  onUseUpload,
+  onShowPipeline,
 }: ChatPanelProps) {
   const t = useTranslations('demoChatbot');
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -167,8 +195,10 @@ export default function ChatPanel({
           </div>
         </div>
         {hasQuestions ? (
-          <div className="hidden min-w-0 items-center gap-1 overflow-x-auto pb-0.5 md:flex">
-            <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wide text-secondary-500 dark:text-secondary-400">
+          // También en el celular (fila con desplazamiento lateral): después de la primera
+          // pregunta es la forma de seguir probando sin subir hasta la barra superior.
+          <div role="group" className="flex min-w-0 items-center gap-1 overflow-x-auto pb-0.5" aria-label={t('chat.suggested')}>
+            <span className="hidden shrink-0 text-[10px] font-semibold uppercase tracking-wide text-secondary-500 dark:text-secondary-400 sm:inline">
               {t('chat.suggested')}
             </span>
             {suggestionButtons(true)}
@@ -210,17 +240,30 @@ export default function ChatPanel({
                       <span className="ml-2 text-xs">{preparing ? t('chat.preparing') : t('chat.thinking')}</span>
                     </span>
                   ) : msg.errorKey ? (
-                    <div className="flex flex-wrap items-center gap-2 text-sm text-red-700 dark:text-red-300" role="alert">
-                      <ExclamationTriangleIcon className="h-4 w-4 shrink-0" aria-hidden="true" />
-                      <span>{t(`chat.${msg.errorKey}`)}</span>
-                      <button
-                        type="button"
-                        onClick={() => onRegenerate(msg.id)}
-                        disabled={busy}
-                        className="rounded-md border border-red-200 px-2 py-0.5 text-xs font-semibold hover:bg-red-50 disabled:opacity-50 dark:border-red-800 dark:hover:bg-red-950/40"
-                      >
-                        {t('chat.retry')}
-                      </button>
+                    <div className="text-sm text-red-700 dark:text-red-300" role="alert" data-error-key={msg.errorKey}>
+                      <p className="flex items-start gap-2">
+                        <ExclamationTriangleIcon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                        <span>{t(`chat.${msg.errorKey}`)}</span>
+                      </p>
+                      <div className="mt-2 flex flex-wrap gap-2 pl-6">
+                        <button
+                          type="button"
+                          onClick={() => onRegenerate(msg.id)}
+                          disabled={busy}
+                          className="rounded-md border border-red-200 px-2 py-0.5 text-xs font-semibold hover:bg-red-50 disabled:opacity-50 dark:border-red-800 dark:hover:bg-red-950/40"
+                        >
+                          {t('chat.retry')}
+                        </button>
+                        {suggestsUpload(msg.errorKey) ? (
+                          <button
+                            type="button"
+                            onClick={onUseUpload}
+                            className="rounded-md border border-red-200 px-2 py-0.5 text-xs font-semibold hover:bg-red-50 dark:border-red-800 dark:hover:bg-red-950/40"
+                          >
+                            {t('chat.useUpload')}
+                          </button>
+                        ) : null}
+                      </div>
                     </div>
                   ) : (
                     <div className="whitespace-pre-wrap break-words">
@@ -231,19 +274,31 @@ export default function ChatPanel({
 
                 {!msg.pending && msg.sources && msg.sources.length > 0 ? (
                   <div className="flex flex-wrap items-center gap-1.5 px-1">
-                    <span className="text-[10px] font-semibold uppercase tracking-wide text-secondary-500 dark:text-secondary-400">
-                      {t('chat.sources')}
-                    </span>
-                    {msg.sources.map((s) => (
+                    <Tooltip content={t('chat.citedHint')} side="top" maxWidth={280}>
+                      <span className="text-[10px] font-semibold uppercase tracking-wide text-secondary-500 dark:text-secondary-400">
+                        {t('chat.sources', { count: msg.sources.length })}
+                      </span>
+                    </Tooltip>
+                    {orderByCited(msg.sources, citedIndexes(msg.content)).map(({ source: s, cited }) => (
                       <button
                         key={s.id}
                         type="button"
                         onClick={() => onCiteClick(s)}
                         aria-label={citationLabel(s.index, s.docName)}
-                        className="inline-flex max-w-full items-center gap-1 rounded-full border border-secondary-200 bg-white px-2.5 py-1 text-[10.5px] text-secondary-700 transition hover:border-primary-400 hover:bg-primary-50 hover:text-primary-700 dark:border-secondary-700 dark:bg-secondary-900 dark:text-secondary-200 dark:hover:bg-primary-950/40 dark:hover:text-primary-200"
+                        data-cited={cited ? 'true' : undefined}
+                        className={`inline-flex max-w-full items-center gap-1 rounded-full border px-2.5 py-1 text-[10.5px] transition hover:border-primary-400 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-primary-950/40 dark:hover:text-primary-200 ${
+                          cited
+                            ? 'border-primary-300 bg-primary-50 text-primary-800 dark:border-primary-800 dark:bg-primary-950/40 dark:text-primary-100'
+                            : 'border-secondary-200 bg-white text-secondary-600 dark:border-secondary-700 dark:bg-secondary-900 dark:text-secondary-300'
+                        }`}
                       >
                         <span className="font-mono">[{s.index}]</span>
                         <span className="truncate">{s.docName}</span>
+                        {cited ? (
+                          <span className="rounded bg-primary-600 px-1 text-[9px] font-semibold uppercase tracking-wide text-white">
+                            {t('chat.cited')}
+                          </span>
+                        ) : null}
                       </button>
                     ))}
                   </div>
@@ -275,7 +330,15 @@ export default function ChatPanel({
                       )}
                     </p>
                     <div className="flex items-center gap-1">
-                      <Tooltip content={t('chat.feedbackUp')} side="top">
+                      <button
+                        type="button"
+                        onClick={onShowPipeline}
+                        className="mr-1 inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10.5px] font-medium text-primary-700 hover:bg-primary-50 dark:text-primary-300 dark:hover:bg-primary-950/40 lg:hidden"
+                      >
+                        <CpuChipIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                        {t('pipeline.toggle')}
+                      </button>
+                      <Tooltip content={t('chat.feedbackUpTooltip')} side="top">
                         <button
                           type="button"
                           onClick={() => onFeedback(msg.id, 'up')}
@@ -290,7 +353,7 @@ export default function ChatPanel({
                           <HandThumbUpIcon className="h-3.5 w-3.5" />
                         </button>
                       </Tooltip>
-                      <Tooltip content={t('chat.feedbackDown')} side="top">
+                      <Tooltip content={t('chat.feedbackDownTooltip')} side="top">
                         <button
                           type="button"
                           onClick={() => onFeedback(msg.id, 'down')}
@@ -359,6 +422,7 @@ export default function ChatPanel({
             <span className="hidden sm:inline">{t('chat.send')}</span>
           </button>
         </div>
+        <p className="mt-1.5 text-[10.5px] leading-snug text-secondary-500 dark:text-secondary-400">{t('chat.privacyNote')}</p>
       </footer>
     </section>
   );

@@ -6,9 +6,9 @@ import {
   BeakerIcon,
   CheckCircleIcon,
   CpuChipIcon,
-  DocumentCheckIcon,
   InformationCircleIcon,
   ListBulletIcon,
+  ScaleIcon,
   SparklesIcon,
   XCircleIcon,
 } from '@heroicons/react/24/outline';
@@ -17,7 +17,7 @@ import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import type { DatosServidor, EstadoServidor } from '../_lib/useServidor';
 import { CODIGOS_REGLAS } from '../_lib/motor';
-import { CATALOGO_EJEMPLO, CONVENIO_EJEMPLO, LOTE_EJEMPLO } from '../_lib/datos-ejemplo';
+import { CATALOGO_EJEMPLO, CONVENIO_EJEMPLO, LOTE_EJEMPLO, MANUALES } from '../_lib/datos-ejemplo';
 import { conPorcentaje, formatoCOP, formatoNumero, formatoPorcentaje } from '../_lib/formato';
 import type { TabId } from '../_lib/tabs';
 
@@ -92,8 +92,9 @@ export default function ResumenTab({
   onIrA: (tab: TabId) => void;
 }) {
   const t = useTranslations('demoExpertSystem.summary');
+  const tMan = useTranslations('demoExpertSystem.manuals');
   const locale = useLocale();
-  const { experto, cups, vector, config } = datos;
+  const { cups, vector, config } = datos;
   const cargando = estado === 'cargando';
   const sinDato = cargando ? '…' : '—';
   const n = (v: number) => formatoNumero(v, locale);
@@ -112,7 +113,7 @@ export default function ResumenTab({
           <p className="mt-1 text-secondary-600 dark:text-secondary-400">{t('subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
-          {actualizado && !cargando && (
+          {actualizado && estado === 'ok' && (
             <span className="text-xs text-secondary-500 dark:text-secondary-400">{t('updatedAt', { hora: actualizado })}</span>
           )}
           <Button size="sm" variant="outline" onClick={onActualizar} disabled={cargando}>
@@ -124,19 +125,31 @@ export default function ResumenTab({
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Kpi
-          titulo={t('accounts')}
-          valor={experto ? n(experto.totalCuentas) : sinDato}
+          titulo={t('rulesActive')}
+          valor={reglasActivas !== null ? String(reglasActivas) : sinDato}
           detalle={
-            experto
-              ? t('accountsProcessed', {
-                  procesadas: n(experto.cuentasProcesadas),
-                  porcentaje: formatoPorcentaje(experto.porcentajeProcesado || 0, locale),
+            reglasActivas !== null
+              ? t('rulesActiveDetail', { total: CODIGOS_REGLAS.length })
+              : cargando
+                ? t('loading')
+                : t('noData')
+          }
+          icono={CpuChipIcon}
+          color="text-green-600 dark:text-green-400"
+        />
+        <Kpi
+          titulo={t('tolerance')}
+          valor={config ? conPorcentaje(Number(config.toleranciaDiferenciaTarifa) || 0, locale) : sinDato}
+          detalle={
+            config
+              ? t('toleranceDetail', {
+                  manual: MANUALES.includes(config.manualPorDefecto) ? tMan(config.manualPorDefecto) : String(config.manualPorDefecto),
                 })
               : cargando
                 ? t('loading')
                 : t('noData')
           }
-          icono={DocumentCheckIcon}
+          icono={ScaleIcon}
           color="text-primary-600 dark:text-primary-400"
         />
         <Kpi
@@ -165,36 +178,13 @@ export default function ResumenTab({
           icono={SparklesIcon}
           color="text-purple-600 dark:text-purple-400"
         />
-        <Kpi
-          titulo={t('rulesActive')}
-          valor={reglasActivas !== null ? String(reglasActivas) : sinDato}
-          detalle={
-            reglasActivas !== null
-              ? t('rulesActiveDetail', { total: CODIGOS_REGLAS.length })
-              : cargando
-                ? t('loading')
-                : t('noData')
-          }
-          icono={CpuChipIcon}
-          color="text-green-600 dark:text-green-400"
-        />
       </div>
 
-      {(cups?.totalCUPS === 0 || experto?.totalCuentas === 0) && (
-        <div className="space-y-2 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-100">
-          {cups?.totalCUPS === 0 && (
-            <p className="flex items-start gap-2">
-              <InformationCircleIcon className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
-              {t('emptyCatalog')}
-            </p>
-          )}
-          {experto?.totalCuentas === 0 && (
-            <p className="flex items-start gap-2">
-              <InformationCircleIcon className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
-              {t('emptyAccounts')}
-            </p>
-          )}
-        </div>
+      {cups?.totalCUPS === 0 && (
+        <p className="flex items-start gap-2 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-100">
+          <InformationCircleIcon className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
+          {t('emptyCatalog')}
+        </p>
       )}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">

@@ -1,10 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, type ReactNode, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocale, useTranslations } from 'next-intl';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import useModalClose from '@/hooks/useModalClose';
 import { formatDate, formatDateTime, type DateStyle } from '../lib/dates';
 import type { HealthLevel } from '../lib/engine';
 import type { ISODate, ISODateTime, Priority, SectorId, StatusId } from '../lib/types';
@@ -62,6 +61,107 @@ export const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 export const card = 'rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900';
 
+/* ------------------------------------------------------------------ */
+/* Ventanas: Escape cierra solo la de arriba, el foco queda dentro y   */
+/* vuelve al botón que la abrió.                                       */
+/* ------------------------------------------------------------------ */
+
+const dialogStack: symbol[] = [];
+let scrollLocks = 0;
+let savedOverflow = '';
+
+/** Último y penúltimo elemento con foco: si un campo con autoFocus ya tomó el foco al abrir, el botón que abrió la ventana es el penúltimo. */
+let lastFocus: HTMLElement | null = null;
+let prevFocus: HTMLElement | null = null;
+if (typeof document !== 'undefined') {
+  document.addEventListener(
+    'focusin',
+    (e) => {
+      if (e.target === lastFocus) return;
+      prevFocus = lastFocus;
+      lastFocus = e.target as HTMLElement;
+    },
+    true,
+  );
+}
+
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+export function useDialog(ref: RefObject<HTMLElement>, onClose: () => void) {
+  const close = useRef(onClose);
+  close.current = onClose;
+  useEffect(() => {
+    const id = Symbol('dialog');
+    const node = ref.current;
+    dialogStack.push(id);
+    const active = document.activeElement as HTMLElement | null;
+    const opener = active && ref.current?.contains(active) ? prevFocus : active;
+    if (scrollLocks++ === 0) {
+      savedOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+    }
+    // Si un campo ya tomó el foco (autoFocus), se respeta; si no, el foco va a la ventana.
+    if (!ref.current?.contains(document.activeElement)) ref.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (dialogStack[dialogStack.length - 1] !== id) return;
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        close.current();
+        return;
+      }
+      if (e.key !== 'Tab' || !ref.current) return;
+      const items = [...ref.current.querySelectorAll<HTMLElement>(FOCUSABLE)].filter((el) => el.offsetParent !== null || el === document.activeElement);
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      const inside = ref.current.contains(document.activeElement);
+      if (e.shiftKey && (document.activeElement === first || document.activeElement === ref.current || !inside)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (document.activeElement === last || !inside)) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      const i = dialogStack.indexOf(id);
+      if (i >= 0) dialogStack.splice(i, 1);
+      if (--scrollLocks === 0) document.body.style.overflow = savedOverflow;
+      // El foco vuelve al botón que abrió la ventana solo si de verdad se cerró
+      // (en desarrollo, React monta y desmonta dos veces los efectos).
+      setTimeout(() => {
+        if (node && document.contains(node)) return;
+        if (opener && document.contains(opener)) opener.focus({ preventScroll: true });
+      }, 0);
+    };
+  }, [ref]);
+}
+
+/** Copia texto al portapapeles; si el navegador no deja usar la API moderna, usa el método clásico. */
+export async function copyText(text: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    try {
+      const area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      const ok = document.execCommand('copy');
+      area.remove();
+      return ok;
+    } catch {
+      return false;
+    }
+  }
+}
+
 export function Modal({
   title,
   subtitle,
@@ -80,11 +180,8 @@ export function Modal({
   footer?: ReactNode;
 }) {
   const t = useTranslations('demoProjectsPro.common');
-  useModalClose(true, onClose);
   const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    ref.current?.focus();
-  }, []);
+  useDialog(ref, onClose);
   const width = size === 'sm' ? 'max-w-md' : size === 'lg' ? 'max-w-3xl' : size === 'xl' ? 'max-w-5xl' : 'max-w-xl';
   return createPortal(
     <div className="fixed inset-0 z-[210] flex items-end sm:items-center justify-center p-0 sm:p-4">

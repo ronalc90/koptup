@@ -1,8 +1,11 @@
 'use client';
 
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { ArrowTopRightOnSquareIcon, CheckIcon, DocumentMagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import Card from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
+import { SLUG_OTRA_DEMO, type Permiso } from '../_lib/usePermisos';
 
 const PASOS = ['s1', 's2', 's3', 's4', 's5'] as const;
 
@@ -12,10 +15,12 @@ const REALIDAD: Array<{ seccion: string; texto: string }> = [
   { seccion: 'tabs.simulador', texto: 'how.realSimulator' },
   { seccion: 'tabs.buscar', texto: 'how.realSearch' },
   { seccion: 'how.rowCodes', texto: 'how.realCodes' },
+  { seccion: 'how.rowReading', texto: 'how.realReading' },
 ];
 
-export default function ComoDecideTab() {
+export default function ComoDecideTab({ accesoOtraDemo }: { accesoOtraDemo: Permiso }) {
   const t = useTranslations('demoExpertSystem');
+  const puedeAbrir = accesoOtraDemo === 'si';
 
   return (
     <div className="space-y-6">
@@ -61,6 +66,35 @@ export default function ComoDecideTab() {
           </ul>
         </Card>
       </div>
+
+      <Card variant="bordered">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex min-w-0 items-start gap-3">
+            <DocumentMagnifyingGlassIcon className="h-8 w-8 shrink-0 text-primary-600 dark:text-primary-400" aria-hidden="true" />
+            <div className="min-w-0">
+              <h3 className="text-lg font-semibold text-secondary-900 dark:text-white">{t('how.otherTitle')}</h3>
+              <p className="mt-1 text-sm text-secondary-700 dark:text-secondary-300">{t('how.otherText')}</p>
+              <p className="mt-1 text-xs text-secondary-500 dark:text-secondary-400">
+                {puedeAbrir ? t('how.otherHasAccess') : t('how.otherNeedsInvite')}
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2 sm:flex-row md:shrink-0">
+            {puedeAbrir ? (
+              <Button size="sm" asChild>
+                <Link href={`/demo/${SLUG_OTRA_DEMO}`}>
+                  {t('how.otherOpen')}
+                  <ArrowTopRightOnSquareIcon className="ml-2 h-4 w-4" aria-hidden="true" />
+                </Link>
+              </Button>
+            ) : (
+              <Button size="sm" variant="outline" asChild>
+                <Link href={`/solicitar-demo?demos=${SLUG_OTRA_DEMO}`}>{t('how.otherRequest')}</Link>
+              </Button>
+            )}
+          </div>
+        </div>
+      </Card>
 
       <Card variant="bordered">
         <h3 className="mb-4 text-lg font-semibold text-secondary-900 dark:text-white">{t('how.realTitle')}</h3>

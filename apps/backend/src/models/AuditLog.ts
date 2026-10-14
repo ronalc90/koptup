@@ -5,10 +5,18 @@ import mongoose, { Document, Schema, Types } from 'mongoose';
  * cuentas). Solo se agregan registros: no existe ningún endpoint para editar
  * ni borrar entradas. Se consulta en GET /api/admin/audit-log (solo admin).
  *
- * Acciones registradas: demo_request.update, demo_request.approve,
- * demo_request.reject, demo_grant.create, demo_grant.extend,
- * demo_grant.revoke, demo_grant.resend_activation, demo_catalog.update,
- * user.activate, user.role_change.
+ * Acciones registradas (`accion`):
+ *  - Demos: demo_request.update, demo_request.approve, demo_request.reject,
+ *    demo_grant.create, demo_grant.extend, demo_grant.revoke,
+ *    demo_grant.resend_activation, demo_catalog.update.
+ *  - Cuentas: user.activate, user.change_password y user.role_change (desde
+ *    el panel, o con actorRol `system` y `detalle.origen` ADMIN_EMAIL o
+ *    set-admin cuando lo asigna el arranque o el script).
+ *  - Comercial: lead.create, lead.assign, lead.stage_change, lead.next_action,
+ *    lead.migrate_contacts, proposal_request.create, proposal.* (create,
+ *    update, duplicate, delete, accept, reject, convert, payment_options,
+ *    payment_received, wompi_checkout) y settings.commerce_update.
+ *  - Datos personales: privacy.* (Admin › Privacidad).
  */
 export interface IAuditLog extends Document {
   actor?: Types.ObjectId | null;

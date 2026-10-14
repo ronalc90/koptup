@@ -124,7 +124,7 @@ export default function ProfilePanel() {
                 [t('contract'), tc(e.contract)],
                 [t('joined'), f.date(e.joined)],
                 [t('end'), e.contractEnd ? f.date(e.contractEnd) : t('noEnd')],
-                [t('tenure'), t('tenureValue', { y: years, m: Math.max(0, months) })],
+                [t('tenure'), e.joined > state.baseDate ? t('tenureFuture', { date: f.date(e.joined) }) : t('tenureValue', { y: years, m: Math.max(0, months) })],
                 [t('probation'), prob ? (prob >= state.baseDate ? t('probationUntil', { date: f.date(prob) }) : t('probationDone')) : t('na')],
                 [t('shift'), tsh(e.shift)],
                 [t('manager'), manager ? <button key="m" type="button" className="text-violet-700 dark:text-violet-300 hover:underline text-left" onClick={() => openProfile(manager.id)}>{manager.name}</button> : t('board')],

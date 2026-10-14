@@ -1,14 +1,18 @@
 /**
  * Lógica del CRM de ejemplo. Todo se calcula en el navegador a partir de los
  * negocios del estado (puntaje, probabilidad, métricas, pronóstico, alertas,
- * historial). Funciones puras y deterministas: no usan la fecha actual del
- * sistema, sino la fecha de corte fija de los datos de ejemplo (REF_DATE), para
- * que el render del servidor y el del cliente sean idénticos.
+ * historial). Funciones puras y deterministas: no leen el reloj del sistema;
+ * reciben la fecha de corte (`ref`, «hoy» en la demo) como parámetro.
+ *
+ * Los datos de ejemplo están escritos contra SEED_REF_DATE. Ya montada, la
+ * demo los corre al día de hoy (hora de Colombia) con shiftState, de modo que
+ * «ayer», «hace 3 días» o «vence en 5 días» significan lo mismo cualquier día.
  */
 
 import { CALLS, SEED_DEALS, SEED_ENROLLMENTS } from './data';
 
-export const REF_DATE = '2026-10-08';
+/** Fecha contra la que están escritos los datos de ejemplo (data.ts). */
+export const SEED_REF_DATE = '2026-10-08';
 
 export type StageId = 'prospect' | 'qualified' | 'proposal' | 'negotiation' | 'won' | 'lost';
 export const OPEN_STAGES: StageId[] = ['prospect', 'qualified', 'proposal', 'negotiation'];
@@ -68,6 +72,12 @@ export interface Deal {
   role?: string;
   title?: string;
   nextAction?: string;
+  /**
+   * Próxima acción automática al ganar o perder el negocio en la demo. Se
+   * muestra en lugar de nextAction mientras el negocio siga cerrado; al
+   * reabrirlo o escribir otra próxima acción, se borra.
+   */
+  nextActionAuto?: 'won' | 'lost';
 }
 
 export type EventType =
@@ -81,7 +91,8 @@ export type EventType =
   | 'won'
   | 'lost'
   | 'stage'
-  | 'sequence';
+  | 'sequence'
+  | 'edit';
 
 export interface ActivityEvent {
   id: string;
@@ -128,7 +139,39 @@ export function addDays(iso: string, days: number): string {
 }
 
 export const daysBetween = (from: string, to: string) => dayNumber(to) - dayNumber(from);
-export const daysSince = (iso: string) => daysBetween(iso, REF_DATE);
+export const daysSince = (iso: string, ref: string) => daysBetween(iso, ref);
+
+const pad2 = (n: number) => String(n).padStart(2, '0');
+
+/** Último día del mes (AAAA-MM-DD). */
+export function monthEnd(year: number, month: number): string {
+  const last = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  return `${year}-${pad2(month)}-${pad2(last)}`;
+}
+
+/** Suma meses a un «AAAA-MM». */
+export function addMonths(ym: string, n: number): string {
+  const [y, m] = ym.split('-').map(Number);
+  const idx = y * 12 + (m - 1) + n;
+  return `${Math.floor(idx / 12)}-${pad2((idx % 12) + 1)}`;
+}
+
+/**
+ * Hoy en Colombia (AAAA-MM-DD). Solo se llama en el navegador, después de
+ * montar, para que el HTML del servidor y el primer render coincidan.
+ */
+export function todayInColombia(now: Date = new Date()): string {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Bogota',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(now);
+  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? '';
+  return `${get('year')}-${get('month')}-${get('day')}`;
+}
+
+export const isIsoDate = (v: unknown): v is string => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
 
 export function formatDate(iso: string, months: string[], locale: string): string {
   const [y, m, d] = iso.split('-').map(Number);
@@ -146,7 +189,8 @@ function group(intStr: string, sep: string): string {
 
 export function formatCOP(value: number, locale: string): string {
   const n = Math.round(value);
-  return locale === 'en' ? `COP ${group(String(n), ',')}` : `$ ${group(String(n), '.')}`;
+  // Espacio duro: el signo y la cifra no se separan al partir la línea.
+  return locale === 'en' ? `COP\u00a0${group(String(n), ',')}` : `$\u00a0${group(String(n), '.')}`;
 }
 
 /** Valor abreviado en millones: "$186 M" / "COP 186M". */
@@ -159,7 +203,7 @@ export function formatCOPShort(value: number, locale: string): string {
     txt = (Math.round(millions * 10) / 10).toFixed(1);
     if (locale !== 'en') txt = txt.replace('.', ',');
   }
-  return locale === 'en' ? `COP ${txt}M` : `$${txt} M`;
+  return locale === 'en' ? `COP\u00a0${txt}M` : `$${txt}\u00a0M`;
 }
 
 export function initials(name: string): string {
@@ -182,10 +226,10 @@ export interface ScoreFactor {
   max: number;
 }
 
-export function scoreFactors(d: Deal): ScoreFactor[] {
+export function scoreFactors(d: Deal, ref: string): ScoreFactor[] {
   const fit = d.size === 'large' ? 25 : d.size === 'medium' ? 18 : 10;
   const engagement = Math.min(25, Math.max(0, d.interactions30d) * 5);
-  const ds = daysSince(d.lastContact);
+  const ds = daysSince(d.lastContact, ref);
   const recency = ds <= 3 ? 20 : ds <= 7 ? 15 : ds <= 14 ? 8 : ds <= 30 ? 3 : 0;
   return [
     { id: 'fit', points: fit, max: 25 },
@@ -196,7 +240,7 @@ export function scoreFactors(d: Deal): ScoreFactor[] {
   ];
 }
 
-export const scoreOf = (d: Deal) => scoreFactors(d).reduce((s, f) => s + f.points, 0);
+export const scoreOf = (d: Deal, ref: string) => scoreFactors(d, ref).reduce((s, f) => s + f.points, 0);
 
 export const temperatureOf = (score: number): Temperature =>
   score >= 75 ? 'hot' : score >= 50 ? 'warm' : 'cold';
@@ -211,25 +255,25 @@ const STAGE_BASE: Record<StageId, number> = {
 };
 
 /** Probabilidad = base de la etapa ajustada por el puntaje (entre 5 % y 95 % si está abierto). */
-export function probabilityOf(d: Deal): number {
+export function probabilityOf(d: Deal, ref: string): number {
   if (d.stage === 'won') return 100;
   if (d.stage === 'lost') return 0;
-  const adj = Math.max(-10, Math.min(12, Math.round((scoreOf(d) - 60) / 4)));
+  const adj = Math.max(-10, Math.min(12, Math.round((scoreOf(d, ref) - 60) / 4)));
   return Math.max(5, Math.min(95, STAGE_BASE[d.stage] + adj));
 }
 
 export const isOpen = (d: Deal) => d.stage !== 'won' && d.stage !== 'lost';
-export const weightedValue = (d: Deal) => (isOpen(d) ? (d.value * probabilityOf(d)) / 100 : 0);
+export const weightedValue = (d: Deal, ref: string) => (isOpen(d) ? (d.value * probabilityOf(d, ref)) / 100 : 0);
 export const stageIndex = (s: StageId) => ALL_STAGES.indexOf(s);
 
 // ---------------------------------------------------------------------------
 // Métricas del encabezado
 // ---------------------------------------------------------------------------
 
-export function computeMetrics(deals: Deal[]) {
+export function computeMetrics(deals: Deal[], ref: string) {
   const open = deals.filter(isOpen);
-  const from = addDays(REF_DATE, -90);
-  const inWindow = (d: Deal) => d.closeDate >= from && d.closeDate <= REF_DATE;
+  const from = addDays(ref, -90);
+  const inWindow = (d: Deal) => d.closeDate >= from && d.closeDate <= ref;
   const won = deals.filter((d) => d.stage === 'won' && inWindow(d));
   const lost = deals.filter((d) => d.stage === 'lost' && inWindow(d));
   const closed = won.length + lost.length;
@@ -239,7 +283,7 @@ export function computeMetrics(deals: Deal[]) {
   return {
     openCount: open.length,
     openValue: open.reduce((s, d) => s + d.value, 0),
-    weighted: open.reduce((s, d) => s + weightedValue(d), 0),
+    weighted: open.reduce((s, d) => s + weightedValue(d, ref), 0),
     won: won.length,
     closed,
     winRate: closed ? Math.round((won.length / closed) * 100) : null,
@@ -252,25 +296,34 @@ export function computeMetrics(deals: Deal[]) {
 // ---------------------------------------------------------------------------
 
 export type PeriodId = 'month' | 'quarter';
-export const PERIODS: Record<PeriodId, { start: string; end: string; quota: number }> = {
-  month: { start: '2026-10-01', end: '2026-10-31', quota: 350_000_000 },
-  quarter: { start: '2026-10-01', end: '2026-12-31', quota: 1_050_000_000 },
-};
+/** Metas de ejemplo del equipo comercial (COP). */
+export const QUOTAS: Record<PeriodId, number> = { month: 350_000_000, quarter: 1_050_000_000 };
+
+/** Periodo del pronóstico que contiene la fecha de corte: el mes o el trimestre calendario. */
+export function periodRange(period: PeriodId, ref: string) {
+  const [year, month] = ref.split('-').map(Number);
+  if (period === 'month') {
+    return { start: `${year}-${pad2(month)}-01`, end: monthEnd(year, month), quota: QUOTAS.month, year, month, quarter: Math.floor((month - 1) / 3) + 1 };
+  }
+  const quarter = Math.floor((month - 1) / 3) + 1;
+  const first = (quarter - 1) * 3 + 1;
+  return { start: `${year}-${pad2(first)}-01`, end: monthEnd(year, first + 2), quota: QUOTAS.quarter, year, month, quarter };
+}
 
 /** Abiertos con cierre en el periodo; los vencidos se cuentan en el periodo actual. */
 const openInPeriod = (d: Deal, end: string) => isOpen(d) && d.closeDate <= end;
 const wonInPeriod = (d: Deal, start: string, end: string) =>
   d.stage === 'won' && d.closeDate >= start && d.closeDate <= end;
 
-export function forecastFor(deals: Deal[], period: PeriodId) {
-  const { start, end, quota } = PERIODS[period];
+export function forecastFor(deals: Deal[], period: PeriodId, ref: string) {
+  const { start, end, quota } = periodRange(period, ref);
   const sumBy = (list: Deal[], fn: (d: Deal) => number) => list.reduce((s, d) => s + fn(d), 0);
   const calc = (list: Deal[]) => {
     const won = sumBy(list.filter((d) => wonInPeriod(d, start, end)), (d) => d.value);
     const open = list.filter((d) => openInPeriod(d, end));
     const negotiation = sumBy(open.filter((d) => d.stage === 'negotiation'), (d) => d.value);
     const late = sumBy(open.filter((d) => d.stage === 'proposal' || d.stage === 'negotiation'), (d) => d.value);
-    const weighted = sumBy(open, weightedValue);
+    const weighted = sumBy(open, (d) => weightedValue(d, ref));
     return {
       won,
       commit: won + negotiation,
@@ -300,12 +353,16 @@ export function stageDistribution(deals: Deal[]) {
   });
 }
 
-export const TREND_MONTHS = ['2026-07', '2026-08', '2026-09', '2026-10', '2026-11', '2026-12'];
+/** Seis meses alrededor de la fecha de corte: los tres anteriores, el actual y los dos siguientes. */
+export function trendMonths(ref: string): string[] {
+  const refMonth = ref.slice(0, 7);
+  return [-3, -2, -1, 0, 1, 2].map((n) => addMonths(refMonth, n));
+}
 
-/** Ganado por mes (real del dataset) y ponderado abierto por mes de cierre (vencidos → mes de corte). */
-export function monthlyTrend(deals: Deal[]) {
-  const refMonth = REF_DATE.slice(0, 7);
-  return TREND_MONTHS.map((month) => {
+/** Ganado por mes y ponderado abierto por mes de cierre (los vencidos van al mes de corte). */
+export function monthlyTrend(deals: Deal[], ref: string) {
+  const refMonth = ref.slice(0, 7);
+  return trendMonths(ref).map((month) => {
     const won = deals
       .filter((d) => d.stage === 'won' && d.closeDate.slice(0, 7) === month)
       .reduce((s, d) => s + d.value, 0);
@@ -318,7 +375,7 @@ export function monthlyTrend(deals: Deal[]) {
               const m = d.closeDate.slice(0, 7) < refMonth ? refMonth : d.closeDate.slice(0, 7);
               return m === month;
             })
-            .reduce((s, d) => s + weightedValue(d), 0);
+            .reduce((s, d) => s + weightedValue(d, ref), 0);
     return { month, won, weighted };
   });
 }
@@ -329,17 +386,17 @@ export type Alert =
   | { kind: 'gap'; value: number }
   | { kind: 'over'; value: number };
 
-export function forecastAlerts(deals: Deal[], period: PeriodId): Alert[] {
+export function forecastAlerts(deals: Deal[], period: PeriodId, ref: string): Alert[] {
   const alerts: Alert[] = [];
   const late = deals
     .filter((d) => d.stage === 'proposal' || d.stage === 'negotiation')
-    .filter((d) => daysSince(d.lastContact) >= 7)
+    .filter((d) => daysSince(d.lastContact, ref) >= 7)
     .sort((a, b) => b.value - a.value);
-  for (const d of late) alerts.push({ kind: 'stale', deal: d, days: daysSince(d.lastContact) });
-  for (const d of deals.filter((x) => isOpen(x) && x.closeDate < REF_DATE)) {
-    alerts.push({ kind: 'overdue', deal: d, days: daysSince(d.closeDate) });
+  for (const d of late) alerts.push({ kind: 'stale', deal: d, days: daysSince(d.lastContact, ref) });
+  for (const d of deals.filter((x) => isOpen(x) && x.closeDate < ref)) {
+    alerts.push({ kind: 'overdue', deal: d, days: daysSince(d.closeDate, ref) });
   }
-  const f = forecastFor(deals, period);
+  const f = forecastFor(deals, period, ref);
   if (f.projection < f.quota) alerts.push({ kind: 'gap', value: f.quota - f.projection });
   else alerts.push({ kind: 'over', value: f.projection - f.quota });
   return alerts;
@@ -360,14 +417,14 @@ export type Recommendation =
   | { id: 'stageNext'; stage: StageId }
   | { id: 'channel'; channel: ChannelId };
 
-export function recommendationsFor(d: Deal): Recommendation[] {
+export function recommendationsFor(d: Deal, ref: string): Recommendation[] {
   if (d.stage === 'won') return [{ id: 'won' }];
   if (d.stage === 'lost') return [{ id: 'lost', reason: d.lostReason ?? 'noResponse' }];
   const recs: Recommendation[] = [];
-  if (d.closeDate < REF_DATE) recs.push({ id: 'overdue', days: daysSince(d.closeDate) });
-  const ds = daysSince(d.lastContact);
+  if (d.closeDate < ref) recs.push({ id: 'overdue', days: daysSince(d.closeDate, ref) });
+  const ds = daysSince(d.lastContact, ref);
   if (ds >= 7) recs.push({ id: 'stale', days: ds });
-  if (temperatureOf(scoreOf(d)) === 'hot' && ds < 7) recs.push({ id: 'hot' });
+  if (temperatureOf(scoreOf(d, ref)) === 'hot' && ds < 7) recs.push({ id: 'hot' });
   if (!d.budgetConfirmed) recs.push({ id: 'budget' });
   if (!d.decisionMaker) recs.push({ id: 'decision' });
   recs.push({ id: 'stageNext', stage: d.stage });
@@ -384,10 +441,10 @@ export function recommendationsFor(d: Deal): Recommendation[] {
  * guardan). Se calculan sobre la semilla y no sobre el estado actual, para que
  * mover un negocio no invente reuniones o propuestas en fechas pasadas.
  */
-function seedTimeline(d: Deal): ActivityEvent[] {
+function seedTimeline(d: Deal, offset: number): ActivityEvent[] {
   const ev: ActivityEvent[] = [];
   const add = (date: string, type: EventType, key: string, params?: ActivityEvent['params']) =>
-    ev.push({ id: `${d.id}-${key}-${date}`, dealId: d.id, date, type, key, params, order: ev.length });
+    ev.push({ id: `${d.id}-${key}-${date}`, dealId: d.id, date: addDays(date, offset), type, key, params, order: ev.length });
   add(d.createdAt, 'created', 'created', { source: d.source });
   const idx = stageIndex(d.stage);
   const clamp = (iso: string) => (iso > d.lastContact ? d.lastContact : iso);
@@ -424,10 +481,10 @@ function seedTimeline(d: Deal): ActivityEvent[] {
   return ev;
 }
 
-export function timelineFor(d: Deal, events: ActivityEvent[]): ActivityEvent[] {
+export function timelineFor(d: Deal, events: ActivityEvent[], ref: string): ActivityEvent[] {
   const seed = SEED_DEALS.find((s) => s.id === d.id);
   const base: ActivityEvent[] = seed
-    ? seedTimeline(seed)
+    ? seedTimeline(seed, daysBetween(SEED_REF_DATE, ref))
     : [{ id: `${d.id}-created`, dealId: d.id, date: d.createdAt, type: 'created', key: 'createdManual', order: 0 }];
   const userEvents = events.filter((e) => e.dealId === d.id).map((e) => ({ ...e, order: e.order + 1000 }));
   return [...base, ...userEvents].sort((a, b) =>
@@ -460,4 +517,33 @@ export function downloadFile(name: string, content: BlobPart, type: string) {
 }
 
 export const NIT_RE = /^\d{3}\.?\d{3}\.?\d{3}-?\d$/;
+
+/** Pesos de la DIAN para el dígito de verificación, de derecha a izquierda. */
+const NIT_WEIGHTS = [3, 7, 13, 17, 19, 23, 29, 37, 41, 43, 47, 53, 59, 67, 71];
+
+/** Dígito de verificación de un NIT (algoritmo de módulo 11 de la DIAN). */
+export function nitCheckDigit(base: string): number {
+  const digits = base.replace(/\D/g, '');
+  let sum = 0;
+  for (let i = 0; i < digits.length; i++) {
+    sum += Number(digits[digits.length - 1 - i]) * (NIT_WEIGHTS[i] ?? 0);
+  }
+  const r = sum % 11;
+  return r < 2 ? r : 11 - r;
+}
+
+export type NitCheck = { ok: true; formatted: string } | { ok: false; reason: 'format' } | { ok: false; reason: 'dv'; expected: number };
+
+/** Valida formato (9 dígitos + dígito de verificación) y el dígito de verificación. */
+export function checkNit(raw: string): NitCheck {
+  const value = raw.trim();
+  if (!NIT_RE.test(value)) return { ok: false, reason: 'format' };
+  const digits = value.replace(/\D/g, '');
+  const base = digits.slice(0, 9);
+  const dv = Number(digits.slice(9));
+  const expected = nitCheckDigit(base);
+  if (dv !== expected) return { ok: false, reason: 'dv', expected };
+  return { ok: true, formatted: `${base.slice(0, 3)}.${base.slice(3, 6)}.${base.slice(6, 9)}-${dv}` };
+}
+
 export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

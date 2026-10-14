@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import {
   ShoppingBagIcon, TruckIcon, BuildingStorefrontIcon, ChartBarSquareIcon, BoltIcon, ArrowPathIcon, CheckCircleIcon, MapIcon,
-  PlayIcon, PauseIcon,
+  PlayIcon, PauseIcon, ArrowLeftIcon, PresentationChartBarIcon, CalculatorIcon, InformationCircleIcon,
 } from '@heroicons/react/24/outline';
 import Button from '@/components/ui/Button';
 import CustomerApp from './components/CustomerApp';
@@ -15,6 +16,10 @@ import { DeliveryProvider, useDelivery, resetStorage, type AppTab } from './comp
 import { Modal, Toasts } from './components/ui';
 import { fmtTime, isActive, opsAlerts } from './components/engine';
 import type { LogEntry } from './components/types';
+
+/** Salidas comerciales: demo guiada con esta demo ya elegida y cotización del producto. */
+const REQUEST_DEMO_HREF = '/solicitar-demo?demos=delivery';
+const QUOTE_HREF = '/contact?service=app-delivery';
 
 const TABS: { key: AppTab; icon: typeof ShoppingBagIcon }[] = [
   { key: 'customer', icon: ShoppingBagIcon },
@@ -31,11 +36,41 @@ export default function DeliveryDemoPage() {
   );
 }
 
+const HEADER_LINK =
+  'inline-flex items-center gap-1.5 rounded-lg border border-white/50 bg-white/10 px-3 py-2 text-sm font-semibold text-white hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white';
+
 function Shell() {
   const t = useTranslations('demoDelivery');
   const { state, dispatch, notify } = useDelivery();
   const [confirmReset, setConfirmReset] = useState(false);
   const tab = state.tab;
+  const tabRefs = useRef<Partial<Record<AppTab, HTMLButtonElement | null>>>({});
+  const prevTab = useRef(tab);
+
+  // Si cambias de app con un botón de otra app (p. ej. «Ver su app» al final de Operaciones),
+  // la página sube hasta la app nueva; si la app ya se ve, no se mueve.
+  useEffect(() => {
+    if (prevTab.current === tab) return;
+    prevTab.current = tab;
+    const el = document.getElementById('delivery-apps');
+    if (el && el.getBoundingClientRect().top < 0) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [tab]);
+
+  // Pestañas con teclado: flechas, Inicio y Fin cambian de app y mueven el foco.
+  const onTabKey = (e: KeyboardEvent<HTMLButtonElement>) => {
+    const i = TABS.findIndex((x) => x.key === tab);
+    const to =
+      e.key === 'ArrowRight' ? (i + 1) % TABS.length
+        : e.key === 'ArrowLeft' ? (i - 1 + TABS.length) % TABS.length
+          : e.key === 'Home' ? 0
+            : e.key === 'End' ? TABS.length - 1
+              : -1;
+    if (to < 0) return;
+    e.preventDefault();
+    const key = TABS[to].key;
+    dispatch({ type: 'set', patch: { tab: key } });
+    tabRefs.current[key]?.focus();
+  };
 
   const alerts = opsAlerts(state.orders, state.now).filter((a) => !a.fraud || !state.reviews[a.id]);
   const counts: Record<AppTab, number> = {
@@ -48,40 +83,82 @@ function Shell() {
   return (
     <div className="min-h-screen bg-secondary-50 text-secondary-900 dark:bg-secondary-950 dark:text-white">
       <div className="mx-auto max-w-7xl px-4 py-6">
-        <section className="mb-4 rounded-2xl bg-gradient-to-br from-orange-500 to-red-600 p-6 text-white shadow-lg md:p-8">
+        <Link
+          href="/demo"
+          className="mb-3 inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-secondary-700 hover:text-secondary-900 dark:text-secondary-300 dark:hover:text-white"
+        >
+          <ArrowLeftIcon className="h-4 w-4" aria-hidden="true" />
+          {t('header.back')}
+        </Link>
+        <section className="mb-3 rounded-2xl bg-gradient-to-br from-orange-600 to-red-700 p-5 text-white shadow-lg sm:p-6 md:p-8">
           <div className="mb-3 flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-semibold backdrop-blur">
-              <BoltIcon className="mr-1 h-3 w-3" />
+            <span className="inline-flex items-center rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-semibold">
+              <BoltIcon className="mr-1 h-3 w-3" aria-hidden="true" />
               {t('meta.badge')}
             </span>
             <span className="rounded-full border border-white/40 bg-white/10 px-2.5 py-0.5 text-xs font-semibold" title={t('meta.sampleDataHint')}>
               {t('meta.sampleData')}
             </span>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{t('meta.title')}</h1>
-          <p className="mt-2 max-w-3xl text-base text-orange-50/90 md:text-lg">{t('meta.subtitle')}</p>
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl">{t('meta.title')}</h1>
+          <p className="mt-2 max-w-3xl text-base text-white/95 md:text-lg">{t('meta.subtitle')}</p>
+          <p className="mt-2 max-w-3xl text-sm text-white/90">{t('header.audience')}</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Link href={REQUEST_DEMO_HREF} className={HEADER_LINK}>
+              <PresentationChartBarIcon className="h-4 w-4" aria-hidden="true" />
+              {t('header.requestDemo')}
+            </Link>
+            <Link href={QUOTE_HREF} className={HEADER_LINK}>
+              <CalculatorIcon className="h-4 w-4" aria-hidden="true" />
+              {t('header.quote')}
+            </Link>
+          </div>
         </section>
+
+        <details className="group mb-4 rounded-lg border border-secondary-200 bg-white/70 px-3 py-2 text-sm dark:border-secondary-800 dark:bg-secondary-900/70">
+          <summary className="flex cursor-pointer list-none items-center gap-2 rounded font-medium text-secondary-800 dark:text-secondary-200">
+            <InformationCircleIcon className="h-4 w-4 shrink-0 text-primary-600 dark:text-primary-400" aria-hidden="true" />
+            {t('header.howTitle')}
+            <span className="ml-auto text-xs text-secondary-500 group-open:hidden">{t('header.show')}</span>
+            <span className="ml-auto hidden text-xs text-secondary-500 group-open:inline">{t('header.hide')}</span>
+          </summary>
+          <ul className="mt-2 list-disc space-y-1.5 pl-5 text-secondary-700 dark:text-secondary-300">
+            {(['real', 'rules', 'clock', 'simulated', 'storage'] as const).map((k) => (
+              <li key={k}>{t(`header.how.${k}`)}</li>
+            ))}
+          </ul>
+        </details>
 
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <div className="flex flex-wrap gap-2" role="tablist" aria-label={t('tabs.label')}>
             {TABS.map(({ key, icon: Icon }) => (
               <button
                 key={key}
+                ref={(el) => { tabRefs.current[key] = el; }}
+                id={`delivery-tab-${key}`}
                 type="button"
                 role="tab"
                 aria-selected={tab === key}
-                onClick={() => dispatch({ type: 'set', patch: { tab: key } })}
+                aria-controls="delivery-panel"
+                tabIndex={tab === key ? 0 : -1}
+                onKeyDown={onTabKey}
+                onClick={() => {
+                  // La pestaña activa lleva a la app (útil en el celular, donde queda más abajo).
+                  if (tab === key) document.getElementById('delivery-apps')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  else dispatch({ type: 'set', patch: { tab: key } });
+                }}
                 className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold transition sm:px-4 ${
                   tab === key
                     ? 'border-l-4 border-orange-500 bg-orange-100 text-orange-800 shadow-sm dark:bg-orange-950/60 dark:text-orange-300'
                     : 'border border-secondary-200 bg-white text-secondary-700 hover:border-orange-400 dark:border-secondary-700 dark:bg-secondary-800 dark:text-secondary-200'
                 }`}
               >
-                <Icon className="h-4 w-4" />
+                <Icon className="h-4 w-4" aria-hidden="true" />
                 {t(`tabs.${key}`)}
                 {counts[key] > 0 && (
-                  <span className="inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-bold text-white" title={t(`tabs.count.${key}`, { n: counts[key] })}>
+                  <span className="inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-600 px-1 text-[11px] font-bold text-white" title={t(`tabs.count.${key}`, { n: counts[key] })}>
                     {counts[key]}
+                    <span className="sr-only"> · {t(`tabs.count.${key}`, { n: counts[key] })}</span>
                   </span>
                 )}
               </button>
@@ -111,7 +188,7 @@ function Shell() {
         <TourBar />
 
         <div id="delivery-apps" className={`scroll-mt-24 ${tab === 'ops' ? 'space-y-6' : 'grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]'}`}>
-          <div role="tabpanel" aria-label={t(`tabs.${tab}`)} className="min-w-0">
+          <div role="tabpanel" id="delivery-panel" aria-labelledby={`delivery-tab-${tab}`} className="min-w-0">
             {tab === 'customer' && <CustomerApp />}
             {tab === 'merchant' && <MerchantApp />}
             {tab === 'ops' && <OpsApp />}
@@ -208,9 +285,9 @@ function TourBar() {
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
         <p className="flex items-center gap-2 text-sm font-semibold">
           <MapIcon className="h-5 w-5 text-orange-500" />
-          {t('tour.title')} <span className="font-normal text-secondary-500">({completed}/{STEPS.length})</span>
+          {t('tour.title')} <span className="font-normal text-secondary-600 dark:text-secondary-400">({completed}/{STEPS.length})</span>
         </p>
-        <button type="button" onClick={() => dispatch({ type: 'set', patch: { tourOpen: false } })} className="text-xs text-secondary-500 hover:underline">{t('tour.hide')}</button>
+        <button type="button" onClick={() => dispatch({ type: 'set', patch: { tourOpen: false } })} className="text-xs text-secondary-600 hover:underline dark:text-secondary-400">{t('tour.hide')}</button>
       </div>
       <ol className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 md:mx-0 md:grid md:grid-cols-5 md:overflow-visible md:px-0 md:pb-0">
         {STEPS.map((s, i) => (
@@ -235,13 +312,23 @@ function TourBar() {
           </li>
         ))}
       </ol>
-      <p className="mt-2 text-xs text-secondary-600 dark:text-secondary-300">
+      <p className="mt-2 text-xs text-secondary-600 dark:text-secondary-300" aria-live="polite">
         {failed && o
           ? t('tour.failed', { id: o.id })
           : nextStep
             ? t(`tour.next.${nextStep.id}`, { id: live?.id ?? '' })
             : t('tour.done')}
       </p>
+      {!nextStep && !failed && (
+        <div className="mt-2 flex flex-wrap gap-2 text-xs">
+          <Link href={REQUEST_DEMO_HREF} className="inline-flex items-center gap-1 rounded-lg bg-primary-600 px-3 py-1.5 font-semibold text-white hover:bg-primary-700">
+            <PresentationChartBarIcon className="h-4 w-4" aria-hidden="true" />{t('header.requestDemo')}
+          </Link>
+          <Link href={QUOTE_HREF} className="inline-flex items-center gap-1 rounded-lg border border-primary-600 px-3 py-1.5 font-semibold text-primary-700 hover:bg-primary-50 dark:border-primary-400 dark:text-primary-300 dark:hover:bg-primary-950/40">
+            <CalculatorIcon className="h-4 w-4" aria-hidden="true" />{t('header.quote')}
+          </Link>
+        </div>
+      )}
     </section>
   );
 }

@@ -4,6 +4,7 @@ import { requireRole } from '../middleware/access';
 import {
   getInvoices,
   getInvoiceById,
+  getInvoicePaymentMethods,
   createInvoice,
   payInvoice,
   downloadInvoice,
@@ -16,10 +17,13 @@ router.use(authenticate);
 
 // Invoice routes
 router.get('/', getInvoices);
-// Emitir facturas: solo admin o manager. Pagar y descargar: dueño o staff (controlador).
+// Métodos de pago configurados por el equipo (el portal los muestra en "Pagar").
+router.get('/payment-methods', getInvoicePaymentMethods);
+// Emitir facturas y registrar pagos: solo admin o manager (rol leído de la BD).
+// Descargar: dueño o staff (controlador, rol de la BD).
 router.post('/', ...requireRole('admin', 'manager'), createInvoice);
 router.get('/:id', getInvoiceById);
-router.post('/:id/pay', payInvoice);
+router.post('/:id/pay', ...requireRole('admin', 'manager'), payInvoice);
 router.get('/:id/download', downloadInvoice);
 
 export default router;

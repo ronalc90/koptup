@@ -231,7 +231,7 @@ function OfferingCard({ offering, globalModality, currency, onOpen }: OfferingCa
               <p className="text-[11px] text-secondary-500 dark:text-secondary-400">
                 {tp('card.fromPrice')}
               </p>
-              <p className="text-xl font-bold text-secondary-900 dark:text-white">
+              <p className="text-lg font-bold text-secondary-900 dark:text-white whitespace-nowrap">
                 {formatMoney(setupCOP, currency)}
               </p>
               <p className="text-[11px] text-secondary-500 dark:text-secondary-400">
@@ -239,7 +239,7 @@ function OfferingCard({ offering, globalModality, currency, onOpen }: OfferingCa
               </p>
             </div>
             <div className="text-right">
-              <p className="text-xl font-bold text-secondary-900 dark:text-white">
+              <p className="text-lg font-bold text-secondary-900 dark:text-white whitespace-nowrap">
                 {recurringCOP > 0 ? formatMoney(recurringCOP, currency) : '—'}
               </p>
               <p className="text-[11px] text-secondary-500 dark:text-secondary-400">
@@ -262,16 +262,14 @@ function OfferingCard({ offering, globalModality, currency, onOpen }: OfferingCa
             {tp('card.viewMore')}
           </Button>
           {offering.demoSlug ? (
-            <Link
-              href={`/demo/${offering.demoSlug}`}
-              className="flex-1"
-              onClick={() => trackOfferingClick(offering, t('name'), 'demo')}
-            >
-              <Button variant="outline" size="sm" className="w-full">
+            // Un solo elemento interactivo: el enlace con el estilo del botón
+            // (antes era un <button> dentro de un <a>).
+            <Button variant="outline" size="sm" className="flex-1" asChild>
+              <Link href={`/demo/${offering.demoSlug}`} onClick={() => trackOfferingClick(offering, t('name'), 'demo')}>
                 {tp('card.viewDemo')}
                 {demoGate && <DemoAccessBadge mode={demoGate.mode} activo={demoGate.activo} className="ml-2" />}
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           ) : null}
         </div>
       </div>
@@ -526,30 +524,28 @@ function OfferingModal({ offering, initialModality, currency, onClose }: Offerin
 
             {/* CTA */}
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              <Link
-                href={`/contact?service=${offering.slug}&tier=${tier.key}&modality=${modality}`}
-                className="flex-1"
-                onClick={() =>
-                  trackOfferingClick(offering, t('name'), 'quote', { plan_tier: tier.key, modality })
-                }
-              >
-                <Button variant="primary" size="md" className="w-full">
-                  {tp('modal.quote')}
-                </Button>
-              </Link>
-              {offering.demoSlug ? (
+              <Button variant="primary" size="md" className="flex-1" asChild>
                 <Link
-                  href={`/demo/${offering.demoSlug}`}
-                  className="flex-1"
+                  href={`/contact?service=${offering.slug}&tier=${tier.key}&modality=${modality}`}
                   onClick={() =>
-                    trackOfferingClick(offering, t('name'), 'demo', { plan_tier: tier.key, modality })
+                    trackOfferingClick(offering, t('name'), 'quote', { plan_tier: tier.key, modality })
                   }
                 >
-                  <Button variant="outline" size="md" className="w-full">
+                  {tp('modal.quote')}
+                </Link>
+              </Button>
+              {offering.demoSlug ? (
+                <Button variant="outline" size="md" className="flex-1" asChild>
+                  <Link
+                    href={`/demo/${offering.demoSlug}`}
+                    onClick={() =>
+                      trackOfferingClick(offering, t('name'), 'demo', { plan_tier: tier.key, modality })
+                    }
+                  >
                     {tp('card.viewDemo')}
                     {demoGate && <DemoAccessBadge mode={demoGate.mode} activo={demoGate.activo} className="ml-2" />}
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               ) : null}
             </div>
           </div>
@@ -620,6 +616,8 @@ export default function OfferingsCatalog() {
     <div id="otras-soluciones" className="scroll-mt-16 md:scroll-mt-20">
       {/* Encabezado */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
+        {/* Separa los planes RAG (arriba) de estos otros productos */}
+        <p className="mb-2 text-sm font-semibold text-primary-700 dark:text-primary-300">{tp('section.eyebrow')}</p>
         <h2 className="text-3xl md:text-4xl font-bold text-secondary-900 dark:text-white">
           {tp('section.title')}
         </h2>
@@ -759,11 +757,9 @@ export default function OfferingsCatalog() {
           <h2 className="text-2xl font-bold">{tp('cta.title')}</h2>
           <p className="mt-2 text-white/90">{tp('cta.body')}</p>
           <div className="mt-4">
-            <Link href="/contact">
-              <Button variant="primary" size="md">
-                {tp('cta.button')}
-              </Button>
-            </Link>
+            <Button variant="primary" size="md" asChild>
+              <Link href="/contact">{tp('cta.button')}</Link>
+            </Button>
           </div>
         </div>
       </section>

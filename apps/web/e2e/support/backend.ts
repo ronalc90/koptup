@@ -100,6 +100,12 @@ export interface ContactLead {
   service: string;
   message: string;
   source: string;
+  /** Cuándo quiere empezar (formulario de /contact). */
+  plazo?: string | null;
+  /** Plan, nivel y modalidad que cotizaba (identificadores). */
+  cotizacion?: { servicio: string; plan?: string; nivel?: string; modalidad?: string } | null;
+  /** Prueba de la autorización de datos (Ley 1581), sin el hash de la IP. */
+  consentimiento?: { aceptado: boolean; fecha: string | null; versionPolitica: string | null } | null;
 }
 
 class ApiError extends Error {}
@@ -156,6 +162,15 @@ export class Api {
 
   async me(token: string): Promise<SessionUser> {
     return unwrap<SessionUser>(await this.ctx.get('api/auth/me', { headers: this.headers(token) }), 'GET /api/auth/me', [200]);
+  }
+
+  /** Cambia el rol de una cuenta (solo admin: PATCH /api/admin/users/:id/role). */
+  async setRole(token: string, userId: string, role: string): Promise<void> {
+    await unwrap(
+      await this.ctx.patch(`api/admin/users/${encodeURIComponent(userId)}/role`, { headers: this.headers(token), data: { role } }),
+      'PATCH /api/admin/users/:id/role',
+      [200],
+    );
   }
 
   // --- Sistema de demos (público) -------------------------------------------
@@ -289,6 +304,26 @@ export async function prospectWithAccess(demos: string[], prefix = 'prospecto'):
     const password = randomPassword();
     const session = await api.activate(activationToken(granted.activationUrl), password);
     return { ...session, password };
+  } finally {
+    await api.dispose();
+  }
+}
+
+/**
+ * Cuenta del equipo con `role` (p. ej. `manager` o `sales`): se registra como
+ * cualquier persona y el admin de pruebas le asigna el rol desde la API.
+ * Devuelve su sesión ya con el rol.
+ */
+export async function staffSession(role: 'manager' | 'sales' | 'developer', prefix: string = role): Promise<Session> {
+  const admin = await adminSession();
+  const api = await Api.open();
+  try {
+    const email = uniqueEmail(prefix);
+    const password = randomPassword();
+    await api.register(`Equipo ${role} E2E`, email, password);
+    const first = await api.login(email, password);
+    await api.setRole(admin.accessToken, first.user.id, role);
+    return await api.login(email, password);
   } finally {
     await api.dispose();
   }

@@ -12,6 +12,8 @@ interface OrderDetail {
   name: string;
   description?: string;
   status: 'pending' | 'in_progress' | 'shipped' | 'completed' | 'cancelled';
+  /** El cliente puede editarlo o cancelarlo solo mientras está pendiente de revisión. */
+  editable?: boolean;
   date: string;
   amount: number;
   items: Array<{ name: string; quantity: number; price: number }>;
@@ -53,7 +55,7 @@ export default function OrderDetailPage() {
     try {
       await api.cancelOrder(order.id);
       setActionMessage('Pedido cancelado exitosamente');
-      setOrder({ ...order, status: 'cancelled' });
+      setOrder({ ...order, status: 'cancelled', editable: false });
     } catch (err: any) {
       setError(err?.response?.data?.message || err?.message || 'No se pudo cancelar el pedido');
     }
@@ -153,6 +155,11 @@ export default function OrderDetailPage() {
               </div>
             )}
 
+            {order.editable === false && order.status !== 'cancelled' && (
+              <p className="mb-3 text-right text-sm text-secondary-600 dark:text-secondary-400">
+                Este pedido ya está en revisión o en curso: escríbenos por Mensajes si necesitas cambiarlo o cancelarlo.
+              </p>
+            )}
             <div className="flex items-center justify-end gap-3">
               <Button variant="secondary" onClick={() => router.push('/dashboard/billing')}>
                 Ver facturación
@@ -160,7 +167,7 @@ export default function OrderDetailPage() {
               <Button
                 variant="danger"
                 onClick={cancelOrder}
-                disabled={order.status === 'cancelled' || order.status === 'completed'}
+                disabled={order.editable === false || order.status !== 'pending'}
               >
                 Cancelar pedido
               </Button>

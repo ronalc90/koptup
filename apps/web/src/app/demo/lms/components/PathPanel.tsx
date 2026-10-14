@@ -65,7 +65,7 @@ export default function PathPanel({
                       <span className="block text-sm font-medium truncate">
                         {t('detail.lessonN', { n: s.lesson.n })}. {pick(s.lesson.title, f.locale)}
                       </span>
-                      <span className="block text-[11px] opacity-80">{t(`path.state_${s.state}`)}</span>
+                      <span className="block text-[11px]">{t(`path.state_${s.state}`)}</span>
                     </span>
                   </button>
                 </li>

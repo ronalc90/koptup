@@ -40,7 +40,17 @@ export default function ProjectSettings({ onClose }: { onClose: () => void }) {
             type="button"
             role="tab"
             aria-selected={tab === id}
+            tabIndex={tab === id ? 0 : -1}
             onClick={() => setTab(id)}
+            onKeyDown={(e) => {
+              const i = TABS.indexOf(id);
+              const next = e.key === 'ArrowRight' ? TABS[(i + 1) % TABS.length] : e.key === 'ArrowLeft' ? TABS[(i + TABS.length - 1) % TABS.length] : e.key === 'Home' ? TABS[0] : e.key === 'End' ? TABS[TABS.length - 1] : null;
+              if (!next) return;
+              e.preventDefault();
+              setTab(next);
+              (e.currentTarget.parentElement?.querySelector(`[data-tab="${next}"]`) as HTMLElement | null)?.focus();
+            }}
+            data-tab={id}
             className={`px-3 py-2 text-sm font-medium whitespace-nowrap border-b-2 -mb-px ${tab === id ? 'border-teal-600 text-teal-700 dark:text-teal-300' : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
           >
             {t(`tab.${id}`)}
@@ -289,31 +299,71 @@ function MilestoneEditor({ m }: { m: Milestone }) {
 function Team() {
   const t = useTranslations('demoProjectsPro.settings');
   const tRole = useTranslations('demoProjectsPro.roles');
-  const f = useFmt();
   const { ws } = useDemo();
   return (
     <div>
       <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">{t('teamHint')}</p>
       <ul className="divide-y divide-slate-100 dark:divide-slate-800">
         {ws.members.map((m) => (
-          <li key={m.id} className="flex flex-wrap items-center gap-3 py-2.5">
-            <Initials name={m.name} size="sm" />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                {m.name}
-                {m.me && <span className="ml-1.5 text-[11px] font-semibold text-teal-700 dark:text-teal-300">{t('you')}</span>}
-              </p>
-              <p className="text-xs text-slate-500">{tRole(m.role)}</p>
+          <li key={m.id} className="py-2.5">
+            <div className="flex items-center gap-3">
+              <Initials name={m.name} size="sm" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                  {m.name}
+                  {m.me && <span className="ml-1.5 text-[11px] font-semibold text-teal-700 dark:text-teal-300">{t('you')}</span>}
+                </p>
+                <p className="text-xs text-slate-500">{tRole(m.role)}</p>
+              </div>
             </div>
-            <p className="text-xs text-slate-600 dark:text-slate-300 text-right">
-              {t('rate', { rate: f.money(m.rate) })}
-              <br />
-              {t('capacity', { hours: m.capacity })}
-            </p>
+            <MemberEditor key={`${m.id}-${m.rate}-${m.capacity}`} id={m.id} name={m.name} rate={m.rate} capacity={m.capacity} />
           </li>
         ))}
       </ul>
     </div>
+  );
+}
+
+function MemberEditor({ id, name, rate, capacity }: { id: string; name: string; rate: number; capacity: number }) {
+  const t = useTranslations('demoProjectsPro.settings');
+  const f = useFmt();
+  const { act } = useDemo();
+  const [r, setR] = useState(String(rate));
+  const [c, setC] = useState(String(capacity));
+  const rateNum = Number(r.replace(/[^\d]/g, ''));
+  const capNum = Number(c.replace(',', '.'));
+  const validCap = Number.isFinite(capNum) && capNum > 0 && capNum <= 80;
+  const validRate = r.trim() !== '' && Number.isFinite(rateNum) && rateNum >= 0;
+  const changed = rateNum !== rate || capNum !== capacity;
+  return (
+    <form
+      className="grid grid-cols-2 sm:grid-cols-[1fr_1fr_auto] gap-2 items-end mt-2 sm:pl-10"
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (!validRate || !validCap || !changed) return;
+        act({ type: 'member.update', id, patch: { rate: rateNum, capacity: capNum } });
+        toast.success(t('memberSaved', { name }));
+      }}
+    >
+      <div>
+        <label htmlFor={`gp-mr-${id}`} className={labelCls}>
+          {t('rateLabel')}
+        </label>
+        <input id={`gp-mr-${id}`} inputMode="numeric" className={inputCls} value={r} onChange={(e) => setR(e.target.value)} />
+      </div>
+      <div>
+        <label htmlFor={`gp-mc-${id}`} className={labelCls}>
+          {t('capacityLabel')}
+        </label>
+        <input id={`gp-mc-${id}`} inputMode="decimal" className={inputCls} value={c} onChange={(e) => setC(e.target.value)} aria-invalid={!validCap} />
+      </div>
+      <button type="submit" className={`${btn.outline} col-span-2 sm:col-span-1`} disabled={!changed || !validRate || !validCap}>
+        {t('save')}
+      </button>
+      <p className={`col-span-2 sm:col-span-3 text-[11px] ${validCap ? 'text-slate-500' : 'text-red-600 dark:text-red-400'}`}>
+        {validCap ? t('memberPreview', { rate: f.money(validRate ? rateNum : 0), hours: f.num(capNum) }) : t('capacityInvalid')}
+      </p>
+    </form>
   );
 }
 

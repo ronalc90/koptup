@@ -8,7 +8,7 @@
       "breadcrumb": "CMS headless"
     },
     "bar": {
-      "title": "CMS headless",
+      "title": "Gestor de contenido (CMS headless)",
       "sample": "Datos de ejemplo",
       "sampleHint": "Empresa, personas, direcciones, teléfonos y dominios ficticios. Tus cambios se guardan solo en este navegador.",
       "subtitle": "Modela tu contenido, edítalo en un editor visual, apruébalo y publícalo en tu web, tu app y tu asistente desde un solo panel.",
@@ -22,10 +22,17 @@
       "resetConfirm": "Restablecer",
       "resetDone": "Listo: cargamos de nuevo los datos de ejemplo.",
       "cancel": "Cancelar",
-      "loading": "Cargando los datos de ejemplo…"
+      "loading": "Cargando los datos de ejemplo…",
+      "back": "Volver al catálogo de demos",
+      "audience": "Para equipos de mercadeo y comunicaciones que publican en su sitio web, su app y su asistente: modelas el contenido una vez, lo mejoras con IA, lo apruebas y sale a todos tus canales.",
+      "start": "Por dónde empezar: sigue el «Recorrido en 5 pasos» de Inicio; cada paso tiene un botón «Ir» que te lleva a la pantalla correcta.",
+      "requestDemo": "Solicitar demo guiada",
+      "quote": "Cotizar tu CMS",
+      "ctaLabel": "Siguientes pasos"
     },
     "common": {
-      "close": "Cerrar"
+      "close": "Cerrar",
+      "dismiss": "Cerrar aviso"
     },
     "nav": {
       "label": "Secciones del CMS",
@@ -48,7 +55,7 @@
       },
       "admin": {
         "name": "Administración",
-        "desc": "Todo lo anterior, más modelos de contenido y webhooks."
+        "desc": "Todo lo anterior, más modelos de contenido y avisos a tus canales (webhooks)."
       }
     },
     "status": {
@@ -156,16 +163,16 @@
           "desc": "Cambia el horario o la foto: la vista previa web y app se actualiza mientras escribes."
         },
         "assistant": {
-          "title": "3. Pide al asistente de redacción una versión más corta",
-          "desc": "En la pestaña «Asistente IA» usa «Versión corta para la app» y aplícala al campo."
+          "title": "3. Mejora un texto con el asistente de IA",
+          "desc": "En la pestaña «Asistente IA» elige una acción (por ejemplo, «Versión corta para la app») y pulsa «Aplicar al campo». Se marca cuando aplicas la propuesta."
         },
         "publish": {
           "title": "4. Envía a revisión, aprueba y publica",
-          "desc": "Envía como Redacción, cambia a Edición con «Ver como», aprueba y publica. Mira el webhook en «Publicación» y el JSON en la pestaña «API»."
+          "desc": "Envía la sede como Redacción, cambia a Edición con «Ver como», apruébala y publícala. Luego mira el aviso (webhook) en «Publicación» y el JSON en la pestaña «API»."
         },
         "rag": {
           "title": "5. Publica la pregunta frecuente y pregúntale al asistente del sitio",
-          "desc": "Publica «¿Qué preparación necesito para una ecografía abdominal?» y en la vista previa pregunta por la ecografía: el asistente cita la respuesta publicada."
+          "desc": "Como Edición, publica «¿Qué preparación necesito para una ecografía abdominal?» y en la vista previa pregunta por la ecografía: el asistente cita la respuesta que acabas de publicar."
         }
       },
       "truthTitle": "Qué es real en esta demo",
@@ -180,7 +187,7 @@
         },
         "simulated": {
           "title": "Simulado:",
-          "desc": "los webhooks (no se envía nada), los dominios .example, el CDN de imágenes y el asistente del sitio (búsqueda por palabras clave en las preguntas frecuentes publicadas)."
+          "desc": "los avisos a tus canales al publicar (webhooks: no se envía nada a internet), los dominios .example, la entrega de imágenes optimizadas (CDN) y el asistente del sitio (búsqueda por palabras clave en las preguntas frecuentes publicadas)."
         },
         "project": {
           "title": "En tu proyecto:",
@@ -193,7 +200,9 @@
       "inHours": "{n, plural, one {en # hora} other {en # horas}}",
       "inDays": "{n, plural, one {en # día} other {en # días}}",
       "activityTitle": "Actividad reciente",
-      "activityEmpty": "Aún no hay actividad en esta sesión. Lo que hagas aparecerá aquí."
+      "activityEmpty": "Aún no hay actividad en esta sesión. Lo que hagas aparecerá aquí.",
+      "tourDoneTitle": "¡Completaste el recorrido!",
+      "tourDoneBody": "Si quieres verlo con tu propio contenido, tus canales y tus permisos, te lo mostramos en una demo guiada o te preparamos una cotización."
     },
     "activity": {
       "created": "creó «{title}»",
@@ -495,7 +504,8 @@
       "footer": "Sitio de ejemplo · Red de Clínicas Montaña Azul (empresa ficticia)",
       "askAssistant": "Pregúntale al asistente",
       "appNote": "La app recibe el mismo contenido por la API y lo muestra en su propio diseño.",
-      "simulatedNote": "Vista previa simulada en tu navegador: en tu proyecto es tu sitio y tu app reales, leyendo el contenido por la API."
+      "simulatedNote": "Vista previa simulada en tu navegador: en tu proyecto es tu sitio y tu app reales, leyendo el contenido por la API.",
+      "upToDate": "Sin cambios pendientes: esto es lo que está publicado."
     },
     "assistant": {
       "title": "Asistente del sitio",
@@ -628,10 +638,15 @@
       "errors": {
         "network": "No pudimos conectar con el servidor de IA. Revisa tu conexión o inténtalo más tarde; el resto de la demo sigue funcionando.",
         "timeout": "La IA tardó demasiado en responder. Inténtalo de nuevo con un texto más corto.",
-        "notConfigured": "El asistente de IA no está configurado en este servidor (falta la clave del modelo). El resto de la demo funciona igual.",
+        "notConfigured": "El asistente de IA no está configurado en este servidor en este momento. El resto de la demo funciona igual; si quieres verlo con IA, pide una demo guiada.",
         "rateLimited": "Llegaste al límite de solicitudes por ahora. Espera unos minutos y vuelve a intentarlo.",
-        "invalid": "El servidor no aceptó ese texto. Prueba con un texto más largo o diferente.",
-        "server": "El servicio de IA respondió con un error. Inténtalo de nuevo en un momento."
+        "invalid": "El servidor no aceptó ese texto (vacío o demasiado largo). Prueba con otro texto.",
+        "server": "El servicio de IA respondió con un error. Inténtalo de nuevo en un momento.",
+        "unavailable": "La IA no está disponible en este momento. Inténtalo de nuevo en unos minutos; el resto de la demo sigue funcionando.",
+        "budget": "Alcanzamos el cupo mensual de IA de esta demo. El resto sigue funcionando; si quieres ver el asistente, te lo mostramos en una demo guiada.",
+        "login": "Para usar la IA en esta demo, inicia sesión con una cuenta que tenga acceso.",
+        "access": "Tu cuenta no tiene acceso a esta demo. Solicítalo y te avisamos cuando esté aprobado.",
+        "disabled": "Esta demo no está disponible en este momento, así que la IA tampoco. El resto de la pantalla sigue funcionando."
       }
     },
     "models": {
@@ -683,7 +698,7 @@
       "by": "{name} · {date}",
       "blocked": "Tiene campos pendientes: ábrela para corregirlos.",
       "writerNote": "Con el rol Redacción ves la cola, pero aprobar y publicar es de Edición. Usa «Ver como» para cambiar de persona.",
-      "webhooksTitle": "Webhooks al publicar",
+      "webhooksTitle": "Avisos a tus canales al publicar (webhooks)",
       "targets": {
         "site": {
           "name": "Sitio web",
@@ -749,7 +764,7 @@
       "models_manage": "Cambiar modelos de contenido",
       "media_upload": "Subir imágenes y editar su texto alternativo",
       "media_delete": "Eliminar imágenes",
-      "webhooks_manage": "Gestionar webhooks"
+      "webhooks_manage": "Gestionar los avisos a tus canales (webhooks)"
     }
   }
 }

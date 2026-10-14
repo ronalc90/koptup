@@ -29,7 +29,7 @@
 |---|---|---|
 | Demo | Existe, visualmente cuidado: encabezado, 4 indicadores, lista de PR con filtros, panel de detalle del PR y **11 pestañas** (Archivos, Review IA, Tests, Seguridad, Performance, Design, Docs, Búsqueda, Refactor, Analítica, Compliance) | `apps/web/src/app/demo/code-review-ia/page.tsx` (345 líneas), `components/tabs.tsx` (572 líneas) |
 | Real o maqueta | **Maqueta.** Todos los datos son constantes (`PRS`, `FILES`, `AI_COMMENTS` en `page.tsx`; `SEC_VULN`, `LICENSES`, `TESTS`, `PERF_METRICS`, `REFACTORS`, `SEARCH_RESULTS` en `tabs.tsx`). No hay `fetch` ni llamadas a IA | `page.tsx`, `tabs.tsx` |
-| Backend | Módulo en memoria `apps/backend/src/modules/code-review/` (CRUD de PR y reseñas, ~180 líneas) **no montado** en el servidor. Su "revisión IA" (`runAiReview`) es una regla por cantidad de líneas agregadas, no usa IA | `code-review.service.ts` |
+| Backend | Módulo en memoria `apps/backend/src/modules/code-review/` (retirado del repositorio en octubre de 2026, está en el historial de git; CRUD de PR y reseñas, ~180 líneas) **no montado** en el servidor. Su "revisión IA" (`runAiReview`) es una regla por cantidad de líneas agregadas, no usa IA | `code-review.service.ts` |
 | i18n ES/EN | Textos de la interfaz en `apps/web/messages/demos/code-review-ia.{es,en}.json` (~7,5 KB). Los datos de ejemplo (títulos y descripciones de PR, código, tests) están en inglés y fijos en el código | |
 | Tests | Solo smoke test (`__tests__/page.test.tsx`), que hoy no se ejecuta | |
 | Tamaño | 950 líneas en total | `wc -l` |
@@ -149,7 +149,7 @@ Desde **Admin › Solicitudes de demo › Aprobar** (personalización del `DemoG
 | Notificaciones e integraciones | Slack/Teams; Jira/Linear (Profesional) |
 | Panel | Historial de revisiones, hallazgos por tipo, tiempo ahorrado, uso de IA por mes |
 | Despliegue | Docker en la nube del cliente (AWS, Azure, GCP u on-premise); opción air-gapped en Enterprise |
-| Base existente | `apps/backend/src/modules/code-review/` sirve solo como modelo de datos de partida (PR, reseña); la lógica de IA debe construirse |
+| Base existente | `apps/backend/src/modules/code-review/` (retirado del repositorio en octubre de 2026: está en el historial de git) sirve solo como modelo de datos de partida (PR, reseña); la lógica de IA debe construirse |
 
 **SaaS:** sin base real, así que **"SaaS: lista de espera"** (DECISIÓN 7). Para ofrecerlo: core multi-tenant y cobro recurrente de la Fase 4, GitHub App pública multi-organización, aislamiento estricto del código por tenant, política de no retención y medición de "PR analizados". En SaaS se compite de frente con herramientas globales que cobran por desarrollador; el diferencial de Koptup está en la modalidad compra (despliegue propio).
 

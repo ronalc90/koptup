@@ -3,10 +3,15 @@ name: Publicar wiki
 # Publica docs/wiki/ en la wiki del repositorio (https://github.com/<owner>/<repo>/wiki).
 # Requisito único: la wiki debe estar activada (Settings > Features > Wikis) y tener
 # al menos una página creada desde la web; después basta con re-ejecutar este workflow.
+#
+# Solo publica sola desde main, para que la wiki no se adelante a lo que está en
+# producción. Para publicar otra rama (por ejemplo, una revisión previa), lánzalo
+# a mano desde la pestaña Actions eligiendo esa rama: la siguiente publicación
+# desde main la vuelve a dejar igual a main.
 
 on:
   push:
-    branches: [main, ccr-55ceecf7-dpc10i]
+    branches: [main]
     paths:
       - 'docs/wiki/**'
       - '.github/workflows/wiki-sync.yml'

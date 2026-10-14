@@ -58,17 +58,19 @@
         },
         "decisions": {
           "title": "Decisiones más Inteligentes",
-          "desc": "Datos analizados en tiempo real para tomar mejores decisiones de negocio."
+          "desc": "La IA resume y cruza la información de tus datos y documentos para que decidas con fuentes, no con suposiciones."
         },
         "advantage": {
-          "title": "Ventaja Competitiva Real",
-          "desc": "Las empresas que adoptan IA hoy liderarán su industria en los próximos años."
+          "title": "Respuestas más Rápidas",
+          "desc": "Tu equipo encuentra la respuesta en segundos y con la fuente citada, sin esperar a que alguien busque el documento."
         }
       }
     },
     "tech": {
       "title": "Tecnologías de IA que Implementamos",
-      "subtitle": "Trabajamos con las plataformas de IA más avanzadas del mercado",
+      "subtitle": "La demo RAG usa la API de OpenAI; las demás plataformas las elegimos contigo según tu proyecto.",
+      "inDemo": "En la demo RAG",
+      "perProject": "Según tu proyecto",
       "orchestration": "Orquestación IA",
       "automation": "Automatización"
     },

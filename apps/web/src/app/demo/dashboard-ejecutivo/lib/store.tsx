@@ -3,16 +3,29 @@
 /**
  * Estado del tablero en el navegador: preferencias guardadas en localStorage
  * (prefijo `demo:bi:`), dataset activo (ejemplo o CSV del visitante, que no se
- * guarda ni sale del navegador), período, vista y avisos.
+ * guarda ni sale del navegador), período, vista, avisos y el avance de los
+ * primeros pasos.
+ *
+ * El mes de corte (`anchor`) llega del servidor: es el último mes cerrado en
+ * Colombia, así el HTML y la hidratación usan las mismas fechas.
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { buildSample } from './dataset';
-import { alerts as buildAlerts, buildContext, buildIndex, findPeriod, findings as buildFindings, periodOptions, type Alert, type Context, type Finding } from './engine';
-import { PRESETS } from './presets';
-import { SECTORS, type CompanyProfile, type Dataset, type Period, type SectorId, type Settings, type ViewId } from './types';
+import { isMonthKey } from './dates';
+import { alerts as buildAlerts, buildContext, buildIndex, findPeriod, findings as buildFindings, periodOptions, type Alert, type Context, type Finding, type Segment } from './engine';
+import { PRESETS, REFERENCE_ANCHOR } from './presets';
+import { SECTORS, type CompanyProfile, type Dataset, type MonthKey, type Period, type SectorId, type Settings, type ViewId } from './types';
 
 const SETTINGS_KEY = 'demo:bi:settings:v1';
-const PERIOD_KEY = 'demo:bi:period:v1';
+/** Período elegido junto con el mes de corte en que se eligió (si el corte cambia, se vuelve al último mes). */
+const PERIOD_KEY = 'demo:bi:period:v2';
+const GUIDE_KEY = 'demo:bi:guide:v1';
+
+/** Pasos de "Primeros pasos": se marcan solos cuando el visitante hace cada cosa. */
+export type GuideStep = 'period' | 'finance' | 'customer' | 'ask' | 'pdf';
+export const GUIDE_STEPS: GuideStep[] = ['period', 'finance', 'customer', 'ask', 'pdf'];
+export type GuideProgress = Record<GuideStep, boolean>;
+const emptyGuide = (): GuideProgress => ({ period: false, finance: false, customer: false, ask: false, pdf: false });
 
 export function defaultSettings(): Settings {
   return {
@@ -75,6 +88,8 @@ export interface Toast {
 }
 
 interface Store {
+  /** Mes de corte de los datos de ejemplo (último mes cerrado). */
+  anchor: MonthKey;
   settings: Settings;
   saveSettings: (s: Settings) => void;
   resetAll: () => void;
@@ -88,7 +103,15 @@ interface Store {
   alerts: Alert[];
   findings: Finding[];
   view: ViewId;
-  setView: (v: ViewId) => void;
+  /** Cambia de sección; con `target` baja hasta ese elemento (id) cuando la sección se pinta. */
+  setView: (v: ViewId, target?: string) => void;
+  scrollTarget: string | null;
+  clearScrollTarget: () => void;
+  /** Filtro de segmento de la vista Clientes (se puede fijar desde los primeros pasos o las alertas). */
+  segment: 'all' | Segment;
+  setSegment: (s: 'all' | Segment) => void;
+  guide: GuideProgress;
+  markGuide: (step: GuideStep) => void;
   customer: string | null;
   openCustomer: (name: string | null) => void;
   invoice: string | null;
@@ -117,24 +140,44 @@ function writeJson(key: string, value: unknown) {
   }
 }
 
-export function DashboardProvider({ children }: { children: ReactNode }) {
+export function DashboardProvider({ anchor: anchorProp, children }: { anchor: MonthKey; children: ReactNode }) {
+  const anchor = isMonthKey(anchorProp) ? anchorProp : REFERENCE_ANCHOR;
   const [settings, setSettings] = useState<Settings>(defaultSettings);
   const [upload, setUploadState] = useState<Dataset | null>(null);
   const [periodKey, setPeriodKeyState] = useState<string | null>(null);
   const [view, setViewState] = useState<ViewId>('resumen');
+  const [scrollTarget, setScrollTarget] = useState<string | null>(null);
+  const [segment, setSegment] = useState<'all' | Segment>('all');
+  const [guide, setGuide] = useState<GuideProgress>(emptyGuide);
   const [customer, setCustomer] = useState<string | null>(null);
   const [invoice, setInvoice] = useState<string | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const toastId = useRef(0);
 
+  // Lo guardado en este navegador se lee después de montar (el HTML del servidor no lo conoce).
   useEffect(() => {
     const saved = readJson(SETTINGS_KEY);
     if (saved) setSettings(sanitize(saved));
-    const p = readJson(PERIOD_KEY);
-    if (typeof p === 'string') setPeriodKeyState(p);
+    const p = readJson(PERIOD_KEY) as { key?: unknown; anchor?: unknown } | null;
+    if (p && typeof p.key === 'string' && p.anchor === anchor) setPeriodKeyState(p.key);
+    const g = readJson(GUIDE_KEY) as Partial<GuideProgress> | null;
+    if (g && typeof g === 'object') {
+      const next = emptyGuide();
+      for (const k of GUIDE_STEPS) next[k] = g[k] === true;
+      setGuide(next);
+    }
+  }, [anchor]);
+
+  const markGuide = useCallback((step: GuideStep) => {
+    setGuide((g) => {
+      if (g[step]) return g;
+      const next = { ...g, [step]: true };
+      writeJson(GUIDE_KEY, next);
+      return next;
+    });
   }, []);
 
-  const sample = useMemo(() => buildSample(settings.sector), [settings.sector]);
+  const sample = useMemo(() => buildSample(settings.sector, anchor), [settings.sector, anchor]);
   const dataset = upload ?? sample;
   const idx = useMemo(() => buildIndex(dataset), [dataset]);
   const periods = useMemo(() => periodOptions(dataset), [dataset]);
@@ -163,26 +206,49 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     setSettings(defaultSettings());
     setUploadState(null);
     setPeriodKeyState(null);
+    setSegment('all');
+    setGuide(emptyGuide());
     writeJson(SETTINGS_KEY, null);
     writeJson(PERIOD_KEY, null);
+    writeJson(GUIDE_KEY, null);
   }, []);
 
-  const setPeriodKey = useCallback((k: string) => {
-    setPeriodKeyState(k);
-    writeJson(PERIOD_KEY, k);
-  }, []);
+  const setPeriodKey = useCallback(
+    (k: string) => {
+      setPeriodKeyState(k);
+      writeJson(PERIOD_KEY, { key: k, anchor });
+      markGuide('period');
+    },
+    [anchor, markGuide],
+  );
 
   const setUpload = useCallback((ds: Dataset | null) => {
     setUploadState(ds);
     setPeriodKeyState(null);
   }, []);
 
-  const setView = useCallback((v: ViewId) => {
-    setViewState(v);
-    if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
+  const setView = useCallback(
+    (v: ViewId, target?: string) => {
+      setViewState(v);
+      if (v === 'finanzas') markGuide('finance');
+      if (target) setScrollTarget(target);
+      else if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    [markGuide],
+  );
+
+  const clearScrollTarget = useCallback(() => setScrollTarget(null), []);
+
+  const openCustomer = useCallback(
+    (name: string | null) => {
+      setCustomer(name);
+      if (name) markGuide('customer');
+    },
+    [markGuide],
+  );
 
   const value: Store = {
+    anchor,
     settings,
     saveSettings,
     resetAll,
@@ -197,8 +263,14 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     findings: findingList,
     view,
     setView,
+    scrollTarget,
+    clearScrollTarget,
+    segment,
+    setSegment,
+    guide,
+    markGuide,
     customer,
-    openCustomer: setCustomer,
+    openCustomer,
     invoice,
     openInvoice: setInvoice,
     toasts,

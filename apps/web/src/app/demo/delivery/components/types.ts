@@ -137,6 +137,12 @@ export interface Order {
   /** Veces que un repartidor rechazó la oferta. */
   driverRejections: number;
   lateNotified?: boolean;
+  /**
+   * Solo en los pedidos de ejemplo que ya estaban en curso al empezar: cuándo
+   * los termina "el resto de la operación" (la cocina de la sede y su
+   * repartidor) si nadie los toca antes. Segundos del día de la demo.
+   */
+  plan?: { ready?: number; pickedUp?: number; delivered?: number };
 }
 
 export interface LogEntry {

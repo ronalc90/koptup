@@ -10,11 +10,23 @@
  *
  * El guardado se espera (si Mongo falla, el error sube al caller, igual que
  * antes en el formulario); las notificaciones nunca hacen fallar la petición.
+ * Con el flujo de compra activo (COMMERCE_ENABLED=true), cada contacto se
+ * liga además a su `Lead` del pipeline comercial (services/leads.service.ts),
+ * que agrupa los contactos por email; apagado, solo se guarda el `Contact`.
  */
-import Contact, { DEFAULT_CONTACT_SOURCE, type ContactSource, type IContact } from '../models/Contact';
+import Contact, {
+  DEFAULT_CONTACT_SOURCE,
+  type ContactSource,
+  type ContactTimeline,
+  type IContact,
+  type IContactConsent,
+  type IContactQuote,
+} from '../models/Contact';
 import { logger } from '../utils/logger';
 import { whatsappService } from './whatsapp.service';
 import { emailService } from './email.service';
+import { isCommerceEnabled } from '../config/commerce';
+import { syncLeadFromContactSafe } from './leads.service';
 
 export interface LeadInput {
   name: string;
@@ -26,6 +38,12 @@ export interface LeadInput {
   message: string;
   /** Origen del lead; por defecto `contact-form`. */
   source?: ContactSource;
+  /** Plan, nivel o modalidad que se estaba cotizando (formulario de /contact). */
+  cotizacion?: IContactQuote;
+  /** Cuándo quiere empezar (formulario de /contact). */
+  plazo?: ContactTimeline;
+  /** Prueba de la autorización de datos (Ley 1581): versión de la política del servidor, fecha, hash de IP. */
+  consentimiento?: IContactConsent;
 }
 
 export interface LeadNotificationResult {
@@ -58,10 +76,17 @@ export async function registerLeadWithNotifications(
     budget,
     message,
     source,
+    ...(input.cotizacion ? { cotizacion: input.cotizacion } : {}),
+    ...(input.plazo ? { plazo: input.plazo } : {}),
+    ...(input.consentimiento ? { consentimiento: input.consentimiento } : {}),
     status: 'new',
   });
 
   logger.info(`✅ Contact saved to database with ID: ${contact._id}`);
+
+  // Pipeline comercial (solo con COMMERCE_ENABLED=true): liga el contacto a
+  // su Lead (uno por email). Nunca hace fallar el registro del contacto.
+  if (isCommerceEnabled()) await syncLeadFromContactSafe(contact);
 
   const notification = { name, email, phone, company, service, budget, message, source };
 

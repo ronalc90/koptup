@@ -7,7 +7,7 @@ export default function ModeracionContenidoLayout({ children }: { children: Reac
   const breadcrumbSchema = getBreadcrumbSchema([
     { name: 'Inicio', url: '/' },
     { name: 'Demos', url: '/demo' },
-    { name: 'Moderación de Contenido con IA', url: '/demo/moderacion-contenido' },
+    { name: 'Moderación de contenido con IA', url: '/demo/moderacion-contenido' },
   ]);
 
   return (

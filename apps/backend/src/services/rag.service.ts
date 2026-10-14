@@ -4,8 +4,10 @@ import { DocumentoLey100 } from '../models/DocumentoLey100';
 import { extractTextFromPDF } from './pdf.service';
 import { logger } from '../utils/logger';
 
-// Perezoso: no falla al importar si falta OPENAI_API_KEY.
-const openai = lazyOpenAI();
+// Perezoso: no falla al importar si falta OPENAI_API_KEY. Lo usa la validación
+// de cuentas médicas (POST /api/process): cliente con el tope mensual de las
+// APIs de salud (HEALTH_MONTHLY_BUDGET_USD), que registra el gasto real.
+const openai = lazyOpenAI('health');
 
 interface RAGContext {
   documentText: string;

@@ -5,6 +5,7 @@ import { z } from 'zod';
 import {
   generateAccessToken,
   generateRefreshToken,
+  refreshTokenTtlSeconds,
   verifyRefreshToken,
 } from '../middleware/auth';
 import { AuthRequest } from '../types';
@@ -24,8 +25,9 @@ import {
 import { recordAudit } from '../services/audit.service';
 import { maskEmail } from '../utils/email-address';
 
-/** Vigencia del refresh token en Redis: 7 días. */
-const REFRESH_TTL_SECONDS = 7 * 24 * 60 * 60;
+/** Mensajes de error de la cuenta (formato único: `{ success: false, code, message }`). */
+const VALIDATION_MESSAGE = 'Revisa los datos del formulario: hay campos vacíos o con un formato inválido.';
+const SESSION_EXPIRED_MESSAGE = 'Tu sesión expiró. Inicia sesión de nuevo.';
 
 /**
  * Emite la sesión (access + refresh) de un usuario: la misma respuesta que
@@ -42,7 +44,8 @@ async function issueSession(user: IUser) {
     id: user._id.toString(),
     email: user.email,
   });
-  await redis.setEx(`refresh_token:${user._id}`, REFRESH_TTL_SECONDS, refreshToken);
+  // La copia en Redis vence igual que el JWT (JWT_REFRESH_EXPIRES_IN, 7 días por defecto).
+  await redis.setEx(`refresh_token:${user._id}`, refreshTokenTtlSeconds(), refreshToken);
   return {
     accessToken,
     refreshToken,
@@ -58,7 +61,7 @@ async function issueSession(user: IUser) {
 export const register = asyncHandler(async (req: AuthRequest, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    throw new AppError('Validation error', 400);
+    throw new AppError(VALIDATION_MESSAGE, 400, 'invalid_request');
   }
 
   const { email, password, name } = req.body;
@@ -67,7 +70,7 @@ export const register = asyncHandler(async (req: AuthRequest, res: Response) => 
   const existingUser = await User.findOne({ email });
 
   if (existingUser) {
-    throw new AppError('User already exists', 400);
+    throw new AppError('Ya existe una cuenta con este correo. Inicia sesión o recupera tu contraseña.', 400, 'email_taken');
   }
 
   // Hash password
@@ -99,7 +102,7 @@ export const login = asyncHandler(async (req: AuthRequest, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     logger.warn('Login validation error');
-    throw new AppError('Validation error', 400);
+    throw new AppError(VALIDATION_MESSAGE, 400, 'invalid_request');
   }
 
   const { email, password } = req.body;
@@ -117,13 +120,13 @@ export const login = asyncHandler(async (req: AuthRequest, res: Response) => {
   }
 
   if (!user || !user.password) {
-    throw new AppError('Invalid credentials', 401);
+    throw new AppError('El correo o la contraseña no son correctos.', 401, 'invalid_credentials');
   }
 
   // Verify password
   const isValidPassword = await bcrypt.compare(password, user.password);
   if (!isValidPassword) {
-    throw new AppError('Invalid credentials', 401);
+    throw new AppError('El correo o la contraseña no son correctos.', 401, 'invalid_credentials');
   }
 
   const session = await issueSession(user);
@@ -146,7 +149,7 @@ export const refreshToken = asyncHandler(
     const { refreshToken } = req.body;
 
     if (!refreshToken) {
-      throw new AppError('Refresh token required', 400);
+      throw new AppError('Falta la sesión para renovar. Inicia sesión de nuevo.', 400, 'refresh_token_required');
     }
 
     // Verify refresh token (firma inválida o vencida → 401, no 500)
@@ -154,21 +157,21 @@ export const refreshToken = asyncHandler(
     try {
       decoded = verifyRefreshToken(String(refreshToken));
     } catch {
-      throw new AppError('Invalid refresh token', 401);
+      throw new AppError(SESSION_EXPIRED_MESSAGE, 401, 'invalid_refresh_token');
     }
 
     // Check if token exists in Redis
     const storedToken = await redis.get(`refresh_token:${decoded.id}`);
 
     if (!storedToken || storedToken !== refreshToken) {
-      throw new AppError('Invalid refresh token', 401);
+      throw new AppError(SESSION_EXPIRED_MESSAGE, 401, 'invalid_refresh_token');
     }
 
     // Get user
     const user = await User.findById(decoded.id);
 
     if (!user) {
-      throw new AppError('User not found', 404);
+      throw new AppError('No encontramos tu cuenta. Inicia sesión de nuevo.', 404, 'not_found');
     }
 
     // Generate new access token
@@ -191,7 +194,7 @@ export const refreshToken = asyncHandler(
 
 export const logout = asyncHandler(async (req: AuthRequest, res: Response) => {
   if (!req.user) {
-    throw new AppError('Unauthorized', 401);
+    throw new AppError('Inicia sesión para continuar.', 401, 'unauthorized');
   }
 
   // Remove refresh token from Redis
@@ -208,13 +211,13 @@ export const logout = asyncHandler(async (req: AuthRequest, res: Response) => {
 export const getProfile = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     if (!req.user) {
-      throw new AppError('Unauthorized', 401);
+      throw new AppError('Inicia sesión para continuar.', 401, 'unauthorized');
     }
 
     const user = await User.findById(req.user.id).select('-password');
 
     if (!user) {
-      throw new AppError('User not found', 404);
+      throw new AppError('No encontramos tu cuenta. Inicia sesión de nuevo.', 404, 'not_found');
     }
 
     res.json({ success: true, data: profileView(user) });
@@ -260,7 +263,7 @@ const UpdateProfileSchema = z
  * actualiza sus datos básicos. El email y el rol no se cambian aquí.
  */
 export const updateProfile = asyncHandler(async (req: AuthRequest, res: Response) => {
-  if (!req.user) throw new AppError('Unauthorized', 401);
+  if (!req.user) throw new AppError('Inicia sesión para continuar.', 401, 'unauthorized');
   const parsed = UpdateProfileSchema.safeParse(req.body ?? {});
   if (!parsed.success) {
     const issue = parsed.error.issues[0];
@@ -268,7 +271,7 @@ export const updateProfile = asyncHandler(async (req: AuthRequest, res: Response
     throw new AppError(issue?.message ?? 'Datos inválidos', 400, 'invalid_profile', { fields: field ? [field] : [] });
   }
   const user = await User.findById(req.user.id);
-  if (!user) throw new AppError('User not found', 404);
+  if (!user) throw new AppError('No encontramos tu cuenta. Inicia sesión de nuevo.', 404, 'not_found');
   const { name, phone, company } = parsed.data;
   if (name !== undefined) user.name = name;
   if ('phone' in (req.body ?? {})) user.phone = phone ?? undefined;
@@ -288,14 +291,14 @@ const ChangePasswordSchema = z.object({
  * nueva: el refresh token anterior (de cualquier otro navegador) deja de servir.
  */
 export const changePassword = asyncHandler(async (req: AuthRequest, res: Response) => {
-  if (!req.user) throw new AppError('Unauthorized', 401);
+  if (!req.user) throw new AppError('Inicia sesión para continuar.', 401, 'unauthorized');
   const parsed = ChangePasswordSchema.safeParse(req.body ?? {});
   if (!parsed.success) {
     const issue = parsed.error.issues[0];
     throw new AppError(issue?.message ?? 'Datos inválidos', 400, 'invalid_password', { fields: [String(issue?.path[0] ?? 'newPassword')] });
   }
   const user = await User.findById(req.user.id).select('+password');
-  if (!user) throw new AppError('User not found', 404);
+  if (!user) throw new AppError('No encontramos tu cuenta. Inicia sesión de nuevo.', 404, 'not_found');
   if (!user.password) {
     throw new AppError('Tu cuenta entra con Google: no tiene una contraseña de KopTup para cambiar.', 400, 'no_local_password');
   }
@@ -328,7 +331,7 @@ export const forgotPassword = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      throw new AppError('Validation error', 400);
+      throw new AppError(VALIDATION_MESSAGE, 400, 'invalid_request');
     }
 
     const { email } = req.body;
@@ -370,7 +373,7 @@ export const resetPassword = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      throw new AppError('Validation error', 400);
+      throw new AppError(VALIDATION_MESSAGE, 400, 'invalid_request');
     }
 
     const { token, password } = req.body;
@@ -484,35 +487,42 @@ export const activateAccount = asyncHandler(async (req: AuthRequest, res: Respon
   res.json({ success: true, message: 'Tu cuenta quedó activa.', data: session });
 });
 
-// Google OAuth callback handler
+/**
+ * Fin del inicio de sesión con Google (GET /api/auth/google/callback). Los
+ * tokens de sesión NO viajan en la URL: se emite un código de un solo uso
+ * (60 s, solo se guarda su hash) y se redirige a la web con el código en el
+ * fragmento (`/auth/callback#code=…`, que el navegador no envía al servidor
+ * ni en el Referer). La web lo canjea con POST /api/auth/google/exchange.
+ */
 export const googleCallback = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     if (!req.user) {
-      throw new AppError('Authentication failed', 401);
+      throw new AppError('No pudimos iniciar sesión con Google. Intenta de nuevo.', 401, 'google_auth_failed');
     }
 
     const user = req.user as any;
-
-    // Generate tokens
-    const accessToken = generateAccessToken({
-      id: user.id,
-      email: user.email,
-      role: user.role,
-      name: user.name,
-    });
-
-    const refreshToken = generateRefreshToken({
-      id: user.id,
-      email: user.email,
-    });
-
-    // Store refresh token in Redis with 7 days expiration
-    await redis.setEx(`refresh_token:${user.id}`, REFRESH_TTL_SECONDS, refreshToken);
-
-    // Redirect to frontend with tokens
-    const frontendURL = process.env.FRONTEND_URL || 'http://localhost:3000';
-    res.redirect(
-      `${frontendURL}/auth/callback?accessToken=${accessToken}&refreshToken=${refreshToken}`
-    );
+    const link = await issueMagicLink({ userId: String(user.id ?? user._id), proposito: 'oauth' });
+    res.setHeader('Cache-Control', 'no-store');
+    res.redirect(link.url);
   }
 );
+
+/**
+ * POST /api/auth/google/exchange { code } — canjea el código de un solo uso
+ * del inicio de sesión con Google por la sesión (misma respuesta que el
+ * login). El código vence a los 60 s y sirve una sola vez.
+ */
+const OAuthCodeSchema = z.object({ code: z.string().trim().min(20).max(200) });
+
+export const googleExchange = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const parsed = OAuthCodeSchema.safeParse(req.body ?? {});
+  if (!parsed.success) throw new AppError('El inicio de sesión con Google no es válido o venció. Intenta de nuevo.', 400, 'token_invalid');
+  const consumed = await consumeMagicLink(parsed.data.code, 'oauth');
+  if (!consumed.ok) throw new AppError('El inicio de sesión con Google no es válido o venció. Intenta de nuevo.', 400, consumed.reason);
+  const user = await User.findById(consumed.doc.user);
+  if (!user) throw new AppError('El inicio de sesión con Google no es válido o venció. Intenta de nuevo.', 400, 'token_invalid');
+  const session = await issueSession(user);
+  logger.info('Google sign-in exchanged for a session');
+  res.setHeader('Cache-Control', 'no-store');
+  res.json({ success: true, message: 'Login successful', data: session });
+});

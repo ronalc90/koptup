@@ -42,6 +42,15 @@ export interface AnswerMeta {
   docsIndexed: number;
 }
 
+/** Mensajes de error de `chat.*`: cada uno dice la causa real (red, límite del servidor…). */
+export type ChatErrorKey =
+  | 'errorNetwork'
+  | 'errorGeneric'
+  | 'errorRateLimited'
+  | 'errorChatRateLimited'
+  | 'errorCapacity'
+  | 'errorUnavailable';
+
 export interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
@@ -50,8 +59,8 @@ export interface ChatMessage {
   meta?: AnswerMeta;
   /** Esperando la respuesta del backend. */
   pending?: boolean;
-  /** Clave de error de `chat.*` si la llamada falló. */
-  errorKey?: 'errorNetwork' | 'errorGeneric';
+  /** Clave de error de `chat.*` si la llamada falló (ver `errors.ts`). */
+  errorKey?: ChatErrorKey;
   /** Pregunta que originó esta respuesta (para "Volver a preguntar"). */
   question?: string;
   feedback?: 'up' | 'down';
@@ -89,4 +98,28 @@ export function countCitations(text: string, sourcesCount: number): number {
     if (n >= 1 && n <= sourcesCount) seen.add(n);
   }
   return seen.size;
+}
+
+/**
+ * Números de "Cómo se respondió", del fragmento citado y de las métricas, con
+ * el formato del idioma de la interfaz (locale fijo: es-CO o en-US, nunca el
+ * del navegador). Solo se pintan después de una respuesta, en el cliente.
+ */
+export type DemoLocale = 'es' | 'en';
+
+const intlLocale = (locale: DemoLocale) => (locale === 'en' ? 'en-US' : 'es-CO');
+
+/** Decimales fijos: 1,198 (es) · 1.198 (en). */
+export function formatDecimal(value: number, digits: number, locale: DemoLocale): string {
+  return new Intl.NumberFormat(intlLocale(locale), { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value);
+}
+
+/** Enteros con separador de miles: 1.023 (es) · 1,023 (en). */
+export function formatInteger(value: number, locale: DemoLocale): string {
+  return new Intl.NumberFormat(intlLocale(locale), { maximumFractionDigits: 0 }).format(value);
+}
+
+/** Costo en dólares, sin símbolo (la etiqueta dice «USD»; «$» en Colombia se lee como pesos). */
+export function formatUsd(value: number, locale: DemoLocale): string {
+  return formatDecimal(value, 5, locale);
 }

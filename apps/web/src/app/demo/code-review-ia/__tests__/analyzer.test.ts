@@ -5,8 +5,9 @@
 import {
   parseInput, analyzeParsed, effectiveNewLines, oldLines, diffRows, countChanges, displayLineOf,
   scoreFor, riskFor, formatStamp, formatNumber, toCsv, MAX_INPUT_LINES,
+  nowStamp, shiftStamp, sampleShiftDays, shiftPr, buildCycloneDx,
 } from '../components/analyzer';
-import { SAMPLE_PRS, SAMPLE_DIFF } from '../components/data';
+import { SAMPLE_PRS, SAMPLE_DIFF, SAMPLE_TODAY } from '../components/data';
 
 describe('parseInput', () => {
   it('lee un diff unificado con sus números de línea', () => {
@@ -150,5 +151,71 @@ describe('formato determinista', () => {
 
   it('escapa el CSV', () => {
     expect(toCsv([['a,b', 'c"d', 1]])).toBe('"a,b","c""d",1');
+  });
+});
+
+describe('fechas de ejemplo relativas a hoy (Colombia)', () => {
+  const allStamps = SAMPLE_PRS.flatMap((p) => [p.openedAt, ...p.events.map((e) => e.at)]);
+  const latest = allStamps.slice().sort().at(-1) ?? '';
+
+  it('la hora actual se calcula en Colombia (UTC-5) sin importar la zona del navegador', () => {
+    expect(nowStamp(new Date('2026-10-15T03:30:00Z'))).toBe('2026-10-14T22:30');
+    expect(nowStamp(new Date('2026-12-31T23:59:00-05:00'))).toBe('2026-12-31T23:59');
+  });
+
+  it('corre fechas con y sin hora, cruzando meses y años', () => {
+    expect(shiftStamp('2026-10-07T16:40', 7)).toBe('2026-10-14T16:40');
+    expect(shiftStamp('2026-12-28T09:00', 7)).toBe('2027-01-04T09:00');
+    expect(shiftStamp('2026-03-01', -1)).toBe('2026-02-28');
+    expect(shiftStamp('sin fecha', 7)).toBe('sin fecha');
+  });
+
+  it('los datos quedan antes de hoy, a menos de una semana, en el mismo día de la semana', () => {
+    for (const today of ['2026-10-09', '2026-10-14', '2026-10-15', '2026-11-02', '2027-02-28', '2028-07-04']) {
+      const days = sampleShiftDays(today, SAMPLE_TODAY);
+      expect(days % 7).toBe(0);
+      const shifted = shiftStamp(latest, days).slice(0, 10);
+      expect(shifted < today).toBe(true);
+      const gap = (Date.parse(today) - Date.parse(shifted)) / 86_400_000;
+      expect(gap).toBeGreaterThanOrEqual(1);
+      expect(gap).toBeLessThanOrEqual(7);
+    }
+  });
+
+  it('los PR de ejemplo se abren de lunes a viernes y su actividad va en orden', () => {
+    for (const pr of SAMPLE_PRS) {
+      const day = new Date(`${pr.openedAt.slice(0, 10)}T12:00:00Z`).getUTCDay();
+      expect(day).toBeGreaterThanOrEqual(1);
+      expect(day).toBeLessThanOrEqual(5);
+      const ats = pr.events.map((e) => e.at);
+      expect(ats).toEqual(ats.slice().sort());
+      expect(pr.events[0].at).toBe(pr.openedAt);
+    }
+    expect(latest.slice(0, 10) < SAMPLE_TODAY).toBe(true);
+  });
+
+  it('shiftPr corre la apertura y la actividad sin tocar el resto', () => {
+    const pr = SAMPLE_PRS[0];
+    const moved = shiftPr(pr, 14);
+    expect(moved.openedAt).toBe(shiftStamp(pr.openedAt, 14));
+    expect(moved.events.map((e) => e.at)).toEqual(pr.events.map((e) => shiftStamp(e.at, 14)));
+    expect(moved.comments).toBe(pr.comments);
+    expect(shiftPr(pr, 0)).toBe(pr);
+  });
+});
+
+describe('SBOM CycloneDX', () => {
+  it('usa los textos del idioma de la demo', () => {
+    const bom = buildCycloneDx({
+      appName: 'app-web',
+      timestamp: '2026-10-14T15:00:00.000Z',
+      dependencies: [{ name: 'cross-spawn', version: '7.0.3', license: 'MIT' }],
+      vulnerabilities: [{ id: 'CVE-2024-21538', name: 'cross-spawn', version: '7.0.3', severity: 'high', fixedIn: '7.0.5', url: 'https://nvd.nist.gov/vuln/detail/CVE-2024-21538' }],
+      note: 'Sample data',
+      recommend: (name, v) => `Upgrade ${name} to ${v}`,
+    }) as { metadata: { properties: { value: string }[] }; vulnerabilities: { recommendation: string }[]; components: { purl: string }[] };
+    expect(bom.metadata.properties[0].value).toBe('Sample data');
+    expect(bom.vulnerabilities[0].recommendation).toBe('Upgrade cross-spawn to 7.0.5');
+    expect(bom.components[0].purl).toBe('pkg:npm/cross-spawn@7.0.3');
   });
 });

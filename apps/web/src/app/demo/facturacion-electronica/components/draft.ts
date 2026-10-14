@@ -4,7 +4,6 @@ import {
   CONSUMIDOR_FINAL,
   DEFAULT_LINES,
   POS_DEFAULT_LINES,
-  RESOLUTION,
   type BillingDoc,
   type DocLine,
   type DocType,
@@ -159,6 +158,7 @@ export function validateDraft(
   ref: BillingDoc | undefined,
   lines: DocLine[],
   invoicePrefix: string,
+  rangeTo: number,
 ): DraftIssue[] {
   const issues: DraftIssue[] = [];
   const needsBuyer = d.type === 'factura' || (d.type === 'pos' && d.posWithBuyer);
@@ -179,7 +179,7 @@ export function validateDraft(
     d.lines.forEach((l, i) => {
       if (!l.description.trim() || l.qty <= 0 || l.unitPrice <= 0) issues.push({ key: 'lineInvalid', n: i + 1 });
     });
-    if (d.type === 'factura' && nextNumber(docs, 'factura', invoicePrefix) > RESOLUTION.to) issues.push({ key: 'rangeExhausted' });
+    if (d.type === 'factura' && nextNumber(docs, 'factura', invoicePrefix) > rangeTo) issues.push({ key: 'rangeExhausted' });
     return issues;
   }
   if (!ref) {

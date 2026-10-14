@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   CheckCircleIcon,
   ClockIcon,
@@ -12,9 +12,10 @@ import {
   ChatBubbleBottomCenterTextIcon,
   ExclamationTriangleIcon,
   LinkIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/outline';
-import type { ComponentType, SVGProps } from 'react';
-import type { AnswerMeta, SourceChunk } from './data';
+import type { ComponentType, ReactNode, SVGProps } from 'react';
+import { formatDecimal, formatInteger, formatUsd, type AnswerMeta, type SourceChunk } from './data';
 import Tooltip from './ui/Tooltip';
 
 interface PipelinePanelProps {
@@ -23,6 +24,13 @@ interface PipelinePanelProps {
   /** Datos de la última respuesta (null si todavía no hay ninguna). */
   meta: AnswerMeta | null;
   sources: SourceChunk[];
+  /** Contenido al pie (las métricas de la sesión). */
+  children?: ReactNode;
+  /** En el panel de celulares y tabletas: botón para cerrarlo. */
+  onClose?: () => void;
+  closeLabel?: string;
+  /** id del título (para `aria-labelledby` del diálogo). */
+  titleId?: string;
 }
 
 type StepState = 'done' | 'skipped' | 'warn';
@@ -41,8 +49,9 @@ interface StepView {
  * fragmentación al indexar → búsqueda BM25 top 5 → prompt con fragmentos y
  * reglas → modelo elegido (o modo extractivo) → citas.
  */
-export default function PipelinePanel({ running, meta, sources }: PipelinePanelProps) {
+export default function PipelinePanel({ running, meta, sources, children, onClose, closeLabel, titleId }: PipelinePanelProps) {
   const t = useTranslations('demoChatbot.pipeline');
+  const locale = useLocale() === 'en' ? 'en' : 'es';
 
   const steps: StepView[] = [];
   if (meta) {
@@ -59,7 +68,7 @@ export default function PipelinePanel({ running, meta, sources }: PipelinePanelP
       title: t('steps.search.title'),
       detail:
         sources.length > 0
-          ? t('steps.search.detail', { count: sources.length, score: bestScore.toFixed(3) })
+          ? t('steps.search.detail', { count: sources.length, score: formatDecimal(bestScore, 3, locale) })
           : t('steps.search.none'),
       state: sources.length > 0 ? 'done' : 'warn',
       Icon: MagnifyingGlassIcon,
@@ -76,7 +85,7 @@ export default function PipelinePanel({ running, meta, sources }: PipelinePanelP
       key: 'model',
       title: t('steps.model.title'),
       detail: usedModel
-        ? t('steps.model.detail', { model: meta.model, latency: meta.backendLatencyMs ?? 0 })
+        ? t('steps.model.detail', { model: meta.model, latency: formatInteger(meta.backendLatencyMs ?? 0, locale) })
         : meta.providerError
           ? t('steps.model.error')
           : t('steps.model.extractive'),
@@ -97,11 +106,27 @@ export default function PipelinePanel({ running, meta, sources }: PipelinePanelP
 
   return (
     <aside className="flex h-full w-full flex-col border-l border-secondary-200 bg-white/70 backdrop-blur dark:border-secondary-800 dark:bg-secondary-900/70">
-      <header className="border-b border-secondary-200 px-4 py-3 dark:border-secondary-800">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-secondary-500 dark:text-secondary-400">
-          {t('title')}
-        </p>
-        <p className="mt-1 text-[11px] leading-relaxed text-secondary-500 dark:text-secondary-400">{t('subtitle')}</p>
+      <header className="flex items-start justify-between gap-2 border-b border-secondary-200 px-4 py-3 dark:border-secondary-800">
+        <div className="min-w-0">
+          <p
+            id={titleId}
+            className="text-[10px] font-semibold uppercase tracking-[0.14em] text-secondary-500 dark:text-secondary-400"
+          >
+            {t('title')}
+          </p>
+          <p className="mt-1 text-[11px] leading-relaxed text-secondary-500 dark:text-secondary-400">{t('subtitle')}</p>
+        </div>
+        {onClose ? (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={closeLabel}
+            data-autofocus
+            className="rounded p-1 text-secondary-500 hover:bg-secondary-100 hover:text-secondary-900 dark:hover:bg-secondary-800 dark:hover:text-white"
+          >
+            <XMarkIcon className="h-5 w-5" />
+          </button>
+        ) : null}
       </header>
 
       <ol className="flex-1 space-y-2 overflow-y-auto px-3 py-3">
@@ -150,7 +175,7 @@ export default function PipelinePanel({ running, meta, sources }: PipelinePanelP
               {t('totals.latency')}
             </div>
             <div className="font-mono text-sm font-bold text-secondary-900 dark:text-white">
-              {meta && !running ? `${meta.clientLatencyMs} ms` : t('totals.notAvailable')}
+              {meta && !running ? `${formatInteger(meta.clientLatencyMs, locale)} ms` : t('totals.notAvailable')}
             </div>
           </div>
         </Tooltip>
@@ -161,7 +186,7 @@ export default function PipelinePanel({ running, meta, sources }: PipelinePanelP
               {t('totals.tokens')}
             </div>
             <div className="font-mono text-sm font-bold text-secondary-900 dark:text-white">
-              {typeof tokens === 'number' && !running ? tokens : t('totals.notAvailable')}
+              {typeof tokens === 'number' && !running ? formatInteger(tokens, locale) : t('totals.notAvailable')}
             </div>
           </div>
         </Tooltip>
@@ -172,11 +197,12 @@ export default function PipelinePanel({ running, meta, sources }: PipelinePanelP
               {t('totals.cost')}
             </div>
             <div className="font-mono text-sm font-bold text-secondary-900 dark:text-white">
-              {typeof cost === 'number' && !running ? `$${cost.toFixed(5)}` : t('totals.notAvailable')}
+              {typeof cost === 'number' && !running ? formatUsd(cost, locale) : t('totals.notAvailable')}
             </div>
           </div>
         </Tooltip>
       </footer>
+      {children}
     </aside>
   );
 }

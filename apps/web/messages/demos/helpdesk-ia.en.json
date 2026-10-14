@@ -8,7 +8,42 @@
       "breadcrumbName": "AI Helpdesk"
     },
     "pageTitle": "AI Helpdesk",
-    "pageSubtitle": "Omnichannel service desk: one inbox for all your channels, automatic classification and assignment, AI reply drafts, SLAs and PQRS tracked in business days. Try it: simulate a ticket, answer it and close it.",
+    "pageSubtitle": "For customer service teams at online stores, internet providers, credit unions and service companies. All your channels in one inbox: tickets are classified and assigned automatically, AI drafts the reply from your knowledge base, and you track SLAs and PQRS (petitions, complaints and claims) in business days.",
+    "shell": {
+      "back": "Back to the demo catalog",
+      "kicker": "Interactive demo · Omnichannel service desk",
+      "requestDemo": "Request a guided demo",
+      "quote": "Get a quote for my company"
+    },
+    "guide": {
+      "title": "Getting started: walk through the demo in 3 minutes",
+      "progress": "{done} of {total} done",
+      "show": "Show the steps",
+      "hide": "Hide the steps",
+      "done": "Done",
+      "steps": {
+        "incoming": {
+          "title": "Receive a message",
+          "text": "Simulate a ticket via WhatsApp, email or phone call and see how it is classified, which macros apply and who it is assigned to.",
+          "action": "Simulate incoming ticket"
+        },
+        "reply": {
+          "title": "Answer it with help",
+          "text": "Insert a reply from the knowledge base or ask AI for a draft, review it and send it.",
+          "action": "Go to the reply"
+        },
+        "resolve": {
+          "title": "Resolve and measure",
+          "text": "Mark the ticket as resolved and answer the satisfaction survey as if you were the customer.",
+          "action": "Go to the ticket"
+        },
+        "sla": {
+          "title": "Track SLAs and PQRS",
+          "text": "Move the clock forward with “+15 min” to watch SLAs expire and check which PQRS are about to expire in business days.",
+          "action": "See the PQRS"
+        }
+      }
+    },
     "sampleBadge": "Sample data",
     "sampleBadgeHint": "This is the service desk of three fictitious brands (Moda Andina, Conecta Sabana and Cooperativa Ceiba). Customers, contacts, orders, amounts and filing numbers are made up. Reference date of the data: Thursday, October 8, 2026.",
     "howItWorks": {
@@ -28,7 +63,13 @@
     },
     "clock": {
       "label": "Demo clock: {date}, {time}",
-      "hint": "Simulated demo clock: it moves one minute for every real minute. SLAs and PQRS terms are calculated with this time.",
+      "hint": "Simulated demo clock: it moves one minute for every real minute while the page is open, unless you pause it. SLAs and PQRS terms are calculated with this time.",
+      "pausedLabel": "(paused)",
+      "pause": "Pause clock",
+      "resume": "Resume clock",
+      "pauseHint": "Stop the demo clock so SLAs don’t move while you explain or read",
+      "pausedToast": "Demo clock paused: SLAs won’t move until you resume it.",
+      "resumedToast": "Demo clock running again.",
       "advance": "+15 min",
       "advanceHint": "Move the demo clock forward 15 minutes to watch SLAs expire",
       "advanced": "You moved the demo clock forward 15 minutes."
@@ -69,7 +110,7 @@
       "autoHint": "New messages the auto-reply answered without an agent, out of all messages evaluated in the log."
     },
     "channels": {
-      "title": "Channels",
+      "title": "Channels (active tickets)",
       "all": "All",
       "email": "Email",
       "webchat": "Web chat",
@@ -120,7 +161,7 @@
       "search": "Search by ticket, customer, subject, filing number or text…",
       "newTicket": "Simulate incoming ticket",
       "noResults": "No tickets match those filters.",
-      "count": "{count, plural, one {# ticket} other {# tickets}}",
+      "count": "{count, plural, one {# ticket} other {# tickets}} · {active} active",
       "unassigned": "Unassigned",
       "viewLabel": "View",
       "views": {
@@ -161,6 +202,7 @@
       "firstIn": "1st reply in {time}",
       "resolutionIn": "Resolution in {time}",
       "breached": "SLA breached {time} ago",
+      "breachedNow": "SLA breached just now",
       "waiting": "Waiting on customer",
       "waitingHint": "You already replied to the customer; the SLA is measured again when they answer.",
       "pqrsLeft": "{n, plural, one {Due in # business day} other {Due in # business days}}",
@@ -266,17 +308,21 @@
       "title": "AI draft",
       "button": "Draft with AI",
       "again": "Generate again",
-      "hint": "Calls an AI model from our server. It answers only with the articles of this demo’s knowledge base and cites the source; review it before sending.",
+      "hint": "Sends this ticket’s customer messages to our server, which asks an AI model (we don’t store the conversation). It answers only with the articles of this demo’s knowledge base and cites the source; review it before sending.",
       "preparing": "Loading the knowledge base on the server…",
       "asking": "Asking the model…",
       "modeLlm": "Generated by {model} in {ms} ms · approx. cost USD {cost}",
       "modeExtractive": "The server has no AI key configured: these are the most relevant excerpts from the knowledge base (extractive mode, no model).",
       "modeProviderError": "The AI provider did not respond: these are the most relevant excerpts from the knowledge base (extractive mode).",
+      "modeBudget": "This demo’s monthly AI quota is used up: these are the most relevant excerpts from the knowledge base (extractive mode, no model).",
+      "modeUnavailable": "AI is not available right now: these are the most relevant excerpts from the knowledge base (extractive mode, no model).",
       "sources": "Sources",
+      "sourceHint": "See the text of the source the draft cited",
       "insert": "Insert into the reply (without citations)",
       "errors": {
         "network": "We couldn’t reach the AI server. Use the knowledge base templates or try again.",
-        "rateLimited": "There are too many requests right now. Wait a minute and try again.",
+        "rateLimited": "You sent many requests in a row. Wait a minute and try again.",
+        "rateLimitedCreate": "The server limits how many demo knowledge bases can be created from the same connection, and that limit was reached. Try again later (it can take up to an hour) or use the suggested replies from the knowledge base.",
         "server": "The AI server returned an error. Try again in a moment."
       },
       "botName": "AI Helpdesk (demo) · knowledge base",
@@ -560,7 +606,7 @@
       "city": "City",
       "message": "Customer message",
       "messageError": "Write a message with at least 10 characters.",
-      "note": "The message never leaves your browser: classification and assignment use this demo’s rules.",
+      "note": "Classification, macros and assignment are calculated in your browser with this demo’s rules. Only if you then click “Draft with AI” are the customer’s messages sent to our server to generate the draft.",
       "submit": "Receive ticket"
     },
     "toasts": {

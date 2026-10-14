@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState, type KeyboardEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import {
@@ -70,6 +70,17 @@ export default function Header({
   const t = useTranslations('demoLms');
   const { state, reset } = useLms();
   const [confirm, setConfirm] = useState(false);
+  const roleRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  // Pestañas de rol: flechas, Inicio y Fin cambian de rol y mueven el foco.
+  const onRoleKey = (e: KeyboardEvent<HTMLButtonElement>, i: number) => {
+    const last = ROLES.length - 1;
+    const next = e.key === 'ArrowRight' ? (i === last ? 0 : i + 1) : e.key === 'ArrowLeft' ? (i === 0 ? last : i - 1) : e.key === 'Home' ? 0 : e.key === 'End' ? last : -1;
+    if (next < 0) return;
+    e.preventDefault();
+    onRole(ROLES[next]);
+    roleRefs.current[next]?.focus();
+  };
 
   return (
     <header className="relative md:sticky md:top-20 z-30 backdrop-blur-md bg-white/80 dark:bg-secondary-900/80 border-b border-secondary-200 dark:border-secondary-800">
@@ -80,7 +91,7 @@ export default function Header({
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-base font-bold tracking-tight text-secondary-900 dark:text-white leading-tight">{ACADEMY.name}</h1>
+              <p className="text-base font-bold tracking-tight text-secondary-900 dark:text-white leading-tight">{ACADEMY.name}</p>
               <span
                 title={t('header.sampleHint')}
                 className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200 border border-amber-200 dark:border-amber-800"
@@ -93,13 +104,22 @@ export default function Header({
         </div>
 
         <div className="ml-auto flex items-center gap-2 flex-wrap">
-          <div className="flex items-center gap-1 p-1 rounded-xl bg-secondary-100 dark:bg-secondary-800" role="tablist" aria-label={t('header.roleLabel')}>
-            {ROLES.map((r) => (
+          <span className="text-xs font-medium text-secondary-500 dark:text-secondary-400" title={t('header.roleHint')} id="lms-role-label">
+            {t('header.roleLabel')}
+          </span>
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-secondary-100 dark:bg-secondary-800" role="tablist" aria-labelledby="lms-role-label">
+            {ROLES.map((r, i) => (
               <button
                 key={r}
+                ref={(el) => {
+                  roleRefs.current[i] = el;
+                }}
                 type="button"
                 role="tab"
                 aria-selected={role === r}
+                tabIndex={role === r ? 0 : -1}
+                title={t('header.roleHint')}
+                onKeyDown={(e) => onRoleKey(e, i)}
                 onClick={() => onRole(r)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   role === r
@@ -127,7 +147,7 @@ export default function Header({
             onClick={() => onSection(n.key)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
               section === n.key
-                ? 'bg-primary-500 text-white shadow-sm'
+                ? 'bg-primary-600 text-white shadow-sm'
                 : 'text-secondary-600 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800'
             }`}
           >

@@ -10,7 +10,7 @@ import Card, { CardContent } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { BRAND, SEDES, SEDE_BY_ID, ZONES } from './data';
 import {
-  DEMO_DATE, GPS_FAR_M, BIG_CASH_LIMIT, RAIN_BONUS, RAIN_FEE, commissionSaved, computeKpis, driverLoad, driverPosition, fmtDate, fmtKm, fmtNum,
+  GPS_FAR_M, BIG_CASH_LIMIT, RAIN_BONUS, RAIN_FEE, commissionSaved, computeKpis, driverLoad, driverPosition, fmtDate, fmtKm, fmtNum,
   fmtTime, isActive, isLate, opsAlerts, ordersByZone, stageTimes, suggestDrivers, toCsv, type OpsAlert,
 } from './engine';
 import type { Order } from './types';
@@ -64,7 +64,7 @@ export default function OpsApp() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `pedidos-fogon-demo-${DEMO_DATE}.csv`;
+    a.download = t('ops.csvFile', { date: state.date });
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -88,7 +88,7 @@ export default function OpsApp() {
                 <ChartBarSquareIcon className="h-5 w-5 text-primary-500" />
                 {t('ops.title', { brand: BRAND })}
               </h2>
-              <p className="text-xs text-secondary-500 dark:text-secondary-400">{t('ops.subtitle', { date: fmtDate(DEMO_DATE, months), time: fmtTime(state.now, locale) })}</p>
+              <p className="text-xs text-secondary-500 dark:text-secondary-400">{t('ops.subtitle', { date: fmtDate(state.date, months), time: fmtTime(state.now, locale) })}</p>
             </div>
             <Button size="sm" variant="outline" onClick={exportCsv}>
               <ArrowDownTrayIcon className="mr-1 h-4 w-4" />{t('ops.exportCsv')}
@@ -99,7 +99,7 @@ export default function OpsApp() {
             <Kpi title={t('ops.kpis.active')} value={String(k.active)} icon={TruckIcon} color="text-orange-500" />
             <Kpi title={t('ops.kpis.drivers')} value={`${online.length}/${state.drivers.length}`} icon={UserGroupIcon} color="text-emerald-500" />
             <Kpi title={t('ops.kpis.avgDelivery')} value={`${k.avgDeliveryMin} ${t('common.min')}`} icon={ClockIcon} color="text-amber-500" />
-            <Kpi title={t('ops.kpis.onTime')} value={`${k.onTimePct} %`} icon={CheckBadgeIcon} color="text-sky-500" />
+            <Kpi title={t('ops.kpis.onTime')} value={locale === 'en' ? `${k.onTimePct}%` : `${k.onTimePct} %`} icon={CheckBadgeIcon} color="text-sky-500" />
             <Kpi title={t('ops.kpis.avgTicket')} value={money(k.avgTicket)} icon={BanknotesIcon} color="text-violet-500" />
           </div>
           <p className="mt-2 text-[11px] text-secondary-500 dark:text-secondary-400">{t('ops.kpis.note')}</p>

@@ -53,8 +53,12 @@ export interface Employee {
   name: string;
   role: Role;
   sede: string;
-  clockedIn: boolean;
-  since: string;
+  /**
+   * Minutos antes de abrir la demo en que marcó entrada (null: no ha marcado).
+   * La hora exacta se calcula en el navegador con la hora de Colombia, para que
+   * turnos y marcaciones sean coherentes con la hora a la que se usa la demo.
+   */
+  sinceMin: number | null;
 }
 
 export interface Customer {
@@ -137,8 +141,8 @@ const RESTAURANT_PRODUCTS: Product[] = [
   { id: 'f16', name: 'Brevas con arequipe', price: 10000, category: 'desserts', emoji: '🍯', tax: 'inc8', station: 'kitchen', stock: [10, 3, 9], min: 4 },
 ];
 
-const emp = (id: string, name: string, role: Role, sede: string, clockedIn: boolean, since: string): Employee => ({
-  id, name, role, sede, clockedIn, since,
+const emp = (id: string, name: string, role: Role, sede: string, sinceMin: number | null): Employee => ({
+  id, name, role, sede, sinceMin,
 });
 
 export const PRESETS: Record<PresetId, Preset> = {
@@ -159,18 +163,18 @@ export const PRESETS: Record<PresetId, Preset> = {
       { id: 'lc-laureles', name: 'Medellín · Laureles', address: 'Cra. 76 # 33-12, Medellín', prefix: 'LC3', nextNumber: 1765, otherTills: { tickets: 39, total: 1876500 } },
     ],
     employees: [
-      emp('e-r1', 'Sofía Pardo', 'cashier', 'lc-chapinero', true, '07:00'),
-      emp('e-r2', 'Camila Ortiz', 'seller', 'lc-chapinero', true, '07:30'),
-      emp('e-r3', 'Mateo Salcedo', 'seller', 'lc-chapinero', false, '—'),
-      emp('e-r4', 'Julián Vargas', 'supervisor', 'lc-chapinero', true, '06:45'),
-      emp('e-r5', 'Daniela Muñoz', 'cashier', 'lc-suba', true, '07:00'),
-      emp('e-r6', 'Kevin Arango', 'seller', 'lc-suba', true, '08:00'),
-      emp('e-r7', 'Luisa Becerra', 'seller', 'lc-suba', false, '—'),
-      emp('e-r8', 'Óscar Rincón', 'supervisor', 'lc-suba', true, '06:50'),
-      emp('e-r9', 'Natalia Restrepo', 'cashier', 'lc-laureles', true, '07:15'),
-      emp('e-r10', 'Santiago Henao', 'seller', 'lc-laureles', true, '07:45'),
-      emp('e-r11', 'Manuela Zapata', 'seller', 'lc-laureles', false, '—'),
-      emp('e-r12', 'Carlos Mejía', 'supervisor', 'lc-laureles', true, '06:30'),
+      emp('e-r1', 'Sofía Pardo', 'cashier', 'lc-chapinero', 240),
+      emp('e-r2', 'Camila Ortiz', 'seller', 'lc-chapinero', 210),
+      emp('e-r3', 'Mateo Salcedo', 'seller', 'lc-chapinero', null),
+      emp('e-r4', 'Julián Vargas', 'supervisor', 'lc-chapinero', 255),
+      emp('e-r5', 'Daniela Muñoz', 'cashier', 'lc-suba', 240),
+      emp('e-r6', 'Kevin Arango', 'seller', 'lc-suba', 180),
+      emp('e-r7', 'Luisa Becerra', 'seller', 'lc-suba', null),
+      emp('e-r8', 'Óscar Rincón', 'supervisor', 'lc-suba', 250),
+      emp('e-r9', 'Natalia Restrepo', 'cashier', 'lc-laureles', 225),
+      emp('e-r10', 'Santiago Henao', 'seller', 'lc-laureles', 195),
+      emp('e-r11', 'Manuela Zapata', 'seller', 'lc-laureles', null),
+      emp('e-r12', 'Carlos Mejía', 'supervisor', 'lc-laureles', 270),
     ],
     tables: [],
   },
@@ -191,21 +195,21 @@ export const PRESETS: Record<PresetId, Preset> = {
       { id: 'fa-granada', name: 'Cali · Granada', address: 'Av. 9N # 12-18, Cali', prefix: 'FA3', nextNumber: 1984, otherTills: { tickets: 22, total: 2101000 } },
     ],
     employees: [
-      emp('e-f1', 'Paula Guerrero', 'cashier', 'fa-usaquen', true, '11:00'),
-      emp('e-f2', 'Ana Martínez', 'waiter', 'fa-usaquen', true, '11:00'),
-      emp('e-f3', 'Luis Gómez', 'waiter', 'fa-usaquen', true, '11:30'),
-      emp('e-f4', 'Diego Ruiz', 'cook', 'fa-usaquen', true, '10:00'),
-      emp('e-f5', 'Felipe Castro', 'bartender', 'fa-usaquen', false, '—'),
-      emp('e-f6', 'Laura Cardona', 'cashier', 'fa-poblado', true, '11:00'),
-      emp('e-f7', 'Jhon Ospina', 'waiter', 'fa-poblado', true, '11:00'),
-      emp('e-f8', 'Valeria Giraldo', 'waiter', 'fa-poblado', false, '—'),
-      emp('e-f9', 'Esteban Arias', 'cook', 'fa-poblado', true, '10:00'),
-      emp('e-f10', 'Sara Montoya', 'bartender', 'fa-poblado', true, '11:00'),
-      emp('e-f11', 'Marcela Lozano', 'cashier', 'fa-granada', true, '11:15'),
-      emp('e-f12', 'Brayan Mosquera', 'waiter', 'fa-granada', true, '11:15'),
-      emp('e-f13', 'Yuliana Caicedo', 'waiter', 'fa-granada', true, '12:00'),
-      emp('e-f14', 'Hernán Valencia', 'cook', 'fa-granada', true, '10:30'),
-      emp('e-f15', 'Tatiana Rivas', 'bartender', 'fa-granada', false, '—'),
+      emp('e-f1', 'Paula Guerrero', 'cashier', 'fa-usaquen', 150),
+      emp('e-f2', 'Ana Martínez', 'waiter', 'fa-usaquen', 150),
+      emp('e-f3', 'Luis Gómez', 'waiter', 'fa-usaquen', 120),
+      emp('e-f4', 'Diego Ruiz', 'cook', 'fa-usaquen', 210),
+      emp('e-f5', 'Felipe Castro', 'bartender', 'fa-usaquen', null),
+      emp('e-f6', 'Laura Cardona', 'cashier', 'fa-poblado', 150),
+      emp('e-f7', 'Jhon Ospina', 'waiter', 'fa-poblado', 150),
+      emp('e-f8', 'Valeria Giraldo', 'waiter', 'fa-poblado', null),
+      emp('e-f9', 'Esteban Arias', 'cook', 'fa-poblado', 210),
+      emp('e-f10', 'Sara Montoya', 'bartender', 'fa-poblado', 150),
+      emp('e-f11', 'Marcela Lozano', 'cashier', 'fa-granada', 135),
+      emp('e-f12', 'Brayan Mosquera', 'waiter', 'fa-granada', 135),
+      emp('e-f13', 'Yuliana Caicedo', 'waiter', 'fa-granada', 90),
+      emp('e-f14', 'Hernán Valencia', 'cook', 'fa-granada', 180),
+      emp('e-f15', 'Tatiana Rivas', 'bartender', 'fa-granada', null),
     ],
     tables: [
       { id: 1, seats: 2 }, { id: 2, seats: 2 }, { id: 3, seats: 4 }, { id: 4, seats: 4 }, { id: 5, seats: 4 },

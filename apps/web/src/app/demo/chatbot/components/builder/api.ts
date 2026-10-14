@@ -14,8 +14,16 @@
  *  - Compatibilidad: si el backend todavía no devuelve `ownerToken`, el bot
  *    queda registrado sin token y NO se envía el header (así no se rompe el
  *    preflight CORS de un backend que aún no lo permite).
- *  - Leer la configuración pública (GET /bots/:id) y conversar
- *    (POST /bots/:id/chat) no requieren token: los usa el widget embebido.
+ *  - Leer la configuración (GET /bots/:id) envía el token si este navegador
+ *    lo tiene: el dueño recibe la lista de documentos; sin token llega la
+ *    vista pública (sin documentos, solo `docsCount`), la que usa el widget.
+ *  - Conversar (POST /bots/:id/chat) no requiere token.
+ *
+ * Bots de ejemplo ("Prueba el asistente"): se crean con `kind: "sample"`
+ * (el backend no guarda sus conversaciones y los borra si no se usan). Si el
+ * backend anuncia `sharedSampleBots` en GET /models, se piden a
+ * POST /sample-bots, que reutiliza el mismo bot para todos los visitantes
+ * (ver `requestSharedSampleBot`).
  */
 import { BACKEND_URL as RAW_BASE } from '@/lib/backend-url';
 
@@ -43,8 +51,17 @@ export interface RemoteBotConfig {
   createdAt: string;
   updatedAt: string;
   docs?: RemoteBotDoc[];
+  /** Vista pública (sin token de dueño): cuántos documentos tiene el bot. */
+  docsCount?: number;
+  /** true si el servidor reconoció a este navegador como dueño del bot. */
+  owned?: boolean;
   /** Solo en la respuesta de creación, si el backend ya implementa la propiedad de bots. */
   ownerToken?: string;
+}
+
+/** Documentos del bot: la lista si eres el dueño, o `docsCount` en la vista pública. */
+export function docsCountOf(bot: Pick<RemoteBotConfig, 'docs' | 'docsCount'>): number {
+  return Math.max(bot.docs?.length ?? 0, typeof bot.docsCount === 'number' ? bot.docsCount : 0);
 }
 
 export interface RemoteChatReplySource {
@@ -75,7 +92,11 @@ export interface RemoteChatReply {
   tokens?: { prompt?: number; completion?: number; total?: number };
   /** Costo estimado del request en USD (solo cuando hubo llamada al modelo). */
   costUSD?: number;
-  /** `llm_provider_error` si el proveedor del modelo falló (sin exponer la clave). */
+  /**
+   * Motivo del modo extractivo: `llm_not_configured` (sin clave de IA),
+   * `budget_exhausted` / `budget_unavailable` (tope de gasto) o
+   * `llm_provider_error` (el proveedor falló; sin exponer la clave).
+   */
   error?: string;
   timestamp: string;
 }
@@ -93,6 +114,8 @@ export interface RemoteModelMeta {
 export interface RemoteModelsResponse {
   available: RemoteModelMeta[];
   activeProvider: 'openai' | null;
+  /** El backend ofrece POST /sample-bots (bots de ejemplo compartidos). */
+  sharedSampleBots?: boolean;
 }
 
 export interface RemoteConversationTurn {
@@ -114,13 +137,19 @@ const API_BASE = `${RAW_BASE}/api/chatbot`;
 
 export const OWNER_TOKEN_HEADER = 'X-Bot-Owner-Token';
 
-/** Error HTTP con el status, para distinguir 401/403/404 en la UI. */
+/**
+ * Error HTTP con el status y el código del backend (`code`, o `error` en las
+ * respuestas antiguas), para distinguir límite de uso, capacidad, 404… en la UI.
+ * `status` 0 = no hubo respuesta (red).
+ */
 export class BotApiError extends Error {
   readonly status: number;
+  readonly code: string | null;
 
-  constructor(status: number, message: string) {
+  constructor(status: number, message: string, code: string | null = null) {
     super(message);
     this.status = status;
+    this.code = code;
   }
 }
 
@@ -139,6 +168,8 @@ export interface OwnedBotEntry {
   kind: OwnedBotKind;
   /** Clave de la empresa de ejemplo + idioma + versión (solo kind = sample). */
   sampleKey?: string;
+  /** Bot de ejemplo compartido por el servidor (sin dueño: no se edita ni se borra). */
+  shared?: boolean;
   savedAt: string;
 }
 
@@ -168,7 +199,7 @@ function writeOwned(data: OwnedBots): void {
 /** Guarda (o actualiza) un bot propio. Conserva el token previo si no llega uno nuevo. */
 export function rememberBot(
   botId: string,
-  entry: { name: string; kind: OwnedBotKind; ownerToken?: string | null; sampleKey?: string },
+  entry: { name: string; kind: OwnedBotKind; ownerToken?: string | null; sampleKey?: string; shared?: boolean },
 ): void {
   const all = readOwned();
   const prev = all[botId];
@@ -177,6 +208,7 @@ export function rememberBot(
     name: entry.name,
     kind: entry.kind,
     sampleKey: entry.sampleKey ?? prev?.sampleKey,
+    shared: entry.shared ?? prev?.shared,
     savedAt: new Date().toISOString(),
   };
   writeOwned(all);
@@ -231,21 +263,33 @@ async function jsonFetch<T>(input: string, init?: RequestInit): Promise<T> {
   }
   if (!res.ok) {
     const text = await res.text().catch(() => '');
-    throw new BotApiError(res.status, `HTTP ${res.status}${text ? ` — ${text.slice(0, 200)}` : ''}`);
+    let code: string | null = null;
+    try {
+      const body = JSON.parse(text) as { code?: unknown; error?: unknown };
+      if (typeof body.code === 'string') code = body.code;
+      else if (typeof body.error === 'string') code = body.error;
+    } catch {
+      /* cuerpo que no es JSON */
+    }
+    throw new BotApiError(res.status, `HTTP ${res.status}${text ? ` — ${text.slice(0, 200)}` : ''}`, code);
   }
   return (await res.json()) as T;
 }
 
 const botUrl = (botId: string) => `${API_BASE}/bots/${encodeURIComponent(botId)}`;
 
-/** Crea un bot y registra su token de dueño (si el backend lo devuelve). */
+/**
+ * Crea un bot y registra su token de dueño (si el backend lo devuelve). El
+ * tipo (`builder` o `sample`) viaja en el cuerpo: el backend no guarda las
+ * conversaciones de los bots de ejemplo.
+ */
 export async function createBot(
   payload: Partial<RemoteBotConfig>,
   meta: { kind: OwnedBotKind; sampleKey?: string },
 ): Promise<RemoteBotConfig> {
   const created = await jsonFetch<RemoteBotConfig>(`${API_BASE}/bots`, {
     method: 'POST',
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ ...payload, kind: meta.kind }),
   });
   rememberBot(created.botId, {
     name: created.name,
@@ -256,9 +300,12 @@ export async function createBot(
   return created;
 }
 
-/** Configuración pública del bot (sin token). */
+/**
+ * Configuración del bot. Con el token de este navegador llega completa (con
+ * sus documentos); sin token, la vista pública (`docs` vacío y `docsCount`).
+ */
 export async function getBot(botId: string): Promise<RemoteBotConfig> {
-  return jsonFetch<RemoteBotConfig>(botUrl(botId));
+  return jsonFetch<RemoteBotConfig>(botUrl(botId), { headers: ownerHeaders(botId) });
 }
 
 export async function patchBot(botId: string, payload: Partial<RemoteBotConfig>): Promise<RemoteBotConfig> {
@@ -269,11 +316,14 @@ export async function patchBot(botId: string, payload: Partial<RemoteBotConfig>)
   });
 }
 
-/** Borra el bot (documentos, fragmentos y conversaciones) y lo saca del registro local. */
-export async function deleteBot(botId: string): Promise<{ deleted: true; botId: string }> {
+/**
+ * Borra el bot (documentos, fragmentos y conversaciones) y lo saca del registro
+ * local. `ownerToken` sirve cuando el bot ya se quitó del registro.
+ */
+export async function deleteBot(botId: string, ownerToken?: string): Promise<{ deleted: true; botId: string }> {
   const res = await jsonFetch<{ deleted: true; botId: string }>(botUrl(botId), {
     method: 'DELETE',
-    headers: ownerHeaders(botId),
+    headers: ownerToken ? { [OWNER_TOKEN_HEADER]: ownerToken } : ownerHeaders(botId),
   });
   forgetBot(botId);
   return res;
@@ -289,7 +339,7 @@ export interface UploadFilePayload {
 export async function uploadBotDocs(
   botId: string,
   files: UploadFilePayload[],
-): Promise<{ docs: RemoteBotDoc[]; added: RemoteBotDoc[] }> {
+): Promise<{ docs: RemoteBotDoc[]; added: RemoteBotDoc[]; errors?: Array<{ name: string; reason: string }> }> {
   return jsonFetch(`${botUrl(botId)}/docs`, {
     method: 'POST',
     headers: ownerHeaders(botId),
@@ -304,21 +354,89 @@ export async function deleteBotDoc(botId: string, docId: string): Promise<{ docs
   });
 }
 
+/**
+ * Pregunta al bot. `lang` (idioma de la página) elige el idioma de los textos
+ * que escribe el servidor sin modelo ("No encontré esa información…", notas
+ * del modo extractivo); sin él, el servidor usa el primer idioma del bot.
+ */
 export async function chatWithBot(
   botId: string,
   message: string,
   history: Array<{ role: string; content: string }>,
   model?: string,
+  lang?: 'es' | 'en',
 ): Promise<RemoteChatReply> {
   return jsonFetch(`${botUrl(botId)}/chat`, {
     method: 'POST',
-    body: JSON.stringify({ message, history, model }),
+    body: JSON.stringify({ message, history, model, lang }),
   });
 }
 
+/**
+ * ¿El backend ofrece POST /sample-bots? Lo anuncia GET /models
+ * (`sharedSampleBots: true`). `null` = todavía no se sabe.
+ */
+let sharedSampleBotsAvailable: boolean | null = null;
+let modelsRequest: Promise<RemoteModelsResponse> | null = null;
+
 /** Modelos de OpenAI soportados y si hay clave configurada (`enabled`). */
 export async function listModels(): Promise<RemoteModelsResponse> {
-  return jsonFetch<RemoteModelsResponse>(`${API_BASE}/models`);
+  const request = jsonFetch<RemoteModelsResponse>(`${API_BASE}/models`);
+  modelsRequest = request;
+  try {
+    const data = await request;
+    sharedSampleBotsAvailable = data.sharedSampleBots === true;
+    return data;
+  } catch (err) {
+    if (modelsRequest === request) modelsRequest = null;
+    throw err;
+  }
+}
+
+/** Espera la respuesta de GET /models (o la pide) para saber si hay bots de ejemplo compartidos. */
+async function sharedSampleBotsSupported(): Promise<boolean> {
+  if (sharedSampleBotsAvailable !== null) return sharedSampleBotsAvailable;
+  try {
+    await (modelsRequest ?? listModels());
+  } catch {
+    return false;
+  }
+  return sharedSampleBotsAvailable === true;
+}
+
+export interface SharedSampleBotRequest {
+  /** Empresa de ejemplo + idioma + versión de los textos (p. ej. `rrhh:es:2026-10-v1`). */
+  sampleKey: string;
+  config: Pick<RemoteBotConfig, 'name' | 'welcome' | 'systemPrompt' | 'tone' | 'color' | 'position' | 'avatar' | 'languages'>;
+  files: UploadFilePayload[];
+}
+
+export interface SharedSampleBotResponse {
+  botId: string;
+  docs: RemoteBotDoc[];
+  shared: true;
+}
+
+/**
+ * Bot de ejemplo compartido: el servidor devuelve el bot que ya tiene
+ * exactamente esos textos (lo crea la primera vez), así cada navegador no crea
+ * el suyo. Devuelve null si el backend no ofrece la ruta (se crea uno propio).
+ */
+export async function requestSharedSampleBot(payload: SharedSampleBotRequest): Promise<SharedSampleBotResponse | null> {
+  if (!(await sharedSampleBotsSupported())) return null;
+  try {
+    const res = await jsonFetch<SharedSampleBotResponse>(`${API_BASE}/sample-bots`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    return res && typeof res.botId === 'string' ? res : null;
+  } catch (err) {
+    if (err instanceof BotApiError && (err.status === 404 || err.status === 405)) {
+      sharedSampleBotsAvailable = false;
+      return null;
+    }
+    throw err;
+  }
 }
 
 /** Historial de conversaciones del bot (operación del dueño). */

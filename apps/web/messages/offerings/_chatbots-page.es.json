@@ -4,9 +4,9 @@
       "badge": "Chatbots RAG",
       "title": "Chatbots RAG para WhatsApp y web",
       "subtitle": "Un chatbot que responde a tus clientes y a tu equipo con los documentos de tu empresa —manuales, políticas, catálogos, preguntas frecuentes— y cita la fuente de cada respuesta. En tu sitio web y en WhatsApp.",
-      "ctaDemo": "Probar la demo",
-      "ctaPilot": "Agenda un piloto",
-      "price": "Desde {essentialFrom}, o piloto de {pilotFrom}. Más IVA si aplica.",
+      "ctaDemo": "Prueba con tu documento",
+      "ctaPilot": "Cotizar el piloto",
+      "price": "Piloto: {pilotFrom}, pago único. Planes desde {essentialFrom} de implementación + {essentialMonthlyFrom} al mes. Más IVA si aplica.",
       "ragLink": "Cómo funciona un chatbot con los documentos de tu empresa"
     },
     "benefits": {
@@ -26,8 +26,8 @@
           "desc": "No hay que reentrenar ningún modelo: el chatbot consulta tus documentos en cada pregunta, así que responde con la versión que tengas cargada."
         },
         "notFound": {
-          "title": "No inventa respuestas",
-          "desc": "Si la respuesta no está en tus documentos, dice «no encontré esa información» en lugar de adivinar."
+          "title": "Instruido para no inventar",
+          "desc": "Si la respuesta no está en tus documentos, dice «no encontré esa información» en lugar de adivinar. Cada dato trae su cita para que lo verifiques."
         },
         "anyHour": {
           "title": "Responde a cualquier hora",
@@ -35,7 +35,7 @@
         },
         "sources": {
           "title": "Conectado a tus fuentes",
-          "desc": "Google Drive, SharePoint o carga manual de documentos; según el plan, también bases de datos y APIs."
+          "desc": "Carga manual de documentos y páginas web; según el plan, conectores a Google Drive, SharePoint, bases de datos y APIs que se construyen en tu proyecto."
         }
       }
     },
@@ -50,7 +50,7 @@
       "whatsapp": {
         "title": "WhatsApp",
         "plan": "Desde el plan Profesional",
-        "desc": "Tus clientes o tu equipo preguntan por WhatsApp y reciben la respuesta con su fuente, a través de la API oficial de WhatsApp Business. El plan Profesional incluye web y WhatsApp."
+        "desc": "En tu proyecto construimos el canal de WhatsApp con la API oficial de WhatsApp Business: tus clientes o tu equipo reciben allí la respuesta con su fuente. La demo de este sitio funciona solo en la web."
       },
       "metaNote": "Las tarifas de Meta por mensajes de WhatsApp se cobran aparte, al costo."
     },
@@ -93,7 +93,7 @@
       "steps": {
         "pilot": {
           "title": "1. Piloto ({pilotWeeks} semanas)",
-          "desc": "Cargamos hasta 100 documentos de una fuente, pruebas el chatbot en una interfaz web con citas y recibes un informe de precisión con 50 preguntas de prueba."
+          "desc": "Nos entregas hasta 100 documentos de un solo origen y 50 preguntas reales con la respuesta que esperas; pruebas el chatbot en una interfaz web con citas y recibes el informe de precisión."
         },
         "implementation": {
           "title": "2. Implementación",
@@ -105,7 +105,7 @@
         },
         "updates": {
           "title": "4. Actualización y soporte",
-          "desc": "Cuando agregas o cambias documentos, el chatbot se actualiza. En el plan Esencial, la mensualidad incluye hosting, actualización de documentos y soporte Lun–Vie."
+          "desc": "Cuando agregas o cambias documentos, el chatbot se actualiza. En el plan Esencial, la mensualidad incluye alojamiento, actualización de documentos y soporte de lunes a viernes."
         }
       }
     },
@@ -114,15 +114,15 @@
       "items": {
         "cost": {
           "q": "¿Cuánto cuesta un chatbot RAG?",
-          "a": "Desde {essentialFrom}, o piloto de {pilotFrom}. En detalle: el piloto de {pilotWeeks} semanas cuesta {pilotPrice}; el plan Esencial (sitio web), {essentialSetup} de setup más {essentialMonthly} al mes, y el Profesional (sitio web y WhatsApp), {proSetup} de setup más {proMonthly} al mes. Todos los precios son más IVA si aplica, y las tarifas de Meta por mensajes de WhatsApp se cobran aparte, al costo."
+          "a": "El piloto de {pilotWeeks} semanas cuesta {pilotPrice}, pago único. El plan Esencial (sitio web) cuesta {essentialSetup} de implementación más {essentialMonthly} al mes, y el Profesional (sitio web y WhatsApp), {proSetup} de implementación más {proMonthly} al mes. Todos los precios son más IVA si aplica, y las tarifas de Meta por mensajes de WhatsApp se cobran aparte, al costo. El detalle, con el total con IVA y el costo del primer año, está en los planes."
         },
         "time": {
           "q": "¿En cuánto tiempo tengo mi chatbot funcionando?",
-          "a": "El piloto con tus documentos toma {pilotWeeks} semanas. La implementación toma {essentialWeeks} semanas en el plan Esencial y {proWeeks} semanas en el Profesional, que agrega WhatsApp y hasta 3 fuentes."
+          "a": "El piloto con tus documentos toma {pilotWeeks} semanas. La implementación toma {essentialWeeks} semanas en el plan Esencial y {proWeeks} semanas en el Profesional, que agrega WhatsApp y hasta 3 orígenes de documentos."
         },
         "whatsapp": {
           "q": "¿El chatbot funciona en WhatsApp?",
-          "a": "Sí. Desde el plan Profesional, el chatbot responde en tu sitio web y en WhatsApp, a través de la API oficial de WhatsApp Business. El plan Esencial incluye el widget para tu sitio web. Las tarifas de Meta por mensajes de WhatsApp se cobran aparte, al costo."
+          "a": "Sí, desde el plan Profesional: en tu proyecto construimos el canal de WhatsApp con la API oficial de WhatsApp Business, y el chatbot responde allí y en tu sitio web. El plan Esencial incluye el widget para tu sitio web. La demo de este sitio funciona solo en la web. Las tarifas de Meta por mensajes de WhatsApp se cobran aparte, al costo."
         },
         "technology": {
           "q": "¿Qué tecnología de IA usan?",
@@ -140,9 +140,9 @@
     },
     "cta": {
       "title": "¿Quieres un chatbot que responda con tus documentos?",
-      "subtitle": "Prueba la demo gratis, sin registro, o agenda un piloto de {pilotWeeks} semanas con los documentos de tu empresa.",
-      "demo": "Probar la demo",
-      "pilot": "Agenda un piloto",
+      "subtitle": "Prueba la demo gratis: los ejemplos no piden registro y para usar tu propio documento solo te pedimos un email. O cotiza un piloto de {pilotWeeks} semanas con los documentos de tu empresa.",
+      "demo": "Prueba con tu documento",
+      "pilot": "Cotizar el piloto",
       "plans": "Ver planes y precios"
     }
   }

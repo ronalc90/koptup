@@ -51,7 +51,7 @@ Esta página es el plan técnico del backend. Para cada módulo dice qué hace h
 | Sistema de demos y Leads | — | ≈ 45 nuevos | — | — | **Nuevo** | 1 |
 | Mensajería (email, WhatsApp, avisos internos) | servicios | — | 890 | Contacto, pedidos, restablecer contraseña | **Refactorizar** hacia el outbox unificado | 1 |
 | Chatbot RAG: constructor y playground | `/api/chatbot/bots/*`, `/models` | 12 | ≈ 950 | `/demo/chatbot` | **Refactorizar** (MongoDB, S3 y núcleo RAG) | 0–2 |
-| Chatbot heredado "por sesión" | `/api/chatbot/session`, `/upload`, `/message`… | 7 | ≈ 700 | Solo la página huérfana `/demo/chatbot/preview` | **Eliminar** | 2 |
+| Chatbot heredado "por sesión" | `/api/chatbot/session`, `/upload`, `/message`… | 7 | ≈ 700 | Ninguno | **Eliminado** (14 de octubre de 2026; limpieza única de sus datos al arrancar) | 2 |
 | Documentos | `/api/documents` | 11 | 1.220 | `/demo/gestor-documentos` | **Refactorizar** (modo muestra, grant y núcleo RAG) | 1–2 |
 | Portal: proyectos, pedidos, facturas, entregables, mensajes, notificaciones | 6 routers | 37 | 3.850 | `/dashboard` y `/admin` | **Mantener y refactorizar** | 1–3 |
 | Propuestas (`Quote`) | `/api/quotes` | 1 | 70 | Ninguno | **Eliminar** el POST público; se reconstruye en la Fase 3 | 0 y 3 |
@@ -145,7 +145,7 @@ flowchart LR
 | Autenticación | `routes/auth.routes.ts`, `controllers/auth.controller.ts` (337 líneas), `config/passport.ts`, `middleware/auth.ts` | `User` en MongoDB. Refresco y restablecimiento en Redis (`auth.controller.ts` líneas 100, 136, 243) | — | Login, registro, Google, recuperar |
 | Administración | `routes/admin.routes.ts` (todo el router con `authorize('admin','manager')`, línea 21), `controllers/admin.controller.ts` (535 líneas: pedidos, facturas, entregables, conversaciones, usuarios y contactos en un solo archivo) | MongoDB | — | `/admin/*` |
 | Contacto | `routes/contact.routes.ts`, `controllers/contact.controller.ts` | `Contact` (`new · read · responded`) | — | `/contact` |
-| Chatbot (2 APIs) | `routes/chatbot.routes.ts` (943 líneas), `controllers/chatbot.controller.ts`, `services/chatbot.service.ts`, `models/Chatbot.ts`, `data/chatbot-store.ts` | Constructor: 4 `Map` en memoria (líneas 107–110) volcados a `data/chatbots/state.json`. Heredado: modelo `Chatbot` en MongoDB y archivos en `uploads/chatbot` | OpenAI opcional (líneas 601–720). Sin clave, responde en modo extractivo BM25 (línea 247). PDF y DOCX no se interpretan en la ruta de bots (línea 155) | `/demo/chatbot` (constructor) y `/demo/chatbot/preview` (heredado, huérfana) |
+| Chatbot | `routes/chatbot.routes.ts`, `services/chatbot-store.service.ts`, `models/ChatbotBot.ts` (la API heredada se retiró el 14 de octubre de 2026) | MongoDB: `chatbot_bots`, `chatbot_bot_chunks` y `chatbot_turns` (conversaciones del widget con TTL de 30 días) | OpenAI opcional con tope mensual. Sin clave o sin presupuesto, modo extractivo BM25 con una nota. PDF y DOCX se leen con `document-text.service` | `/demo/chatbot` (tres modos) y `/embed/chatbot/<id>` (widget) |
 | Documentos | `routes/document.routes.ts`, `controllers/document.controller.ts` (633 líneas), `services/document-ai.service.ts`, `services/storage.service.ts` | `Document` con su embedding dentro del documento. Archivo en S3 solo si hay credenciales; si no, en disco (`document.controller.ts` líneas 74–85) | Análisis y embeddings con `text-embedding-ada-002`. Similitud coseno calculada en memoria | `/demo/gestor-documentos` (`hooks/useDocuments.ts`) |
 | Portal | `routes/{project,orders,invoices,deliverables,messages,notifications}.routes.ts`, `services/project.service.ts` (594 líneas) | MongoDB. Adjuntos de pedidos en `uploads/orders` | — | `/dashboard/*`, `/admin/*` |
 | Propuestas | `routes/quote.routes.ts`, `models/Quote.ts` (`pending · contacted · completed`) | MongoDB | — | Ninguno: `requestQuote` de `lib/api.ts` no se llama desde ninguna página |
@@ -438,23 +438,23 @@ No existen hoy. Se crean con el sistema de demos (sección 12 de Sistema de demo
 
 #### 3.7 Chatbot RAG
 
-> `/api/chatbot` · `routes/chatbot.routes.ts` (943 líneas), `data/chatbot-store.ts`, `controllers/chatbot.controller.ts`, `services/chatbot.service.ts`, `models/Chatbot.ts` · 19 endpoints en dos APIs
+> `/api/chatbot` · `routes/chatbot.routes.ts`, `services/chatbot-store.service.ts`, `models/ChatbotBot.ts`, `services/chatbot-legacy-cleanup.service.ts` · estado al 14 de octubre de 2026 en la rama `ccr-55ceecf7-dpc10i` (pendiente de merge)
 
 - **Qué hace:**
-  - **API de bots** (constructor y playground de `/demo/chatbot`): crear y configurar bots, subir documentos en base64, indexar URLs, preguntar y ver conversaciones.
+  - **API de bots** (los tres modos de `/demo/chatbot` y el widget `/embed/chatbot/<id>`): crear y configurar bots, subir documentos en base64 (TXT, MD, CSV, PDF y DOCX), indexar páginas web públicas (`POST /bots/:id/urls`), preguntar y ver conversaciones.
     - Recupera fragmentos con BM25 simplificado.
-    - Si hay clave de OpenAI, genera la respuesta con cita; si no, responde en modo extractivo.
-  - **API heredada "por sesión"** (`/session`, `/upload`, `/message`, `/info`, `/config`, `/messages`, `/documents`): la usa solo la página huérfana `/demo/chatbot/preview`, a través de los proxies `apps/web/src/app/api/chatbot/*`.
+    - Si hay clave de OpenAI y presupuesto, genera la respuesta con cita; si no, responde en modo extractivo con una nota que lo explica (en español o inglés según `lang` o el idioma del bot).
+  - **Bots de ejemplo compartidos** (`POST /sample-bots`): «Prueba el asistente» pide el bot de cada empresa de ejemplo; el servidor lo identifica por la huella de su contenido, lo crea una sola vez y lo reutiliza. `GET /models` lo anuncia con `sharedSampleBots: true`.
+  - **API heredada "por sesión"** (`/session`, `/upload`, `/message`, `/info`, `/config`, `/messages`, `/documents`): **retirada** (responde 404). Al arrancar, el backend borra lo que dejó: la colección `chatbots` (guardaba preguntas y documentos sin vencimiento) y `uploads/chatbot`.
 - **Estado:**
-  - Estado en memoria más un archivo JSON en disco.
-  - PDF y DOCX no se interpretan en la API de bots: se tratan como texto.
-  - Los límites de uso y de costo de la IA se rediseñan con la pasarela de IA de la Fase 0. Mientras tanto, el Builder y las preguntas libres del Playground no tienen tope de costo.
-  - La rama `rag-reposicionamiento` (hecho, pendiente de merge) agregó las reglas de respuesta con fuente (`GROUNDING_RULES`) y la API `/api/demo-rag` de "Prueba con tu documento", con el pipeline compartido en `services/rag-pipeline.ts`.
+  - Bots, documentos, fragmentos y conversaciones en MongoDB (`chatbot_bots`, `chatbot_bot_chunks`, `chatbot_turns`); las conversaciones del widget vencen a los 30 días (índice TTL). El archivo heredado `state.json` se migra una vez y se borra.
+  - Propiedad por token del navegador (`X-Bot-Owner-Token`), tope de gasto mensual (`CHATBOT_MONTHLY_BUDGET_USD`) y cupos por IP: 180 consultas por minuto (sin contar `GET /models`), 60 preguntas por minuto y 30 bots nuevos por hora.
+  - Reglas de respuesta con fuente (`GROUNDING_RULES`) y la API `/api/demo-rag` de "Prueba con tu documento", con el pipeline compartido en `services/rag-pipeline.ts`.
   - Los modelos están en una constante del archivo.
   - Es el producto principal del reposicionamiento ([Sistemas RAG](Producto-chatbot-rag-ia.md), [Reposicionamiento RAG](13-Reposicionamiento-RAG.md)).
-- **Decisión: refactorizar** la API de bots y **eliminar** la heredada.
+- **Decisión: refactorizar** la API de bots y **eliminar** la heredada (eliminada el 14 de octubre de 2026).
 - **Cambios:**
-  1. **Persistencia (Fase 0, tarea 10).** Modelos `Bot`, `BotDocument`, `BotChunk` y `BotMessage` en MongoDB, y archivos en el almacenamiento de objetos.
+  1. **Persistencia (Fase 0, tarea 10). Hecha** en MongoDB (`ChatbotBot`, `ChatbotBotChunks`, `ChatbotTurn`); los archivos no se guardan, solo su texto en fragmentos.
      - Migración idempotente desde `state.json`.
      - Los bots de demo anónimos llevan `expiresAt`.
   2. **Pasarela de IA (Fase 0, tarea 5).** Cupos por visitante (IP en hash y `sessionId`), por grant y tope mensual de la demo (`DEMO_MONTHLY_BUDGET_USD`). El modelo se elige por variable de entorno.
@@ -467,7 +467,7 @@ No existen hoy. Se crean con el sistema de demos (sección 12 de Sistema de demo
      - Citas con página y fragmento.
      - Ingesta de URLs con límites de tamaño, tiempo y tipo de contenido, y lista de dominios permitidos.
   5. **Grants (Fase 2).** Un `DemoGrant` del chatbot amplía el cupo y crea un bot personalizado con el logo y el sector del prospecto (`DemoGrant.customization`).
-  6. **Retiro de la API heredada (Fase 2).** Se eliminan las 7 rutas, `chatbot.controller.ts`, `chatbot.service.ts`, `models/Chatbot.ts`, los proxies de Next y la página `/preview`. Es la tarea 18 de [Sistemas RAG](Producto-chatbot-rag-ia.md).
+  6. **Retiro de la API heredada (Fase 2). Hecho:** se eliminaron las 7 rutas, `chatbot.controller.ts`, `chatbot.service.ts`, `models/Chatbot.ts`, los proxies de Next y la página `/preview`, con una limpieza única al arrancar (`chatbot-legacy-cleanup.service.ts`).
   7. **SaaS real (Fase 4, tarea 25).** `Organization` y `tenantId` en todas las consultas, medición de conversaciones y cobro recurrente.
 
 **Modelo de datos del chatbot (Fase 0, ampliado en la Fase 2):**
@@ -655,7 +655,7 @@ Los eventos `demo_upload` y `demo_start` los emite la web con GA4, solo con cons
     - tiene referencias a un pagador real;
     - no tiene pruebas.
   - La demo `/demo/cuentas-medicas` solo usa `/auditoria/*` y `/documentos-conocimiento/*`.
-  - `/cuentas`, `/ley100`, `/process` y `/export` solo las llaman páginas internas (`/test`).
+  - `/cuentas`, `/ley100`, `/process` y `/export` no las llama ninguna página de la web (la página interna `/test` se retiró).
   - `/liquidacion` y `/reglas-facturacion` solo las llaman las páginas huérfanas `/liquidacion`.
   - Hay seeds (≈ 2.600 líneas en `db/seeds/`) y *scrapers* de catálogos oficiales (≈ 2.100 líneas) que ningún script de `package.json` ejecuta.
 - **Decisión: mover a un servicio aparte, por etapas.** Se mantiene como producto vertical ([Demo cuentas médicas](Demo-cuentas-medicas.md)).

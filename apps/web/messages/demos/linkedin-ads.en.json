@@ -1,49 +1,55 @@
 {
   "demoLinkedinAds": {
     "hero": {
+      "back": "Back to the demo catalog",
+      "requestDemo": "Request a guided demo",
+      "quote": "Get a quote for a content engine",
       "badge": "Internal use · Marketing",
-      "title": "How we use AI for our LinkedIn content",
-      "subtitle": "This is the internal tool KopTup uses to prepare posts about its demos: a 30-day editorial plan, posts, ad copy, carousels and screenshots. It does not post to LinkedIn: you copy the text and publish it yourself.",
+      "title": "AI content generator for LinkedIn",
+      "subtitle": "This is the tool KopTup uses to prepare posts about its own demos: a 30-day editorial plan, posts, ad copy, carousels and images. It does not post to LinkedIn: you copy the text and publish it yourself.",
+      "forWhoLabel": "Who is it for?",
+      "forWho": "B2B marketing teams and agencies that post on LinkedIn consistently: this is how an AI content engine built around your own catalog would work.",
       "chips": {
-        "demos": "{count} demos in the catalog",
+        "demos": "{count} demos to promote",
         "days": "{count} planned days",
         "combos": "{angles} angles × {tones} tones",
-        "capture": "Photo and video of each demo"
+        "capture": "Images, photo and video of each demo"
       },
-      "cta": "Want a content engine like this for your company? Let's talk"
+      "start": "Start: the day 1 post",
+      "seeCalendar": "See the calendar"
     },
     "badges": {
       "sampleData": "Sample data",
+      "sampleDataHint": "The calendar, the templates and the previews are sample content; “Generate with AI” does call a real model.",
       "notPublishing": "Does not post to LinkedIn"
     },
     "tabs": {
+      "label": "Demo sections",
       "overview": "Overview",
       "calendar": "30-day calendar",
       "generator": "Post generator",
       "capture": "Screenshots and video"
     },
     "overview": {
-      "stats": {
-        "demos": "Demos to promote",
-        "days": "Planned days",
-        "angles": "Post angles",
-        "tones": "Voice tones"
-      },
+      "firstStepsTitle": "First steps",
+      "firstStepsDesc": "Three steps to go from an idea to a post ready for LinkedIn. Each one is checked off as you do it.",
+      "progress": "{done} of {total} steps done",
+      "done": "Done",
       "stepLabel": "Step {n}",
       "steps": {
         "calendar": {
-          "title": "See the 30-day plan",
+          "title": "Pick a day from the plan",
           "desc": "A different demo every day, with a suggested angle and format. Click a day and the generator loads that setup.",
           "cta": "Open calendar"
         },
         "generator": {
-          "title": "Generate and edit the post",
-          "desc": "Pick a demo, angle and tone. You get a hook, body, call to action, hashtags, ad copy and a carousel, with a simulated preview.",
+          "title": "Generate and review the post",
+          "desc": "With AI or with templates: hook, body, call to action and hashtags, plus ad copy and a carousel. Copy it or save it as a draft.",
           "cta": "Open generator"
         },
         "capture": {
           "title": "Add the visual",
-          "desc": "Create a 1200×627 image from templates or take a photo or video of the demo exactly as you see it.",
+          "desc": "Create a 1200×627 image from templates or take a photo or video of the demo; use it in the preview or download it.",
           "cta": "Open screenshots"
         }
       },
@@ -67,146 +73,346 @@
         },
         "4": {
           "label": "Publish it yourself:",
-          "text": "copy the text, upload the image or video to LinkedIn and post from your account. If you want paid reach, use the ad copy tab."
+          "text": "copy the text, upload the image or video to LinkedIn and post from your account. If you want paid reach, use the “Ad copy” view in the generator."
         }
       },
       "scopeTitle": "What this demo does and does not do",
       "doesTitle": "Does",
       "doesNotTitle": "Does not",
       "does": {
-        "0": "Generates a post, ad copy and a carousel with AI (an OpenAI model called from KopTup's server) or, when AI is not available, with local templates, and tells you which one it used.",
+        "0": "Generates the post, ad copy and a carousel with AI (an OpenAI model called from KopTup's server, with a usage quota) or, when AI is not available, with local templates, and tells you which one it used.",
         "1": "Lets you edit the text, checks it for accuracy alerts, saves drafts in this browser and exports them to CSV.",
-        "2": "Creates 1200×627 images from templates, downloads the carousel as a PDF and captures a photo or video of any KopTup demo.",
+        "2": "Creates 1200×627 images from templates, downloads the carousel as a PDF and takes a photo or video of the KopTup demos you can open.",
         "3": "Adds UTM parameters to links so you can measure visits in your analytics."
       },
       "doesNot": {
-        "0": "It does not connect to your LinkedIn account or post for you (simulated in the demo; in a custom project it can connect to the LinkedIn API if your company has approved access).",
+        "0": "It does not connect to your LinkedIn account or post for you. In a custom project it can connect to the LinkedIn API if your company has approved access.",
         "1": "It does not measure reach, clicks or followers: the preview shows no real reactions.",
         "2": "It does not make up results: the texts include no client figures or testimonials; if you add a figure, it needs a source."
       }
     },
     "catalog": {
       "chatbot": {
+        "titulo": "RAG chatbot over your documents",
+        "descripcion": "An assistant that answers only from your documents and cites the source of each answer",
+        "funciones": [
+          "Try it with a sample document or your own (PDF, DOCX or TXT)",
+          "Cites the page or passage behind each answer",
+          "Says “not found” when the answer is not in the documents",
+          "Set up your own assistant with its website widget"
+        ],
         "industria": "Customer service",
         "publico": ["Clinics", "E-commerce", "Law firms", "Schools and universities", "Internal support"],
         "problema": "Teams lose hours answering the same questions and many chatbots answer without a source to back them up"
       },
       "ecommerce": {
+        "titulo": "Online store",
+        "descripcion": "A sample store for Colombia, from purchase to shipping and reports",
+        "funciones": [
+          "Catalog, cart with coupons and simulated payment (card, PSE, Nequi or cash on delivery)",
+          "The order shows up in the store's admin panel",
+          "Simulated shipping label and tracking, with returns",
+          "Sales reports you can export to CSV"
+        ],
         "industria": "Retail",
         "publico": ["Retailers", "Manufacturers", "Direct-to-consumer brands"],
         "problema": "Many online stores show the same catalog to everyone and do not guide the purchase"
       },
       "dashboard-ejecutivo": {
+        "titulo": "Executive dashboard",
+        "descripcion": "A management dashboard for a fictitious company, with figures that match across views",
+        "funciones": [
+          "Sales versus target, margin and income statement",
+          "Receivables aging and 13-week cash flow",
+          "Rule-based alerts and guided questions",
+          "PDF report and your own sales CSV loaded in the browser"
+        ],
         "industria": "Management",
         "publico": ["General managers", "Finance directors", "Department heads"],
         "problema": "Reports arrive late, in spreadsheets, and do not explain what changed"
       },
       "gestor-documentos": {
+        "titulo": "AI document manager",
+        "descripcion": "Organize, search and summarize company documents",
+        "funciones": [
+          "A construction company's sample archive with folders, search and trash",
+          "Clause detection in contracts",
+          "Signed in, you upload your PDF, DOCX, TXT or CSV files and AI summarizes and tags them",
+          "Search by meaning and “Explain with AI”"
+        ],
         "industria": "Document management",
         "publico": ["Legal teams", "Compliance teams", "Notaries", "HR teams"],
         "problema": "Documents sit in folders nobody reviews until an audit comes"
       },
       "sistema-reservas": {
+        "titulo": "Booking system",
+        "descripcion": "Online bookings for clinics, spas and sports courts, with the business schedule",
+        "funciones": [
+          "The customer picks a location, service, professional and a free slot",
+          "Simulated deposit and confirmation with a WhatsApp and email preview",
+          "Schedule by professional to confirm, reschedule and mark attendance",
+          "Exports the schedule to .ics and the list to CSV"
+        ],
         "industria": "Services",
         "publico": ["Clinics", "Restaurants", "Beauty salons", "Private practices"],
         "problema": "Appointments get lost because the schedule lives in a notebook or in scattered chats"
       },
       "gestor-contenido": {
+        "titulo": "Headless CMS",
+        "descripcion": "Content for web, app and assistant, from draft to publication",
+        "funciones": [
+          "Content types with web and app preview",
+          "AI text improvements",
+          "Review, approval and scheduled publishing with roles",
+          "Delivery through a JSON API and webhooks to notify channels"
+        ],
         "industria": "Communications",
         "publico": ["Marketing teams", "Sales teams", "Internal communications"],
         "problema": "Writing emails, announcements and proposals takes longer than it should"
       },
       "control-proyectos": {
+        "titulo": "Project management with client portal",
+        "descripcion": "Client projects with progress the client can see",
+        "funciones": [
+          "Board, list, calendar and timeline with dependencies",
+          "Hours and budget per milestone",
+          "Portal where the client sees progress and approves deliverables",
+          "Construction, creative agency and software examples"
+        ],
         "industria": "Project management",
         "publico": ["Project offices", "Construction companies", "Software companies"],
         "problema": "Projects fall behind and nobody sees the warning signs in time"
       },
       "crm-ia": {
+        "titulo": "AI CRM",
+        "descripcion": "A B2B sales pipeline with each lead score explained",
+        "funciones": [
+          "Drag-and-drop sales pipeline",
+          "Each lead score explained factor by factor",
+          "Forecast in pesos versus target",
+          "WhatsApp and email drafts and a follow-up sequence"
+        ],
         "industria": "Sales",
         "publico": ["Sales teams", "Account executives", "Sales managers"],
         "problema": "Salespeople forget follow-ups and spend time on deals that are not moving"
       },
       "erp": {
+        "titulo": "Modular ERP",
+        "descripcion": "Sales, inventory, purchasing, accounting and more, all connected",
+        "funciones": [
+          "An invoice reduces inventory, posts its journal entry and goes to receivables",
+          "Purchasing with approvals",
+          "Accounting with the Colombian chart of accounts, treasury and receivables",
+          "HR and production"
+        ],
         "industria": "Operations",
         "publico": ["Manufacturers", "Distributors", "Growing SMBs"],
         "problema": "The company runs several systems that do not talk to each other"
       },
       "helpdesk-ia": {
+        "titulo": "AI help desk",
+        "descripcion": "One inbox for every support channel, with AI-drafted replies",
+        "funciones": [
+          "Single inbox for email, chat, WhatsApp and calls (simulated)",
+          "Rule-based automatic classification and assignment",
+          "AI-drafted reply that cites the knowledge base",
+          "SLA, surveys and complaints tracked in Colombian business days"
+        ],
         "industria": "Support",
         "publico": ["Help desks", "Customer service", "IT support"],
         "problema": "The support team solves the same requests every day"
       },
       "lms": {
+        "titulo": "Online course platform",
+        "descripcion": "Online courses with an AI tutor and verifiable certificates",
+        "funciones": [
+          "Course catalog and simulated checkout",
+          "Lessons with an AI tutor that cites the lesson",
+          "Final exam and adaptive path",
+          "Certificates with a verifiable QR code"
+        ],
         "industria": "Training",
         "publico": ["HR teams", "Corporate universities", "Training centers"],
         "problema": "Internal courses get abandoned because they are long and generic"
       },
       "telemedicina": {
+        "titulo": "Telehealth for healthcare providers",
+        "descripcion": "A provider's day: scheduling, virtual visit and billing",
+        "funciones": [
+          "The patient books and fills in the pre-visit form with consents",
+          "Virtual office with a waiting room and simulated video visit",
+          "Prescription and visit notes",
+          "Simulated billing and health-services report"
+        ],
         "industria": "Healthcare",
         "publico": ["Clinics", "Healthcare providers", "Specialist practices"],
         "problema": "Patients in remote areas wait a long time to see a specialist"
       },
       "facturacion-electronica": {
+        "titulo": "E-invoicing (simulator)",
+        "descripcion": "An e-invoicing simulator for Colombia",
+        "funciones": [
+          "Invoices, credit and debit notes and POS equivalent document",
+          "Validates the tax ID check digit and computes VAT and withholdings",
+          "Sample PDF with QR code and XML",
+          "Sample RADIAN events and period ledgers"
+        ],
         "industria": "Accounting",
         "publico": ["Accountants", "SMBs", "Mid-sized companies"],
         "problema": "A badly issued e-invoice leads to rejections and rework"
       },
       "wms-logistica": {
+        "titulo": "WMS and warehouse logistics",
+        "descripcion": "A logistics operator's flow, from receiving to delivery",
+        "funciones": [
+          "Receiving with scanning and rule-based put-away",
+          "Order waves with stock reserved by expiry date",
+          "Picking, packing and shipping label as PDF",
+          "Delivery with signature and tracking"
+        ],
         "industria": "Logistics",
         "publico": ["Logistics operators", "Manufacturers with their own warehouse"],
         "problema": "Warehouse staff waste time looking for products without a clear location"
       },
       "pos": {
+        "titulo": "Point of sale (POS)",
+        "descripcion": "The register of a mini-market and a restaurant",
+        "funciones": [
+          "Selling with a barcode scanner and scale",
+          "Tables and kitchen tickets",
+          "Split payment and sample POS equivalent document",
+          "Offline sales and register closing"
+        ],
         "industria": "Brick-and-mortar retail",
         "publico": ["Stores", "Restaurants", "Retail chains"],
         "problema": "The register is not connected to inventory and closings are done by hand"
       },
       "hrms": {
+        "titulo": "HR and payroll",
+        "descripcion": "Records, vacations, recruiting and Colombian payroll in one place",
+        "funciones": [
+          "Digital employee records and vacations in business days",
+          "Recruiting with rule-based scoring",
+          "Biweekly payroll with contributions and provisions",
+          "Employee app with an assistant that answers from the handbook"
+        ],
         "industria": "Human resources",
         "publico": ["HR managers", "SMBs", "Companies with more than 50 people"],
         "problema": "The HR team lives between spreadsheets and forms"
       },
       "automatizacion": {
+        "titulo": "Process automation",
+        "descripcion": "A workflow editor to automate repetitive tasks",
+        "funciones": [
+          "Sample flows: supplier invoices, collections and leads",
+          "Step-by-step runs with input and output data",
+          "Editor to add and configure steps",
+          "Versions, templates and cases to review"
+        ],
         "industria": "Operations",
         "publico": ["Operations teams", "Marketing teams", "Back-office teams"],
         "problema": "Some repetitive tasks could be automated, but it looks like they require coding"
       },
       "saas-boilerplate": {
+        "titulo": "Subscription SaaS platform",
+        "descripcion": "How your software would look sold by subscription",
+        "funciones": [
+          "Customer sign-up with isolated data",
+          "Simulated subscription billing",
+          "Teams, roles and support access",
+          "Audit log, webhooks and test API"
+        ],
         "industria": "Startups",
         "publico": ["Founders", "Startups", "Teams launching a minimum viable product"],
         "problema": "Every new product rebuilds the same things: sign-in, billing and an admin panel"
       },
       "voice-ai": {
+        "titulo": "AI voice agent",
+        "descripcion": "How a voice agent would answer the phone, in sample calls",
+        "funciones": [
+          "Sample banking, healthcare, collections and ordering calls",
+          "Transcript with sensitive data masked",
+          "Intent, sentiment and agent actions",
+          "Handoff to a human agent with context"
+        ],
         "industria": "Phone support",
         "publico": ["Collections teams", "Customer service", "Appointment scheduling"],
         "problema": "Phone support only grows by hiring more people"
       },
       "firma-electronica": {
+        "titulo": "E-signature",
+        "descripcion": "Signing envelopes with verifiable evidence, from template to signature",
+        "funciones": [
+          "Envelopes from templates with variables or from a PDF",
+          "Signer view with a verification code",
+          "Evidence with a verifiable hash chain",
+          "Metrics for the sample envelopes"
+        ],
         "industria": "Contracts",
         "publico": ["Law firms", "HR teams", "Real estate agencies"],
         "problema": "Collecting every signature on a contract takes days of emails and resends"
       },
       "scraping": {
+        "titulo": "Data extraction and monitoring",
+        "descripcion": "Monitoring of public sources: prices, procurement and regulations",
+        "funciones": [
+          "Extractor built with clicks",
+          "What changed since yesterday",
+          "Configurable alerts",
+          "Data downloads and a legal sheet for each source"
+        ],
         "industria": "Market intelligence",
         "publico": ["Pricing teams", "Market research", "Real estate agencies"],
         "problema": "Companies learn too late about price and catalog changes in their market"
       },
       "code-review-ia": {
+        "titulo": "AI code review",
+        "descripcion": "Automatic pull request review with comments on the code",
+        "funciones": [
+          "Score and risk for each pull request",
+          "Comments anchored to the change, with suggestions",
+          "Security findings and vulnerable dependencies",
+          "Review your own diff with local rules"
+        ],
         "industria": "Software development",
         "publico": ["Tech leads", "Development teams", "Technology directors"],
         "problema": "Code changes wait days for a review"
       },
       "moderacion-contenido": {
+        "titulo": "Content moderation",
+        "descripcion": "A platform's moderation console, with rules you adjust",
+        "funciones": [
+          "Sample cases classified with their explanation",
+          "Threshold rules that decide each case's route",
+          "Simulator with a sample batch",
+          "Human review for borderline cases"
+        ],
         "industria": "Digital platforms",
         "publico": ["Online marketplaces", "Online communities", "Learning platforms"],
         "problema": "Offensive content and spam in a community hurt the brand"
       },
       "delivery": {
+        "titulo": "Delivery app",
+        "descripcion": "A restaurant's own delivery channel, in four connected apps",
+        "funciones": [
+          "Customer app to order and pay",
+          "Store app to accept and prepare",
+          "Operations assigns couriers and watches times",
+          "The courier delivers with a code"
+        ],
         "industria": "Last mile",
         "publico": ["Delivery companies", "Stores with their own fleet", "Restaurants"],
         "problema": "Couriers drive inefficient routes and customers do not know where their order is"
       },
       "loyalty": {
+        "titulo": "Loyalty program",
+        "descripcion": "A retail chain's points club, from the register to the results",
+        "funciones": [
+          "Sign-up and points at the register",
+          "Member app to redeem",
+          "Rules, tiers, missions and campaigns",
+          "Results and points liability"
+        ],
         "industria": "Loyalty",
         "publico": ["Retailers", "Restaurants", "Hotels"],
         "problema": "Points programs are boring and almost nobody redeems their rewards"
@@ -287,7 +493,7 @@
         "tecnico": [
           "Want me to write about the architecture? Let me know in the comments.",
           "If you are interested in the technical details, message me.",
-          "Which stack would you use? I'm reading."
+          "Which tech stack would you use? I'm reading."
         ],
         "storytelling": [
           "Does your company have a similar story? Share it 👇",
@@ -380,7 +586,7 @@
         "17": "A tip to write clearer emails with the help of a template.",
         "18": "What we took into account when designing the point-of-sale register.",
         "19": "Hypothetical case: an HR team that closes payroll with less rework.",
-        "20": "Weekend: what would you build first in your SaaS product?",
+        "20": "Weekend: what would you build first in your software product?",
         "21": "Weekend: a tip to monitor public prices responsibly.",
         "22": "Hypothetical case: a store that rewards its frequent customers.",
         "23": "Bold tone: if reviewing a code change takes days, the process can be improved.",
@@ -398,22 +604,71 @@
       "ai": {
         "title": "Generate with AI",
         "desc": "One click: an OpenAI model, called from KopTup's server, writes the post, the ad copy and the carousel slides for the demo, angle and tone you choose. Always review the result before publishing it.",
-        "langNote": "The AI writes in Spanish for Latin American audiences (the prompt is in Spanish).",
+        "langNote": "The AI writes in Spanish for Latin American audiences (the prompt is in Spanish). Quota: 5 generations every 10 minutes and 30 a day per account.",
         "button": "Generate with AI",
         "regenerate": "Regenerate with AI",
         "loading": "Generating with AI…",
         "success": "Generated with AI ({model}).",
         "strategy": "Why this approach:",
-        "unavailable": "AI is not available right now: {reason}.",
-        "fallbackLocal": "We are showing the local template version.",
+        "fallbackLocal": "Meanwhile, you see the local template version (no AI).",
         "fallbackEdited": "Your edited text is kept.",
-        "reasons": {
-          "notConfigured": "the server has no OpenAI key configured",
-          "limit": "the generation limit was reached, try again later",
-          "access": "you need approved access to this demo",
-          "invalid": "the AI response was incomplete",
-          "network": "the server could not be reached",
-          "generic": "the server could not complete the request"
+        "fallbackPrevious": "The text the AI generated earlier for this combination is kept.",
+        "errors": {
+          "budget": {
+            "title": "Monthly AI quota used up",
+            "text": "This demo has already used this month's AI budget; it renews on the 1st of each month."
+          },
+          "notConfigured": {
+            "title": "AI not available on this server",
+            "text": "AI generation is not set up here (the model key is missing)."
+          },
+          "rateLimited": {
+            "title": "You reached the generation limit",
+            "text": "You can generate with AI 5 times every 10 minutes and 30 times a day. Try again in a few minutes.",
+            "textWait": "You can generate with AI 5 times every 10 minutes and 30 times a day. Try again in {min} min."
+          },
+          "limitsUnavailable": {
+            "title": "We could not check the AI quota",
+            "text": "So we did not call the model. Try again in a few minutes."
+          },
+          "login": {
+            "title": "Your session ended",
+            "text": "Sign in again to generate with AI.",
+            "action": "Sign in"
+          },
+          "access": {
+            "title": "Your account has no access to this demo",
+            "text": "To generate with AI you need approved, current access to this demo.",
+            "action": "Request access"
+          },
+          "disabled": {
+            "title": "Demo turned off",
+            "text": "The KopTup team has turned this demo off for now."
+          },
+          "unavailable": {
+            "title": "The AI is not responding right now",
+            "text": "The generation service is not available. Try again in a few minutes."
+          },
+          "llm": {
+            "title": "The model could not respond",
+            "text": "Try again in a moment."
+          },
+          "invalid": {
+            "title": "The AI response was incomplete",
+            "text": "Try again; the model sometimes cuts its answer short."
+          },
+          "badRequest": {
+            "title": "The request could not be sent",
+            "text": "The demo data is not valid for the AI."
+          },
+          "network": {
+            "title": "No connection to the server",
+            "text": "Check your internet connection and try again."
+          },
+          "generic": {
+            "title": "AI generation failed",
+            "text": "The server could not complete the request."
+          }
         }
       },
       "source": {
@@ -424,16 +679,18 @@
       "demoLabel": "Demo to promote",
       "angleLabel": "Post angle",
       "toneLabel": "Tone",
-      "variantLabel": "Variant",
+      "variantLabel": "Version",
       "variantButton": "Generate another version",
       "variantN": "v{n}",
-      "variantHelp": "Each version changes the hook and the closing line with the same information.",
+      "variantHelp": "Each version changes the hook and the closing line of the templates. If you generated with AI in a version, going back to it brings that text back.",
+      "utmTitle": "Visit tracking (UTM)",
       "utmLabel": "Add UTM to links",
       "utmHelp": "Adds utm_source=linkedin, the medium and the campaign to the demo link so you can measure visits in your analytics.",
       "views": {
+        "label": "Format",
         "organic": "Organic post",
         "ad": "Ad copy",
-        "carousel": "{count}-slide carousel"
+        "carousel": "Carousel ({count} slides)"
       },
       "post": {
         "textLabel": "LinkedIn text (editable)",
@@ -441,12 +698,13 @@
         "copy": "Copy text",
         "copied": "Copied!",
         "copyError": "Automatic copy failed; select the text and copy it.",
-        "reset": "Reset",
+        "reset": "Reset text",
         "saveDraft": "Save draft",
         "saved": "Draft saved",
         "previewLabel": "LinkedIn-style preview (simulated)",
         "removeImage": "Remove image",
-        "imageHint": "Add an image from the Screenshots and video tab."
+        "imageHint": "No image yet.",
+        "goToCapture": "Create one in Screenshots and video"
       },
       "ad": {
         "headline": "Headline",
@@ -491,11 +749,12 @@
         "utm": "The link has UTM parameters",
         "noUtm": "The link has no UTM parameters",
         "length": "Within the 3,000-character maximum",
-        "tooLong": "Over LinkedIn's 3,000 characters"
+        "tooLong": "Over LinkedIn's 3,000 characters",
+        "addLink": "Add the demo link"
       },
       "drafts": {
         "title": "Saved drafts ({count})",
-        "empty": "No drafts yet. Save one from the organic post.",
+        "empty": "No drafts yet. Save one from the “Organic post” view.",
         "stored": "They are saved in this browser only.",
         "open": "Open",
         "copy": "Copy",
@@ -537,9 +796,10 @@
     },
     "capture": {
       "title": "Visuals for the post",
-      "subtitle": "Create an image from a template or capture the demo exactly as you see it. Download PNG or WebM.",
+      "subtitle": "Create an image from a template or capture the demo exactly as you see it. Download PNG or WebM, or use it in the preview.",
       "demoLabel": "Demo",
       "modes": {
+        "label": "Visual type",
         "auto": "Automatic capture",
         "visual": "Designed template"
       },
@@ -554,6 +814,7 @@
       "webmNote": "LinkedIn does not accept WebM videos. Convert it to MP4, for example with ffmpeg:",
       "auto": {
         "info": "The real demo loads in the frame. The photo captures exactly what you see in it; the video records while you click through the demo, at a few frames per second (depends on your device). No permissions are needed because the demo is on the same site.",
+        "accessNote": "If your account has no access to a request-only demo, the frame shows its access screen: pick an open demo.",
         "photo": "Take photo",
         "capturing": "Capturing…",
         "record": "Record video",
@@ -573,6 +834,7 @@
           "headline": "Featured headline",
           "features": "Feature list"
         },
+        "stylesLabel": "Image style",
         "download": "Download PNG 1200×627",
         "generating": "Generating…",
         "sizeNote": "1200×627 px is the size LinkedIn recommends for link images.",
@@ -583,6 +845,13 @@
           "seeDemo": "See the demo"
         }
       }
+    },
+    "reset": {
+      "button": "Reset",
+      "question": "Delete the drafts and preferences saved in this browser?",
+      "confirm": "Yes, reset",
+      "cancel": "Cancel",
+      "done": "Done: the demo started over"
     }
   }
 }

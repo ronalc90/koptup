@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
@@ -10,22 +9,25 @@ import {
   CodeBracketIcon, ShieldCheckIcon, SparklesIcon, MagnifyingGlassIcon, CheckCircleIcon,
   DocumentTextIcon, BeakerIcon, ChartBarIcon, PuzzlePieceIcon, ClockIcon, ExclamationTriangleIcon,
   ArrowPathIcon, TrashIcon, InformationCircleIcon, ClipboardDocumentListIcon, GlobeAltIcon, XMarkIcon,
+  ArrowUturnLeftIcon,
 } from '@heroicons/react/24/outline';
 import {
   effectiveNewLines, oldLines, diffRows, countChanges, displayLineOf, scoreFor, riskFor, sizeFor,
   analyzeParsed, findingsToComments, formatStamp, formatNumber, nowStamp, toCsv, buildCycloneDx, tr,
+  sampleShiftDays, shiftPr,
   type PR, type PRStatus, type CommentStatus, type PREvent, type Locale, type ParsedInput, type FileChange,
 } from './components/analyzer';
-import { SAMPLE_PRS, DEMO_USER, COMPANY, BASE_BRANCH } from './components/data';
+import { SAMPLE_PRS, DEMO_USER, COMPANY, BASE_BRANCH, SAMPLE_TODAY } from './components/data';
 import {
-  SummaryTab, CommentsTab, DiffTab, SecurityTab, TestsTab, RepoTab, MetricsTab, riskTone,
+  SummaryTab, CommentsTab, DiffTab, SecurityTab, TestsTab, RepoTab, MetricsTab, riskTone, FOCUS,
   type TabKey, type PRView, type FileView, type CommentActions, type Platform,
 } from './components/tabs';
 import DiffModal from './components/DiffModal';
+import { BackToCatalog, CommercialLinks, FirstSteps, ResetConfirm, type StepId } from './components/intro';
 
-/** Solicitud de demo guiada: formulario de contacto con el producto preseleccionado. */
-const RUTA_SOLICITAR_DEMO = '/contact?service=code-review-ia';
 const STORAGE_KEY = 'koptup-demo-code-review-v1';
+/** PR con el que empieza el recorrido (webhook de pagos). */
+const START_PR = 'p218';
 /** Autor de los PR creados con "Prueba con tu diff" (se muestra como "tú"). */
 const YOU = '__you__';
 
@@ -44,6 +46,14 @@ const freshState = (pr: PR): PRState => ({
   events: [],
 });
 const initialStates = (): StateMap => Object.fromEntries(SAMPLE_PRS.map((p) => [p.id, freshState(p)]));
+/** El PR de ejemplo sigue como al empezar (para ofrecer volverlo a su estado inicial). */
+const isPristine = (pr: PR, st: PRState | undefined): boolean => {
+  if (!st) return true;
+  const init = freshState(pr);
+  if (st.status !== init.status || st.addedTests.length > 0 || st.events.length > 0) return false;
+  return pr.comments.every((c) => (st.comments[c.id] ?? 'open') === (init.comments[c.id] ?? 'open'));
+};
+type Steps = Partial<Record<StepId, boolean>>;
 
 const STATUSES: PRStatus[] = ['open', 'inReview', 'changesRequested', 'approved', 'merged'];
 const COMMENT_STATUSES: CommentStatus[] = ['open', 'applied', 'dismissed', 'resolved'];
@@ -53,12 +63,16 @@ const EVENT_KINDS: PREvent['kind'][] = [
 ];
 
 /** Lee el estado guardado de los PR de ejemplo y descarta lo que no tenga la forma esperada. */
-function readSaved(): StateMap | null {
+function readSaved(): { prs: StateMap; steps: Steps } | null {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    const data = JSON.parse(raw) as { prs?: Record<string, Partial<PRState>> };
+    const data = JSON.parse(raw) as { prs?: Record<string, Partial<PRState>>; steps?: Record<string, unknown> };
     if (!data || typeof data !== 'object' || !data.prs) return null;
+    const steps: Steps = {};
+    if (data.steps && typeof data.steps === 'object') {
+      for (const k of ['apply', 'diff', 'repo', 'merge', 'own'] as const) if (data.steps[k] === true) steps[k] = true;
+    }
     const out = initialStates();
     for (const pr of SAMPLE_PRS) {
       const s = data.prs[pr.id];
@@ -79,7 +93,7 @@ function readSaved(): StateMap | null {
           .slice(-50);
       }
     }
-    return out;
+    return { prs: out, steps };
   } catch {
     return null;
   }
@@ -143,6 +157,7 @@ const statusColor = (s: PRStatus): 'info' | 'warning' | 'success' | 'primary' | 
     : s === 'changesRequested' ? 'danger' : s === 'inReview' ? 'warning' : 'info';
 
 function download(name: string, content: string, mime: string) {
+  // Descarga generada en el navegador (no pasa por ningún servidor).
   const blob = new Blob([content], { type: mime });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -172,14 +187,26 @@ export default function CodeReviewIAPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [toast, setToast] = useState<Toast | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  const [steps, setSteps] = useState<Steps>({});
+  const [confirmReset, setConfirmReset] = useState(false);
+  /** Días que se corren las fechas de ejemplo (null hasta montar: dependen de hoy). */
+  const [shiftDays, setShiftDays] = useState<number | null>(null);
   const toastSeq = useRef(0);
   const tabsRef = useRef<HTMLDivElement>(null);
+  const actionsRef = useRef<HTMLDivElement>(null);
+  const modalReturnRef = useRef<HTMLElement | null>(null);
+  const resetBtnRef = useRef<HTMLButtonElement>(null);
 
-  // Estado guardado (solo de los PR de ejemplo). Se lee después de montar para
-  // que el HTML del servidor y el primer render del cliente coincidan.
+  // Estado guardado (solo de los PR de ejemplo) y fechas relativas a hoy en
+  // Colombia. Se calculan después de montar para que el HTML del servidor y el
+  // primer render del cliente coincidan.
   useEffect(() => {
     const saved = readSaved();
-    if (saved) setStates(saved);
+    if (saved) {
+      setStates(saved.prs);
+      setSteps(saved.steps);
+    }
+    setShiftDays(sampleShiftDays(nowStamp(new Date()).slice(0, 10), SAMPLE_TODAY));
     setHydrated(true);
   }, []);
   useEffect(() => {
@@ -187,11 +214,11 @@ export default function CodeReviewIAPage() {
     if (!hydrated) return;
     try {
       const prs = Object.fromEntries(SAMPLE_PRS.map((p) => [p.id, states[p.id]]));
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ v: 1, prs }));
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ v: 1, prs, steps }));
     } catch {
       /* sin almacenamiento: la demo funciona igual, solo no recuerda los cambios */
     }
-  }, [states, hydrated]);
+  }, [states, steps, hydrated]);
 
   useEffect(() => {
     if (!toast) return;
@@ -203,7 +230,10 @@ export default function CodeReviewIAPage() {
     setToast({ id: toastSeq.current, text, tone });
   }, []);
 
-  const allPrs = useMemo(() => [...userPrs, ...SAMPLE_PRS], [userPrs]);
+  const samplePrs = useMemo(() => SAMPLE_PRS.map((p) => shiftPr(p, shiftDays ?? 0)), [shiftDays]);
+  const allPrs = useMemo(() => [...userPrs, ...samplePrs], [userPrs, samplePrs]);
+  /** Fechas visibles: vacías en el primer render (se calculan con la fecha de hoy). */
+  const fmtDate = useCallback((at: string) => (shiftDays === null ? '' : formatStamp(at, locale)), [shiftDays, locale]);
   const views = useMemo(
     () => allPrs.map((p) => buildView(p, states[p.id] ?? freshState(p))),
     [allPrs, states],
@@ -226,6 +256,20 @@ export default function CodeReviewIAPage() {
       return hay.includes(q);
     });
   }, [views, filter, query, locale]);
+
+  // Avance de los primeros pasos: se marca cuando el paso se hizo de verdad en
+  // la demo (no basta con pulsar "Ir"); volver un PR al inicio no lo desmarca.
+  const doneSteps: Record<StepId, boolean> = {
+    apply: !!steps.apply || SAMPLE_PRS.some((p) => (states[p.id]?.events ?? []).some((e) => e.kind === 'applied')),
+    diff: !!steps.diff,
+    repo: !!steps.repo,
+    merge: !!steps.merge || SAMPLE_PRS.some((p) => (states[p.id]?.events ?? []).some((e) => e.kind === 'merged')),
+    own: !!steps.own,
+  };
+  const markStep = useCallback((id: StepId) => setSteps((prev) => (prev[id] ? prev : { ...prev, [id]: true })), []);
+  useEffect(() => {
+    if (tab === 'diff' || tab === 'repo') markStep(tab);
+  }, [tab, markStep]);
 
   // ---------- Acciones ----------
   const stamp = () => nowStamp(new Date());
@@ -253,6 +297,7 @@ export default function CodeReviewIAPage() {
       comments: { ...s.comments, [commentId]: next },
       events: [...s.events, { at: stamp(), kind, who, detail: cv ? `${cv.c.file}:${cv.line}` : undefined }],
     }));
+    if (next === 'applied' && !owner.userDiff) markStep('apply');
     notify(t(toastKey));
   };
 
@@ -297,6 +342,7 @@ export default function CodeReviewIAPage() {
       return;
     }
     updatePr(pr.id, (s) => ({ ...s, status: 'merged', events: [...s.events, { at: stamp(), kind: 'merged', who: DEMO_USER }] }));
+    markStep('merge');
     notify(t('toasts.merged', { number: pr.number }));
   };
 
@@ -362,7 +408,7 @@ export default function CodeReviewIAPage() {
         'package.json', '', d.resolved ? t('security.resolved') : t('security.pending'), `${d.name} ${d.current}`,
       ]);
     }
-    download(`code-review-pr-${pr.number}-seguridad.csv`, `﻿${toCsv(rows)}`, 'text/csv;charset=utf-8');
+    download(t('csv.securityFile', { number: pr.number }), `﻿${toCsv(rows)}`, 'text/csv;charset=utf-8');
     notify(t('toasts.exported'));
   };
 
@@ -370,6 +416,8 @@ export default function CodeReviewIAPage() {
     const bom = buildCycloneDx({
       appName: pr.repo.split('/')[1] ?? pr.repo,
       timestamp: new Date().toISOString(),
+      note: t('csv.sbomNote'),
+      recommend: (name, fixedIn) => t('csv.sbomRecommend', { name, version: fixedIn }),
       dependencies: view.deps.map((d) => ({ name: d.name, version: d.current, license: d.license })),
       vulnerabilities: view.deps
         .filter((d) => d.advisory && !d.resolved)
@@ -393,7 +441,7 @@ export default function CodeReviewIAPage() {
         v.comments.filter((x) => x.status !== 'open').length, v.pr.firstReviewMin ?? '',
       ]);
     }
-    download('code-review-metricas-equipo.csv', `﻿${toCsv(rows)}`, 'text/csv;charset=utf-8');
+    download(t('csv.metricsFile'), `﻿${toCsv(rows)}`, 'text/csv;charset=utf-8');
     notify(t('toasts.exported'));
   };
 
@@ -426,6 +474,7 @@ export default function CodeReviewIAPage() {
     };
     setUserPrs((prev) => [newPr, ...prev]);
     setStates((prev) => ({ ...prev, [id]: freshState(newPr) }));
+    markStep('own');
     setSelectedId(id);
     setFilter('all');
     setQuery('');
@@ -456,7 +505,9 @@ export default function CodeReviewIAPage() {
     } catch {
       /* ignorar */
     }
+    setConfirmReset(false);
     setStates(initialStates());
+    setSteps({});
     setUserPrs([]);
     setSelectedId(SAMPLE_PRS[0].id);
     setTab('summary');
@@ -467,10 +518,51 @@ export default function CodeReviewIAPage() {
     notify(t('toasts.reset'));
   };
 
+  /** Vuelve un PR de ejemplo a su estado inicial (también deshace "Fusionar"). */
+  const resetPr = () => {
+    if (pr.userDiff) return;
+    const base = SAMPLE_PRS.find((p) => p.id === pr.id);
+    if (!base) return;
+    updatePr(pr.id, () => freshState(base));
+    setFocusId(null);
+    notify(t('toasts.prReset', { number: pr.number }));
+  };
+
   const selectPr = (id: string) => {
     setSelectedId(id);
     setOpenFile(null);
     setFocusId(null);
+  };
+  const scrollToTabs = () => {
+    window.setTimeout(() => tabsRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' }), 30);
+  };
+  const openModal = (from?: HTMLElement | null) => {
+    modalReturnRef.current = from ?? (document.activeElement as HTMLElement | null);
+    setModalOpen(true);
+  };
+  /** Botón "Ir" de cada primer paso: deja lista la pantalla donde se hace. */
+  const goStep = (id: StepId, from: HTMLElement) => {
+    if (id === 'own') {
+      openModal(from);
+      return;
+    }
+    if (id === 'apply' || id === 'merge') {
+      if (!filteredViews.some((v) => v.pr.id === START_PR)) {
+        setFilter('all');
+        setQuery('');
+      }
+      selectPr(START_PR);
+    }
+    if (id === 'merge') {
+      window.setTimeout(() => {
+        actionsRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
+        actionsRef.current?.querySelector<HTMLButtonElement>('button:not([disabled])')?.focus({ preventScroll: true });
+      }, 30);
+      return;
+    }
+    setTab(id === 'apply' ? 'comments' : id);
+    setFocusId(null);
+    scrollToTabs();
   };
   const goTab = (k: TabKey) => {
     setTab(k);
@@ -482,7 +574,24 @@ export default function CodeReviewIAPage() {
     setTab('diff');
     tabsRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
   };
-  const closeModal = useCallback(() => setModalOpen(false), []);
+  const closeModal = useCallback(() => {
+    setModalOpen(false);
+    // El foco vuelve al botón que abrió la ventana.
+    const back = modalReturnRef.current;
+    window.setTimeout(() => back?.focus?.(), 0);
+  }, []);
+  const onTabKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const idx = tabs.findIndex((x) => x.key === tab);
+    let next = -1;
+    if (e.key === 'ArrowRight') next = (idx + 1) % tabs.length;
+    else if (e.key === 'ArrowLeft') next = (idx - 1 + tabs.length) % tabs.length;
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = tabs.length - 1;
+    if (next < 0) return;
+    e.preventDefault();
+    goTab(tabs[next].key);
+    window.setTimeout(() => document.getElementById(`crv-tab-${tabs[next].key}`)?.focus(), 0);
+  };
 
   // ---------- Indicadores de cabecera (calculados con los datos) ----------
   const openCount = views.filter((v) => v.status !== 'merged').length;
@@ -510,39 +619,65 @@ export default function CodeReviewIAPage() {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
       <header className="border-b border-neutral-800 bg-gradient-to-r from-neutral-700 to-neutral-900 shadow-lg">
-        <div className="max-w-[1500px] mx-auto px-4 py-3 flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 mr-2 min-w-0">
-            <CodeBracketIcon className="w-6 h-6 text-neutral-200 shrink-0" />
-            <h1 className="font-semibold tracking-tight text-zinc-100">{t('header.title')}</h1>
-            <Badge variant="warning" size="sm" className="shrink-0">{t('header.sampleBadge')}</Badge>
-          </div>
-          <div className="order-last w-full md:order-none md:w-auto md:flex-1 md:max-w-md">
-            <div className="relative w-full">
-              <MagnifyingGlassIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
-              <input
-                type="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder={t('header.searchPlaceholder')}
-                aria-label={t('header.searchPlaceholder')}
-                className="w-full bg-neutral-900/60 border border-neutral-700 rounded-lg pl-9 pr-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-neutral-400"
-              />
+        <div className="max-w-[1500px] mx-auto px-4 pt-3 pb-4">
+          <BackToCatalog t={t} />
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2 mr-2 min-w-0">
+              <CodeBracketIcon className="w-6 h-6 text-neutral-200 shrink-0" />
+              <h1 className="text-lg font-semibold tracking-tight text-zinc-100">{t('header.title')}</h1>
+              <Badge variant="warning" size="sm" className="shrink-0" title={t('header.sampleHint')}>
+                {t('header.sampleBadge')}
+                <span className="sr-only">: {t('header.sampleHint')}</span>
+              </Badge>
+            </div>
+            <div className="order-last w-full md:order-none md:w-auto md:flex-1 md:max-w-md">
+              <div className="relative w-full">
+                <MagnifyingGlassIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+                <input
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder={t('header.searchPlaceholder')}
+                  aria-label={t('header.searchPlaceholder')}
+                  className="w-full bg-neutral-900/60 border border-neutral-600 rounded-lg pl-9 pr-3 py-2 text-sm text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-neutral-300 focus-visible:ring-2 focus-visible:ring-violet-400"
+                />
+              </div>
+            </div>
+            <div className="ml-auto flex flex-wrap items-center gap-2">
+              <Button size="sm" variant="primary" className="focus:!ring-offset-zinc-900" onClick={(e) => openModal(e.currentTarget)}>
+                <PuzzlePieceIcon className="w-4 h-4 mr-1.5" />{t('header.tryDiff')}
+              </Button>
+              <Button
+                ref={resetBtnRef}
+                size="sm" variant="ghost" className="!text-neutral-200 hover:!bg-neutral-800 focus:!ring-offset-zinc-900"
+                onClick={() => setConfirmReset(true)} title={t('header.resetHint')} aria-expanded={confirmReset}
+              >
+                <ArrowPathIcon className="w-4 h-4 mr-1" />{t('header.reset')}
+              </Button>
             </div>
           </div>
-          <div className="ml-auto flex flex-wrap items-center gap-2">
-            <Button size="sm" variant="primary" onClick={() => setModalOpen(true)}>
-              <PuzzlePieceIcon className="w-4 h-4 mr-1.5" />{t('header.tryDiff')}
-            </Button>
-            <Button size="sm" variant="outline" className="!border-neutral-300 !text-neutral-100 hover:!bg-neutral-800" asChild>
-              <Link href={RUTA_SOLICITAR_DEMO}>{t('header.requestDemo')}</Link>
-            </Button>
-            <Button size="sm" variant="ghost" className="!text-neutral-300 hover:!bg-neutral-800" onClick={resetDemo} title={t('header.resetHint')}>
-              <ArrowPathIcon className="w-4 h-4 mr-1" />{t('header.reset')}
-            </Button>
+          {confirmReset && (
+            <ResetConfirm
+              t={t}
+              onConfirm={() => { resetDemo(); window.setTimeout(() => resetBtnRef.current?.focus(), 0); }}
+              onCancel={() => { setConfirmReset(false); window.setTimeout(() => resetBtnRef.current?.focus(), 0); }}
+            />
+          )}
+          <p className="mt-2 text-sm text-neutral-100">{t('header.subtitle', { company: COMPANY })}</p>
+          <p className="mt-1 text-sm text-neutral-300">{t('header.audience')}</p>
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+            <p className="flex min-w-0 flex-1 basis-72 items-start gap-1.5 text-xs text-neutral-200">
+              <InformationCircleIcon className="w-4 h-4 shrink-0 text-violet-300" aria-hidden="true" />
+              <span>{t('header.start')}</span>
+            </p>
+            <nav aria-label={t('header.ctaLabel')}>
+              <CommercialLinks t={t} />
+            </nav>
           </div>
         </div>
-        <p className="max-w-[1500px] mx-auto px-4 pb-3 text-sm text-neutral-200/90">{t('header.subtitle', { company: COMPANY })}</p>
       </header>
+
+      <FirstSteps t={t} done={doneSteps} onGo={goStep} />
 
       <div className="max-w-[1500px] mx-auto px-4 py-5 space-y-5">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -567,18 +702,18 @@ export default function CodeReviewIAPage() {
                     type="button"
                     aria-pressed={filter === f}
                     onClick={() => setFilter(f)}
-                    className={`flex-1 py-2 transition-colors ${filter === f ? 'text-neutral-200 border-b-2 border-neutral-400 bg-neutral-800/40' : 'text-zinc-400 hover:text-zinc-200'}`}
+                    className={`flex-1 py-2 transition-colors ${FOCUS} focus-visible:ring-inset ${filter === f ? 'text-neutral-200 border-b-2 border-neutral-400 bg-neutral-800/40' : 'text-zinc-400 hover:text-zinc-200'}`}
                   >
                     {t(`sidebar.${f}`)}
                   </button>
                 ))}
               </div>
-              <div className="px-3 py-2 text-[11px] text-zinc-500 border-b border-zinc-800">{t('sidebar.viewingAs', { user: DEMO_USER })}</div>
+              <div className="px-3 py-2 text-[11px] text-zinc-400 border-b border-zinc-800">{t('sidebar.viewingAs', { user: DEMO_USER })}</div>
               <div className="max-h-[420px] lg:max-h-[640px] overflow-y-auto">
                 {filteredViews.length === 0 && (
                   <div className="p-4 text-xs text-zinc-400 space-y-2">
                     <p>{t('sidebar.empty')}</p>
-                    <Button size="sm" variant="ghost" className="!text-zinc-300 !px-0" onClick={() => { setQuery(''); setFilter('all'); }}>
+                    <Button size="sm" variant="ghost" className="!text-zinc-300 !px-0 hover:!bg-zinc-800 focus:!ring-offset-zinc-900" onClick={() => { setQuery(''); setFilter('all'); }}>
                       <XMarkIcon className="w-4 h-4 mr-1" />{t('sidebar.clear')}
                     </Button>
                   </div>
@@ -591,7 +726,7 @@ export default function CodeReviewIAPage() {
                       type="button"
                       onClick={() => selectPr(v.pr.id)}
                       aria-current={selectedId === v.pr.id ? 'true' : undefined}
-                      className={`w-full text-left px-3 py-3 border-b border-zinc-800 hover:bg-zinc-800/40 transition-colors ${selectedId === v.pr.id ? 'bg-zinc-800/60 border-l-4 border-l-neutral-300' : ''}`}
+                      className={`w-full text-left px-3 py-3 border-b border-zinc-800 hover:bg-zinc-800/40 transition-colors ${FOCUS} focus-visible:ring-inset ${selectedId === v.pr.id ? 'bg-zinc-800/60 border-l-4 border-l-neutral-300' : ''}`}
                     >
                       <div className="flex items-start justify-between gap-2">
                         <span className="text-[11px] text-zinc-500">#{v.pr.number}</span>
@@ -637,7 +772,7 @@ export default function CodeReviewIAPage() {
                 <Row label={t('pr.commits')} value={`${pr.commits}`} />
                 <Row label={t('pr.filesChanged')} value={`${view.files.length}`} />
                 <Row label={t('pr.changes')} value={<span><span className="text-emerald-400">+{view.additions}</span> / <span className="text-rose-400">-{view.deletions}</span></span>} />
-                <Row label={t('pr.openedAt')} value={formatStamp(pr.openedAt, locale)} />
+                <Row label={t('pr.openedAt')} value={fmtDate(pr.openedAt)} />
                 <Row
                   label={t('pr.firstReview')}
                   value={pr.firstReviewMin !== undefined ? t('pr.firstReviewValue', { min: pr.firstReviewMin }) : t('pr.firstReviewLocal')}
@@ -651,7 +786,7 @@ export default function CodeReviewIAPage() {
                       <button
                         type="button"
                         onClick={() => openFileInDiff(f.path)}
-                        className={`w-full flex items-center justify-between text-xs px-2 py-1.5 rounded hover:bg-zinc-800/60 ${tab === 'diff' && currentDiffFile === f.path ? 'bg-zinc-800/60 text-neutral-100' : 'text-zinc-300'}`}
+                        className={`w-full flex items-center justify-between text-xs px-2 py-1.5 rounded hover:bg-zinc-800/60 ${FOCUS} ${tab === 'diff' && currentDiffFile === f.path ? 'bg-zinc-800/60 text-neutral-100' : 'text-zinc-300'}`}
                       >
                         <span className="truncate text-left font-mono">{f.path}</span>
                         <span className="shrink-0 ml-2"><span className="text-emerald-400">+{f.additions}</span> <span className="text-rose-400">-{f.deletions}</span></span>
@@ -660,11 +795,11 @@ export default function CodeReviewIAPage() {
                   ))}
                 </ul>
               </div>
-              <div className="p-3 space-y-2">
+              <div ref={actionsRef} className="p-3 space-y-2 scroll-mt-24">
                 {pr.userDiff ? (
                   <>
                     <p className="text-[11px] text-zinc-400 flex gap-1.5"><InformationCircleIcon className="w-4 h-4 shrink-0" />{t('pr.userNote')}</p>
-                    <Button size="sm" variant="ghost" className="!text-rose-300 hover:!bg-zinc-800" onClick={deleteUserPr}>
+                    <Button size="sm" variant="ghost" className="!text-rose-300 hover:!bg-zinc-800 focus:!ring-offset-zinc-900" onClick={deleteUserPr}>
                       <TrashIcon className="w-4 h-4 mr-1.5" />{t('pr.deleteUserPr')}
                     </Button>
                   </>
@@ -673,19 +808,24 @@ export default function CodeReviewIAPage() {
                 ) : (
                   <>
                     <div className="flex gap-2 flex-wrap">
-                      <Button size="sm" variant="primary" className="!bg-emerald-600 hover:!bg-emerald-700" onClick={approve} disabled={isOwn || view.status === 'approved'}>
+                      <Button size="sm" variant="primary" className="!bg-emerald-600 hover:!bg-emerald-700 focus:!ring-offset-zinc-900" onClick={approve} disabled={isOwn || view.status === 'approved'}>
                         <CheckCircleIcon className="w-4 h-4 mr-1.5" />{t('pr.approve')}
                       </Button>
-                      <Button size="sm" variant="danger" onClick={requestChanges} disabled={isOwn || view.status === 'changesRequested'}>{t('pr.requestChanges')}</Button>
-                      <Button size="sm" variant="outline" className="!border-neutral-400 !text-neutral-200 hover:!bg-neutral-800" onClick={merge} disabled={view.status !== 'approved'}>{t('pr.merge')}</Button>
+                      <Button size="sm" variant="danger" className="focus:!ring-offset-zinc-900" onClick={requestChanges} disabled={isOwn || view.status === 'changesRequested'}>{t('pr.requestChanges')}</Button>
+                      <Button size="sm" variant="outline" className="!border-neutral-400 !text-neutral-200 hover:!bg-neutral-800 focus:!ring-offset-zinc-900" onClick={merge} disabled={view.status !== 'approved'}>{t('pr.merge')}</Button>
                     </div>
-                    <p className="text-[11px] text-zinc-500">
+                    <p className="text-[11px] text-zinc-400">
                       {isOwn && view.status !== 'approved' ? t('pr.ownNote')
                         : pendingBlocking > 0 ? t('pr.blockedNote', { count: pendingBlocking })
                           : view.status === 'approved' ? t('pr.readyNote')
                             : t('pr.approveNote')}
                     </p>
                   </>
+                )}
+                {!pr.userDiff && !isPristine(SAMPLE_PRS.find((p) => p.id === pr.id) ?? pr, states[pr.id]) && (
+                  <Button size="sm" variant="ghost" className="!text-zinc-300 hover:!bg-zinc-800 !px-2 focus:!ring-offset-zinc-900" onClick={resetPr} title={t('pr.resetPrHint')}>
+                    <ArrowUturnLeftIcon className="w-4 h-4 mr-1.5" />{t('pr.resetPr')}
+                  </Button>
                 )}
               </div>
             </Card>
@@ -694,15 +834,18 @@ export default function CodeReviewIAPage() {
           {/* Pestañas */}
           <Card variant="bordered" padding="none" className="!bg-zinc-900 !border-zinc-800 overflow-hidden min-w-0">
             <div ref={tabsRef} className="border-b border-zinc-800 overflow-x-auto scroll-mt-24">
-              <div className="flex min-w-max" role="tablist" aria-label={t('tabs.label')}>
+              <div className="flex min-w-max" role="tablist" aria-label={t('tabs.label')} onKeyDown={onTabKey}>
                 {tabs.map(({ key, label, icon: Icon, count }) => (
                   <button
                     key={key}
+                    id={`crv-tab-${key}`}
                     type="button"
                     role="tab"
                     aria-selected={tab === key}
+                    aria-controls="crv-tabpanel"
+                    tabIndex={tab === key ? 0 : -1}
                     onClick={() => goTab(key)}
-                    className={`flex items-center gap-1.5 px-2.5 py-3 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${tab === key ? 'border-neutral-300 text-neutral-100 bg-neutral-800/40' : 'border-transparent text-zinc-400 hover:text-zinc-200'}`}
+                    className={`flex items-center gap-1.5 px-2.5 py-3 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${FOCUS} focus-visible:ring-inset ${tab === key ? 'border-neutral-300 text-neutral-100 bg-neutral-800/40' : 'border-transparent text-zinc-400 hover:text-zinc-200'}`}
                   >
                     <Icon className="w-4 h-4" />{label}
                     {count !== undefined && count > 0 && <span className="ml-0.5 rounded-full bg-zinc-700 px-1.5 text-[10px] text-zinc-200">{count}</span>}
@@ -710,9 +853,9 @@ export default function CodeReviewIAPage() {
                 ))}
               </div>
             </div>
-            <div className="p-4 sm:p-5" role="tabpanel">
+            <div className="p-4 sm:p-5" role="tabpanel" id="crv-tabpanel" aria-labelledby={`crv-tab-${tab}`}>
               {tab === 'summary' && (
-                <SummaryTab view={view} t={t} locale={locale} onGo={goTab} onOpenFile={openFileInDiff} onTryDiff={() => setModalOpen(true)} />
+                <SummaryTab view={view} t={t} locale={locale} onOpenFile={openFileInDiff} fmtDate={fmtDate} />
               )}
               {tab === 'comments' && <CommentsTab view={view} t={t} locale={locale} actions={actions} focusId={focusId} />}
               {tab === 'diff' && (
@@ -735,11 +878,9 @@ export default function CodeReviewIAPage() {
           </Card>
         </div>
 
-        <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 px-4 py-3 text-xs text-zinc-400 flex flex-col md:flex-row md:items-center gap-3 justify-between">
+        <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 px-4 py-3 text-xs text-zinc-400 flex flex-col lg:flex-row lg:items-center gap-3 justify-between">
           <p className="flex gap-2"><InformationCircleIcon className="w-4 h-4 shrink-0 text-zinc-500" />{t('footer.sampleNote', { company: COMPANY })}</p>
-          <Button size="sm" variant="outline" className="!border-neutral-400 !text-neutral-200 hover:!bg-neutral-800 shrink-0" asChild>
-            <Link href={RUTA_SOLICITAR_DEMO}>{t('footer.cta')}</Link>
-          </Button>
+          <CommercialLinks t={t} className="shrink-0" />
         </div>
       </div>
 

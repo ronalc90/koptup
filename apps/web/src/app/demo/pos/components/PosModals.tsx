@@ -19,7 +19,7 @@ import {
   ClockIcon,
 } from '@heroicons/react/24/outline';
 import { PRESETS, SCALE_READINGS, type Customer, type ModGroup, type PayMethod, type PresetId, type Product } from './data';
-import { dateTimeLabel, docLabel, phoneLabel, plainNumber, type Payment, type Totals } from './engine';
+import { dateTimeLabel, docLabel, lineAmount, nitCheckDigit, phoneLabel, plainNumber, tipAmount, type Payment, type TicketLine, type Totals } from './engine';
 import type { Buyer, Closure, Sale } from './usePosStore';
 import { Modal, employeeName, inputCls, printById, selectCls, useFmt } from './ui';
 
@@ -252,7 +252,18 @@ export function CheckoutModal({
   }, [pending]);
 
   const buyerDigits = doc.replace(/[^0-9]/g, '');
-  const buyerValid = !wantsInvoice || (buyerDigits.length >= 5 && buyerDigits.length <= 12 && name.trim().length >= 3 && emailOk(email));
+  // El NIT se escribe con su dígito de verificación y se comprueba como lo hace la DIAN (módulo 11).
+  const nitMatch = /^(\d{6,10})-(\d)$/.exec(doc.replace(/[.\s]/g, ''));
+  const nitError =
+    !wantsInvoice || docType !== 'NIT' || !doc.trim()
+      ? null
+      : !nitMatch
+        ? t('checkout.buyer.nitFormat')
+        : nitCheckDigit(nitMatch[1]) !== Number(nitMatch[2])
+          ? t('checkout.buyer.nitDv', { dv: nitCheckDigit(nitMatch[1]) })
+          : null;
+  const buyerValid =
+    !wantsInvoice || (buyerDigits.length >= 5 && buyerDigits.length <= 12 && !nitError && name.trim().length >= 3 && emailOk(email));
 
   const add = (m: PayMethod, value: number) => {
     setError(null);
@@ -296,7 +307,8 @@ export function CheckoutModal({
   const missing: string[] = [];
   if (tipPct === null) missing.push(t('checkout.missing.tip'));
   if (pending > 0) missing.push(t('checkout.missing.pending', { amount: f.money(pending) }));
-  if (!buyerValid) missing.push(t('checkout.missing.buyer'));
+  if (nitError) missing.push(nitError);
+  else if (!buyerValid) missing.push(t('checkout.missing.buyer'));
 
   return (
     <Modal labelId="pos-checkout-title" title={t('checkout.title')} onClose={onCancel} size="lg">
@@ -471,7 +483,20 @@ export function CheckoutModal({
               <option value="NIT">{t('checkout.buyer.docTypes.NIT')}</option>
               <option value="CE">{t('checkout.buyer.docTypes.CE')}</option>
             </select>
-            <input value={doc} onChange={(e) => setDoc(e.target.value.slice(0, 15))} placeholder={t('checkout.buyer.doc')} aria-label={t('checkout.buyer.doc')} className={`${inputCls} sm:col-span-2`} />
+            <input
+              value={doc}
+              onChange={(e) => setDoc(e.target.value.slice(0, 15))}
+              placeholder={docType === 'NIT' ? t('checkout.buyer.nitPlaceholder') : t('checkout.buyer.doc')}
+              aria-label={t('checkout.buyer.doc')}
+              aria-invalid={!!nitError}
+              aria-describedby={nitError ? 'pos-nit-error' : undefined}
+              className={`${inputCls} sm:col-span-2`}
+            />
+            {nitError && (
+              <p id="pos-nit-error" className="sm:col-span-3 -mt-1 text-xs text-red-600">
+                {nitError}
+              </p>
+            )}
             <input value={name} onChange={(e) => setName(e.target.value.slice(0, 60))} placeholder={t('checkout.buyer.name')} aria-label={t('checkout.buyer.name')} className={`${inputCls} sm:col-span-3`} />
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value.slice(0, 80))} placeholder={t('checkout.buyer.email')} aria-label={t('checkout.buyer.email')} className={`${inputCls} sm:col-span-3`} />
           </div>
@@ -729,6 +754,115 @@ export function ReceiptModal({
 }
 
 // ---------------------------------------------------------------------------
+// Pre-cuenta de una mesa (informativa: no es documento fiscal)
+// ---------------------------------------------------------------------------
+
+/** Propina sugerida que se muestra en la pre-cuenta (el cliente decide al pagar). */
+const SUGGESTED_TIP = 10;
+
+export function BillModal({
+  preset,
+  sede,
+  table,
+  guests,
+  waiterId,
+  lines,
+  totals,
+  pointsRedeemed,
+  issuedAt,
+  onClose,
+  notify,
+}: {
+  preset: PresetId;
+  sede: string;
+  table: number;
+  guests: number;
+  waiterId?: string;
+  lines: TicketLine[];
+  totals: Totals;
+  pointsRedeemed: number;
+  issuedAt: string;
+  onClose: () => void;
+  notify: (m: string) => void;
+}) {
+  const t = useTranslations('demoPos');
+  const f = useFmt();
+  const p = PRESETS[preset];
+  const sedeObj = p.sedes.find((s) => s.id === sede);
+  const tip = tipAmount(totals.base, SUGGESTED_TIP);
+  const waiter = employeeName(preset, waiterId);
+  return (
+    <Modal labelId="pos-bill-title" title={t('bill.title', { n: table })} subtitle={t('bill.subtitle')} onClose={onClose}>
+      <div className="max-h-[50vh] overflow-y-auto mb-4">
+        <div id="pos-bill-print" className="bg-white text-secondary-900 font-mono text-[11px] sm:text-xs rounded-md border-2 border-dashed border-secondary-300 p-3 sm:p-4">
+          <div className="text-center mb-2">
+            <div className="font-bold text-sm">{p.business.name}</div>
+            <div>{sedeObj?.address}</div>
+            <div className="mt-1 font-bold">{t('bill.heading')}</div>
+            <div>
+              {t('receipt.table', { n: table })} · {t('bill.guests', { n: guests })}
+            </div>
+            {waiter && <div>{t('receipt.waiter', { name: waiter })}</div>}
+            <div>{t('receipt.date', { date: dateTimeLabel(issuedAt, f.locale) })}</div>
+          </div>
+          <div className="border-t border-dashed border-secondary-400 my-2" />
+          {lines.map((l) => (
+            <div key={l.uid} className="mb-0.5">
+              <div className="flex justify-between gap-2">
+                <span className="min-w-0 break-words">
+                  {l.qty}× {l.name}
+                </span>
+                <span className="shrink-0">{f.money(lineAmount(l))}</span>
+              </div>
+              {(l.mods?.length || l.note) && (
+                <div className="pl-2 opacity-80">{[...(l.mods ?? []).map((m) => t(`modifiers.items.${m}`)), ...(l.note ? [l.note] : [])].join(', ')}</div>
+              )}
+            </div>
+          ))}
+          <div className="border-t border-dashed border-secondary-400 my-2" />
+          <Row label={t('ticket.gross')} value={f.money(totals.gross)} />
+          {totals.discount > 0 && <Row label={t('ticket.pointsDiscount', { points: plainNumber(pointsRedeemed, f.locale) })} value={`−${f.money(totals.discount)}`} />}
+          <Row label={t('ticket.base')} value={f.money(totals.base)} />
+          {totals.taxes
+            .filter((x) => x.kind !== 'exento')
+            .map((x) => (
+              <Row key={x.kind} label={t(`tax.${x.kind}`)} value={f.money(x.tax)} />
+            ))}
+          <div className="flex justify-between font-bold text-sm mt-1">
+            <span>{t('bill.subtotal')}</span>
+            <span>{f.money(totals.net)}</span>
+          </div>
+          <div className="border-t border-dashed border-secondary-400 my-2" />
+          <Row label={t('bill.tip', { pct: SUGGESTED_TIP })} value={f.money(tip)} />
+          <div className="flex justify-between font-bold mt-0.5">
+            <span>{t('bill.totalWithTip')}</span>
+            <span>{f.money(totals.net + tip)}</span>
+          </div>
+          <div className="mt-2 text-[10px]">{t('bill.tipNote')}</div>
+          <div className="text-center mt-2 text-[10px] font-semibold">{t('bill.notFiscal')}</div>
+        </div>
+      </div>
+      <div className="flex flex-col sm:flex-row gap-2">
+        <Button
+          variant="outline"
+          onClick={() => {
+            notify(t('receipt.printing'));
+            printById('pos-bill-print');
+          }}
+          className="flex-1 gap-1"
+        >
+          <PrinterIcon className="h-4 w-4" />
+          {t('receipt.print')}
+        </Button>
+        <Button onClick={onClose} className="flex-1">
+          {t('receipt.done')}
+        </Button>
+      </div>
+    </Modal>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Caja: apertura y cierre (Z)
 // ---------------------------------------------------------------------------
 
@@ -772,6 +906,7 @@ export function OpenShiftModal({
             {candidates.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name} · {t(`staff.roles.${c.role}`)}
+                {staffIn(c.id) ? '' : ` · ${t('staff.off')}`}
               </option>
             ))}
           </select>

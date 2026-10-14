@@ -2,14 +2,15 @@
 
 /**
  * Estado de la demo en el navegador: reducer + localStorage (clave
- * `demo:cms:v1`). Los datos se generan después de montar la página, con la
- * hora del navegador, así que el HTML del servidor no tiene fechas (sin
- * errores de hidratación). Cada 5 s se revisan las publicaciones programadas.
+ * `demo:cms:v1`; lo guardado por versiones anteriores compatibles se migra).
+ * Los datos se generan después de montar la página, con la hora del
+ * navegador, así que el HTML del servidor no tiene fechas (sin errores de
+ * hidratación). Cada 5 s se revisan las publicaciones programadas.
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from 'react';
 import { useLocale } from 'next-intl';
 import { currentUser, reducer, type Action } from './reducer';
-import { buildState, STATE_VERSION } from './seed';
+import { buildState, migrate } from './seed';
 import { iso } from './time';
 import type { AppState, Locale, Person, Status, ViewId } from './types';
 
@@ -37,6 +38,10 @@ interface Ctx {
   setContentLocale: (l: Locale) => void;
   toasts: Toast[];
   toast: (text: string, tone?: Toast['tone']) => void;
+  dismissToast: (id: number) => void;
+  /** Veces que la IA respondió en esta visita (no se guarda). */
+  aiUses: number;
+  countAiUse: () => void;
   reset: () => void;
   nowMs: number;
   storageOk: boolean;
@@ -52,8 +57,9 @@ function load(): AppState {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (raw) {
-      const parsed = JSON.parse(raw) as AppState;
-      if (parsed && parsed.version === STATE_VERSION && Array.isArray(parsed.entries)) return parsed;
+      // Lo guardado por una versión anterior compatible se conserva (ver `migrate`).
+      const parsed = migrate(JSON.parse(raw));
+      if (parsed) return parsed;
     }
   } catch {
     /* sin almacenamiento: datos nuevos */
@@ -76,6 +82,7 @@ export function CmsProvider({ children }: { children: ReactNode }) {
   const [nowMs, setNowMs] = useState(0);
   const [storageOk, setStorageOk] = useState(true);
   const [statusPreset, setStatusPreset] = useState<Status | null>(null);
+  const [aiUses, setAiUses] = useState(0);
   const seq = useRef(0);
 
   useEffect(() => {
@@ -101,11 +108,19 @@ export function CmsProvider({ children }: { children: ReactNode }) {
     }
   }, [state]);
 
-  const toast = useCallback((text: string, tone: Toast['tone'] = 'ok') => {
-    const id = ++seq.current;
-    setToasts((t) => [...t.slice(-2), { id, text, tone }]);
-    window.setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 4200);
-  }, []);
+  const dismissToast = useCallback((id: number) => setToasts((t) => t.filter((x) => x.id !== id)), []);
+
+  // Como máximo dos avisos a la vez; cada uno se va solo a los 4 s o con su botón de cerrar.
+  const toast = useCallback(
+    (text: string, tone: Toast['tone'] = 'ok') => {
+      const id = ++seq.current;
+      setToasts((t) => [...t.slice(-1), { id, text, tone }]);
+      window.setTimeout(() => dismissToast(id), 4000);
+    },
+    [dismissToast],
+  );
+
+  const countAiUse = useCallback(() => setAiUses((n) => n + 1), []);
 
   const act = useCallback((a: ActInput) => {
     dispatch({ ...a, now: iso(Date.now()) } as Action);
@@ -159,6 +174,9 @@ export function CmsProvider({ children }: { children: ReactNode }) {
             setContentLocale,
             toasts,
             toast,
+            dismissToast,
+            aiUses,
+            countAiUse,
             reset,
             nowMs,
             storageOk,
@@ -167,7 +185,7 @@ export function CmsProvider({ children }: { children: ReactNode }) {
             showEntries,
           }
         : null,
-    [state, act, view, go, editingId, openEntry, contentLocale, toasts, toast, reset, nowMs, storageOk, newId, statusPreset, showEntries],
+    [state, act, view, go, editingId, openEntry, contentLocale, toasts, toast, dismissToast, aiUses, countAiUse, reset, nowMs, storageOk, newId, statusPreset, showEntries],
   );
 
   return <CmsContext.Provider value={value}>{children}</CmsContext.Provider>;

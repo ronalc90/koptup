@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, type KeyboardEvent } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { InformationCircleIcon, MagnifyingGlassIcon, ServerIcon, ComputerDesktopIcon } from '@heroicons/react/24/outline';
 import Card from '@/components/ui/Card';
@@ -78,16 +78,17 @@ export default function BuscarCodigosTab({
     setError(null);
   };
 
-  const opcion = (f: Fuente, titulo: string, detalle: string, Icono: typeof ServerIcon, deshabilitada: boolean) => {
+  const opcion = (f: Fuente, titulo: string, detalle: string, Icono: typeof ServerIcon) => {
     const activa = fuenteEfectiva === f;
     return (
       <button
         type="button"
         role="radio"
+        id={`fuente-${f}`}
         aria-checked={activa}
-        disabled={deshabilitada}
+        tabIndex={activa ? 0 : -1}
         onClick={() => cambiarFuente(f)}
-        className={`flex flex-1 items-start gap-3 rounded-lg border p-3 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+        className={`flex flex-1 items-start gap-3 rounded-lg border p-3 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-secondary-900 ${
           activa
             ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
             : 'border-secondary-200 hover:border-primary-300 dark:border-secondary-700'
@@ -102,6 +103,15 @@ export default function BuscarCodigosTab({
     );
   };
 
+  /** Flechas cambian la fuente (patrón de grupo de opciones accesible). */
+  const onTeclaFuente = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (!['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp'].includes(e.key)) return;
+    e.preventDefault();
+    const otra: Fuente = fuenteEfectiva === 'ejemplo' ? 'servidor' : 'ejemplo';
+    cambiarFuente(otra);
+    document.getElementById(`fuente-${otra}`)?.focus();
+  };
+
   const total = resultado?.items.length ?? 0;
 
   return (
@@ -111,21 +121,29 @@ export default function BuscarCodigosTab({
         <p className="mt-1 text-secondary-600 dark:text-secondary-400">{t('subtitle')}</p>
       </div>
 
-      <div className="mb-5">
-        <p className="mb-2 text-sm font-medium text-secondary-700 dark:text-secondary-300" id="fuente-busqueda">
-          {t('sourceLabel')}
-        </p>
-        <div role="radiogroup" aria-labelledby="fuente-busqueda" className="flex flex-col gap-2 sm:flex-row">
-          {opcion('ejemplo', t('sourceSample'), t('sourceSampleHint', { total: CATALOGO_EJEMPLO.length }), ComputerDesktopIcon, false)}
-          {opcion(
-            'servidor',
-            t('sourceServer'),
-            servidorDisponible ? t('sourceServerHint', { total: formatoNumero(vectorizados, locale) }) : t('sourceServerOff'),
-            ServerIcon,
-            !servidorDisponible
-          )}
+      {servidorDisponible ? (
+        <div className="mb-5">
+          <p className="mb-2 text-sm font-medium text-secondary-700 dark:text-secondary-300" id="fuente-busqueda">
+            {t('sourceLabel')}
+          </p>
+          <div role="radiogroup" aria-labelledby="fuente-busqueda" className="flex flex-col gap-2 sm:flex-row" onKeyDown={onTeclaFuente}>
+            {opcion('ejemplo', t('sourceSample'), t('sourceSampleHint', { total: CATALOGO_EJEMPLO.length }), ComputerDesktopIcon)}
+            {opcion('servidor', t('sourceServer'), t('sourceServerHint', { total: formatoNumero(vectorizados, locale) }), ServerIcon)}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="mb-5 flex items-start gap-3 rounded-lg border border-secondary-200 bg-secondary-50 p-3 text-sm dark:border-secondary-700 dark:bg-secondary-800">
+          <ComputerDesktopIcon className="mt-0.5 h-5 w-5 shrink-0 text-primary-600 dark:text-primary-400" aria-hidden="true" />
+          <div className="min-w-0">
+            <p className="font-medium text-secondary-900 dark:text-white">
+              {t('sourceOnlySample', { total: CATALOGO_EJEMPLO.length })}
+            </p>
+            <p className="text-secondary-600 dark:text-secondary-400">
+              {estado === 'ok' ? t('sourceServerOff') : t('sourceServerUnknown')}
+            </p>
+          </div>
+        </div>
+      )}
 
       <form onSubmit={onSubmit} className="mb-4 flex flex-col gap-2 sm:flex-row">
         <label htmlFor="consulta-cups" className="sr-only">
@@ -157,7 +175,7 @@ export default function BuscarCodigosTab({
               type="button"
               onClick={() => usarEjemplo(t(clave))}
               disabled={buscando}
-              className="rounded-full bg-secondary-100 px-3 py-1 text-xs text-secondary-700 transition-colors hover:bg-primary-100 hover:text-primary-700 dark:bg-secondary-800 dark:text-secondary-300 dark:hover:bg-primary-900 dark:hover:text-primary-300"
+              className="rounded-full bg-secondary-100 px-3 py-1 text-xs text-secondary-700 transition-colors hover:bg-primary-100 hover:text-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:bg-secondary-800 dark:text-secondary-300 dark:hover:bg-primary-900 dark:hover:text-primary-300"
             >
               {t(clave)}
             </button>

@@ -48,7 +48,7 @@
       "resumen": "Overview",
       "finanzas": "Finance",
       "clientes": "Customers",
-      "preguntas": "Ask your data",
+      "preguntas": "Guided questions",
       "alertas": "Alerts",
       "fuentes": "Data sources",
       "configuracion": "Settings"
@@ -57,8 +57,8 @@
       "product": "Executive dashboard",
       "expand": "Expand sidebar",
       "collapse": "Collapse sidebar",
-      "openMenu": "Open menu",
-      "closeMenu": "Close menu",
+      "openMenu": "Open the dashboard sections",
+      "closeMenu": "Close the sections",
       "sidebarSample": "Sample data: the company, customers, tax ID and figures are fictitious and generated in your browser.",
       "sidebarUpload": "You are viewing the data from your file. It never leaves your browser; reloading takes you back to the sample data.",
       "pdf": "PDF report",
@@ -81,11 +81,12 @@
         "resumen": "Indicators for {period} against the target and the same period last year.",
         "finanzas": "Income statement for {period}, receivables aging and projected cash flow.",
         "clientes": "Sales, margin, receivables and segment for each customer in {period}.",
-        "preguntas": "Guided questions answered with the dashboard figures.",
+        "preguntas": "Answers calculated with the figures for {period}, each with its formula.",
         "alertas": "Deviations detected by rules and a preview of the weekly summary.",
         "fuentes": "Where the data comes from and how to try the dashboard with your own file.",
         "configuracion": "Company, sales target, alert thresholds and summary recipients."
-      }
+      },
+      "sections": "Sections"
     },
     "search": {
       "label": "Search the dashboard",
@@ -186,7 +187,7 @@
         "note": "Distinct customers with at least one invoice in the period"
       },
       "ticket": {
-        "title": "Average ticket",
+        "title": "Average invoice value",
         "note": "{count, plural, one {Sales ÷ # invoice} other {Sales ÷ # invoices}}"
       },
       "yoy": "{pct} vs. last year",
@@ -208,15 +209,15 @@
       "month": "Month"
     },
     "overview": {
-      "salesTitle": "Sales {year}: actual, target and projection",
-      "salesSubtitle": "Target = same month of {prev} + {goal}%. Projection: {method}, 80% band. No AI involved.",
-      "salesSubtitleNoForecast": "Target = same month of {prev} + {goal}%. Not enough months to project.",
+      "salesTitle": "Sales from {from} to {to}: actual, target and projection",
+      "salesSubtitle": "Target = same month last year + {goal}%. Projection: {method}, 80% band. No AI involved.",
+      "salesSubtitleNoForecast": "Target = same month last year + {goal}%. The projection appears when you pick the latest month with data.",
       "method": {
         "seasonal": "same month last year × growth of the last 3 months",
         "trend": "linear trend of the last months"
       },
       "cityTitle": "Sales by {dim} vs. target",
-      "citySubtitle": "Green: on target · amber: up to 5% below · red: more than 5% below.",
+      "citySubtitle": "Green: on target · amber: up to {gap}% below · red: more than {gap}% below (threshold in Settings).",
       "linesTitle": "Sales by business line",
       "linesSubtitle": "Share of the period’s sales and gross margin of each line.",
       "marginShort": "margin {pct}",
@@ -246,7 +247,8 @@
       "margin": "Gross margin is {margin} vs. {prev} in the same period last year ({delta}). The line that changed the most is {line}: from {linePrev} to {lineMargin}.",
       "overdue": "Receivables more than 90 days past due total {over90}. {count, plural, one {One customer accounts} other {# customers account}} for {share}: {names}.",
       "forecast": "At the current pace, {range} would close at {value} (80% range: {low} to {high}), {compliance} of target.",
-      "forecastNoBudget": "At the current pace, {range} would close at {value} (80% range: {low} to {high})."
+      "forecastNoBudget": "At the current pace, {range} would close at {value} (80% range: {low} to {high}).",
+      "overdueAll": "Receivables more than 90 days past due total {over90}, all of it from {count, plural, one {one customer} other {# customers}}: {names}."
     },
     "finance": {
       "uploadTitle": "Finance with your file",
@@ -315,7 +317,7 @@
         "legendMin": "Lowest-cash week",
         "legendBelow": "Below minimum cash",
         "legendFloor": "Minimum cash ({floor})",
-        "legendMarkers": "IVA = bimonthly VAT payment · P = service bonus (prima)",
+        "legendMarkers": "IVA = bimonthly VAT payment · P = service bonus (prima, June and December)",
         "markerTax": "IVA",
         "markerBonus": "P",
         "weekRange": "Week {n}: {start} to {end}",
@@ -329,8 +331,9 @@
         "rentOther": "Rent and other",
         "tax": "VAT",
         "balance": "Balance",
-        "method": "How it is calculated: open receivables are collected on their due date plus each customer’s average delay (whatever is already past that delay is spread over the next 4 weeks, and invoices more than 180 days past due, {excluded}, are not projected); projected sales are collected according to each customer’s terms and delay (on average {days} days); suppliers paid at {supplierDays} days; payroll twice a month, service bonus in December, rent on the 5th and other expenses spread across the month.",
-        "taxNote": "Bimonthly VAT is 19% of taxable sales minus VAT on taxable purchases. The payment date ({date}) is an example: the real one depends on the last digit of the tax ID in the DIAN calendar."
+        "method": "How it is calculated: open receivables are collected on their due date plus each customer’s average delay (whatever is already past that delay is spread over the next 4 weeks, and invoices more than 180 days past due, {excluded}, are not projected); projected sales are collected according to each customer’s terms and delay (on average {days} days); suppliers paid at {supplierDays} days; payroll twice a month, service bonus (prima) in June and December, rent on the 5th and other expenses spread across the month.",
+        "taxNote": "Bimonthly VAT is 19% of taxable sales minus VAT on taxable purchases. The payment date ({date}) is an example: the real one depends on the last digit of the tax ID in the DIAN calendar.",
+        "belowFloor": "Below the minimum cash"
       },
       "moves": {
         "title": "Key movements",
@@ -346,8 +349,8 @@
       }
     },
     "customers": {
-      "title": "Customer ranking",
-      "subtitle": "{period}. “At risk”: buys {drop}% or less than in the same period last year.",
+      "title": "Customers in the period",
+      "subtitle": "{period}. “At risk”: their purchases fell {drop}% or more against the same period last year.",
       "export": "Export CSV",
       "exported": "{file} downloaded ({count, plural, one {# row} other {# rows}})",
       "all": "All ({count})",
@@ -378,7 +381,7 @@
         "segment": "Segment"
       },
       "noPrev": "No data",
-      "segmentNote": "Rule-based segments: “New” = first purchase in the last 180 days; “At risk” = buys {drop}% or less than a year ago; “Recurring” = everyone else. Change the threshold in Settings.",
+      "segmentNote": "Rule-based segments: “New” = first purchase in the last 180 days; “At risk” = their purchases fell {drop}% or more against the same period last year; “Recurring” = everyone else. Change the threshold in Settings.",
       "csv": {
         "customer": "Customer",
         "seller": "Sales rep",
@@ -409,7 +412,7 @@
         "segmentWhy": {
           "nuevo": "First purchase less than 180 days ago.",
           "recurrente": "Buys steadily compared with last year.",
-          "riesgo": "Buys {drop}% or less than in the same period last year."
+          "riesgo": "Their purchases fell {drop}% or more against the same period last year."
         },
         "last12": "Sales over the last 12 months",
         "openTitle": "Open invoices as of {date}",
@@ -440,7 +443,7 @@
       }
     },
     "ask": {
-      "title": "Guided questions",
+      "title": "Pick or type your question",
       "subtitle": "Pick a question or type it. Answers are calculated with the figures for {period}.",
       "q": {
         "customersDown": "Which customers buy less than last year?",
@@ -489,7 +492,7 @@
       "subtitle": "Rules are evaluated every time you change the period, the data or the thresholds.",
       "editThresholds": "Edit thresholds",
       "empty": "No alerts with the current thresholds.",
-      "rules": "Rules: sales or a city more than {goalGap}% below target · a line whose margin is {marginDrop} pts lower than last year · receivables > 90 days up more than {overdueGrowth}% vs. the previous close · projected cash below {cashFloor} · customers buying {riskDrop}% or less than a year ago · projection below target.",
+      "rules": "Rules: sales or a city more than {goalGap}% below target · a line whose margin is {marginDrop} pts lower than last year · receivables > 90 days up more than {overdueGrowth}% vs. the previous close · cash at cut-off or projected below {cashFloor} · customers whose purchases fell {riskDrop}% or more against last year · projection below target.",
       "severity": {
         "critical": "Critical",
         "warning": "Warning",
@@ -519,11 +522,12 @@
         },
         "cashFloor": {
           "title": "Projected cash below the minimum",
-          "text": "In the week of {start} to {end}, projected cash drops to {balance}, below the minimum of {floor}."
+          "text": "In the week of {start} to {end}, projected cash drops to {balance}, below the minimum of {floor}.",
+          "textToday": "Cash at cut-off ({today}) is already below the minimum of {floor}. Over the next 13 weeks the lowest point is {balance}, in the week of {start} to {end}."
         },
         "customersRisk": {
           "title": "{count, plural, one {# customer at risk} other {# customers at risk}}",
-          "text": "They buy {drop}% or less than in the same period last year: {names}{count, plural, one {} =2 {} =3 {} other { and others}}. Together that is {lost} less."
+          "text": "Their purchases fell {drop}% or more against the same period last year: {names}{count, plural, one {} =2 {} =3 {} other { and others}}. Together that is {lost} less."
         },
         "forecastGoal": {
           "title": "Projection below target",
@@ -542,7 +546,7 @@
       "noAlerts": "No active alerts",
       "forecast": "Projection {range}: {value}",
       "link": "Open dashboard: {link}",
-      "linkPlaceholder": "Open dashboard: link to your dashboard",
+      "linkPlaceholder": "Open dashboard: (link to this demo)",
       "previewTitle": "Monday summary (preview)",
       "previewSubtitle": "This is how the weekly summary would arrive by WhatsApp or email, with the figures for the selected period.",
       "channel": "Channel",
@@ -692,8 +696,8 @@
         "goalGap": "Alert if sales (or a city) fall further below target.",
         "marginDrop": "Alert if a line loses these points vs. last year.",
         "overdueGrowth": "Alert if receivables > 90 days grow more vs. the previous close.",
-        "riskDrop": "Customers buying this percentage or less than a year ago.",
-        "cashFloor": "Alert if any cash-flow week falls below it (millions of pesos)."
+        "riskDrop": "Flags a customer as “at risk” when their purchases fall this percentage or more against last year.",
+        "cashFloor": "Alert if cash at cut-off or any cash-flow week falls below it (millions of pesos)."
       },
       "recipientsTitle": "Monday summary recipients",
       "recipientsSubtitle": "Used in the weekly summary preview (Alerts).",
@@ -721,7 +725,7 @@
       "saved": "Settings saved in this browser",
       "storageNote": "Saved only in this browser (localStorage); nobody else sees it. Current target for the sector: {goal}%.",
       "resetTitle": "Reset the demo?",
-      "resetText": "You go back to the sample data, the fictitious company, the default targets and thresholds and the latest month with data. If you uploaded a file, it is discarded.",
+      "resetText": "You go back to the sample data, the fictitious company, the default targets and thresholds, the latest month with data and unticked first steps. If you uploaded a file, it is discarded.",
       "resetConfirm": "Yes, reset",
       "resetDone": "Demo reset",
       "cancel": "Cancel",
@@ -732,7 +736,8 @@
         "goal": "The target must be between −50% and 100%.",
         "threshold": "Check the value of “{field}”.",
         "email": "{name}’s email address is not valid.",
-        "phone": "{name}’s mobile number must have at least 10 digits."
+        "phone": "{name}’s mobile number must have at least 10 digits.",
+        "nitDv": "The check digit does not match: for tax ID {nit} it is {dv}."
       }
     },
     "report": {
@@ -747,7 +752,7 @@
       "topCustomers": "Top customers",
       "aging": "Receivables aging as of {date}",
       "cash": "13-week cash flow from {date}",
-      "cashNote": "Cash at cut-off: {start}. Lowest point: {min} in the week of {week}.",
+      "cashNote": "Cash at cut-off: {start}. Lowest point over the 13 weeks: {min}, in the week of {week}. Minimum cash: {floor}.",
       "alerts": "Alerts",
       "method": "How the figures were calculated",
       "methodGoal": "Target = sales of the same months last year + {goal}%.",
@@ -766,10 +771,71 @@
       "yoy": "Vs. last year",
       "overdue": "Past due",
       "amount": "Amount",
-      "footer": "Koptup executive dashboard demo · sample data",
+      "footer": "KopTup executive dashboard demo · sample data",
       "page": "Page {n} of {total}",
       "done": "Report downloaded: {file}",
       "error": "The PDF could not be generated. Please try again."
+    },
+    "intro": {
+      "back": "Back to the demo catalog",
+      "sampleBadge": "Sample data",
+      "sampleHint": "The company, customers, tax ID and figures are fictitious and calculated in your browser.",
+      "title": "Executive dashboard for management",
+      "subtitle": "Sales against target, margin, receivables, cash flow and alerts for a Colombian company on one screen, with a PDF report ready for the board.",
+      "audience": "For general managers, finance managers and business owners who build their reports by hand in Excel today. Start with the first steps below or try it with a CSV of your sales.",
+      "requestDemo": "Request a guided demo",
+      "quote": "Get a quote for your dashboard",
+      "tryCsv": "Try it with your CSV",
+      "reset": "Reset demo",
+      "cutoffNote": "Data cut-off: last closed month ({month}). The sample data rolls forward by itself every month.",
+      "how": {
+        "title": "How this demo works",
+        "show": "Show",
+        "hide": "Hide",
+        "data": "Every figure comes from the same sample invoices and is calculated in your browser: what you see in Overview, Finance, Customers, the alerts and the PDF always adds up.",
+        "dates": "The cut-off is the last closed month ({month}); you can review any of the last 12 months, their quarters or the year to date.",
+        "noAi": "No AI in this demo: the summary and alerts are built with rules, the projection is statistical and the questions are guided. In your project, an AI model can write the summary and answer free-form questions.",
+        "simulated": "The Monday summary is a preview: nothing is sent automatically. Connectors (Siigo, SAP Business One, HubSpot and others) are set up in your project; there are no connections here.",
+        "storage": "Your settings are saved only in this browser. Any CSV you load never leaves it and is discarded when you reload."
+      }
+    },
+    "guide": {
+      "title": "First steps",
+      "subtitle": "Five one-minute steps to see what the dashboard does. They tick themselves off as you do them.",
+      "progress": "{done} of {total} done",
+      "hide": "Hide",
+      "show": "Show",
+      "done": "Done",
+      "steps": {
+        "period": {
+          "title": "Change the period",
+          "text": "Pick another month, a quarter or the year to date: indicators, alerts and the PDF are recalculated.",
+          "action": "Pick a period"
+        },
+        "finance": {
+          "title": "Check 13 weeks of cash",
+          "text": "Find the week when cash runs lowest and which payments explain it.",
+          "action": "Open Finance"
+        },
+        "customer": {
+          "title": "Open an at-risk customer",
+          "text": "Customers whose purchases fell against last year, with what they owe you.",
+          "action": "See at-risk customers"
+        },
+        "ask": {
+          "title": "Ask a guided question",
+          "text": "For example, which city is furthest from target; the answer shows how it was calculated.",
+          "action": "Go to the questions"
+        },
+        "pdf": {
+          "title": "Download the PDF report",
+          "text": "Two pages with the period's figures, ready to send to your board.",
+          "action": "Download PDF"
+        }
+      },
+      "finished": "Done! You have seen the main features. Want to see it with your company's data?",
+      "finishedDemo": "Request a guided demo",
+      "finishedQuote": "Get a quote for your dashboard"
     }
   }
 }

@@ -4,6 +4,8 @@
  * Consultorio virtual (vista del profesional): sala de espera con signos de alarma,
  * videoconsulta (paciente simulado + tu cámara opcional), chat con guion, ficha,
  * laboratorios del paciente, receta y órdenes, notas SOAP y cierre con resumen.
+ * La consulta en curso vive en el estado guardado de la demo: si recargas, sigue abierta.
+ * Cada paciente lo atiende el profesional de su especialidad y se factura con su tarifa.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
@@ -33,15 +35,15 @@ import {
   XCircleIcon,
 } from '@heroicons/react/24/outline';
 import PatientRecordPanel from './PatientRecordPanel';
-import PrescriptionEditor, { ConsultDraft, EMPTY_DRAFT } from './PrescriptionEditor';
+import PrescriptionEditor from './PrescriptionEditor';
 import { flagBadge } from './LabBillingPanels';
-import { DEMO_DATE, IPS, LAB_ORDERS, PROFESSIONAL } from './mockData';
-import { avatarColor, demoClock, fmtCOP, fmtDate, fmtDec, fmtTimer, initials, payerOf, priceFor, sortQueue, tx } from './logic';
+import { GENERIC_REPLY, IPS, LAB_ORDERS, SPECIALTIES } from './mockData';
+import { avatarColor, fmtCOP, fmtDate, fmtDec, fmtTimer, initials, payerOf, priceFor, sortQueue, specOf, tx, waitMinutes } from './logic';
 import { makePdf } from './pdf';
 import { attachStream, useCameraAllowed, useLocalMedia } from './useLocalMedia';
 import { Modal, PRIORITY_STYLES, SimTag, useAuditText, useDateNames, useLoc } from './ui';
 import type { TelemedStore } from './store';
-import type { Attention, ChatMessage, ConsultTab, MainTab, Patient, Priority, Soap } from './types';
+import type { Attention, ConsultDraft, ConsultTab, MainTab, Patient, Priority, SpecKey, Soap } from './types';
 
 interface Props {
   store: TelemedStore;
@@ -51,30 +53,22 @@ interface Props {
   onOpenAudit: () => void;
 }
 
-const EMPTY_SOAP: Soap = { s: '', o: '', a: '', p: '' };
-
 export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit }: Props) {
   const t = useTranslations('demoTelemed');
   const loc = useLoc();
   const names = useDateNames();
   const auditText = useAuditText();
-  const { state, log, updatePatient, addAttention, nextRxNumber } = store;
+  const { state, log, updatePatient, addAttention, nextRxNumber, updateConsult, clock } = store;
+  const consult = state.consult;
 
   const [filter, setFilter] = useState<'all' | Priority>('all');
+  const [specFilter, setSpecFilter] = useState<'all' | SpecKey>('all');
   const [search, setSearch] = useState('');
-  const [activeId, setActiveId] = useState<string | null>(null);
-  const [consultTab, setConsultTab] = useState<ConsultTab>('record');
-  const [seconds, setSeconds] = useState(0);
-  const [startedAt, setStartedAt] = useState('');
-  const [micOn, setMicOn] = useState(true);
+  const [nowMs, setNowMs] = useState(0);
   const [sharing, setSharing] = useState(false);
   const [recording, setRecording] = useState(false);
-  const [chat, setChat] = useState<ChatMessage[]>([]);
   const [chatDraft, setChatDraft] = useState('');
   const [typing, setTyping] = useState(false);
-  const scriptIdx = useRef(0);
-  const [draft, setDraft] = useState<ConsultDraft>(EMPTY_DRAFT);
-  const [soap, setSoap] = useState<Soap>(EMPTY_SOAP);
   const [showEnd, setShowEnd] = useState(false);
   const [summary, setSummary] = useState<{
     attention: Attention;
@@ -88,23 +82,38 @@ export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit
   const media = useLocalMedia();
   const camAllowed = useCameraAllowed();
 
-  const active = state.patients.find((p) => p.id === activeId) ?? null;
+  const active = consult ? (state.patients.find((p) => p.id === consult.patientId && p.status === 'inConsult') ?? null) : null;
+  const activeId = active?.id ?? null;
+  const activeSpec = active ? specOf(active.spec) : null;
+  const draft = consult?.draft;
+  const soap = consult?.soap;
+  const chat = consult?.chat;
+  const micOn = consult?.micOn ?? true;
+  const consultTab: ConsultTab = consult?.tab ?? 'record';
+  const seconds = consult && nowMs ? Math.max(0, Math.floor((nowMs - consult.startEpoch) / 1000)) : 0;
 
-  // Si la consulta abierta deja de existir (p. ej. al restablecer los datos), se cierra.
+  const setDraft = (next: ConsultDraft | ((d: ConsultDraft) => ConsultDraft)) =>
+    updateConsult((c) => ({ draft: typeof next === 'function' ? next(c.draft) : next }));
+  const setSoap = (fn: (s: Soap) => Soap) => updateConsult((c) => ({ soap: fn(c.soap) }));
+  const setConsultTab = (tab: ConsultTab) => updateConsult({ tab });
+
+  // Si la consulta abierta deja de existir (p. ej. al restablecer los datos), se cierran sus controles.
   useEffect(() => {
-    if (activeId && (!active || active.status !== 'inConsult')) {
-      setActiveId(null);
+    if (!activeId) {
       setShowEnd(false);
       setRecording(false);
       setSharing(false);
+      setTyping(false);
       media.stop();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeId, active?.status]);
+  }, [activeId]);
 
+  // Cronómetro de la consulta: sale de la hora real de inicio (sigue igual después de recargar).
   useEffect(() => {
     if (!activeId) return;
-    const i = window.setInterval(() => setSeconds((s) => s + 1), 1000);
+    setNowMs(Date.now());
+    const i = window.setInterval(() => setNowMs(Date.now()), 1000);
     return () => window.clearInterval(i);
   }, [activeId]);
 
@@ -119,40 +128,37 @@ export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit
     if (chatBox.current) chatBox.current.scrollTop = chatBox.current.scrollHeight;
   }, [chat, typing]);
 
+  const waitingAll = state.patients.filter((p) => p.status === 'waiting');
   const queue = useMemo(() => {
     const q = search.trim().toLowerCase();
     return sortQueue(state.patients.filter((p) => p.status === 'waiting')).filter(
-      (p) => (filter === 'all' || p.priority === filter) && (!q || p.name.toLowerCase().includes(q) || tx(p.reason, loc).toLowerCase().includes(q)),
+      (p) =>
+        (filter === 'all' || p.priority === filter) &&
+        (specFilter === 'all' || p.spec === specFilter) &&
+        (!q || p.name.toLowerCase().includes(q) || tx(p.reason, loc).toLowerCase().includes(q)),
     );
-  }, [state.patients, filter, search, loc]);
+  }, [state.patients, filter, specFilter, search, loc]);
 
   function callPatient(p: Patient) {
     if (activeId) return;
-    setActiveId(p.id);
-    updatePatient(p.id, { status: 'inConsult' });
-    setSeconds(0);
-    setStartedAt(demoClock());
-    setConsultTab('record');
-    scriptIdx.current = 0;
-    setChat([{ id: 'c0', from: 'patient', text: t('chat.hello'), at: demoClock() }]);
-    setDraft(EMPTY_DRAFT);
-    setSoap(EMPTY_SOAP);
-    setMicOn(true);
+    store.startConsult(p.id);
     setSharing(false);
     setRecording(false);
-    log('doctor', 'consultStart', { patient: p.name });
+    setChatDraft('');
+    log('doctor', 'consultStart', { patient: p.name, spec: { t: `specialties.${p.spec}` } }, specOf(p.spec).pro);
     // Si el video no está a la vista (celular, o la sala de espera quedó desplazada), se lleva a la vista.
     window.setTimeout(() => {
       const el = videoBox.current;
       if (!el) return;
       const top = el.getBoundingClientRect().top;
-      // 80 px de margen para que la barra superior del sitio no tape el video.
-      if (top < 80 || top > window.innerHeight * 0.6) window.scrollTo({ top: top + window.scrollY - 80, behavior: 'smooth' });
+      // 96 px de margen para que la barra superior fija del sitio no tape la consulta.
+      if (top < 96 || top > window.innerHeight * 0.6) window.scrollTo({ top: top + window.scrollY - 96, behavior: 'smooth' });
     }, 50);
   }
 
   function referPatient(p: Patient) {
     updatePatient(p.id, { status: 'referred' });
+    if (p.appointmentId) store.updateAppointment(p.appointmentId, { status: 'referred' });
     addAttention({
       kind: 'referral',
       billable: false,
@@ -160,9 +166,9 @@ export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit
       docType: p.docType,
       doc: p.doc,
       payerId: p.payerId,
-      spec: 'general',
-      date: DEMO_DATE,
-      time: demoClock(),
+      spec: p.spec,
+      date: state.day,
+      time: clock(),
       durationMin: 0,
       dx: null,
       value: 0,
@@ -174,23 +180,27 @@ export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit
       orders: [],
       soap: null,
     });
-    log('doctor', 'referred', { patient: p.name });
+    log('doctor', 'referred', { patient: p.name }, specOf(p.spec).pro);
     notify(t('toasts.referred', { name: p.name }));
     setReferTarget(null);
   }
 
+  const pro = activeSpec?.pro;
+
   function sendChat() {
     const text = chatDraft.trim();
     if (!text || !active) return;
-    setChat((c) => [...c, { id: `d${c.length}`, from: 'doctor', text, at: demoClock() }]);
+    const at = clock();
+    updateConsult((c) => ({ chat: [...c.chat, { id: `d${c.chat.length}`, from: 'doctor', text, at }] }));
     setChatDraft('');
     setTyping(true);
     const script = active.script;
     window.setTimeout(() => {
-      const idx = scriptIdx.current;
-      scriptIdx.current += 1;
-      const reply = idx < script.length ? tx(script[idx], loc) : t('chat.generic');
-      setChat((c) => [...c, { id: `p${c.length}`, from: 'patient', text: reply, at: demoClock() }]);
+      const replyAt = clock();
+      updateConsult((c) => ({
+        scriptIdx: c.scriptIdx + 1,
+        chat: [...c.chat, { id: `p${c.chat.length}`, from: 'patient', text: c.scriptIdx < script.length ? script[c.scriptIdx] : GENERIC_REPLY, at: replyAt }],
+      }));
       setTyping(false);
     }, 1100);
   }
@@ -198,13 +208,13 @@ export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit
   async function toggleCamera() {
     if (media.stream) {
       media.stop();
-      log('doctor', 'camOff');
+      log('doctor', 'camOff', undefined, pro);
       return;
     }
     const ok = await media.start(true);
     if (ok) {
       media.setAudioEnabled(micOn);
-      log('doctor', 'camOn');
+      log('doctor', 'camOn', undefined, pro);
     } else {
       notify(t('video.camError'), 'warn');
     }
@@ -212,9 +222,9 @@ export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit
 
   function toggleMic() {
     const next = !micOn;
-    setMicOn(next);
+    updateConsult({ micOn: next });
     media.setAudioEnabled(next);
-    log('doctor', next ? 'micOn' : 'micOff');
+    log('doctor', next ? 'micOn' : 'micOff', undefined, pro);
   }
 
   function toggleRecording() {
@@ -225,17 +235,18 @@ export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit
       return;
     }
     setRecording((r) => !r);
-    log('doctor', recording ? 'recStop' : 'recStart');
+    log('doctor', recording ? 'recStop' : 'recStart', undefined, pro);
   }
 
   function signRx() {
-    if (!active || !draft.dx) return;
+    if (!active || !draft?.dx) return;
     const number = nextRxNumber();
+    const signedAt = clock();
     setDraft((d) => ({
       ...d,
       rx: {
         number,
-        signedAt: demoClock(),
+        signedAt,
         meds: d.meds.map(({ name, dose, freq, duration, instructions }) => ({
           name,
           dose,
@@ -246,7 +257,7 @@ export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit
       },
       rxSent: false,
     }));
-    log('doctor', 'rxSigned', { number, patient: active.name });
+    log('doctor', 'rxSigned', { number, patient: active.name }, pro);
   }
 
   function importPreconsult() {
@@ -272,30 +283,32 @@ export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit
       s: x.s ? `${x.s}\n${s}` : s,
       o: x.o || (parts.length ? `${t('soap.importO')}: ${parts.join(', ')}.` : x.o),
     }));
-    log('doctor', 'soapImported', { patient: active.name });
+    log('doctor', 'soapImported', { patient: active.name }, pro);
   }
 
   const endChecks = {
-    dx: !!draft.dx,
-    rx: draft.meds.length === 0 || !!draft.rx,
-    notes: !!(soap.a.trim() || soap.p.trim()),
+    dx: !!draft?.dx,
+    rx: !draft || draft.meds.length === 0 || !!draft.rx,
+    notes: !!(soap && (soap.a.trim() || soap.p.trim())),
   };
+  const endPrice = active ? priceFor(active.spec, payerOf(active.payerId).kind) : null;
 
   function finalize() {
-    if (!active || !endChecks.dx || !endChecks.rx) return;
+    if (!active || !consult || !draft || !soap || !endChecks.dx || !endChecks.rx) return;
     const kind = payerOf(active.payerId).kind;
-    const price = priceFor('general', kind);
-    const durationMin = Math.max(1, Math.round(seconds / 60));
+    const price = priceFor(active.spec, kind);
+    const durationSec = Math.max(1, Math.floor((Date.now() - consult.startEpoch) / 1000));
     const attention: Omit<Attention, 'id' | 'invoice'> = {
       kind: 'consult',
       patientName: active.name,
       docType: active.docType,
       doc: active.doc,
       payerId: active.payerId,
-      spec: 'general',
-      date: DEMO_DATE,
-      time: startedAt,
-      durationMin,
+      spec: active.spec,
+      date: state.day,
+      time: consult.startedAt,
+      durationMin: Math.max(1, Math.round(durationSec / 60)),
+      durationSec,
       dx: draft.dx ? { code: draft.dx.code, label: draft.dx.label } : null,
       value: price.value,
       patientShare: price.patient,
@@ -308,10 +321,8 @@ export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit
     };
     const { id, invoice } = addAttention({ ...attention, billable: true });
     updatePatient(active.id, { status: 'done' });
-    log('doctor', 'consultEnd', {
-      patient: active.name,
-      duration: fmtTimer(seconds),
-    });
+    if (active.appointmentId) store.updateAppointment(active.appointmentId, { status: 'attended' });
+    log('doctor', 'consultEnd', { patient: active.name, duration: fmtTimer(durationSec) }, pro);
     log('billing', 'invoiceCreated', { invoice: invoice ?? '', attention: id });
     setSummary({
       attention: { ...attention, id, invoice },
@@ -319,7 +330,7 @@ export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit
       soap,
       draft,
     });
-    setActiveId(null);
+    store.endConsult();
     setShowEnd(false);
     setRecording(false);
     setSharing(false);
@@ -329,10 +340,11 @@ export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit
   async function downloadSummary() {
     if (!summary) return;
     const { attention: a, patient: p, soap: s, draft: d } = summary;
+    const sp = specOf(a.spec);
     await makePdf({
       filename: `${t('summary.fileName')}-${a.id}.pdf`,
       title: t('summary.pdfTitle'),
-      subtitle: `${a.id} · ${fmtDate(a.date, loc, names, { year: true })} ${a.time} · ${t('summary.duration', { min: String(a.durationMin) })}`,
+      subtitle: `${a.id} · ${fmtDate(a.date, loc, names, { year: true })} ${a.time} · ${t('summary.duration', { time: fmtTimer(a.durationSec ?? a.durationMin * 60) })}`,
       sample: t('pdf.sample'),
       ipsLine: t('pdf.ipsLine', { nit: IPS.nit, city: IPS.city[loc] }),
       sections: [
@@ -344,7 +356,7 @@ export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit
             [t('rx.pdf.age'), `${p.age} ${t('record.years')}`],
             [t('rx.pdf.payer'), tx(payerOf(p.payerId).name, loc)],
             [t('summary.modality'), t('summary.modalityValue')],
-            [t('summary.professional'), `${PROFESSIONAL.name} · ${t('specialties.general')}`],
+            [t('summary.professional'), `${sp.pro} · ${t(`specialties.${a.spec}`)}`],
           ],
         },
         {
@@ -389,8 +401,8 @@ export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit
         },
       ],
       signature: {
-        name: PROFESSIONAL.name,
-        detail: t('rx.pdf.signature', { reg: PROFESSIONAL.reg, time: a.time }),
+        name: sp.pro,
+        detail: t('rx.pdf.signature', { reg: sp.reg, time: a.time }),
       },
       footer: t('pdf.footer'),
     });
@@ -403,13 +415,16 @@ export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit
   return (
     <section className={visible ? 'grid grid-cols-1 lg:grid-cols-12 gap-4' : 'hidden'} aria-hidden={!visible}>
       {/* Sala de espera + auditoría */}
-      <div className="lg:col-span-3 space-y-4 min-w-0">
+      <div id="tm-queue" className="lg:col-span-3 space-y-4 min-w-0 scroll-mt-24">
         <Card variant="bordered" padding="sm">
           <CardHeader className="mb-3">
             <div className="flex items-center justify-between gap-2">
               <CardTitle className="text-base">{t('queue.title')}</CardTitle>
-              <span className="rounded-full bg-primary-100 dark:bg-primary-900/40 px-2 py-0.5 text-xs font-semibold text-primary-700 dark:text-primary-200">
-                {queue.length}
+              <span
+                className="rounded-full bg-primary-100 dark:bg-primary-900/40 px-2 py-0.5 text-xs font-semibold text-primary-700 dark:text-primary-200"
+                title={t('queue.countHint', { shown: String(queue.length), total: String(waitingAll.length) })}
+              >
+                {queue.length === waitingAll.length ? queue.length : `${queue.length}/${waitingAll.length}`}
               </span>
             </div>
             <p className="text-xs text-secondary-500 dark:text-secondary-400 mt-1">{t('queue.subtitle')}</p>
@@ -442,6 +457,24 @@ export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit
                 </button>
               ))}
             </div>
+            <div>
+              <label htmlFor="queue-spec" className="sr-only">
+                {t('queue.specFilter')}
+              </label>
+              <select
+                id="queue-spec"
+                value={specFilter}
+                onChange={(e) => setSpecFilter(e.target.value as 'all' | SpecKey)}
+                className="w-full rounded-lg border border-secondary-300 dark:border-secondary-600 bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white pl-3 pr-9 py-2 text-xs"
+              >
+                <option value="all">{t('queue.allSpecs')}</option>
+                {SPECIALTIES.map((sp) => (
+                  <option key={sp.key} value={sp.key}>
+                    {t(`specialties.${sp.key}`)} · {sp.pro}
+                  </option>
+                ))}
+              </select>
+            </div>
             <ul className="space-y-2 max-h-[640px] overflow-y-auto pr-1">
               {queue.length === 0 && <li className="text-sm text-secondary-500 dark:text-secondary-400 text-center py-6">{t('queue.empty')}</li>}
               {queue.map((p) => (
@@ -464,10 +497,14 @@ export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit
                       <p className="text-[11px] text-secondary-500 dark:text-secondary-400 mt-0.5 truncate">
                         {p.age} {t('record.years')} · {tx(payerOf(p.payerId).name, loc)}
                       </p>
+                      <p className="text-[11px] font-medium text-secondary-700 dark:text-secondary-200 mt-0.5">
+                        {t(`specialties.${p.spec}`)} · {specOf(p.spec).pro}
+                        {p.appointmentId && <span className="font-normal text-secondary-500 dark:text-secondary-400"> · {t('queue.withAppt', { code: p.appointmentId })}</span>}
+                      </p>
                       <div className="flex items-center justify-between mt-2 text-xs">
                         <span className="text-secondary-500 dark:text-secondary-400 flex items-center gap-1">
                           <ClockIcon className="w-3.5 h-3.5" />
-                          {t('queue.waiting', { min: String(p.waitMin) })}
+                          {t('queue.waiting', { min: String(waitMinutes(p, store.now)) })}
                         </span>
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${PRIORITY_STYLES[p.priority].chip}`}>
                           {t(`priority.${p.priority}`)}
@@ -535,129 +572,144 @@ export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit
 
       {/* Video y chat */}
       <div className="lg:col-span-6 space-y-4 min-w-0">
-        <Card variant="bordered" padding="none" className="overflow-hidden">
-          <div
-            ref={videoBox}
-            className="relative w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950"
-            style={{ aspectRatio: '16 / 9', minHeight: 280 }}
-          >
-            {!active && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white/80 px-6">
-                <VideoCameraSlashIcon className="w-14 h-14 mx-auto mb-3 opacity-50" />
-                <p className="text-lg font-semibold">{t('video.noActive')}</p>
-                <p className="text-sm text-white/60 mt-1">{t('video.noActiveHint')}</p>
+        <div ref={videoBox} className="scroll-mt-24">
+          <Card variant="bordered" padding="none" className="overflow-hidden">
+            {active && activeSpec && consult && (
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 border-b border-secondary-200 dark:border-secondary-700 px-4 py-2 text-xs text-secondary-600 dark:text-secondary-300">
+                <span className="font-semibold text-secondary-900 dark:text-white">{t('video.inConsult', { name: active.name })}</span>
+                <span>
+                  <span className="hidden sm:inline">· </span>
+                  {t(`specialties.${active.spec}`)} · {activeSpec.pro} · {t('video.since', { time: consult.startedAt })}
+                </span>
               </div>
             )}
-            {active && (
-              <>
-                <div className="absolute inset-x-0 top-0 bottom-16 flex flex-col items-center justify-center gap-2">
-                  <div
-                    className={`w-20 h-20 sm:w-36 sm:h-36 rounded-full bg-gradient-to-br ${avatarColor(active.name)} flex items-center justify-center text-white text-3xl sm:text-5xl font-bold shadow-2xl ring-4 ring-white/20`}
-                  >
-                    {initials(active.name)}
-                  </div>
-                  <span className="rounded bg-black/50 px-2 py-0.5 text-[11px] text-white/80">{t('video.patientSimulated')}</span>
+            <div
+              className="relative w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950"
+              style={{ aspectRatio: '16 / 9', minHeight: 280 }}
+            >
+              {!active && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white/80 px-6">
+                  <VideoCameraSlashIcon className="w-14 h-14 mx-auto mb-3 opacity-50" />
+                  <p className="text-lg font-semibold">{t('video.noActive')}</p>
+                  <p className="text-sm text-white/60 mt-1">{t('video.noActiveHint')}</p>
                 </div>
-                <div className="absolute top-3 right-3 w-24 h-[68px] sm:w-40 sm:h-[90px] rounded-lg overflow-hidden bg-slate-700 ring-1 ring-white/30 shadow-lg">
-                  {media.stream ? (
-                    <video
-                      ref={attachStream(media.stream)}
-                      autoPlay
-                      playsInline
-                      muted
-                      className="h-full w-full object-cover -scale-x-100"
-                      aria-label={t('video.selfView')}
-                    />
-                  ) : (
-                    <div className="flex h-full w-full flex-col items-center justify-center text-center text-white/80 px-1">
-                      <VideoCameraSlashIcon className="w-5 h-5" />
-                      <span className="text-[10px] leading-tight mt-1">{camAllowed ? t('video.camOffSelf') : t('video.selfSimulated')}</span>
+              )}
+              {active && (
+                <>
+                  <div className="absolute inset-x-0 top-0 bottom-16 flex flex-col items-center justify-center gap-2">
+                    <div
+                      className={`w-20 h-20 sm:w-36 sm:h-36 rounded-full bg-gradient-to-br ${avatarColor(active.name)} flex items-center justify-center text-white text-3xl sm:text-5xl font-bold shadow-2xl ring-4 ring-white/20`}
+                    >
+                      {initials(active.name)}
                     </div>
-                  )}
-                  <span className="absolute bottom-0 inset-x-0 bg-black/50 text-[10px] text-white text-center">{t('video.you')}</span>
-                </div>
-                <div className="absolute top-3 left-3 flex flex-col gap-1.5 items-start">
-                  <span className="px-2 py-1 rounded bg-black/60 text-white text-xs flex items-center gap-1 font-mono">
-                    <ClockIcon className="w-3.5 h-3.5" />
-                    {fmtTimer(seconds)}
-                  </span>
-                  {recording && (
-                    <span className="px-2 py-1 rounded bg-red-600/90 text-white text-xs flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                      {t('video.recBadge')}
+                    <span className="rounded bg-black/50 px-2 py-0.5 text-[11px] text-white/80">{t('video.patientSimulated')}</span>
+                  </div>
+                  <div className="absolute top-3 right-3 w-24 h-[68px] sm:w-40 sm:h-[90px] rounded-lg overflow-hidden bg-slate-700 ring-1 ring-white/30 shadow-lg">
+                    {media.stream ? (
+                      <>
+                        <video
+                          ref={attachStream(media.stream)}
+                          autoPlay
+                          playsInline
+                          muted
+                          className="h-full w-full object-cover -scale-x-100"
+                          aria-label={t('video.selfView')}
+                        />
+                        <span className="absolute bottom-0 inset-x-0 bg-black/50 text-[10px] text-white text-center">{t('video.you')}</span>
+                      </>
+                    ) : (
+                      <div className="flex h-full w-full flex-col items-center justify-center gap-0.5 text-center text-white/80 px-1">
+                        <VideoCameraSlashIcon className="hidden sm:block w-5 h-5" />
+                        <span className="text-[10px] leading-tight">{camAllowed ? t('video.camOffSelf') : t('video.selfSimulated')}</span>
+                        <span className="text-[10px] leading-tight text-white/60">{t('video.you')}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="absolute top-3 left-3 flex flex-col gap-1.5 items-start">
+                    <span className="px-2 py-1 rounded bg-black/60 text-white text-xs flex items-center gap-1 font-mono">
+                      <ClockIcon className="w-3.5 h-3.5" />
+                      {fmtTimer(seconds)}
                     </span>
-                  )}
-                  {sharing && <span className="px-2 py-1 rounded bg-blue-600/90 text-white text-xs">{t('video.sharingBadge')}</span>}
-                  {!micOn && <span className="px-2 py-1 rounded bg-black/60 text-white text-xs">{t('video.muted')}</span>}
-                </div>
-                <div className="hidden sm:block absolute bottom-16 left-3 px-2 py-1 rounded bg-black/60 text-white text-xs">{active.name}</div>
-                <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-3 flex items-center justify-center gap-2 flex-wrap">
-                  <button
-                    type="button"
-                    onClick={toggleMic}
-                    className={ctrl(micOn)}
-                    aria-label={micOn ? t('video.mute') : t('video.unmute')}
-                    title={micOn ? t('video.mute') : t('video.unmute')}
-                    aria-pressed={!micOn}
-                  >
-                    <span className="relative">
-                      <MicrophoneIcon className="w-5 h-5" />
-                      {!micOn && <span className="absolute left-1/2 top-1/2 h-0.5 w-6 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-current" />}
-                    </span>
-                  </button>
-                  {camAllowed && (
+                    {recording && (
+                      <span className="px-2 py-1 rounded bg-red-600/90 text-white text-xs flex items-center gap-1">
+                        <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                        {t('video.recBadge')}
+                      </span>
+                    )}
+                    {sharing && <span className="px-2 py-1 rounded bg-blue-600/90 text-white text-xs">{t('video.sharingBadge')}</span>}
+                    {!micOn && <span className="px-2 py-1 rounded bg-black/60 text-white text-xs">{t('video.muted')}</span>}
+                  </div>
+                  <div className="hidden sm:block absolute bottom-16 left-3 px-2 py-1 rounded bg-black/60 text-white text-xs">
+                    {active.name} · {t(`specialties.${active.spec}`)}
+                  </div>
+                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-3 flex items-center justify-center gap-2 flex-wrap">
                     <button
                       type="button"
-                      onClick={toggleCamera}
-                      disabled={media.starting}
-                      className={ctrl(!!media.stream)}
-                      aria-label={media.stream ? t('video.camStop') : t('video.camStart')}
-                      title={media.stream ? t('video.camStop') : t('video.camStart')}
-                      aria-pressed={!!media.stream}
+                      onClick={toggleMic}
+                      className={ctrl(micOn)}
+                      aria-label={micOn ? t('video.mute') : t('video.unmute')}
+                      title={micOn ? t('video.mute') : t('video.unmute')}
+                      aria-pressed={!micOn}
                     >
-                      {media.stream ? <VideoCameraIcon className="w-5 h-5" /> : <VideoCameraSlashIcon className="w-5 h-5" />}
+                      <span className="relative">
+                        <MicrophoneIcon className="w-5 h-5" />
+                        {!micOn && <span className="absolute left-1/2 top-1/2 h-0.5 w-6 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-current" />}
+                      </span>
                     </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSharing((s) => !s);
-                      log('doctor', sharing ? 'shareStop' : 'shareStart');
-                    }}
-                    className={ctrl(sharing)}
-                    aria-label={sharing ? t('video.shareStop') : t('video.share')}
-                    title={sharing ? t('video.shareStop') : t('video.share')}
-                    aria-pressed={sharing}
-                  >
-                    <ComputerDesktopIcon className="w-5 h-5" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={toggleRecording}
-                    className={ctrl(recording)}
-                    aria-label={recording ? t('video.recStop') : t('video.rec')}
-                    title={recording ? t('video.recStop') : t('video.rec')}
-                    aria-pressed={recording}
-                  >
-                    <span className={`block rounded-full ${recording ? 'w-3.5 h-3.5 rounded-sm bg-red-600' : 'w-4 h-4 bg-red-500 ring-2 ring-current'}`} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowEnd(true)}
-                    className="px-4 py-2 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center gap-2 text-sm font-medium shadow-lg"
-                  >
-                    <PhoneXMarkIcon className="w-5 h-5" /> {t('video.end')}
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-          <div className="px-4 py-2.5 text-[11px] text-secondary-500 dark:text-secondary-400 border-t border-secondary-200 dark:border-secondary-700 flex flex-wrap items-center gap-2">
-            <SimTag>{t('video.simTag')}</SimTag>
-            <span>{camAllowed ? t('video.note') : t('video.noteNoCam')}</span>
-            {media.error && <span className="text-amber-700 dark:text-amber-300">{t(`video.errors.${media.error}`)}</span>}
-          </div>
-        </Card>
+                    {camAllowed && (
+                      <button
+                        type="button"
+                        onClick={toggleCamera}
+                        disabled={media.starting}
+                        className={ctrl(!!media.stream)}
+                        aria-label={media.stream ? t('video.camStop') : t('video.camStart')}
+                        title={media.stream ? t('video.camStop') : t('video.camStart')}
+                        aria-pressed={!!media.stream}
+                      >
+                        {media.stream ? <VideoCameraIcon className="w-5 h-5" /> : <VideoCameraSlashIcon className="w-5 h-5" />}
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSharing((s) => !s);
+                        log('doctor', sharing ? 'shareStop' : 'shareStart', undefined, pro);
+                      }}
+                      className={ctrl(sharing)}
+                      aria-label={sharing ? t('video.shareStop') : t('video.share')}
+                      title={sharing ? t('video.shareStop') : t('video.share')}
+                      aria-pressed={sharing}
+                    >
+                      <ComputerDesktopIcon className="w-5 h-5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={toggleRecording}
+                      className={ctrl(recording)}
+                      aria-label={recording ? t('video.recStop') : t('video.rec')}
+                      title={recording ? t('video.recStop') : t('video.rec')}
+                      aria-pressed={recording}
+                    >
+                      <span className={`block rounded-full ${recording ? 'w-3.5 h-3.5 rounded-sm bg-red-600' : 'w-4 h-4 bg-red-500 ring-2 ring-current'}`} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowEnd(true)}
+                      className="px-4 py-2 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center gap-2 text-sm font-medium shadow-lg"
+                    >
+                      <PhoneXMarkIcon className="w-5 h-5" /> {t('video.end')}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+            <div className="px-4 py-2.5 text-[11px] text-secondary-500 dark:text-secondary-400 border-t border-secondary-200 dark:border-secondary-700 flex flex-wrap items-center gap-2">
+              <SimTag>{t('video.simTag')}</SimTag>
+              <span>{camAllowed ? t('video.note') : t('video.noteNoCam')}</span>
+              {media.error && <span className="text-amber-700 dark:text-amber-300">{t(`video.errors.${media.error}`)}</span>}
+            </div>
+          </Card>
+        </div>
 
         {active && (
           <Card variant="bordered" padding="sm">
@@ -676,7 +728,7 @@ export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit
                 className="h-48 overflow-y-auto space-y-2 pr-1 mb-2 bg-secondary-50 dark:bg-secondary-950/40 rounded-lg p-2"
                 aria-live="polite"
               >
-                {chat.map((m) => (
+                {(chat ?? []).map((m) => (
                   <div key={m.id} className={`flex ${m.from === 'doctor' ? 'justify-end' : 'justify-start'}`}>
                     <div
                       className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${
@@ -685,7 +737,7 @@ export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit
                           : 'bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white border border-secondary-200 dark:border-secondary-700'
                       }`}
                     >
-                      <p>{m.text}</p>
+                      <p>{m.key === 'hello' ? t('chat.hello', { who: t(`specialties.honorific.${active.spec}`) }) : tx(m.text, loc)}</p>
                       <p className={`text-[10px] mt-1 ${m.from === 'doctor' ? 'text-white/70' : 'text-secondary-500'}`}>{m.at}</p>
                     </div>
                   </div>
@@ -712,10 +764,11 @@ export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit
       </div>
 
       {/* Panel de la consulta */}
-      <div className="lg:col-span-3 min-w-0">
+      <div id="tm-consult-panel" className="lg:col-span-3 min-w-0 scroll-mt-24">
         <Card variant="bordered" padding="sm" className="h-full">
           <CardHeader className="mb-3">
-            <div className="flex flex-wrap gap-1" role="tablist" aria-label={t('consult.panelLabel')}>
+            {!active && <CardTitle className="text-base">{t('consult.panelLabel')}</CardTitle>}
+            <div className={active ? 'flex flex-wrap gap-1' : 'hidden'} role="tablist" aria-label={t('consult.panelLabel')}>
               {(
                 [
                   { k: 'record', icon: HeartIcon },
@@ -773,7 +826,7 @@ export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit
                     </table>
                   </div>
                 )}
-                {draft.orders.length > 0 && (
+                {draft && draft.orders.length > 0 && (
                   <div>
                     <p className="text-[10px] uppercase tracking-wide text-secondary-500 dark:text-secondary-400 mb-1">{t('lab.orderedToday')}</p>
                     <ul className="space-y-0.5 text-xs text-secondary-700 dark:text-secondary-200">
@@ -785,36 +838,30 @@ export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit
                 )}
               </div>
             )}
-            {active && consultTab === 'rx' && (
+            {active && draft && consultTab === 'rx' && (
               <PrescriptionEditor
+                day={state.day}
                 patient={active}
                 draft={draft}
                 onChange={setDraft}
                 onDx={(dx) => {
                   setDraft((d) => ({ ...d, dx }));
-                  log('doctor', 'dxSet', {
-                    code: dx.code,
-                    patient: active.name,
-                  });
+                  log('doctor', 'dxSet', { code: dx.code, patient: active.name }, pro);
                 }}
                 onSign={signRx}
                 onUnsign={() => {
-                  if (draft.rx) log('doctor', 'rxVoided', { number: draft.rx.number });
+                  if (draft.rx) log('doctor', 'rxVoided', { number: draft.rx.number }, pro);
                   setDraft((d) => ({ ...d, rx: null, rxSent: false }));
                 }}
                 onSend={() => {
                   setDraft((d) => ({ ...d, rxSent: true }));
-                  if (draft.rx)
-                    log('doctor', 'rxSent', {
-                      number: draft.rx.number,
-                      patient: active.name,
-                    });
+                  if (draft.rx) log('doctor', 'rxSent', { number: draft.rx.number, patient: active.name }, pro);
                   notify(t('toasts.rxSent', { name: active.name }));
                 }}
                 notify={notify}
               />
             )}
-            {active && consultTab === 'notes' && (
+            {active && soap && consultTab === 'notes' && (
               <div className="space-y-2">
                 <Button size="sm" variant="outline" fullWidth onClick={importPreconsult}>
                   {t('soap.import')}
@@ -880,11 +927,12 @@ export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit
               </li>
             ))}
           </ul>
-          {active && (
+          {active && endPrice && (
             <p className="text-xs text-secondary-500 dark:text-secondary-400">
               {t('end.billingPreview', {
-                value: fmtCOP(priceFor('general', payerOf(active.payerId).kind).value, loc),
-                share: fmtCOP(priceFor('general', payerOf(active.payerId).kind).patient, loc),
+                spec: t(`specialties.${active.spec}`),
+                value: fmtCOP(endPrice.value, loc),
+                share: fmtCOP(endPrice.patient, loc),
                 payer: tx(payerOf(active.payerId).name, loc),
               })}
             </p>
@@ -927,9 +975,10 @@ export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit
                 </p>
                 <p className="text-xs text-secondary-500 mt-1">
                   {summary.attention.id} · {summary.attention.time} ·{' '}
-                  {t('summary.duration', {
-                    min: String(summary.attention.durationMin),
-                  })}
+                  {t('summary.duration', { time: fmtTimer(summary.attention.durationSec ?? summary.attention.durationMin * 60) })}
+                </p>
+                <p className="text-xs text-secondary-500 mt-1">
+                  {t(`specialties.${summary.attention.spec}`)} · {specOf(summary.attention.spec).pro}
                 </p>
               </div>
               <div className="rounded-lg border border-secondary-200 dark:border-secondary-700 p-3">
@@ -979,9 +1028,7 @@ export default function ConsoleView({ store, visible, notify, goTab, onOpenAudit
                 variant="outline"
                 fullWidth
                 onClick={() => {
-                  log('doctor', 'summarySent', {
-                    patient: summary.patient.name,
-                  });
+                  log('doctor', 'summarySent', { patient: summary.patient.name }, specOf(summary.attention.spec).pro);
                   notify(t('toasts.summarySent', { name: summary.patient.name }));
                 }}
               >

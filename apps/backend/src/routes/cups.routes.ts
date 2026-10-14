@@ -15,6 +15,7 @@ import {
   revectorizarDesactualizados,
 } from '../controllers/cups.controller';
 import { requireAdmin, requireStaffOrDemoAccess } from '../middleware/access';
+import { aiGate } from '../middleware/ai-gate';
 
 const router = express.Router();
 
@@ -34,10 +35,11 @@ router.get('/estadisticas', demo, obtenerEstadisticas);
 router.get('/incompletos', demo, obtenerIncompletos);
 
 // Embeddings y búsqueda semántica
-router.post('/vectorizar', ...soloAdmin, vectorizarCUPS);
-router.post('/buscar-semantica', demo, buscarSemantica);
-router.post('/buscar-similares', demo, buscarSimilares);
+// Vectorizar y buscar usan embeddings de OpenAI: tope HEALTH_MONTHLY_BUDGET_USD y cupo diario por usuario.
+router.post('/vectorizar', ...soloAdmin, aiGate('health'), vectorizarCUPS);
+router.post('/buscar-semantica', demo, aiGate('health'), buscarSemantica);
+router.post('/buscar-similares', demo, aiGate('health'), buscarSimilares);
 router.get('/estadisticas-vectorizacion', demo, obtenerEstadisticasVectorizacion);
-router.post('/revectorizar', ...soloAdmin, revectorizarDesactualizados);
+router.post('/revectorizar', ...soloAdmin, aiGate('health'), revectorizarDesactualizados);
 
 export default router;

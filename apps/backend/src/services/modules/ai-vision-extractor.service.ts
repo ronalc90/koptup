@@ -12,6 +12,7 @@
  */
 
 import OpenAI from 'openai';
+import { createOpenAIClient } from '../openai.service';
 import { PaginaProcesada, TipoDocumento } from './document-ingestion.service';
 
 /**
@@ -161,7 +162,8 @@ class AIVisionExtractorService {
   constructor() {
     const apiKey = process.env.OPENAI_API_KEY;
     if (apiKey) {
-      this.openai = new OpenAI({ apiKey });
+      // Cliente con el tope mensual de gasto de las APIs de salud (HEALTH_MONTHLY_BUDGET_USD).
+      this.openai = createOpenAIClient({ feature: 'health', apiKey });
       console.log('🤖 AI Vision Extractor (GPT-4o) inicializado');
     } else {
       console.warn('⚠️  OPENAI_API_KEY no configurada - Extractor no disponible');

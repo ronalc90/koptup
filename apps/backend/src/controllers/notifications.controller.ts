@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { AuthRequest } from '../types';
-import { isStaffRole } from '../middleware/access';
+import { isStaffSession } from '../middleware/access';
 import Notification from '../models/Notification';
 import { createNotification } from '../utils/notifications';
 
@@ -228,9 +228,9 @@ export const createNewNotification = async (req: AuthRequest, res: Response) => 
     const userId = req.user?.id;
     const { type, title, message, actionUrl, metadata, targetUserId } = req.body;
 
-    // Solo el staff puede crear notificaciones para otra cuenta (targetUserId);
-    // el resto solo para sí mismo.
-    if (targetUserId && String(targetUserId) !== String(userId) && !isStaffRole(req.user?.role)) {
+    // Solo el staff (rol vigente en la BD) puede crear notificaciones para otra
+    // cuenta (targetUserId); el resto solo para sí mismo.
+    if (targetUserId && String(targetUserId) !== String(userId) && !(await isStaffSession(req))) {
       return res.status(403).json({
         success: false,
         message: 'No tienes permiso para notificar a otro usuario',

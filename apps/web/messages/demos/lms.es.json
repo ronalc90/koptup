@@ -8,8 +8,46 @@
       "breadcrumbDemos": "Demos",
       "breadcrumbTitle": "Plataforma de cursos (LMS)"
     },
+    "shell": {
+      "back": "Volver al catálogo de demos",
+      "kicker": "Demo interactiva · Educación",
+      "title": "Plataforma de cursos virtuales (LMS)",
+      "subtitle": "Para academias, centros de formación y empresas que capacitan a su equipo. Recorre Academia Quindé, una academia de ejemplo: compra un curso, estudia con el tutor con IA, presenta la evaluación y descarga tu certificado; luego mira lo que ven el instructor y el administrador.",
+      "realNote": "El tutor usa IA real sobre el material del curso; pagos, factura electrónica, correos y clases en vivo son simulados. Lo que hagas se guarda solo en este navegador durante 7 días.",
+      "requestDemo": "Solicitar demo guiada",
+      "quote": "Cotizar para mi academia"
+    },
+    "guide": {
+      "title": "Primeros pasos: recorre la demo en 5 minutos",
+      "progress": "{done} de {total} hechos",
+      "show": "Ver los pasos",
+      "hide": "Ocultar los pasos",
+      "done": "Hecho",
+      "steps": {
+        "buy": {
+          "title": "Compra un curso",
+          "text": "Elige un curso, aplica el cupón BIENVENIDA10 y paga con PSE, tarjeta o Nequi de prueba. No se cobra nada.",
+          "action": "Comprar un curso"
+        },
+        "tutor": {
+          "title": "Pregúntale al tutor con IA",
+          "text": "En Mis cursos, toca una pregunta sugerida: el tutor responde con el material del curso y te lleva a la lección y el minuto.",
+          "action": "Ir al tutor"
+        },
+        "quiz": {
+          "title": "Aprueba y obtén tu certificado",
+          "text": "Completa las lecciones, presenta la evaluación final (apruebas con 70 %) y descarga el certificado con QR.",
+          "action": "Ir a la evaluación"
+        },
+        "academy": {
+          "title": "Mira el lado de la academia",
+          "text": "Como Administrador ves tu compra en Ventas, los cupones y los certificados emitidos; como Instructor, el riesgo de abandono y el creador de cursos.",
+          "action": "Ver como administrador"
+        }
+      }
+    },
     "header": {
-      "subtitle": "Plataforma de cursos virtuales · demo con datos de ejemplo",
+      "subtitle": "Academia ficticia de educación continua · Pereira",
       "sampleBadge": "Datos de ejemplo",
       "sampleHint": "Academia ficticia. Pagos, factura electrónica, correos y clases en vivo son simulados; el tutor usa IA real sobre el material del curso.",
       "roleLabel": "Ver como",
@@ -24,7 +62,8 @@
       "resetTitle": "¿Restablecer la demo?",
       "resetBody": "Se borran tus compras, avances, notas, certificados nuevos, cupones y cursos creados en este navegador, y vuelven los datos de ejemplo iniciales.",
       "resetConfirm": "Sí, restablecer",
-      "resetDone": "Listo: la demo volvió a los datos de ejemplo."
+      "resetDone": "Listo: la demo volvió a los datos de ejemplo.",
+      "roleHint": "Cambia de vista: en la demo puedes ver los tres roles; en tu proyecto cada rol entra con su propia cuenta y permisos."
     },
     "nav": {
       "catalog": "Catálogo",
@@ -186,7 +225,7 @@
       "base": "Base gravable",
       "iva": "IVA 19 %",
       "total": "Total pagado",
-      "footer": "Academia de ejemplo creada para la demo de Koptup. En tu proyecto, el pago lo procesa la pasarela (Wompi o PayU) y la factura electrónica la emite tu proveedor autorizado por la DIAN."
+      "footer": "Academia de ejemplo creada para la demo de KopTup. En tu proyecto, el pago lo procesa la pasarela (Wompi o PayU) y la factura electrónica la emite tu proveedor autorizado por la DIAN."
     },
     "learning": {
       "empty": "Aún no tienes cursos. Compra o inscríbete en uno del catálogo.",
@@ -237,7 +276,7 @@
       "sources": "Fuentes del material",
       "openSource": "Ir a esta parte de la lección",
       "minute": "min {time}",
-      "statusIdle": "IA real (vía el servidor de Koptup) sobre el guion de las lecciones. Cada respuesta cita sus fuentes.",
+      "statusIdle": "IA real (vía el servidor de KopTup) sobre el guion de las lecciones. Cada respuesta cita sus fuentes.",
       "statusLlm": "Respondió un modelo de IA ({model}) usando solo el material del curso.",
       "statusExtractive_noKey": "El servidor no tiene IA configurada: te muestro los fragmentos más relevantes del material, sin redactar.",
       "statusExtractive_budget": "Se agotó el cupo de IA de la demo: te muestro los fragmentos más relevantes del material.",
@@ -249,7 +288,7 @@
       "localNone": "No encontré esa información en el material de este curso. Prueba con otras palabras o con una de las preguntas sugeridas.",
       "rateLimited": "Hiciste muchas preguntas seguidas. Espera un momento y vuelve a intentarlo.",
       "noMaterial": "Este curso no tiene material de texto para el tutor. Agrégalo al crear el curso (texto de cada lección).",
-      "privacy": "Tus preguntas se envían al servidor de Koptup solo para responder en esta demo. No escribas datos personales."
+      "privacy": "Tus preguntas se envían al servidor de KopTup y a su proveedor de IA solo para responder en esta demo; la conversación no se guarda. No escribas datos personales."
     },
     "quiz": {
       "title": "Evaluación final",
@@ -264,8 +303,9 @@
       "passed": "¡Aprobaste!",
       "failed": "Aún no apruebas",
       "scoreLine": "Resultado: {score} de {total} ({pct})",
+      "lastLine": "Último intento: {score} de {total} ({pct})",
       "best": "mejor intento: {best} de {total}",
-      "perfectBadge": "Insignia desbloqueada: Genio del quiz",
+      "perfectBadge": "Insignia desbloqueada: Evaluación perfecta",
       "review": "Repasa estas lecciones antes de volver a intentarlo:",
       "certIssued": "Certificado {code} emitido.",
       "seeCert": "Ver certificado",
@@ -308,7 +348,7 @@
       "reminderOff": "Recordatorio desactivado.",
       "addCalendar": "Agregar al calendario",
       "icsDone": "Descargaste el evento (.ics) para tu calendario.",
-      "icsNote": "Sesión de ejemplo de la demo LMS de Koptup.",
+      "icsNote": "Sesión de ejemplo de la demo LMS de KopTup.",
       "openClass": "Clase abierta a toda la comunidad de la academia.",
       "simNote": "Las clases son simuladas. En tu proyecto se crean en Zoom, Google Meet o Microsoft Teams desde la plataforma y la asistencia se registra automáticamente.",
       "simRoom": "Sala simulada",
@@ -337,9 +377,9 @@
       "weekly": "Reto semanal: completa {goal} lecciones en 7 días (+{xp} XP)",
       "weeklyDone": "¡Reto semanal cumplido! +{xp} XP",
       "howTitle": "¿Cómo se calculan tus puntos?",
-      "howLessons": "{n} lecciones completadas × {xp} XP",
-      "howQuiz": "{n} evaluaciones aprobadas × {xp} XP, más {bonus} XP por cada puntaje perfecto ({perfect})",
-      "howCerts": "{n} certificados × {xp} XP",
+      "howLessons": "{n, plural, one {# lección completada} other {# lecciones completadas}} × {xp} XP",
+      "howQuiz": "{n, plural, one {# evaluación aprobada} other {# evaluaciones aprobadas}} × {xp} XP, más {bonus} XP por cada puntaje perfecto ({perfect})",
+      "howCerts": "{n, plural, one {# certificado vigente} other {# certificados vigentes}} × {xp} XP",
       "howLevel": "Subes de nivel cada {xp} XP.",
       "badges": "Insignias",
       "unlocked": "{n}/{total} desbloqueadas",
@@ -353,7 +393,7 @@
       "b1Desc": "Completa tu primera lección.",
       "b2": "Constancia",
       "b2Desc": "Estudia 3 días seguidos.",
-      "b3": "Genio del quiz",
+      "b3": "Evaluación perfecta",
       "b3Desc": "Saca el 100 % en una evaluación.",
       "b4": "Curioso",
       "b4Desc": "Hazle 3 preguntas al tutor.",
@@ -365,11 +405,11 @@
     "certificates": {
       "title": "Certificados",
       "subtitle": "Con código único y QR que abre la página de verificación.",
-      "nameLabel": "Nombre en tus certificados",
+      "nameLabel": "Tu nombre para los certificados",
       "nameSave": "Guardar nombre",
-      "nameSaved": "Nombre actualizado en tus certificados.",
+      "nameSaved": "Nombre guardado: se usará en tus próximos certificados.",
       "nameError": "Escribe al menos 3 caracteres.",
-      "nameHint": "Escribe tu nombre para ver tus certificados con él (se guarda solo en este navegador).",
+      "nameHint": "Se usa en los certificados que emitas desde ahora (se guarda solo en este navegador). Los ya emitidos conservan el nombre con el que se emitieron; puedes reemitirlos con el nombre nuevo.",
       "noCerts": "Aún no tienes certificados. Completa un curso y aprueba la evaluación final.",
       "completion": "Certificado de finalización",
       "issuedTo": "Otorgado a",
@@ -381,7 +421,7 @@
       "share": "Copiar enlace",
       "linkCopied": "Enlace de verificación copiado.",
       "copyPrompt": "Copia el enlace de verificación:",
-      "simNote": "Certificados de ejemplo. La página de verificación comprueba una firma de ejemplo que viaja en el enlace; en tu proyecto el código se consulta en el registro de certificados del servidor.",
+      "simNote": "Certificados de ejemplo. En la demo, el registro de certificados vive en este navegador: la página de verificación solo confirma los emitidos aquí (simulado). En tu proyecto, el código se consulta en el registro del servidor y cualquiera puede verificarlo.",
       "pdfHeading": "CERTIFICADO DE FINALIZACIÓN",
       "pdfCertifies": "{org} certifica que",
       "pdfCompleted": "completó satisfactoriamente el curso",
@@ -390,7 +430,11 @@
       "pdfDirectorName": "Coordinación académica",
       "pdfDirector": "Firma de ejemplo",
       "pdfVerify": "Verifica escaneando el QR",
-      "pdfSample": "DOCUMENTO DE EJEMPLO generado por la demo de Koptup. Academia ficticia: este certificado no acredita estudios reales."
+      "pdfSample": "DOCUMENTO DE EJEMPLO generado por la demo de KopTup. Academia ficticia: este certificado no acredita estudios reales.",
+      "otherName": "Emitido a nombre de {name}.",
+      "reissue": "Reemitir a nombre de {name}",
+      "reissued": "Certificado reemitido como {code}. El código {old} queda anulado.",
+      "replacesNote": "Reemplaza al certificado {old}, que quedó anulado."
     },
     "analytics": {
       "title": "Analítica del instructor",
@@ -564,7 +608,8 @@
       "issuedTitle": "Certificados emitidos",
       "issuedSubtitle": "{count, plural, one {# certificado emitido} other {# certificados emitidos}} en la academia de ejemplo.",
       "issuedMine": "Emitidos en tu recorrido por la demo",
-      "issuedNote": "Los estudiantes de ejemplo no tienen certificados individuales en la demo; los tuyos sí tienen código y QR verificable."
+      "issuedNote": "Los estudiantes de ejemplo no tienen certificados individuales en la demo; los tuyos sí tienen código y QR verificable.",
+      "issuedReplaced": "reemplazado por {code}"
     },
     "verify": {
       "metaTitle": "Verificar certificado",
@@ -583,8 +628,17 @@
       "tamperedBody": "La información del enlace del certificado {code} fue modificada: la firma no corresponde.",
       "invalid": "Enlace incompleto o inválido",
       "invalidBody": "Escanea el QR del certificado o abre el enlace de verificación desde la demo.",
-      "note": "Verificación de ejemplo: en la demo, los datos del certificado viajan en el enlace con una firma de ejemplo. En tu proyecto, el código se consulta en el registro de certificados del servidor.",
-      "backToDemo": "Ir a la demo de cursos"
+      "note": "Verificación simulada: en la demo, el registro de certificados vive en el navegador donde se emitieron, así que esta página solo confirma los certificados emitidos en este navegador. En tu proyecto, el código se consulta en el registro del servidor desde cualquier dispositivo.",
+      "backToDemo": "Ir a la demo de cursos",
+      "sampleAcademy": "academia de ejemplo",
+      "validBody": "Está en el registro de certificados de la demo en este navegador y coincide con su firma de ejemplo.",
+      "unconfirmed": "No se puede confirmar en este navegador",
+      "unconfirmedBody": "La firma de ejemplo del enlace coincide, pero el certificado {code} no está en el registro de este navegador. En la demo, los certificados se guardan solo en el navegador donde se emitieron, así que solo ahí se pueden confirmar. En un proyecto real, cualquiera lo verifica en línea contra el registro del servidor.",
+      "linkData": "Datos que trae el enlace (sin confirmar)",
+      "replaced": "Certificado anulado",
+      "replacedBody": "El certificado {code} se reemitió con el código {by} y ya no es válido.",
+      "otherCertBody": "La firma de ejemplo del enlace coincide, pero en este navegador el código {code} pertenece a otro certificado de la demo: cada navegador numera sus certificados por separado, así que solo el navegador donde se emitió puede confirmarlo. En un proyecto real, el código es único y cualquiera lo verifica en línea contra el registro del servidor.",
+      "allDemos": "Ver todas las demos"
     },
     "common": {
       "close": "Cerrar",

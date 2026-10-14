@@ -8,6 +8,7 @@ import {
   BeakerIcon,
   LockClosedIcon,
   PlusIcon,
+  UserGroupIcon,
 } from '@heroicons/react/24/outline';
 import Button from '@/components/ui/Button';
 
@@ -34,7 +35,7 @@ export default function Encabezado({ vista, onCambiarVista, onAuditar, mostrarNa
     <header className="mb-6">
       <Link
         href="/demo"
-        className="mb-4 inline-flex items-center gap-2 rounded-lg px-2 py-1 text-sm font-medium text-gray-700 hover:bg-white/70 dark:text-gray-300 dark:hover:bg-white/10"
+        className="mb-4 inline-flex items-center gap-2 rounded-lg px-2 py-1 text-sm font-medium text-gray-700 hover:bg-white/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:text-gray-300 dark:hover:bg-white/10"
       >
         <ArrowLeftIcon className="h-4 w-4" aria-hidden="true" />
         {t('backToDemos')}
@@ -54,9 +55,13 @@ export default function Encabezado({ vista, onCambiarVista, onAuditar, mostrarNa
           </div>
           <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">{t('title')}</h1>
           <p className="max-w-3xl text-gray-700 dark:text-gray-300">{t('subtitle')}</p>
+          <p className="mt-2 flex max-w-3xl items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
+            <UserGroupIcon className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
+            {t('audience')}
+          </p>
           <Link
             href="/rag"
-            className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary-700 underline decoration-primary-300 underline-offset-4 hover:text-primary-800 hover:decoration-primary-600 dark:text-primary-300"
+            className="mt-3 inline-flex items-center gap-1 rounded text-sm font-semibold text-primary-700 underline decoration-primary-300 underline-offset-4 hover:text-primary-800 hover:decoration-primary-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:text-primary-300"
           >
             {t('ragLink')}
             <ArrowRightIcon className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
@@ -81,7 +86,7 @@ export default function Encabezado({ vista, onCambiarVista, onAuditar, mostrarNa
                     type="button"
                     onClick={() => onCambiarVista(p.id)}
                     aria-current={seleccionada ? 'page' : undefined}
-                    className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                    className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 ${
                       seleccionada
                         ? 'bg-primary-600 text-white shadow-sm'
                         : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'

@@ -8,7 +8,7 @@
       "breadcrumb": "Headless CMS"
     },
     "bar": {
-      "title": "Headless CMS",
+      "title": "Content manager (headless CMS)",
       "sample": "Sample data",
       "sampleHint": "Fictitious company, people, addresses, phone numbers and domains. Your changes are saved only in this browser.",
       "subtitle": "Model your content, edit it in a visual editor, approve it and publish it to your website, your app and your assistant from a single panel.",
@@ -22,10 +22,17 @@
       "resetConfirm": "Reset",
       "resetDone": "Done: the sample data was loaded again.",
       "cancel": "Cancel",
-      "loading": "Loading the sample data…"
+      "loading": "Loading the sample data…",
+      "back": "Back to the demo catalog",
+      "audience": "For marketing and communications teams that publish to their website, app and assistant: you model your content once, improve it with AI, approve it and it reaches every channel.",
+      "start": "Where to start: follow the “5-step tour” on Home; each step has a “Go” button that takes you to the right screen.",
+      "requestDemo": "Request a guided demo",
+      "quote": "Get a quote for your CMS",
+      "ctaLabel": "Next steps"
     },
     "common": {
-      "close": "Close"
+      "close": "Close",
+      "dismiss": "Dismiss notice"
     },
     "nav": {
       "label": "CMS sections",
@@ -48,7 +55,7 @@
       },
       "admin": {
         "name": "Administrator",
-        "desc": "Everything above, plus content models and webhooks."
+        "desc": "All of the above, plus content models and notices to your channels (webhooks)."
       }
     },
     "status": {
@@ -156,16 +163,16 @@
           "desc": "Change the hours or the photo: the web and app preview updates as you type."
         },
         "assistant": {
-          "title": "3. Ask the writing assistant for a shorter version",
-          "desc": "In the “AI assistant” tab use “Short version for the app” and apply it to the field."
+          "title": "3. Improve a text with the AI assistant",
+          "desc": "In the “AI assistant” tab pick an action (for example, “Short version for the app”) and press “Apply to field”. It is marked when you apply the suggestion."
         },
         "publish": {
           "title": "4. Send for review, approve and publish",
-          "desc": "Send as Writer, switch to Editor with “View as”, approve and publish. See the webhook under “Publishing” and the JSON in the “API” tab."
+          "desc": "Send the location for review as Writer, switch to Editor with “View as”, approve it and publish it. Then see the notice (webhook) under “Publishing” and the JSON in the “API” tab."
         },
         "rag": {
           "title": "5. Publish the FAQ and ask the site assistant",
-          "desc": "Publish “How do I prepare for an abdominal ultrasound?” and ask about the ultrasound in the preview: the assistant cites the published answer."
+          "desc": "As Editor, publish “How do I prepare for an abdominal ultrasound?” and ask about the ultrasound in the preview: the assistant cites the answer you just published."
         }
       },
       "truthTitle": "What is real in this demo",
@@ -180,7 +187,7 @@
         },
         "simulated": {
           "title": "Simulated:",
-          "desc": "webhooks (nothing is sent), the .example domains, the image CDN and the site assistant (keyword search over the published FAQs)."
+          "desc": "the notices to your channels on publish (webhooks: nothing is sent to the internet), the .example domains, optimized image delivery (CDN) and the site assistant (keyword search over the published FAQs)."
         },
         "project": {
           "title": "In your project:",
@@ -193,7 +200,9 @@
       "inHours": "{n, plural, one {in # hour} other {in # hours}}",
       "inDays": "{n, plural, one {in # day} other {in # days}}",
       "activityTitle": "Recent activity",
-      "activityEmpty": "No activity in this session yet. What you do will show up here."
+      "activityEmpty": "No activity in this session yet. What you do will show up here.",
+      "tourDoneTitle": "You finished the tour!",
+      "tourDoneBody": "If you want to see it with your own content, channels and permissions, we can walk you through it in a guided demo or prepare a quote."
     },
     "activity": {
       "created": "created “{title}”",
@@ -495,7 +504,8 @@
       "footer": "Sample site · Montaña Azul clinic network (fictitious company)",
       "askAssistant": "Ask the assistant",
       "appNote": "The app receives the same content through the API and shows it with its own design.",
-      "simulatedNote": "Preview simulated in your browser: in your project it is your real site and app, reading the content through the API."
+      "simulatedNote": "Preview simulated in your browser: in your project it is your real site and app, reading the content through the API.",
+      "upToDate": "No pending changes: this is what is published."
     },
     "assistant": {
       "title": "Site assistant",
@@ -628,10 +638,15 @@
       "errors": {
         "network": "We could not reach the AI server. Check your connection or try again later; the rest of the demo keeps working.",
         "timeout": "The AI took too long to respond. Try again with a shorter text.",
-        "notConfigured": "The AI assistant is not configured on this server (the model key is missing). The rest of the demo works the same.",
+        "notConfigured": "The AI assistant is not configured on this server right now. The rest of the demo works the same; to see it with AI, request a guided demo.",
         "rateLimited": "You reached the request limit for now. Wait a few minutes and try again.",
-        "invalid": "The server did not accept that text. Try a longer or different text.",
-        "server": "The AI service responded with an error. Try again in a moment."
+        "invalid": "The server did not accept that text (empty or too long). Try a different text.",
+        "server": "The AI service responded with an error. Try again in a moment.",
+        "unavailable": "The AI is not available right now. Try again in a few minutes; the rest of the demo keeps working.",
+        "budget": "This demo reached its monthly AI quota. Everything else keeps working; to see the assistant, we can show it to you in a guided demo.",
+        "login": "To use the AI in this demo, sign in with an account that has access.",
+        "access": "Your account does not have access to this demo. Request it and we will let you know when it is approved.",
+        "disabled": "This demo is not available right now, so the AI isn't either. The rest of the screen keeps working."
       }
     },
     "models": {
@@ -683,7 +698,7 @@
       "by": "{name} · {date}",
       "blocked": "It has pending fields: open it to fix them.",
       "writerNote": "As a Writer you can see the queue, but approving and publishing belong to Editors. Use “View as” to switch person.",
-      "webhooksTitle": "Webhooks on publish",
+      "webhooksTitle": "Notices to your channels on publish (webhooks)",
       "targets": {
         "site": {
           "name": "Website",
@@ -749,7 +764,7 @@
       "models_manage": "Change content models",
       "media_upload": "Upload images and edit their alt text",
       "media_delete": "Delete images",
-      "webhooks_manage": "Manage webhooks"
+      "webhooks_manage": "Manage notices to your channels (webhooks)"
     }
   }
 }

@@ -239,7 +239,7 @@ export default function PlayerPanel({
                   {t('player.completed')}
                 </Badge>
               ) : (
-                <Button variant="outline" size="sm" onClick={complete}>
+                <Button variant="outline" size="sm" className="dark:text-primary-300 dark:border-primary-400" onClick={complete}>
                   <CheckCircleIcon className="w-4 h-4 mr-1" />
                   {lesson.kind === 'reading' ? t('player.markRead') : t('player.markDone')}
                 </Button>
@@ -257,7 +257,7 @@ export default function PlayerPanel({
                 >
                   {SPEEDS.map((s) => (
                     <option key={s} value={s}>
-                      {f.dec(s)}x
+                      {f.speed(s)}
                     </option>
                   ))}
                 </select>
@@ -300,7 +300,7 @@ export default function PlayerPanel({
             <Textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder={t('player.notesPlaceholder')} rows={3} aria-label={t('player.notes')} />
             <div className="flex items-center justify-between mt-3 gap-2 flex-wrap">
               <span className="text-[11px] text-secondary-500 dark:text-secondary-400">{t('player.notesHint')}</span>
-              <Button variant="outline" size="sm" onClick={saveNote} disabled={!note.trim()}>
+              <Button variant="outline" size="sm" className="dark:text-primary-300 dark:border-primary-400" onClick={saveNote} disabled={!note.trim()}>
                 {isVideo ? t('player.saveNoteAt', { time: clock(time) }) : t('player.saveNote')}
               </Button>
             </div>
@@ -361,7 +361,7 @@ export default function PlayerPanel({
                       isDone
                         ? 'bg-emerald-500 text-white'
                         : active
-                          ? 'bg-primary-500 text-white'
+                          ? 'bg-primary-600 text-white'
                           : 'bg-secondary-200 dark:bg-secondary-700 text-secondary-700 dark:text-secondary-200'
                     }`}
                   >
@@ -369,7 +369,7 @@ export default function PlayerPanel({
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate text-secondary-800 dark:text-secondary-100">{pick(item.title, f.locale)}</p>
-                    <p className="text-xs text-secondary-500 dark:text-secondary-400 inline-flex items-center gap-1">
+                    <p className="text-xs text-secondary-600 dark:text-secondary-400 inline-flex items-center gap-1">
                       <Icon className="w-3.5 h-3.5" />
                       {t(`kind.${item.kind}`)} · {item.kind === 'video' ? clock(item.duration) : t('detail.minutes', { n: Math.round(item.duration / 60) })}
                     </p>

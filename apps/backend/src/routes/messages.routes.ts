@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth';
+import { requireStaff } from '../middleware/access';
 import {
   getConversations,
   getConversationById,
@@ -15,7 +16,8 @@ router.use(authenticate);
 
 // Conversation routes
 router.get('/conversations', getConversations);
-router.post('/conversations', createConversation);
+// Crear conversaciones: solo el equipo (admin, manager o sales; rol de la BD).
+router.post('/conversations', ...requireStaff, createConversation);
 router.get('/conversations/:id', getConversationById);
 router.post('/conversations/:id/read', markAsRead);
 

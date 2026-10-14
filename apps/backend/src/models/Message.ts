@@ -5,7 +5,7 @@ export interface IMessage extends Document {
   conversationId: mongoose.Types.ObjectId;
   sender: mongoose.Types.ObjectId;
   senderName: string;
-  senderRole: 'admin' | 'client' | 'support' | 'project_manager';
+  senderRole: 'admin' | 'client' | 'support';
   content: string;
   type: 'text' | 'file' | 'system' | 'notification';
   attachment?: {
@@ -47,7 +47,7 @@ const MessageSchema: Schema = new Schema(
     },
     senderRole: {
       type: String,
-      enum: ['admin', 'client', 'support', 'project_manager'],
+      enum: ['admin', 'client', 'support'],
       required: true,
     },
     content: {

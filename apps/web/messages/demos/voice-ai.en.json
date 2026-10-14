@@ -2,21 +2,27 @@
   "demoVoice": {
     "meta": {
       "title": "AI voice agent for call centers demo",
-      "description": "Interactive demo with sample data: listen to four calls (banking, healthcare, collections and orders) with your browser’s voice, a synced and masked transcript, intent, sentiment, the agent’s simulated actions, a handoff to a human agent with context, an outbound campaign with contact-hour rules and calculated metrics.",
+      "description": "Interactive demo with sample data: listen to four scripted calls (banking, healthcare, collections and orders) with your browser’s voice, with a masked transcript, intent, sentiment, simulated agent actions and a handoff to a human agent with context; plus an editable outbound campaign that applies Colombian contact hours and public holidays, and computed metrics.",
       "breadcrumbHome": "Home",
       "breadcrumbDemos": "Demos",
       "breadcrumbName": "AI voice agent"
     },
     "header": {
-      "back": "Back to demos",
+      "back": "Back to the demo catalog",
       "title": "AI voice agent for call centers",
-      "subtitle": "Listen to sample calls handled by a voice agent: transcript, intent, sentiment, the agent’s actions and a handoff to a human agent with full context.",
+      "subtitle": "Listen to four sample calls and see, turn by turn, how an AI voice agent understands the caller, does the work in your systems and, when needed, hands the call to a human agent with full context.",
       "sampleBadge": "Sample data",
-      "scriptBadge": "Scripted calls",
-      "requestDemo": "Request a demo with your script",
+      "scriptBadge": "Scripted calls, no live AI",
+      "requestDemo": "Request a guided demo",
       "reset": "Reset",
-      "resetHint": "Clears your test calls, the personalization and the simulated campaign",
-      "resetDone": "Demo reset."
+      "resetHint": "Clears your test calls, the personalization, your getting-started progress and your campaign changes",
+      "resetDone": "Demo reset.",
+      "kicker": "For contact center, collections and appointment-scheduling managers",
+      "sampleBadgeHint": "The companies, people, numbers and IDs are fictitious.",
+      "quote": "Get a quote for this agent",
+      "resetConfirm": "Delete your test calls, the personalization, your getting-started progress and your campaign changes?",
+      "resetYes": "Yes, reset",
+      "resetNo": "Cancel"
     },
     "picker": {
       "title": "1. Pick a scenario",
@@ -28,7 +34,8 @@
       "companyPlaceholder": "E.g. My Company Inc.",
       "agent": "Agent name",
       "agentPlaceholder": "Sofía",
-      "personalizeHint": "Used in the call greeting. Stored only in this browser."
+      "personalizeHint": "Used in the call greeting. Stored only in this browser.",
+      "goToCall": "Selected scenario: press to go to the call"
     },
     "direction": {
       "inbound": "Inbound",
@@ -67,7 +74,7 @@
       },
       "voice": {
         "available": "You are hearing your browser’s synthesized voice ({voice}). In your project we use a neural voice from a text-to-speech (TTS) provider.",
-        "unavailable": "Your browser has no English voices installed: the call moves forward with the transcript only.",
+        "unavailable": "Your browser has no English voices installed: the call moves forward with the transcript only. To hear it, try desktop Chrome, Edge or Safari.",
         "unsupported": "Your browser does not support speech synthesis: the call moves forward with the transcript only.",
         "muted": "Voice muted: the call moves forward with the transcript only."
       }
@@ -121,7 +128,8 @@
       "orderStatus": "Order status",
       "damagedProduct": "Damaged product (warranty)",
       "balanceInquiry": "Balance inquiry",
-      "billingClaim": "Billing complaint"
+      "billingClaim": "Billing complaint",
+      "none": "No reason detected"
     },
     "flow": {
       "title": "Call flow",
@@ -140,7 +148,7 @@
     },
     "actions": {
       "title": "Agent actions",
-      "subtitle": "Functions the agent calls during the conversation (function calling)",
+      "subtitle": "Functions the agent calls during the conversation (function calling). In the demo the responses are simulated: it does not connect to any system or send any message.",
       "status": {
         "pending": "pending",
         "running": "running…",
@@ -303,7 +311,7 @@
     },
     "log": {
       "title": "Call log",
-      "subtitle": "Sample shift on Thursday, October 8, 2026, plus your test calls",
+      "subtitle": "Sample shift on Thursday, October 8, 2026 and, on top, your test calls with their real date and time",
       "tabs": {
         "all": "All",
         "inbound": "Inbound",
@@ -317,10 +325,11 @@
         "result": "Outcome",
         "sentiment": "Sentiment",
         "csat": "Survey",
-        "scenario": "Scenario"
+        "scenario": "Script",
+        "when": "Date and time"
       },
-      "open": "Open",
-      "openHint": "Loads the sample scenario for this kind of call",
+      "open": "Listen",
+      "openHint": "Opens this scripted call in the player and starts it",
       "mine": "Your test",
       "results": {
         "resolved": "Resolved by AI",
@@ -335,7 +344,11 @@
       "clearMine": "Delete my tests",
       "cleared": "Your test calls were deleted.",
       "noCsat": "—",
-      "fileName": "sample-call-log.csv"
+      "fileName": "sample-call-log.csv",
+      "filterLabel": "Filter by channel",
+      "replay": "Replay",
+      "replayHint": "Plays this call again",
+      "noScript": "This call only exists in the log: there is no script to listen to"
     },
     "kpis": {
       "title": "Shift metrics",
@@ -356,12 +369,12 @@
     },
     "campaign": {
       "title": "Outbound campaign: payment reminder",
-      "subtitle": "October 2026 installment · {count} contacts scheduled between October 8 and 13",
+      "subtitle": "October 2026 installment · {count, plural, one {# contact scheduled} other {# contacts scheduled}}. You can add, exclude or remove contacts and simulate again.",
       "rulesTitle": "Rules the dialer applies",
       "rules": {
         "window": "Monday to Friday 7:00 to 19:00 and Saturdays 8:00 to 15:00",
         "noSunday": "No calls on Sundays or Colombian public holidays",
-        "frequency": "At most 1 call per week to each person (rule set for this campaign)",
+        "frequency": "At most 1 call per week to the same number (counts the last previous contact and this campaign’s calls)",
         "exclusion": "Do-not-call list: people who asked not to be contacted"
       },
       "legalNote": "Reference: Colombian Law 2300 of 2023 (contact hours for collections). The exact rules are validated with your legal advisor and configured during implementation.",
@@ -375,7 +388,8 @@
         "contact": "Contact",
         "number": "Number",
         "scheduled": "Scheduled",
-        "result": "Outcome"
+        "result": "Outcome",
+        "actions": "Actions"
       },
       "waiting": "Waiting",
       "outcomes": {
@@ -392,7 +406,7 @@
         "afterClose": "Blocked: after the allowed hours",
         "excluded": "Excluded: on the do-not-call list",
         "frequency": "Blocked: already contacted this week",
-        "outOfRange": "The demo only includes 2026 holidays",
+        "outOfRange": "Pick a date between 2024 and 2099",
         "invalid": "Invalid date or time"
       },
       "metrics": {
@@ -403,14 +417,42 @@
         "voicemail": "Voicemail",
         "agreements": "Payment agreements"
       },
-      "simulated": "Simulated in the demo: no calls are made. In your project the dialer uses your SIP trunk or a telephony provider.",
+      "simulated": "Simulated in the demo: no call is made and each allowed call’s outcome is set by the contact. In your project the dialer uses your SIP trunk or a telephony provider.",
       "tester": {
         "title": "Try the contact-hours rule",
-        "subtitle": "Pick a 2026 date and a time to see whether the dialer would call.",
+        "subtitle": "Pick a date and time to see whether the dialer would call. Colombian public holidays are computed for each year.",
         "date": "Date",
         "time": "Time",
         "allowed": "Allowed: {when}",
         "blocked": "{reason} · {when}"
+      },
+      "continue": "Continue campaign",
+      "custom": "Added by you",
+      "empty": "There are no contacts in the campaign. Add one or reset the demo.",
+      "edited": "The campaign changed: simulate it again to see the results.",
+      "exclude": "Exclude {name}",
+      "include": "Remove {name} from the do-not-call list",
+      "remove": "Remove {name} from the campaign",
+      "excludedToast": "{name} is now on the do-not-call list.",
+      "includedToast": "{name} was removed from the do-not-call list.",
+      "removedToast": "You removed {name} from the campaign.",
+      "lockedWhileRunning": "Wait for the simulation to finish to edit the campaign.",
+      "form": {
+        "title": "Add a contact",
+        "hint": "Use fictitious data: the number is stored masked and only in this browser.",
+        "name": "Name",
+        "namePlaceholder": "E.g. Andrés R.",
+        "number": "Mobile or landline (10 digits)",
+        "numberPlaceholder": "E.g. 300 000 0000",
+        "date": "Date",
+        "time": "Time",
+        "outcome": "Simulated outcome if the call is allowed",
+        "submit": "Add to the campaign",
+        "added": "You added {name} to the campaign.",
+        "errorName": "Type a name.",
+        "errorNumber": "Type a 10-digit Colombian mobile (3xx) or landline (60x) number.",
+        "errorWhen": "Pick a valid date and time.",
+        "full": "The demo allows up to {max} contacts: remove one to add another."
       }
     },
     "dates": {
@@ -565,8 +607,9 @@
       }
     },
     "footer": {
-      "sampleNote": "Sample data: the companies, people, numbers and IDs are fictitious. The calls follow a fixed script (no AI model runs in this demo), your browser generates the voice and the integrations (core banking, scheduling, collections, WhatsApp, payments, CRM) are simulated. Your test calls and personalization are stored only in this browser.",
-      "cta": "Request a demo with your script"
+      "sampleNote": "Sample data: the companies, people, numbers and IDs are fictitious. The calls follow a fixed script (no AI model runs in this demo), your browser generates the voice and the integrations (core banking, scheduling, collections, WhatsApp, payments, CRM) are simulated. Your test calls, the personalization and the campaign are stored only in this browser.",
+      "cta": "Request a guided demo",
+      "quote": "Get a quote for this agent"
     },
     "scenarios": {
       "banca": {
@@ -619,7 +662,8 @@
             "title": "Travel notice: validity and countries",
             "body": "A notice covers up to 90 days and several countries. It can be changed or cancelled in the app or by phone."
           }
-        }
+        },
+        "file": "banking"
       },
       "salud": {
         "name": "Healthcare: confirm or reschedule an appointment",
@@ -674,7 +718,8 @@
             "title": "Preparing for the internal medicine appointment",
             "body": "Arrive 15 minutes early with an ID document and test results from the last 6 months."
           }
-        }
+        },
+        "file": "healthcare"
       },
       "cobranza": {
         "name": "Preventive collections: payment agreement",
@@ -730,7 +775,8 @@
             "title": "Contact hours for collections",
             "body": "Only call Monday to Friday 7:00 to 19:00 and Saturdays 8:00 to 15:00; never on Sundays or public holidays. Respect the do-not-call list."
           }
-        }
+        },
+        "file": "collections"
       },
       "pedido": {
         "name": "Order: status and damaged product",
@@ -783,6 +829,52 @@
             "title": "Orders with several packages",
             "body": "An order may arrive in several packages from different warehouses; each package has its own tracking."
           }
+        },
+        "file": "order"
+      }
+    },
+    "howItWorks": {
+      "title": "What is real and what is simulated in this demo",
+      "show": "Show",
+      "hide": "Hide",
+      "script": "The four calls follow a fixed script: there is no speech recognition or live AI model, and the intent, confidence and sentiment are precomputed.",
+      "voice": "Your browser generates the voice with the English voices it has installed; if it has none, the call moves forward with the transcript only.",
+      "simulated": "The agent’s actions, the handoff, the WhatsApp messages and the payment links are simulated: the demo does not connect to any system or send any message.",
+      "real": "Computed for real: the campaign rules (contact hours, Colombian public holidays for every year, frequency and do-not-call list), the call log metrics and the files you download.",
+      "storage": "Your test calls, the personalization and the campaign are stored only in this browser.",
+      "project": "In your project: a +57 number or your SIP trunk, speech recognition, a language model and a neural voice, connected to your systems."
+    },
+    "guide": {
+      "title": "Getting started",
+      "progress": "{done} of {total} done",
+      "show": "Show",
+      "hide": "Hide",
+      "done": "Done",
+      "steps": {
+        "pick": {
+          "title": "Pick the call and your company",
+          "text": "Four sample calls: banking, healthcare, collections and orders. Type your company name to hear it in the greeting.",
+          "action": "Type my company"
+        },
+        "listen": {
+          "title": "Listen to the call",
+          "text": "Press “Start call”: you will see the transcript, intent and sentiment turn by turn.",
+          "action": "Start call"
+        },
+        "result": {
+          "title": "Review the outcome",
+          "text": "When it ends you get the summary, the actions the agent ran and the call in the log.",
+          "action": "Skip to the end"
+        },
+        "transfer": {
+          "title": "Try the handoff",
+          "text": "In “Order” the agent hands the call to a human agent with full context. You can also transfer it yourself.",
+          "action": "Open the order call"
+        },
+        "campaign": {
+          "title": "Simulate the collections campaign",
+          "text": "The dialer blocks Sundays, public holidays, disallowed hours, repeated calls and the do-not-call list.",
+          "action": "Go to the campaign"
         }
       }
     }

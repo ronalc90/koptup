@@ -86,6 +86,12 @@ export interface Ticket {
   escalation: Escalation | null;
   /** El SLA ya venció y se aplicó la regla de escalamiento automático. */
   slaHandled: boolean;
+  /**
+   * Plazo que venció (primera respuesta o resolución) y a qué hora. Se guarda
+   * para que, al subir la prioridad por el vencimiento, el tiempo vencido se
+   * siga midiendo desde ese plazo y no con la política de la prioridad nueva.
+   */
+  slaBreach?: { kind: 'first' | 'resolution'; due: number } | null;
 }
 
 export interface Agent {
@@ -375,6 +381,8 @@ export const SEED_TICKETS: Ticket[] = [
     pqrs: null,
     escalation: null,
     slaHandled: true,
+    // Llegó a las 9:05 con prioridad Media: la primera respuesta vencía a las 10:05.
+    slaBreach: { kind: 'first', due: 605 },
   },
   {
     id: 'TCK-1047',
@@ -529,6 +537,9 @@ export const SEED_TICKETS: Ticket[] = [
   },
 ];
 
+/** Ids de los datos de ejemplo (para saber qué hizo el visitante en los primeros pasos). */
+export const SEED_TICKET_IDS: ReadonlySet<string> = new Set(SEED_TICKETS.map((t) => t.id));
+
 /** Siguiente número de radicado PQRS de ejemplo. */
 export const SEED_PQRS_SEQ = 419;
 
@@ -609,6 +620,8 @@ export const SEED_SURVEYS: Survey[] = [
   { id: 's8', ticketId: 'TCK-1017', agent: 'luis', score: 4, nps: 7, comment: '', at: -5 * DAY + 610 },
   { id: 's9', ticketId: 'TCK-1015', agent: 'maria', score: 5, nps: 10, comment: k('surveys.s9'), at: -6 * DAY + 760 },
 ];
+
+export const SEED_SURVEY_IDS: ReadonlySet<string> = new Set(SEED_SURVEYS.map((s) => s.id));
 
 export const SEED_SETTINGS: Settings = { autoReplyOn: true, threshold: 0.8 };
 

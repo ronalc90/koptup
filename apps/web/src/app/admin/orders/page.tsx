@@ -14,7 +14,7 @@ import {
   ChatBubbleLeftRightIcon,
   UserIcon,
   ClockIcon,
-  CurrencyDollarIcon,
+  ArrowDownTrayIcon,
 } from '@heroicons/react/24/outline';
 
 export default function AdminOrdersPage() {
@@ -27,6 +27,35 @@ export default function AdminOrdersPage() {
   const [rejectionReason, setRejectionReason] = useState('');
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [orderToReject, setOrderToReject] = useState<any>(null);
+  // Error de descarga de un adjunto, por pedido (se muestra bajo la lista).
+  const [attachmentErrors, setAttachmentErrors] = useState<Record<string, string>>({});
+  const [downloadingAttachment, setDownloadingAttachment] = useState<string | null>(null);
+
+  /** Descarga un adjunto con la sesión (GET /api/orders/:id/attachments/:attachmentId). */
+  const downloadAttachment = async (order: any, file: any) => {
+    const key = `${order.id}:${file._id}`;
+    setDownloadingAttachment(key);
+    setAttachmentErrors((prev) => ({ ...prev, [order.id]: '' }));
+    try {
+      const blob = await api.downloadOrderAttachment(order.id, String(file._id));
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = file.fileName || 'adjunto';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (error: any) {
+      const status = error?.response?.status ?? error?.status;
+      setAttachmentErrors((prev) => ({
+        ...prev,
+        [order.id]: status === 410 ? t('attachmentGone', { name: file.fileName }) : t('attachmentError', { name: file.fileName }),
+      }));
+    } finally {
+      setDownloadingAttachment(null);
+    }
+  };
 
   const loadOrders = async () => {
     try {
@@ -341,14 +370,16 @@ export default function AdminOrdersPage() {
                         </p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                           {order.attachments.map((file: any, idx: number) => (
-                            <a
-                              key={idx}
-                              href={file.fileUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-2 p-2 bg-white dark:bg-secondary-950 rounded border border-secondary-200 dark:border-secondary-700 hover:bg-secondary-50 dark:hover:bg-secondary-900 transition-colors"
+                            <button
+                              key={file._id ?? idx}
+                              type="button"
+                              onClick={() => downloadAttachment(order, file)}
+                              disabled={downloadingAttachment === `${order.id}:${file._id}`}
+                              aria-label={t('downloadAttachment', { name: file.fileName })}
+                              title={t('downloadAttachment', { name: file.fileName })}
+                              className="flex items-center gap-2 p-2 text-left bg-white dark:bg-secondary-950 rounded border border-secondary-200 dark:border-secondary-700 hover:bg-secondary-50 dark:hover:bg-secondary-900 transition-colors disabled:opacity-60 disabled:cursor-wait"
                             >
-                              <CurrencyDollarIcon className="h-4 w-4 text-primary-600 dark:text-primary-400 flex-shrink-0" />
+                              <ArrowDownTrayIcon className="h-4 w-4 text-primary-600 dark:text-primary-400 flex-shrink-0" aria-hidden="true" />
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium text-secondary-900 dark:text-white truncate">
                                   {file.fileName}
@@ -357,9 +388,14 @@ export default function AdminOrdersPage() {
                                   {(file.fileSize / 1024).toFixed(1)} KB
                                 </p>
                               </div>
-                            </a>
+                            </button>
                           ))}
                         </div>
+                        {attachmentErrors[order.id] && (
+                          <p role="alert" className="mt-2 text-sm text-red-700 dark:text-red-400">
+                            {attachmentErrors[order.id]}
+                          </p>
+                        )}
                       </div>
                     )}
 

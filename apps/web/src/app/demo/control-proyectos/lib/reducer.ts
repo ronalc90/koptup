@@ -3,14 +3,16 @@
  * fechas "hoy" y "ahora" llegan en la acción desde el navegador.
  */
 import { addDays } from './dates';
-import { isOverdue, me } from './engine';
+import { isOverdue, me, progress } from './engine';
 import { buildState, buildWorkspaceFor, findMentions } from './seed';
 import type {
   AppNotification,
   AppState,
   Automations,
+  InvoiceBasis,
   ISODate,
   ISODateTime,
+  Member,
   Milestone,
   NotificationKind,
   Prefs,
@@ -63,7 +65,8 @@ export type Action =
   | { type: 'milestone.add'; projectId: string; milestone: Omit<Milestone, 'id' | 'projectId'> }
   | { type: 'milestone.update'; id: string; patch: Partial<Pick<Milestone, 'name' | 'start' | 'end' | 'budget' | 'billing'>> }
   | ({ type: 'sprint.close'; id: string; nextName: string } & Stamp)
-  | ({ type: 'milestone.invoice'; id: string; number: string } & Stamp)
+  | ({ type: 'milestone.invoice'; id: string; number: string; amount: number; basis: InvoiceBasis } & Stamp)
+  | { type: 'member.update'; id: string; patch: Partial<Pick<Member, 'rate' | 'capacity'>> }
   | ({ type: 'task.create'; task: TaskDraft } & Stamp)
   | ({ type: 'task.update'; id: string; patch: TaskPatch } & Stamp)
   | ({ type: 'task.move'; id: string; status: StatusId } & Stamp)
@@ -273,6 +276,14 @@ function wsReducer(ws: Workspace, prefs: Prefs, a: Action): Workspace {
       return { ...w, milestones: [...w.milestones, { ...a.milestone, id: mid, projectId: a.projectId }] };
     }
 
+    case 'member.update': {
+      const patch: Partial<Pick<Member, 'rate' | 'capacity'>> = {};
+      if (a.patch.rate !== undefined && Number.isFinite(a.patch.rate) && a.patch.rate >= 0) patch.rate = Math.round(a.patch.rate);
+      if (a.patch.capacity !== undefined && Number.isFinite(a.patch.capacity) && a.patch.capacity > 0 && a.patch.capacity <= 80) patch.capacity = a.patch.capacity;
+      if (Object.keys(patch).length === 0) return ws;
+      return { ...ws, members: ws.members.map((m) => (m.id === a.id ? { ...m, ...patch } : m)) };
+    }
+
     case 'milestone.update':
       return { ...ws, milestones: ws.milestones.map((m) => (m.id === a.id ? { ...m, ...a.patch } : m)) };
 
@@ -290,9 +301,11 @@ function wsReducer(ws: Workspace, prefs: Prefs, a: Action): Workspace {
         out = { ...w, milestones: [...w.milestones, next] };
       }
       const target = next;
+      // Avance del sprint al cerrarlo (por horas estimadas): sirve para facturar por lo terminado.
+      const closedProgress = progress(ws.tasks.filter((t) => t.milestoneId === m.id));
       out = {
         ...out,
-        milestones: out.milestones.map((x) => (x.id === m.id ? { ...x, closed: true } : x)),
+        milestones: out.milestones.map((x) => (x.id === m.id ? { ...x, closed: true, closedProgress } : x)),
         tasks: out.tasks.map((t) =>
           t.milestoneId === m.id && t.status !== 'done'
             ? { ...t, milestoneId: target.id, history: [...t.history, { at: a.now, actor, key: 'sprintMoved', params: { sprint: target.name } }] }
@@ -306,7 +319,9 @@ function wsReducer(ws: Workspace, prefs: Prefs, a: Action): Workspace {
       const m = ws.milestones.find((x) => x.id === a.id);
       const project = m && ws.projects.find((p) => p.id === m.projectId);
       if (!m || !project || m.invoice) return ws;
-      let out: Workspace = { ...ws, milestones: ws.milestones.map((x) => (x.id === m.id ? { ...x, invoice: { number: a.number, on: a.today } } : x)) };
+      const amount = Math.max(0, Math.round(a.amount));
+      if (!(amount > 0)) return ws;
+      let out: Workspace = { ...ws, milestones: ws.milestones.map((x) => (x.id === m.id ? { ...x, invoice: { number: a.number, on: a.today, amount, basis: a.basis } } : x)) };
       const [oid, w] = nextId(out, 'o');
       out = { ...w, outbox: [{ id: oid, at: a.now, projectId: project.id, channel: 'email', to: project.clientContact, key: 'invoice', params: { number: a.number, milestone: m.name } }, ...w.outbox] };
       return pushNotif(out, prefs, { kind: 'sent', at: a.now, key: 'invoiceSent', params: { number: a.number, who: project.clientContact }, projectId: project.id });

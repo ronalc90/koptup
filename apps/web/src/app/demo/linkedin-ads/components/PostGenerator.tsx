@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import {
   ArrowPathIcon,
@@ -18,7 +19,9 @@ import {
   FolderOpenIcon,
   XMarkIcon,
   CalendarDaysIcon,
+  LinkIcon,
 } from '@heroicons/react/24/outline';
+import { refreshAccessToken } from '@/lib/auth-token';
 import {
   AD_CTAS,
   AD_CTA_KEYS,
@@ -37,10 +40,14 @@ import {
   generarAdCopy,
   generarCarrusel,
   generarPost,
+  incluyeEnlace,
+  normalizarEnlaceDemo,
   urlDemo,
   type AdCopyGenerado,
   type CarruselSlide,
 } from './generador';
+import { clasificarErrorIA, esSesionVencida, type ErrorIA } from './errores';
+import { adaptarRespuesta, type AiPack, type RespuestaIA } from './respuestaIA';
 import { revisarTexto } from './veracidad';
 import { usePlantillas } from './useLinkedinData';
 import { descargarCarruselPdf } from './carruselPdf';
@@ -53,18 +60,12 @@ const INSTRUCCION_SIN_METRICAS =
 const INSTRUCCION_CAPACIDADES =
   'Usa solo las funciones listadas en los beneficios; no inventes capacidades ni integraciones.';
 
+/** Ruta de la demo para volver después de iniciar sesión o pedir acceso. */
+const RUTA_DEMO = '/demo/linkedin-ads';
+
 type Fuente = 'ai' | 'local' | 'edited';
 type Vista = 'organico' | 'anuncio' | 'carrusel';
-type MotivoIA = 'notConfigured' | 'limit' | 'access' | 'invalid' | 'network' | 'generic';
-
-interface AiPack {
-  id: number;
-  textoPost: string;
-  ad: AdCopyGenerado;
-  carrusel: CarruselSlide[];
-  estrategia: string;
-  model: string;
-}
+export type Progreso = 'post' | 'visual';
 
 interface Borrador {
   id: string;
@@ -77,17 +78,6 @@ interface Borrador {
   texto: string;
 }
 
-interface RespuestaIA {
-  data?: {
-    post?: { hook?: unknown; body?: unknown; cta?: unknown; hashtags?: unknown };
-    ad?: { headline?: unknown; introText?: unknown; description?: unknown; cta?: unknown };
-    carrusel?: unknown;
-    estrategia?: unknown;
-  };
-  model?: string;
-  error?: string;
-}
-
 interface PostGeneratorProps {
   demos: KoptupDemo[];
   demoId: string;
@@ -97,39 +87,10 @@ interface PostGeneratorProps {
   planDia: DiaCalendario | null;
   imagen: string | null;
   onQuitarImagen: () => void;
-}
-
-const esTexto = (v: unknown): v is string => typeof v === 'string' && v.trim().length > 0;
-
-function adaptarRespuesta(json: RespuestaIA, id: number): AiPack | null {
-  const d = json.data;
-  if (!d?.post || !d.ad) return null;
-  const { hook, body, cta, hashtags } = d.post;
-  if (!esTexto(hook) || !esTexto(body) || !esTexto(cta)) return null;
-  const tags = Array.isArray(hashtags)
-    ? hashtags.filter(esTexto).map((h) => (h.startsWith('#') ? h : `#${h}`))
-    : [];
-  const adCta = AD_CTAS.includes(d.ad.cta as AdCta) ? (d.ad.cta as AdCta) : 'Más información';
-  if (!esTexto(d.ad.headline) || !esTexto(d.ad.introText) || !esTexto(d.ad.description)) return null;
-  const slides: CarruselSlide[] = Array.isArray(d.carrusel)
-    ? (d.carrusel as Record<string, unknown>[])
-        .filter((s) => esTexto(s?.titulo))
-        .map((s, i) => ({
-          // Se renumeran en orden: el modelo puede repetir o saltar números.
-          numero: i + 1,
-          titulo: s.titulo as string,
-          bullets: Array.isArray(s.bullets) ? (s.bullets as unknown[]).filter(esTexto) : [],
-          notaVisual: esTexto(s.notaVisual) ? s.notaVisual : '',
-        }))
-    : [];
-  return {
-    id,
-    textoPost: [hook, body, cta, tags.join(' ')].filter(Boolean).join('\n\n'),
-    ad: { headline: d.ad.headline, introText: d.ad.introText, description: d.ad.description, cta: adCta },
-    carrusel: slides,
-    estrategia: esTexto(d.estrategia) ? d.estrategia : '',
-    model: json.model || 'OpenAI',
-  };
+  /** Avisa a la página que ya generaste, copiaste o guardaste un post (primeros pasos). */
+  onProgreso?: (paso: Progreso) => void;
+  /** Abre la pestaña «Capturas y video» para sumar una imagen. */
+  onIrACapturas?: () => void;
 }
 
 export default function PostGenerator({
@@ -141,6 +102,8 @@ export default function PostGenerator({
   planDia,
   imagen,
   onQuitarImagen,
+  onProgreso,
+  onIrACapturas,
 }: PostGeneratorProps) {
   const t = useTranslations('demoLinkedinAds.generator');
   const tAng = useTranslations('demoLinkedinAds.angles');
@@ -152,9 +115,11 @@ export default function PostGenerator({
   const [tono, setTono] = useState<TonoPost>('cercano');
   const [variante, setVariante] = useState(0);
   const [vista, setVista] = useState<Vista>('organico');
-  const [aiPack, setAiPack] = useState<AiPack | null>(null);
+  // Resultados de la IA por combinación (demo, ángulo, tono y versión): si
+  // cambias una opción y vuelves, recuperas el texto que generó la IA.
+  const [aiPacks, setAiPacks] = useState<Record<string, AiPack>>({});
   const [aiLoading, setAiLoading] = useState(false);
-  const [aiError, setAiError] = useState<MotivoIA | null>(null);
+  const [aiError, setAiError] = useState<ErrorIA | null>(null);
   const [override, setOverride] = useState<{ key: string; texto: string } | null>(null);
   const [utm, setUtm] = useState(true);
   const [borradores, setBorradores] = useState<Borrador[]>([]);
@@ -178,13 +143,15 @@ export default function PostGenerator({
     }
   }, []);
 
-  // Cambiar demo, ángulo, tono o variante deja obsoleto el resultado de la IA.
+  const combo = `${demoId}|${angulo}|${tono}|${variante}`;
+  const aiPack: AiPack | null = aiPacks[combo] ?? null;
+
+  // Cambiar demo, ángulo, tono o versión cancela la solicitud en curso y su aviso.
   useEffect(() => {
-    setAiPack(null);
     setAiError(null);
     setAiLoading(false);
     solicitudVigente.current = '';
-  }, [demoId, angulo, tono, variante]);
+  }, [combo]);
 
   useEffect(() => {
     if (!aviso) return;
@@ -204,15 +171,16 @@ export default function PostGenerator({
   const localAd = useMemo(() => generarAdCopy(demo, variante, plantillas), [demo, variante, plantillas]);
   const localCarrusel = useMemo(() => generarCarrusel(demo, plantillas), [demo, plantillas]);
 
-  const claveActual = `${demoId}|${angulo}|${tono}|${variante}|${aiPack ? aiPack.id : 'local'}`;
+  const claveActual = `${combo}|${aiPack ? aiPack.id : 'local'}`;
   const editado = override !== null && override.key === claveActual;
   const textoBase = aiPack ? aiPack.textoPost : localPost.textoCompleto;
   const textoPost = aplicarUtm(editado ? override.texto : textoBase, url, qPost, utm);
   const fuente: Fuente = editado ? 'edited' : aiPack ? 'ai' : 'local';
-  const revision = useMemo(() => revisarTexto(textoPost, demo.path), [textoPost, demo.path]);
+  const revision = useMemo(() => revisarTexto(textoPost, url), [textoPost, url]);
 
   const ad = aiPack?.ad ?? localAd;
-  const adIntro = aplicarUtm(ad.introText, url, qAd, utm);
+  // La UTM de pauta va en la URL de destino; el texto introductorio queda corto.
+  const adIntro = ad.introText;
   const adUrl = utm ? `${url}?${qAd}` : url;
   const adCtaLabel = t(`ad.ctaLabels.${AD_CTA_KEYS[ad.cta]}`);
   const carrusel = aiPack && aiPack.carrusel.length >= 3 ? aiPack.carrusel : localCarrusel;
@@ -224,6 +192,7 @@ export default function PostGenerator({
     if (ok) {
       setCopiado(clave);
       setTimeout(() => setCopiado((c) => (c === clave ? null : c)), 1500);
+      if (clave === 'post' || clave === 'ad' || clave === 'carrusel') onProgreso?.('post');
     } else {
       notificar('error', t('post.copyError'));
     }
@@ -234,76 +203,82 @@ export default function PostGenerator({
     escribirLS(LS_UTM, valor);
   };
 
+  /** Agrega el enlace a la demo al final del texto (queda como edición tuya). */
+  const agregarEnlace = () => {
+    setOverride({ key: claveActual, texto: `${textoPost.trimEnd()}\n\n👉 ${url}` });
+  };
+
   const generarConIA = useCallback(async () => {
-    const solicitud = `${demoId}|${angulo}|${tono}|${variante}|${Date.now()}`;
+    const solicitud = `${combo}|${Date.now()}`;
     solicitudVigente.current = solicitud;
     setAiLoading(true);
     setAiError(null);
-    let motivo: MotivoIA | null = null;
-    try {
-      let resp: Response;
-      try {
-        resp = await fetch('/api/linkedin-ads/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            demo: {
-              titulo: demo.titulo,
-              tagline: demo.tagline,
-              industria: demo.industria,
-              path: demo.path,
-              emoji: demo.emoji,
-              problemaResuelve: demo.problemaResuelve,
-              beneficiosClave: demo.funciones,
-              publicoObjetivo: demo.publicoObjetivo,
-              metricaImpactante: INSTRUCCION_SIN_METRICAS,
-              caracteristicasIA: [INSTRUCCION_CAPACIDADES],
-              hashtagsEspecificos: demo.hashtagsEspecificos,
-            },
-            angulo,
-            tono,
-            anguloLabel: tAng(`${angulo}.label`),
-            anguloDescripcion: tAng(`${angulo}.desc`),
-            tonoLabel: tTon(`${tono}.label`),
-            tonoDescripcion: tTon(`${tono}.desc`),
-          }),
-        });
-      } catch {
-        motivo = 'network';
-        return;
-      }
+    let error: ErrorIA | null = null;
+    const cuerpo = JSON.stringify({
+      demo: {
+        titulo: demo.titulo,
+        tagline: demo.tagline,
+        industria: demo.industria,
+        path: demo.path,
+        emoji: demo.emoji,
+        problemaResuelve: demo.problemaResuelve,
+        beneficiosClave: demo.funciones,
+        publicoObjetivo: demo.publicoObjetivo,
+        metricaImpactante: INSTRUCCION_SIN_METRICAS,
+        caracteristicasIA: [INSTRUCCION_CAPACIDADES],
+        hashtagsEspecificos: demo.hashtagsEspecificos,
+      },
+      angulo,
+      tono,
+      anguloLabel: tAng(`${angulo}.label`),
+      anguloDescripcion: tAng(`${angulo}.desc`),
+      tonoLabel: tTon(`${tono}.label`),
+      tonoDescripcion: tTon(`${tono}.desc`),
+    });
+    const pedir = async () => {
+      const resp = await fetch('/api/linkedin-ads/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: cuerpo,
+      });
       let json: RespuestaIA | null = null;
       try {
         json = (await resp.json()) as RespuestaIA;
       } catch {
         json = null;
       }
+      return { resp, json };
+    };
+    try {
+      let r: Awaited<ReturnType<typeof pedir>>;
+      try {
+        r = await pedir();
+        // Sesión vencida: se renueva con el refresh token y se reintenta una vez.
+        if (esSesionVencida(r.resp.status, r.json) && (await refreshAccessToken())) r = await pedir();
+      } catch {
+        error = { motivo: 'network' };
+        return;
+      }
       if (solicitudVigente.current !== solicitud) return; // el usuario cambió la configuración
+      const { resp, json } = r;
       if (!resp.ok) {
-        const err = json?.error ?? '';
-        motivo =
-          resp.status === 429 || resp.status === 402
-            ? 'limit'
-            : resp.status === 401 || resp.status === 403
-              ? 'access'
-              : resp.status === 503 && /OPENAI_API_KEY|configur/i.test(err)
-                ? 'notConfigured'
-                : 'generic';
+        error = clasificarErrorIA(resp.status, json, resp.headers.get('retry-after'));
         return;
       }
-      const pack = json ? adaptarRespuesta(json, ++aiSeq.current) : null;
+      const pack = json ? adaptarRespuesta(json, ++aiSeq.current, demo, url) : null;
       if (!pack) {
-        motivo = 'invalid';
+        error = { motivo: 'invalid' };
         return;
       }
-      setAiPack(pack);
+      setAiPacks((prev) => ({ ...prev, [combo]: pack }));
+      onProgreso?.('post');
     } finally {
       if (solicitudVigente.current === solicitud) {
         setAiLoading(false);
-        if (motivo) setAiError(motivo);
+        if (error) setAiError(error);
       }
     }
-  }, [demo, demoId, angulo, tono, variante, tAng, tTon]);
+  }, [combo, demo, url, angulo, tono, tAng, tTon, onProgreso]);
 
   const guardarBorrador = () => {
     const nuevo: Borrador = {
@@ -320,6 +295,7 @@ export default function PostGenerator({
     setBorradores(lista);
     escribirLS(LS_BORRADORES, lista);
     notificar('ok', t('post.saved'));
+    onProgreso?.('post');
   };
 
   const abrirBorrador = (b: Borrador) => {
@@ -327,8 +303,9 @@ export default function PostGenerator({
     onAnguloChange(b.angulo);
     setTono(b.tono);
     setVariante(b.variante);
-    setAiPack(null);
-    setOverride({ key: `${b.demoId}|${b.angulo}|${b.tono}|${b.variante}|local`, texto: b.texto });
+    const comboBorrador = `${b.demoId}|${b.angulo}|${b.tono}|${b.variante}`;
+    const packBorrador = aiPacks[comboBorrador];
+    setOverride({ key: `${comboBorrador}|${packBorrador ? packBorrador.id : 'local'}`, texto: b.texto });
     setVista('organico');
     notificar('ok', t('drafts.loaded'));
   };
@@ -412,16 +389,38 @@ export default function PostGenerator({
             )}
           </button>
           {aiError ? (
-            <p
-              role="status"
-              className="mt-2 flex items-start gap-1.5 rounded-md bg-amber-50 px-2.5 py-1.5 text-[11px] leading-snug text-amber-800 dark:bg-amber-950/40 dark:text-amber-200"
+            <div
+              role="alert"
+              data-testid="ai-error"
+              data-motivo={aiError.motivo}
+              className="mt-2 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-2 text-[11px] leading-snug text-amber-900 dark:border-amber-800/50 dark:bg-amber-950/40 dark:text-amber-100"
             >
-              <ExclamationTriangleIcon className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-              <span>
-                {t('ai.unavailable', { reason: t(`ai.reasons.${aiError}`) })}{' '}
-                {fuente === 'edited' ? t('ai.fallbackEdited') : t('ai.fallbackLocal')}
-              </span>
-            </p>
+              <p className="flex items-start gap-1.5 font-semibold">
+                <ExclamationTriangleIcon className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                {t(`ai.errors.${aiError.motivo}.title`)}
+              </p>
+              <p className="mt-1">
+                {aiError.motivo === 'rateLimited' && aiError.minutos
+                  ? t('ai.errors.rateLimited.textWait', { min: aiError.minutos })
+                  : t(`ai.errors.${aiError.motivo}.text`)}{' '}
+                {fuente === 'edited' ? t('ai.fallbackEdited') : aiPack ? t('ai.fallbackPrevious') : t('ai.fallbackLocal')}
+              </p>
+              {aiError.motivo === 'login' ? (
+                <Link
+                  href={`/login?redirect=${encodeURIComponent(RUTA_DEMO)}`}
+                  className="mt-1.5 inline-block font-semibold text-primary-700 underline hover:text-primary-800 dark:text-primary-300"
+                >
+                  {t('ai.errors.login.action')}
+                </Link>
+              ) : aiError.motivo === 'access' ? (
+                <Link
+                  href="/solicitar-demo?demos=linkedin-ads"
+                  className="mt-1.5 inline-block font-semibold text-primary-700 underline hover:text-primary-800 dark:text-primary-300"
+                >
+                  {t('ai.errors.access.action')}
+                </Link>
+              ) : null}
+            </div>
           ) : null}
           {aiPack ? (
             <div
@@ -523,7 +522,7 @@ export default function PostGenerator({
           <p className="mt-2 text-[11px] text-secondary-500 dark:text-secondary-400">{t('variantHelp')}</p>
         </Bloque>
 
-        <Bloque titulo="UTM">
+        <Bloque titulo={t('utmTitle')}>
           <label className="flex cursor-pointer items-start gap-2 text-xs text-secondary-700 dark:text-secondary-300">
             <input
               type="checkbox"
@@ -553,7 +552,11 @@ export default function PostGenerator({
           </p>
         ) : null}
 
-        <div className="flex flex-wrap items-center gap-1 rounded-lg bg-secondary-100 p-1 text-xs dark:bg-secondary-800" role="tablist">
+        <div
+          className="flex flex-wrap items-center gap-1 rounded-lg bg-secondary-100 p-1 text-xs dark:bg-secondary-800"
+          role="tablist"
+          aria-label={t('views.label')}
+        >
           {(
             [
               { key: 'organico', label: t('views.organic'), Icon: NewspaperIcon },
@@ -565,9 +568,11 @@ export default function PostGenerator({
             return (
               <button
                 key={key}
+                id={`li-vista-${key}`}
                 type="button"
                 role="tab"
                 aria-selected={activo}
+                aria-controls={`li-panel-${key}`}
                 onClick={() => setVista(key)}
                 className={`inline-flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-3 py-1.5 transition ${
                   activo
@@ -614,7 +619,7 @@ export default function PostGenerator({
         </div>
 
         {vista === 'organico' ? (
-          <div className="space-y-4">
+          <div id="li-panel-organico" role="tabpanel" aria-labelledby="li-vista-organico" className="space-y-4">
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
               <div className="min-w-0 space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
@@ -686,12 +691,23 @@ export default function PostGenerator({
                 </div>
                 <PostPreview texto={textoPost} imagenUrl={imagen} />
                 {!imagen ? (
-                  <p className="text-[11px] text-secondary-500 dark:text-secondary-400">{t('post.imageHint')}</p>
+                  <p className="text-[11px] text-secondary-500 dark:text-secondary-400">
+                    {t('post.imageHint')}{' '}
+                    {onIrACapturas ? (
+                      <button
+                        type="button"
+                        onClick={onIrACapturas}
+                        className="font-semibold text-primary-700 underline hover:text-primary-800 dark:text-primary-300"
+                      >
+                        {t('post.goToCapture')}
+                      </button>
+                    ) : null}
+                  </p>
                 ) : null}
               </div>
             </div>
 
-            <Revision revision={revision} />
+            <Revision revision={revision} onAgregarEnlace={agregarEnlace} />
 
             <Borradores
               borradores={borradores}
@@ -709,7 +725,7 @@ export default function PostGenerator({
         ) : null}
 
         {vista === 'anuncio' ? (
-          <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+          <div id="li-panel-anuncio" role="tabpanel" aria-labelledby="li-vista-anuncio" className="grid grid-cols-1 gap-4 xl:grid-cols-2">
             <div className="min-w-0 space-y-3">
               <Campo label={t('ad.headline')} maxLen={LIMITES.adHeadline} value={ad.headline} over={t('ad.over')} />
               <Campo label={t('ad.intro')} maxLen={LIMITES.adIntro} value={adIntro} over={t('ad.over')} />
@@ -762,7 +778,7 @@ export default function PostGenerator({
         ) : null}
 
         {vista === 'carrusel' ? (
-          <div className="space-y-3">
+          <div id="li-panel-carrusel" role="tabpanel" aria-labelledby="li-vista-carrusel" className="space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase tracking-wide text-secondary-500 dark:text-secondary-400">
@@ -857,7 +873,13 @@ function Campo({ label, value, maxLen, over }: { label: string; value: string; m
   );
 }
 
-function Revision({ revision }: { revision: ReturnType<typeof revisarTexto> }) {
+function Revision({
+  revision,
+  onAgregarEnlace,
+}: {
+  revision: ReturnType<typeof revisarTexto>;
+  onAgregarEnlace: () => void;
+}) {
   const t = useTranslations('demoLinkedinAds.generator.checks');
   const items: { ok: boolean; texto: string }[] = [
     revision.cifras.length
@@ -887,6 +909,16 @@ function Revision({ revision }: { revision: ReturnType<typeof revisarTexto> }) {
           </li>
         ))}
       </ul>
+      {!revision.enlace ? (
+        <button
+          type="button"
+          onClick={onAgregarEnlace}
+          className="mt-3 inline-flex items-center gap-1.5 rounded-md border border-primary-600 px-3 py-1.5 text-xs font-semibold text-primary-700 transition hover:bg-primary-50 dark:border-primary-400 dark:text-primary-200 dark:hover:bg-primary-950/60"
+        >
+          <LinkIcon className="h-3.5 w-3.5" aria-hidden="true" />
+          {t('addLink')}
+        </button>
+      ) : null}
     </div>
   );
 }

@@ -8,11 +8,13 @@ const KNOWN_ERRORS: ReadonlySet<DemoErrorCode> = new Set<DemoErrorCode>([
   'invalid_format',
   'file_too_large',
   'too_many_pages',
+  'too_much_text',
   'empty_document',
   'unreadable_document',
   'missing_file',
   'invalid_email',
   'consent_required',
+  'lead_unavailable',
   'daily_limit',
   'question_limit',
   'invalid_question',
@@ -37,7 +39,7 @@ export function demoErrorText(t: UploadDemoTranslator, code: DemoErrorCode, limi
   });
 }
 
-/** Errores que significan "la demo no está disponible": se muestra la tarjeta con el CTA a /contact. */
+/** Errores que significan "la demo no está disponible": se muestra la tarjeta con el CTA a la demo guiada. */
 export function unavailableReasonFor(code: DemoErrorCode): 'budget_exhausted' | 'disabled' | null {
   if (code === 'budget_exhausted') return 'budget_exhausted';
   if (code === 'demo_disabled') return 'disabled';

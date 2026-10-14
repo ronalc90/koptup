@@ -8,7 +8,7 @@ import { DEFAULT_TYPES } from './models';
 import { atBogota, iso } from './time';
 import type { AppState, Block, Entry, EntryContent, FieldValue, L10n, Media, Person, Status, TypeId, Webhook } from './types';
 
-export const STATE_VERSION = 3;
+export const STATE_VERSION = 4;
 
 export const COMPANY = {
   name: 'Red de Clínicas Montaña Azul',
@@ -99,7 +99,7 @@ function specs(): Spec[] {
       updatedDaysAgo: 21,
       publishedDaysAgo: 21,
       fields: {
-        title: L('Tu salud, cerca de ti en seis ciudades', 'Your health, close to you in six cities'),
+        title: L('Tu salud, cerca de ti en cinco ciudades', 'Your health, close to you in five cities'),
         summary: L(
           'Medicina general, laboratorio, ecografía, odontología y fisioterapia con cita el mismo día en la mayoría de sedes.',
           'General practice, lab tests, ultrasound, dentistry and physical therapy, with same-day appointments at most locations.',
@@ -116,7 +116,7 @@ function specs(): Spec[] {
         BTN(pi, 'Ver sedes y horarios', 'See locations and hours', '/sedes'),
       ],
       seo: {
-        title: L('Red de Clínicas Montaña Azul | Citas en seis ciudades', 'Montaña Azul Clinics | Appointments in six cities'),
+        title: L('Red de Clínicas Montaña Azul | Citas en cinco ciudades', 'Montaña Azul Clinics | Appointments in five cities'),
         description: L(
           'Medicina general, laboratorio, ecografía, odontología y fisioterapia en Bogotá, Medellín, Cali, Barranquilla y Bucaramanga. Agenda en línea o por WhatsApp.',
           'General practice, lab tests, ultrasound, dentistry and physical therapy in Bogotá, Medellín, Cali, Barranquilla and Bucaramanga. Book online or on WhatsApp.',
@@ -177,8 +177,8 @@ function specs(): Spec[] {
         photo: 'm-fachada-chapinero',
         services: ['svc-medicina-general', 'svc-ecografia', 'svc-laboratorio', 'svc-odontologia'],
         description: L(
-          'A dos cuadras de la estación de TransMilenio de la calle 63. Parqueadero para bicicletas y acceso para sillas de ruedas.',
-          'Two blocks from the Calle 63 TransMilenio station. Bike parking and wheelchair access.',
+          'A dos cuadras de la estación de transporte público de la calle 63. Parqueadero para bicicletas y acceso para sillas de ruedas.',
+          'Two blocks from the Calle 63 public transit station. Bike parking and wheelchair access.',
         ),
       },
       seo: {
@@ -709,4 +709,38 @@ export function buildState(nowMs: number): AppState {
     activity: [],
     tour: { model: false, edit: false, assistant: false, publish: false, rag: false },
   };
+}
+
+/**
+ * Textos de ejemplo corregidos en la versión 4: la red tiene seis sedes en
+ * cinco ciudades (dos en Bogotá), no «seis ciudades»; y la sede Chapinero ya
+ * no nombra un sistema de transporte real.
+ */
+const V4_FIXES: [string, string][] = [
+  ['Tu salud, cerca de ti en seis ciudades', 'Tu salud, cerca de ti en cinco ciudades'],
+  ['Your health, close to you in six cities', 'Your health, close to you in five cities'],
+  ['Citas en seis ciudades', 'Citas en cinco ciudades'],
+  ['Appointments in six cities', 'Appointments in five cities'],
+  ['la estación de TransMilenio de la calle 63', 'la estación de transporte público de la calle 63'],
+  ['the Calle 63 TransMilenio station', 'the Calle 63 public transit station'],
+];
+const V4_FIXED_ENTRIES = new Set(['page-inicio', 'loc-chapinero']);
+
+/**
+ * Estado guardado → estado actual. Conserva lo que la persona hizo con la
+ * versión 3 (solo corrige los textos de ejemplo que no haya cambiado) y
+ * descarta cualquier otra cosa irreconocible (devuelve null: datos nuevos).
+ */
+export function migrate(raw: unknown): AppState | null {
+  const s = raw as AppState | null;
+  if (!s || typeof s !== 'object' || !Array.isArray(s.entries)) return null;
+  if (s.version === STATE_VERSION) return s;
+  if (s.version !== 3) return null;
+  const entries = s.entries.map((e) => {
+    if (!V4_FIXED_ENTRIES.has(e.id)) return e;
+    let json = JSON.stringify(e);
+    for (const [from, to] of V4_FIXES) json = json.split(from).join(to);
+    return JSON.parse(json) as Entry;
+  });
+  return { ...s, version: STATE_VERSION, entries };
 }

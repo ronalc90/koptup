@@ -14,7 +14,8 @@ import {
 } from '@heroicons/react/24/outline';
 import Card from '@/components/ui/Card';
 import { INCOME_TAX_RATE } from '../lib/catalog';
-import { balance, periodRange, pnl, receivables } from '../lib/engine';
+import { balance, pnl, receivables } from '../lib/engine';
+import { fmtMonthLong, fmtMonthRange } from '../lib/format';
 import { useErp } from '../lib/store';
 import type { ModuleId } from '../lib/types';
 import { useFmt } from './ui';
@@ -39,12 +40,11 @@ interface Kpi {
 
 export default function Kpis() {
   const t = useTranslations('demoErp.kpis');
-  const tp = useTranslations('demoErp.periods');
-  const { computed, state, filters, goTo } = useErp();
+  const { computed, state, filters, goTo, range } = useErp();
   const f = useFmt();
 
   const kpis = useMemo<Kpi[]>(() => {
-    const r = periodRange(filters.period);
+    const r = range;
     const co = filters.company;
     const cur = pnl(computed.entries, co, r, INCOME_TAX_RATE);
     const prev = r.prev ? pnl(computed.entries, co, r.prev, INCOME_TAX_RATE) : null;
@@ -68,9 +68,15 @@ export default function Kpis() {
     ];
     // f cambia con idioma y moneda
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [computed, state, filters.period, filters.company, filters.currency, f.locale, t]);
+  }, [computed, state, range, filters.company, filters.currency, f.locale, t]);
 
-  const compareLabel = filters.period === 'ytd' ? t('ytdNote') : t('vs', { period: tp(`prev_${filters.period}`) });
+  // Período con el que se compara: el mes anterior o los tres meses anteriores
+  const prevLabel = range.prev
+    ? range.prev.start.slice(0, 7) === range.prev.end.slice(0, 7)
+      ? fmtMonthLong(range.prev.start.slice(0, 7), f.locale)
+      : fmtMonthRange(range.prev.start.slice(0, 7), range.prev.end.slice(0, 7), f.locale)
+    : '';
+  const compareLabel = range.prev ? t('vs', { period: prevLabel }) : t('ytdNote');
 
   return (
     <section aria-label={t('aria')} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -79,6 +85,8 @@ export default function Kpis() {
         const flat = k.delta === null || Math.abs(k.delta) < 0.05;
         const tone: Tone = flat || k.upIsGood === null ? 'neutral' : up === k.upIsGood ? 'good' : 'bad';
         const toneCls = tone === 'good' ? 'text-green-600 dark:text-green-400' : tone === 'bad' ? 'text-red-600 dark:text-red-400' : 'text-secondary-500 dark:text-secondary-400';
+        // Para lectores de pantalla: la variación con su valor y el período con el que se compara
+        const deltaAria = k.delta === null ? '' : t(flat ? 'deltaFlat' : up ? 'deltaUp' : 'deltaDown', { value: `${f.dec(Math.abs(k.delta), 1)}${k.isPp ? ' pp' : '%'}`, period: prevLabel });
         return (
           <button key={k.key} onClick={() => goTo(k.module, undefined, true)} className="text-left" title={k.full ? `${t(k.key)}: ${k.full}` : undefined}>
             <Card variant="bordered" padding="sm" className="h-full hover:shadow-medium hover:border-primary-300 dark:hover:border-primary-700 transition-all">
@@ -87,9 +95,12 @@ export default function Kpis() {
                   <k.icon className="w-5 h-5 text-white" />
                 </div>
                 {k.delta !== null && (
-                  <span className={`text-xs font-semibold flex items-center gap-0.5 ${toneCls}`} aria-label={t(up ? 'deltaUp' : 'deltaDown')}>
-                    {!flat && (up ? <ArrowUpRightIcon className="w-3.5 h-3.5" /> : <ArrowDownRightIcon className="w-3.5 h-3.5" />)}
-                    {flat ? `${f.dec(0, 1)}${k.isPp ? ' pp' : '%'}` : k.isPp ? `${up ? '+' : ''}${f.dec(k.delta!, 1)} pp` : `${up ? '+' : ''}${f.dec(k.delta!, 1)}%`}
+                  <span className={`text-xs font-semibold flex items-center gap-0.5 ${toneCls}`}>
+                    <span aria-hidden="true" className="flex items-center gap-0.5">
+                      {!flat && (up ? <ArrowUpRightIcon className="w-3.5 h-3.5" /> : <ArrowDownRightIcon className="w-3.5 h-3.5" />)}
+                      {flat ? `${f.dec(0, 1)}${k.isPp ? ' pp' : '%'}` : k.isPp ? `${up ? '+' : ''}${f.dec(k.delta!, 1)} pp` : `${up ? '+' : ''}${f.dec(k.delta!, 1)}%`}
+                    </span>
+                    <span className="sr-only">{deltaAria}</span>
                   </span>
                 )}
               </div>

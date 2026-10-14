@@ -40,13 +40,34 @@ export interface Settlement {
   vacation: number;
   vacationDays: number;
   indemnity: number;
+  /** Días de salario que paga la indemnización (0 si no aplica). */
+  indemnityDays: number;
   total: number;
 }
 
 /**
+ * Días de salario de la indemnización por despido sin justa causa (art. 64
+ * C.S.T.): en contrato indefinido, 30 días por el primer año y 20 por cada año
+ * adicional (20 y 15 si el salario es de 10 salarios mínimos o más), en
+ * proporción a la fracción de año; a término fijo, los días que faltan para
+ * terminar el plazo; por obra o labor, el tiempo que falta y como mínimo 15
+ * días (en la demo no se conoce la fecha de fin de la obra: se usa el mínimo).
+ * El contrato de aprendizaje no tiene indemnización.
+ */
+export function indemnityDays(e: Employee, lastDay: ISODate): number {
+  if (e.contract === 'apprentice') return 0;
+  if (e.contract === 'fixed') return e.contractEnd ? Math.max(0, diffDays(lastDay, e.contractEnd)) : 0;
+  if (e.contract === 'work') return 15;
+  const years = Math.max(0, diffDays(e.joined, lastDay)) / 365;
+  const high = e.salary >= 10 * PARAMS.smmlv;
+  const [first, extra] = high ? [20, 15] : [30, 20];
+  return years <= 1 ? first : first + extra * (years - 1);
+}
+
+/**
  * Liquidación de prestaciones simplificada (días de 30 por mes, base con
- * auxilio de transporte para cesantías y prima). Indemnización solo para el
- * despido sin justa causa en contrato indefinido (art. 64 C.S.T., < 10 SMMLV).
+ * auxilio de transporte para cesantías y prima) e indemnización por despido
+ * sin justa causa según el tipo de contrato (ver `indemnityDays`).
  */
 export function settlement(e: Employee, lastDay: ISODate, reason: ExitReason, vacationBalanceDays: number): Settlement {
   const year = lastDay.slice(0, 4);
@@ -67,12 +88,12 @@ export function settlement(e: Employee, lastDay: ISODate, reason: ExitReason, va
   const prima = Math.round((base * primaDays) / 360);
   const vacationDays = apprentice ? 0 : Math.max(0, Math.floor(vacationBalanceDays * 10) / 10);
   const vacation = Math.round((e.salary / 30) * vacationDays);
-  let indemnity = 0;
-  if (reason === 'dismissal' && e.contract === 'indefinite') {
-    const years = diffDays(e.joined, lastDay) / 365;
-    const daysPay = years <= 1 ? 30 : 30 + 20 * (years - 1);
-    indemnity = Math.round((e.salary / 30) * daysPay);
-  }
+  // Días con un decimal: la pantalla muestra los mismos días con los que se calcula el valor.
+  const indemnityPaidDays = reason === 'dismissal' ? Math.round(indemnityDays(e, lastDay) * 10) / 10 : 0;
+  const indemnity = Math.round((e.salary / 30) * indemnityPaidDays);
   const total = pendingSalary + severance + interest + prima + vacation + indemnity;
-  return { pendingSalary, pendingDays, severance, severanceDays, interest, prima, primaDays, vacation, vacationDays, indemnity, total };
+  return {
+    pendingSalary, pendingDays, severance, severanceDays, interest, prima, primaDays, vacation, vacationDays, indemnity,
+    indemnityDays: indemnityPaidDays, total,
+  };
 }

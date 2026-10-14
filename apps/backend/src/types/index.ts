@@ -13,6 +13,12 @@ export interface AuthRequest extends Request {
     reason: 'staff' | 'public' | 'grant' | 'login_required' | 'no_access';
     grantId?: string;
   };
+  /** Lo llena `aiGate` (middleware/ai-gate.ts): si la petición puede usar la IA. */
+  aiGate?: {
+    allowed: boolean;
+    code?: 'budget_exhausted' | 'ai_unavailable' | 'ai_user_limit';
+    message?: string;
+  };
 }
 
 export interface User {

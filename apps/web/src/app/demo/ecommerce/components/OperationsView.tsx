@@ -29,10 +29,23 @@ export default function OperationsView() {
   const [trackLimit, setTrackLimit] = useState(PAGE);
   const [newReturn, setNewReturn] = useState(false);
 
-  const byAgeDesc = (a: { ageMin?: number; createdAt?: number }, b: { ageMin?: number; createdAt?: number }) => orderAge(b, clock) - orderAge(a, clock);
-  const toDispatch = useMemo(() => state.orders.filter((o) => o.status === 'preparing').sort(byAgeDesc), [state.orders, clock]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Por despachar: primero los pedidos del visitante (para que encuentre el suyo
+  // sin paginar) y después del más antiguo al más nuevo, como se despacha.
+  const toDispatch = useMemo(
+    () =>
+      state.orders
+        .filter((o) => o.status === 'preparing')
+        .sort((a, b) => Number(!!b.demo) - Number(!!a.demo) || orderAge(b, clock) - orderAge(a, clock)),
+    [state.orders, clock],
+  );
   const toConfirm = state.orders.filter((o) => o.status === 'new').length;
-  const inTransit = useMemo(() => state.orders.filter((o) => o.status === 'shipped').sort((a, b) => orderAge(a, clock) - orderAge(b, clock)), [state.orders, clock]);
+  const inTransit = useMemo(
+    () =>
+      state.orders
+        .filter((o) => o.status === 'shipped')
+        .sort((a, b) => Number(!!b.demo) - Number(!!a.demo) || orderAge(a, clock) - orderAge(b, clock)),
+    [state.orders, clock],
+  );
 
   const warehouses = WAREHOUSES.map((w) => {
     const units = state.products.reduce((s, p) => s + p.warehouses[w.id], 0);
@@ -44,7 +57,7 @@ export default function OperationsView() {
   return (
     <div className="mx-auto max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
       <header>
-        <h1 className="text-2xl font-bold text-secondary-900 dark:text-white sm:text-3xl">{t('ops.title')}</h1>
+        <h2 className="text-2xl font-bold text-secondary-900 dark:text-white sm:text-3xl">{t('ops.title')}</h2>
         <p className="text-sm text-secondary-500">{t('ops.subtitle')}</p>
       </header>
 

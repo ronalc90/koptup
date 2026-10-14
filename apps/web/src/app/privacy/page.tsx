@@ -15,55 +15,23 @@ import {
 export default function PrivacyPage() {
   const t = useTranslations('privacyPage');
 
-  const sections = [
-    {
-      icon: DocumentTextIcon,
-      title: t('s1.title'),
-      content: [
-        { subtitle: t('s1.c1.subtitle'), text: t('s1.c1.text') },
-        { subtitle: t('s1.c2.subtitle'), text: t('s1.c2.text') },
-        { subtitle: t('s1.c3.subtitle'), text: t('s1.c3.text') },
-      ],
-    },
-    {
-      icon: UserGroupIcon,
-      title: t('s2.title'),
-      content: [
-        { subtitle: t('s2.c1.subtitle'), text: t('s2.c1.text') },
-        { subtitle: t('s2.c2.subtitle'), text: t('s2.c2.text') },
-        { subtitle: t('s2.c3.subtitle'), text: t('s2.c3.text') },
-        { subtitle: t('s2.c4.subtitle'), text: t('s2.c4.text') },
-      ],
-    },
-    {
-      icon: LockClosedIcon,
-      title: t('s3.title'),
-      content: [
-        { subtitle: t('s3.c1.subtitle'), text: t('s3.c1.text') },
-        { subtitle: t('s3.c2.subtitle'), text: t('s3.c2.text') },
-        { subtitle: t('s3.c3.subtitle'), text: t('s3.c3.text') },
-      ],
-    },
-    {
-      icon: ShieldCheckIcon,
-      title: t('s4.title'),
-      content: [
-        { subtitle: t('s4.c1.subtitle'), text: t('s4.c1.text') },
-        { subtitle: t('s4.c2.subtitle'), text: t('s4.c2.text') },
-        { subtitle: t('s4.c3.subtitle'), text: t('s4.c3.text') },
-        { subtitle: t('s4.c4.subtitle'), text: t('s4.c4.text') },
-      ],
-    },
-    {
-      icon: ClockIcon,
-      title: t('s5.title'),
-      content: [
-        { subtitle: t('s5.c1.subtitle'), text: t('s5.c1.text') },
-        { subtitle: t('s5.c2.subtitle'), text: t('s5.c2.text') },
-        { subtitle: t('s5.c3.subtitle'), text: t('s5.c3.text') },
-      ],
-    },
+  // Cada sección: título y apartados (s<n>.c<m>). Los textos describen solo lo
+  // que el sistema hace de verdad (ver docs/wiki/Doc-12-SEO-Analitica-y-Legal.md).
+  const sectionDefs: Array<{ key: string; icon: typeof DocumentTextIcon; items: number }> = [
+    { key: 's1', icon: DocumentTextIcon, items: 6 },
+    { key: 's2', icon: UserGroupIcon, items: 6 },
+    { key: 's3', icon: ClockIcon, items: 4 },
+    { key: 's4', icon: LockClosedIcon, items: 2 },
+    { key: 's5', icon: ShieldCheckIcon, items: 2 },
   ];
+  const sections = sectionDefs.map(({ key, icon, items }) => ({
+    icon,
+    title: t(`${key}.title`),
+    content: Array.from({ length: items }, (_, i) => ({
+      subtitle: t(`${key}.c${i + 1}.subtitle`),
+      text: t(`${key}.c${i + 1}.text`),
+    })),
+  }));
 
   const rights = [
     { title: t('rights.r1.title'), description: t('rights.r1.description') },
@@ -304,8 +272,8 @@ export default function PrivacyPage() {
             <ClockIcon className="h-5 w-5" />
             <span className="text-sm">{t('footer.updated')}</span>
           </div>
-          <p className="text-sm text-secondary-500 dark:text-secondary-500">
-            {t('footer.copyright')}
+          <p className="text-sm text-secondary-500 dark:text-secondary-500" suppressHydrationWarning>
+            {t('footer.copyright', { year: new Date().getFullYear() })}
           </p>
         </div>
       </section>

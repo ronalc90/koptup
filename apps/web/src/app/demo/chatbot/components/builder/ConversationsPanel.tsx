@@ -13,6 +13,7 @@ import toast from 'react-hot-toast';
 import { ArrowDownTrayIcon, ArrowPathIcon, TrashIcon, ChatBubbleLeftEllipsisIcon } from '@heroicons/react/24/outline';
 
 import { BotApiError, clearConversations, getConversations, isNotFoundReply, type RemoteConversationTurn } from './api';
+import ConfirmDialog from '../ui/ConfirmDialog';
 
 interface ConversationsPanelProps {
   botId: string | null;
@@ -58,6 +59,7 @@ export default function ConversationsPanel({ botId, refreshKey }: ConversationsP
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [nonce, setNonce] = useState(0);
+  const [confirmClear, setConfirmClear] = useState(false);
 
   useEffect(() => {
     if (!botId) {
@@ -74,7 +76,13 @@ export default function ConversationsPanel({ botId, refreshKey }: ConversationsP
       .catch((err) => {
         if (cancelled) return;
         setTurns([]);
-        setError(err instanceof BotApiError && (err.status === 401 || err.status === 403) ? 'notOwner' : 'loadFailed');
+        setError(
+          err instanceof BotApiError && (err.status === 401 || err.status === 403)
+            ? 'notOwner'
+            : err instanceof BotApiError && err.status === 429
+              ? 'rateLimited'
+              : 'loadFailed',
+        );
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -118,18 +126,26 @@ export default function ConversationsPanel({ botId, refreshKey }: ConversationsP
 
   const handleClear = useCallback(async () => {
     if (!botId) return;
-    if (!window.confirm(t('clearConfirm'))) return;
     try {
       await clearConversations(botId);
       setTurns([]);
       toast.success(t('cleared'));
-    } catch {
-      toast.error(t('loadFailed'));
+    } catch (err) {
+      toast.error(err instanceof BotApiError && err.status === 429 ? t('rateLimited') : t('loadFailed'));
     }
   }, [botId, t]);
 
   return (
     <section className="rounded-lg border border-secondary-200 bg-white shadow-sm dark:border-secondary-800 dark:bg-secondary-900">
+      <ConfirmDialog
+        open={confirmClear}
+        title={t('clear')}
+        body={t('clearConfirm')}
+        confirmLabel={t('clearAction')}
+        cancelLabel={t('cancel')}
+        onConfirm={() => void handleClear()}
+        onClose={() => setConfirmClear(false)}
+      />
       <header className="flex flex-col gap-2 border-b border-secondary-200 px-4 py-3 dark:border-secondary-800 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
           <h3 className="text-sm font-bold text-secondary-900 dark:text-white">{t('title')}</h3>
@@ -157,7 +173,7 @@ export default function ConversationsPanel({ botId, refreshKey }: ConversationsP
             </button>
             <button
               type="button"
-              onClick={handleClear}
+              onClick={() => setConfirmClear(true)}
               disabled={exchanges.length === 0}
               className="inline-flex items-center gap-1 rounded-md border border-red-200 px-2 py-1 text-[11px] font-medium text-red-700 hover:bg-red-50 disabled:opacity-50 dark:border-red-900 dark:text-red-300 dark:hover:bg-red-950/40"
             >
@@ -187,7 +203,7 @@ export default function ConversationsPanel({ botId, refreshKey }: ConversationsP
 
           {error ? (
             <p className="mt-3 text-xs text-red-700 dark:text-red-300" role="alert">
-              {error === 'notOwner' ? t('notOwner') : t('loadFailed')}
+              {error === 'notOwner' ? t('notOwner') : error === 'rateLimited' ? t('rateLimited') : t('loadFailed')}
             </p>
           ) : exchanges.length === 0 ? (
             <p className="mt-3 flex items-center gap-1.5 text-xs text-secondary-500 dark:text-secondary-400">

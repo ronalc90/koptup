@@ -80,7 +80,7 @@ export function SalesChart({ points, highlight, fmt }: { points: MonthPoint[]; h
   const max = Math.max(1, ...points.map((p) => Math.max(p.actual ?? 0, p.budget ?? 0, p.forecast?.high ?? 0)));
   const ticks = niceTicks(max * 1.05, 4);
   const top = ticks[ticks.length - 1];
-  const m = { l: axisWidth(ticks.map((v) => fmt.moneyM(v, 0))), r: 10, t: 12, b: 26 };
+  const m = { l: axisWidth(ticks.map((v) => fmt.moneyM(v, 0))), r: 10, t: 12, b: 38 };
   const innerW = width - m.l - m.r;
   const innerH = H - m.t - m.b;
   const y = (v: number) => m.t + innerH - (v / top) * innerH;
@@ -90,6 +90,18 @@ export function SalesChart({ points, highlight, fmt }: { points: MonthPoint[]; h
   const budgetPts = points.map((p, i) => (p.budget !== null ? `${cx(i)},${y(p.budget)}` : null)).filter(Boolean);
   const fIdx = points.map((p, i) => (p.forecast ? i : -1)).filter((i) => i >= 0);
   const lastActual = points.reduce((acc, p, i) => (p.actual !== null ? i : acc), -1);
+  // En pantallas angostas se rotula un mes de cada dos, siempre incluido el último mes del período elegido.
+  const hlLast = points.reduce((acc, p, i) => (highlight.includes(p.month) ? i : acc), lastActual);
+  const labeled = points.map((_, i) => band >= 30 || Math.abs(i - hlLast) % 2 === 0);
+  // El año va debajo del primer mes rotulado y de cada cambio de año.
+  let prevYear = '';
+  const yearShown = points.map((p, i) => {
+    if (!labeled[i]) return false;
+    const year = p.month.slice(0, 4);
+    const show = year !== prevYear;
+    prevYear = year;
+    return show;
+  });
   const fPath = fIdx.length
     ? [lastActual >= 0 ? `${cx(lastActual)},${y(points[lastActual].actual ?? 0)}` : null, ...fIdx.map((i) => `${cx(i)},${y(points[i].forecast!.value)}`)].filter(Boolean).join(' ')
     : '';
@@ -133,8 +145,7 @@ export function SalesChart({ points, highlight, fmt }: { points: MonthPoint[]; h
           ))}
           {points.map((p, i) => {
             const isHl = highlight.includes(p.month);
-            // En pantallas angostas se rotula un mes de cada dos (siempre el del período elegido).
-            const label = band >= 30 || i % 2 === 0 || isHl ? fmt.names.short[monthNum(p.month) - 1] : '';
+            const label = labeled[i] ? fmt.names.short[monthNum(p.month) - 1] : '';
             return (
               <g key={p.month}>
                 {p.actual !== null && (
@@ -147,9 +158,14 @@ export function SalesChart({ points, highlight, fmt }: { points: MonthPoint[]; h
                     className={`fill-[#7c3aed] dark:fill-[#9085e9] ${isHl || !highlight.length ? '' : 'opacity-40'}`}
                   />
                 )}
-                <text x={cx(i)} y={H - 8} textAnchor="middle" fontSize="11" className={isHl ? 'fill-slate-900 dark:fill-white font-semibold' : 'fill-slate-500 dark:fill-slate-400'}>
+                <text x={cx(i)} y={H - 20} textAnchor="middle" fontSize="11" className={isHl ? 'fill-slate-900 dark:fill-white font-semibold' : 'fill-slate-500 dark:fill-slate-400'}>
                   {label}
                 </text>
+                {yearShown[i] && (
+                  <text x={cx(i)} y={H - 6} textAnchor="middle" fontSize="10" className="fill-slate-400 dark:fill-slate-500">
+                    {p.month.slice(0, 4)}
+                  </text>
+                )}
               </g>
             );
           })}
@@ -177,6 +193,7 @@ export function SalesChart({ points, highlight, fmt }: { points: MonthPoint[]; h
               onFocus={() => setHover(i)}
               onBlur={() => setHover(null)}
               className="outline-none focus:stroke-purple-500"
+              strokeWidth={2}
             />
           ))}
         </svg>
@@ -205,7 +222,7 @@ export function SalesChart({ points, highlight, fmt }: { points: MonthPoint[]; h
               </div>
             )}
             {hp.budget !== null && (hp.actual !== null || hp.forecast) && (
-              <div className="text-slate-300">{t('compliance', { pct: fmt.pct((hp.actual ?? hp.forecast!.value) / hp.budget, 0) })}</div>
+              <div className="text-slate-300">{t('compliance', { pct: fmt.compliance((hp.actual ?? hp.forecast!.value) / hp.budget) })}</div>
             )}
           </Tooltip>
         )}
@@ -225,21 +242,22 @@ export interface BarItem {
   budget: number | null;
 }
 
-export function GoalBars({ items, fmt }: { items: BarItem[]; fmt: Fmt }) {
+/** Barras por ciudad o sede: verde si cumple la meta, ámbar si está hasta `gap` por debajo y rojo si está más abajo. */
+export function GoalBars({ items, fmt, gap }: { items: BarItem[]; fmt: Fmt; gap: number }) {
   const t = useTranslations(`${NS}.charts`);
   const max = Math.max(1, ...items.map((i) => Math.max(i.value, i.budget ?? 0)));
   return (
     <ul className="space-y-3">
       {items.map((it) => {
         const c = it.budget ? it.value / it.budget : null;
-        const tone = c === null ? 'bg-[#7c3aed] dark:bg-[#9085e9]' : c >= 1 ? 'bg-emerald-600 dark:bg-emerald-500' : c >= 0.95 ? 'bg-amber-500' : 'bg-red-600 dark:bg-red-500';
+        const tone = c === null ? 'bg-[#7c3aed] dark:bg-[#9085e9]' : c >= 1 ? 'bg-emerald-600 dark:bg-emerald-500' : c >= 1 - gap ? 'bg-amber-500' : 'bg-red-600 dark:bg-red-500';
         return (
           <li key={it.key} title={`${it.label}: ${fmt.money(it.value)}${it.budget ? ` · ${t('budget')} ${fmt.money(it.budget)}` : ''}`}>
             <div className="flex items-baseline justify-between gap-2 text-sm">
               <span className="font-medium text-slate-800 dark:text-slate-100 truncate">{it.label}</span>
               <span className="text-slate-600 dark:text-slate-300 whitespace-nowrap">
                 {fmt.moneyM(it.value)}
-                {c !== null && <span className="ml-2 text-xs font-semibold">{t('ofGoal', { pct: fmt.pct(c, 0) })}</span>}
+                {c !== null && <span className="ml-2 text-xs font-semibold">{t('ofGoal', { pct: fmt.compliance(c) })}</span>}
               </span>
             </div>
             <div className="relative h-3 mt-1 rounded-full bg-slate-100 dark:bg-slate-800">
@@ -428,7 +446,8 @@ export function CashChart({ bars, floor, minN, fmt }: { bars: CashBar[]; floor: 
             onMouseEnter={() => setHover(i)}
             onFocus={() => setHover(i)}
             onBlur={() => setHover(null)}
-            className="outline-none"
+            className="outline-none focus:stroke-purple-500"
+            strokeWidth={2}
           />
         ))}
       </svg>

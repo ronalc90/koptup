@@ -1,251 +1,885 @@
 {
   "demoAutomation": {
-    "pageTitle": "Plataforma de Automatización",
-    "pageSubtitle": "Diseña flujos visuales con triggers, IA nativa, código sandboxed, observabilidad y versionado. Estilo n8n + Zapier, pensado para equipos.",
-    "actions": {
-      "run": "Ejecutar workflow",
-      "running": "Ejecutando...",
-      "save": "Guardar",
-      "templates": "Plantillas",
-      "selfHosted": "Self-hosted",
-      "cloud": "Cloud",
-      "promote": "Promover a prod",
-      "openSdk": "SDK custom nodes",
-      "close": "Cerrar"
+    "pageTitle": "Automatización de procesos",
+    "shell": {
+      "back": "Volver a demos",
+      "sampleBadge": "Datos de ejemplo",
+      "sampleHint": "Empresa, personas, documentos y cifras ficticios",
+      "simBadge": "Conectores e IA simulados",
+      "how": "¿Qué es real y qué es simulado?",
+      "realTitle": "Real (funciona en tu navegador)",
+      "real": [
+        "El motor ejecuta el flujo paso a paso con el ejemplo que elijas: llena las plantillas {{campo}}, evalúa condiciones, busca en las hojas de ejemplo y aplica las reglas.",
+        "Reintentos con espera creciente y casos «Para revisar» que puedes reintentar, aprobar, marcar como atendidos o descartar.",
+        "El código JavaScript de un paso se ejecuta de verdad, aislado en tu navegador.",
+        "Agregar, mover, duplicar y borrar pasos; versiones; plantillas; exportar el historial en CSV e importar o exportar el flujo en JSON.",
+        "Todo se guarda en este navegador (localStorage) hasta que restableces la demo."
+      ],
+      "simTitle": "Simulado",
+      "sim": [
+        "La empresa, sus proveedores, clientes, facturas y cifras son ficticios.",
+        "Los conectores (correo, hojas de cálculo, software contable, CRM, pasarela de pagos, WhatsApp) no se conectan a nada: no se envía ni se cobra nada.",
+        "La «IA» usa reglas fijas (lectura del XML, palabras clave y plantillas); no llama a ningún modelo.",
+        "Los tiempos de cada paso son simulados y las esperas se acortan.",
+        "Las ejecuciones del mes y el ahorro combinan un ritmo de ejemplo con lo que ejecutes aquí."
+      ],
+      "tourTitle": "Recorrido sugerido",
+      "tour": [
+        "Pulsa «Ejecutar» con la factura que cuadra y mira cada paso en el lienzo y en Ejecuciones.",
+        "Elige la factura FE-10234 (no cuadra) y ejecuta: el caso queda en «Para revisar».",
+        "Abre «Revisar casos» y aprueba o descarta la excepción.",
+        "Cambia la tolerancia de la condición o agrega un paso desde la paleta y vuelve a ejecutar.",
+        "Guarda una versión y prueba otra plantilla (cobranza o leads)."
+      ],
+      "reset": "Restablecer demo",
+      "resetTitle": "¿Restablecer la demo?",
+      "resetBody": "Se borran tus flujos, versiones, ejecuciones y casos, y vuelven los datos de ejemplo de hoy.",
+      "resetDone": "La demo volvió a los datos de ejemplo.",
+      "loading": "Cargando la demo…"
     },
-    "header": {
-      "workflow": "Workflow",
-      "workflowName": "Onboarding cliente PRO",
-      "env": "Entorno",
-      "envs": {
-        "dev": "dev",
-        "staging": "staging",
-        "prod": "prod"
-      },
-      "version": "v",
-      "lastRun": "Última ejecución"
+    "common": {
+      "simulated": "Simulado",
+      "close": "Cerrar",
+      "cancel": "Cancelar",
+      "undo": "Deshacer"
     },
     "palette": {
-      "title": "Paleta de nodos",
-      "searchPlaceholder": "Buscar nodo...",
+      "title": "Paleta de pasos",
+      "hint": "Haz clic para agregar después del paso elegido, o arrastra al lienzo.",
+      "searchPlaceholder": "Buscar paso…",
+      "noResults": "Ningún paso coincide.",
+      "addSr": "(agregar)",
+      "open": "Abrir la paleta de pasos",
       "categories": {
-        "triggers": "Triggers",
-        "actions": "Acciones",
-        "ai": "IA",
+        "triggers": "Disparadores",
+        "ai": "IA (simulada)",
+        "apps": "Sistemas (simulados)",
+        "notify": "Avisos (simulados)",
         "logic": "Lógica",
         "code": "Código"
-      },
-      "items": {
-        "webhook": "Webhook",
-        "schedule": "Schedule (cron)",
-        "polling": "Polling HTTP",
-        "fileWatch": "File watch",
-        "emailIn": "Email entrante",
-        "dbCdc": "DB CDC",
-        "http": "HTTP Request",
-        "slack": "Slack notify",
-        "email": "Enviar email",
-        "sheets": "Google Sheets",
-        "stripe": "Stripe charge",
-        "salesforce": "Salesforce",
-        "llm": "LLM call",
-        "embedding": "Embedding",
-        "rag": "RAG retrieval",
-        "vision": "Visión IA",
-        "stt": "Speech to text",
-        "structured": "Structured output",
-        "filter": "Filter",
-        "switch": "Switch",
-        "loop": "Loop",
-        "merge": "Merge",
-        "wait": "Wait",
-        "subflow": "Sub-workflow",
-        "js": "JavaScript",
-        "python": "Python",
-        "transform": "Transform"
       }
     },
-    "canvas": {
-      "title": "Canvas",
-      "subtitle": "Conecta nodos visualmente. Las líneas representan el flujo de datos.",
-      "zoomIn": "Acercar",
-      "zoomOut": "Alejar",
-      "fit": "Ajustar",
-      "runHint": "Pulsa Ejecutar para simular el flujo",
-      "nodes": {
-        "trigger": "Webhook trigger",
-        "triggerDesc": "POST /hooks/onboarding",
-        "filter": "Filter",
-        "filterDesc": "plan === 'PRO'",
-        "http": "Enriquecer cliente",
-        "httpDesc": "GET clearbit.com/api",
-        "llm": "Resumen IA",
-        "llmDesc": "GPT-4o · structured",
-        "transform": "Transform",
-        "transformDesc": "Map → CRM schema",
-        "slack": "Slack notify",
-        "slackDesc": "#ventas-pro",
-        "subflow": "Sub-workflow",
-        "subflowDesc": "Asignar CSM"
+    "types": {
+      "trigger_email": {
+        "name": "Correo entrante",
+        "desc": "Se activa cuando llega un correo al buzón (simulado).",
+        "help": "Disparador. En la demo, cada ejemplo trae un correo con la factura electrónica adjunta (XML). En tu proyecto se conecta a tu buzón real con permisos de solo lectura."
       },
-      "status": {
-        "idle": "En espera",
-        "running": "Corriendo",
-        "success": "OK",
-        "error": "Error"
+      "trigger_webhook": {
+        "name": "Formulario web",
+        "desc": "Se activa cuando tu sitio envía un formulario.",
+        "help": "Disparador. En la demo, los ejemplos son formularios de contacto ya enviados. En tu proyecto, tu sitio llama a una dirección segura del flujo."
+      },
+      "trigger_schedule": {
+        "name": "Programación",
+        "desc": "Se activa a una hora fija.",
+        "help": "Disparador. Corre a la hora y los días elegidos. En la demo, cada ejemplo es un cliente de la cartera que revisa esa ejecución."
+      },
+      "trigger_chat": {
+        "name": "Mensaje de WhatsApp",
+        "desc": "Se activa con el mensaje de un cliente (simulado).",
+        "help": "Disparador. En la demo los mensajes son de ejemplo y no hay conexión con WhatsApp. En tu proyecto se usa WhatsApp Business con la línea de tu empresa."
+      },
+      "ai_extract": {
+        "name": "Leer factura",
+        "desc": "Saca NIT, número, fecha, IVA y total del XML.",
+        "help": "En la demo los datos se sacan del XML con reglas fijas, y la confianza baja si faltan campos, si el dígito de verificación del NIT no cuadra o si subtotal + IVA no da el total. Si queda por debajo del mínimo, el caso va a «Para revisar». En tu proyecto lo hace un modelo de IA."
+      },
+      "ai_classify": {
+        "name": "Clasificar mensaje",
+        "desc": "Asigna una categoría y detecta la ciudad.",
+        "help": "En la demo clasifica por palabras clave: una línea por categoría con el formato «categoría: palabra, palabra». Una categoría sin palabras es la de respaldo. También detecta la ciudad si aparece en el texto. En tu proyecto lo hace un modelo de IA."
+      },
+      "ai_draft": {
+        "name": "Redactar texto",
+        "desc": "Escribe un mensaje con los datos del caso.",
+        "help": "En la demo llena la plantilla con los datos ({{campo}}); si falta un dato, el paso falla y dice cuál. En tu proyecto un modelo de IA redacta a partir de esta guía."
+      },
+      "ai_rag": {
+        "name": "Preguntar al asistente",
+        "desc": "Responde con las políticas de la empresa y cita la fuente.",
+        "help": "En la demo busca la respuesta por palabras clave en cuatro políticas de ejemplo y cita la fuente; si no encuentra nada, el caso pasa a una persona. En tu proyecto es el asistente RAG de KopTup con tus documentos."
+      },
+      "app_sheet": {
+        "name": "Buscar en hoja de cálculo",
+        "desc": "Busca una fila por el valor de una columna.",
+        "help": "Busca en una de las tres hojas de ejemplo (órdenes de compra, cartera y clientes) la fila cuya columna coincide con el valor. Si no la encuentra, el caso va a «Para revisar»."
+      },
+      "app_accounting": {
+        "name": "Registrar en software contable",
+        "desc": "Crea la cuenta por pagar o el recibo (simulado).",
+        "help": "En la demo valida el tercero y el valor y genera un número de documento consecutivo, pero no se conecta a ningún software contable. En tu proyecto se conecta al tuyo por su API."
+      },
+      "app_crm": {
+        "name": "Crear contacto en el CRM",
+        "desc": "Crea o actualiza el contacto (simulado).",
+        "help": "En la demo revisa si el correo ya existe en la hoja de clientes (entonces lo actualiza) y asigna un identificador; no se conecta a ningún CRM."
+      },
+      "app_payment": {
+        "name": "Crear enlace de pago",
+        "desc": "Genera un enlace de pago con vencimiento (simulado).",
+        "help": "En la demo el enlace es de ejemplo (pagos.example) y no cobra nada. En tu proyecto se conecta a la pasarela de pagos que uses."
+      },
+      "app_http": {
+        "name": "Llamada HTTP",
+        "desc": "Envía datos a otra aplicación (simulado).",
+        "help": "En la demo no sale a internet: valida la dirección y el JSON y responde con un eco de lo que enviarías."
+      },
+      "notify_chat": {
+        "name": "Enviar mensaje",
+        "desc": "Por WhatsApp o por el chat del equipo (simulado).",
+        "help": "En la demo no se envía nada: muestra el mensaje con los datos llenos. Por WhatsApp exige un celular colombiano válido (10 dígitos que empiezan por 3)."
+      },
+      "notify_email": {
+        "name": "Enviar correo",
+        "desc": "Correo al cliente o al equipo (simulado).",
+        "help": "En la demo no se envía ningún correo: valida la dirección y muestra el texto final."
+      },
+      "logic_condition": {
+        "name": "Condición (si / si no)",
+        "desc": "Compara dos valores y decide el camino.",
+        "help": "Compara el valor con el de «Contra». «Es aproximadamente igual a» acepta la diferencia en % que indiques en la tolerancia. Si no se cumple, el caso va a «Para revisar» o el flujo termina sin hacer nada más."
+      },
+      "logic_wait": {
+        "name": "Esperar",
+        "desc": "Pausa el flujo unos minutos.",
+        "help": "En tu proyecto el flujo se pausa los minutos indicados. En la demo la espera se registra pero no se hace, para no tenerte esperando."
+      },
+      "logic_assign": {
+        "name": "Asignar por regla",
+        "desc": "Elige un responsable con una tabla.",
+        "help": "Una línea por regla con el formato «valor = responsable». La línea «* = …» es la regla por defecto. No distingue mayúsculas ni tildes."
+      },
+      "code_js": {
+        "name": "Código JavaScript",
+        "desc": "Calcula algo con código propio.",
+        "help": "El código se ejecuta de verdad en tu navegador, aislado (sin acceso a la página ni a internet) y con un límite de 1,5 segundos. Recibe «datos» y lo que devuelvas con return pasa al siguiente paso."
+      },
+      "code_map": {
+        "name": "Mapear campos",
+        "desc": "Arma un objeto nuevo con los datos.",
+        "help": "Una línea por campo con el formato «nombre = {{campo}}». Sirve para dejar los datos con la forma que espera otro sistema."
       }
+    },
+    "fields": {
+      "name": "Nombre del paso",
+      "mailbox": "Buzón",
+      "filter": "Qué correos",
+      "path": "Ruta del formulario",
+      "time": "Hora",
+      "days": "Días",
+      "line": "Línea de WhatsApp",
+      "source": "Documento a leer",
+      "threshold": "Confianza mínima (%)",
+      "saveAs": "Guardar el resultado como",
+      "text": "Texto a clasificar",
+      "rules": "Reglas (categoría: palabras)",
+      "template": "Plantilla del mensaje",
+      "question": "Pregunta",
+      "sheet": "Hoja",
+      "column": "Columna",
+      "value": "Valor a buscar",
+      "document": "Documento",
+      "account": "Cuenta (PUC)",
+      "party": "Tercero (NIT)",
+      "amount": "Valor",
+      "contactName": "Nombre del contacto",
+      "email": "Correo",
+      "phone": "Celular",
+      "owner": "Responsable",
+      "reference": "Referencia",
+      "dueDays": "Días para pagar",
+      "method": "Método",
+      "url": "Dirección (URL)",
+      "body": "Cuerpo (JSON)",
+      "channel": "Canal",
+      "to": "Para",
+      "message": "Mensaje",
+      "subject": "Asunto",
+      "left": "Valor",
+      "op": "Comparación",
+      "right": "Contra",
+      "tolerance": "Tolerancia (%)",
+      "onFalse": "Si no se cumple",
+      "minutes": "Minutos",
+      "by": "Según",
+      "table": "Tabla (valor = responsable)",
+      "code": "Código",
+      "mapping": "Campos (nombre = valor)"
+    },
+    "options": {
+      "filter": {
+        "attachments": "Solo con adjuntos .zip o .xml",
+        "all": "Todos"
+      },
+      "days": {
+        "weekdays": "Lunes a viernes",
+        "daily": "Todos los días",
+        "mondays": "Solo los lunes"
+      },
+      "document": {
+        "payable": "Cuenta por pagar",
+        "receipt": "Recibo de caja",
+        "note": "Nota contable"
+      },
+      "account": {
+        "220505": "220505 · Proveedores nacionales",
+        "233595": "233595 · Otros costos y gastos por pagar",
+        "130505": "130505 · Clientes nacionales"
+      },
+      "channel": {
+        "whatsapp": "WhatsApp (simulado)",
+        "team": "Chat del equipo (simulado)"
+      },
+      "op": {
+        "eq": "es igual a",
+        "neq": "es distinto de",
+        "gt": "es mayor que",
+        "lt": "es menor que",
+        "approx": "es aproximadamente igual a",
+        "contains": "contiene",
+        "exists": "tiene un valor"
+      },
+      "onFalse": {
+        "review": "enviar a revisión",
+        "stop": "terminar el flujo"
+      }
+    },
+    "sheets": {
+      "orders": {
+        "name": "Órdenes de compra",
+        "cols": {
+          "oc": "N.º de orden",
+          "nit": "NIT del proveedor",
+          "proveedor": "Proveedor",
+          "total": "Total",
+          "estado": "Estado"
+        }
+      },
+      "receivables": {
+        "name": "Cartera",
+        "cols": {
+          "nit": "NIT del cliente",
+          "cliente": "Cliente",
+          "factura": "Factura",
+          "saldo": "Saldo",
+          "diasVencida": "Días de vencida",
+          "celular": "Celular",
+          "correo": "Correo"
+        }
+      },
+      "customers": {
+        "name": "Clientes",
+        "cols": {
+          "correo": "Correo",
+          "nombre": "Nombre",
+          "ciudad": "Ciudad",
+          "comercial": "Comercial"
+        }
+      }
+    },
+    "credentials": {
+      "mail": "Buzón facturas@ · acceso de ejemplo",
+      "sheet": "Hojas de cálculo · cuenta de ejemplo",
+      "accounting": "Software contable · token de ejemplo",
+      "crm": "CRM · token de ejemplo",
+      "payment": "Pasarela de pagos · llave de pruebas",
+      "messaging": "Mensajería · cuenta de ejemplo",
+      "smtp": "Correo saliente · cuenta de ejemplo",
+      "http": "API externa · token de ejemplo"
+    },
+    "canvas": {
+      "title": "Lienzo del flujo",
+      "status": {
+        "idle": "en espera",
+        "running": "ejecutando",
+        "success": "listo",
+        "retry": "reintentando",
+        "failed": "falló",
+        "review": "en revisión",
+        "stopped": "terminó aquí",
+        "cancelled": "detenido"
+      },
+      "branchReview": "Si no: revisión",
+      "branchStop": "Si no: termina",
+      "nodeLabel": "Paso {n}: {name} ({type}), {status}",
+      "emptyHint": "Agrega pasos desde la paleta: haz clic en uno o arrástralo aquí."
     },
     "inspector": {
       "title": "Configuración",
-      "empty": "Selecciona un nodo del canvas para editarlo.",
+      "empty": "Elige un paso del lienzo para configurarlo.",
+      "open": "Abrir la configuración del paso",
+      "position": "Paso {n} de {total}",
       "tabs": {
         "params": "Parámetros",
-        "auth": "Auth",
-        "retry": "Retries",
-        "test": "Test"
+        "auth": "Credencial",
+        "retry": "Reintentos",
+        "test": "Probar"
       },
-      "fields": {
-        "name": "Nombre",
-        "method": "Método",
-        "url": "URL",
-        "headers": "Headers",
-        "body": "Body",
-        "prompt": "Prompt",
-        "model": "Modelo",
-        "temperature": "Temperatura",
-        "condition": "Condición",
-        "channel": "Canal",
-        "message": "Mensaje"
-      },
+      "vars": "Datos disponibles en este paso",
+      "varsEmpty": "Ejecuta el flujo (o usa «Probar») para ver aquí los datos que llegan a este paso.",
+      "triggerNote": "Es el disparador. Para cambiarlo, elige otro en la paleta.",
+      "moveBefore": "Antes",
+      "moveAfter": "Después",
+      "duplicate": "Duplicar",
+      "delete": "Eliminar",
+      "credential": "Credencial",
+      "noCredential": "Sin credencial",
+      "credentialRequired": "Sin credencial, este paso falla al ejecutarse.",
+      "credentialNote": "Son nombres de ejemplo: la demo no guarda secretos. En tu proyecto las credenciales van cifradas en el gestor de secretos de tu nube.",
+      "noCredentialNeeded": "Este paso no necesita credenciales.",
+      "openEditor": "Abrir editor de código",
       "retry": {
+        "intro": "Si el paso falla por un error temporal (por ejemplo, el sistema responde 429), se vuelve a intentar con una espera creciente.",
         "attempts": "Reintentos",
-        "backoff": "Backoff",
-        "backoffOpts": {
-          "linear": "Lineal",
-          "exponential": "Exponencial"
-        },
-        "dlq": "Dead letter queue",
-        "alert": "Alertar a"
+        "none": "Sin reintentos",
+        "base": "Primera espera",
+        "backoff": "Crecimiento de la espera",
+        "exponential": "Exponencial (se duplica)",
+        "linear": "Lineal (se suma)",
+        "preview": "Espera antes de cada reintento",
+        "after": "Si se agotan los reintentos, la ejecución falla y el caso queda en «Para revisar» para reintentarlo a mano."
       },
       "test": {
-        "run": "Ejecutar paso",
-        "preview": "Preview de respuesta",
-        "mockOutput": "Output mock generado"
+        "sample": "Ejemplo",
+        "run": "Probar este paso",
+        "running": "Probando…",
+        "note": "Corre los pasos anteriores con el ejemplo y luego este paso. No queda en el historial.",
+        "blocked": "El ejemplo no llegó a este paso: se detuvo en «{step}».",
+        "input": "Entrada",
+        "output": "Salida"
       }
     },
     "logs": {
       "title": "Ejecuciones",
-      "subtitle": "Historial de runs con step-through",
+      "subtitle": "Historial de «{name}»",
+      "filter": "Filtrar por estado",
+      "filterAll": "Todas",
+      "export": "Exportar CSV",
+      "none": "Este flujo todavía no tiene ejecuciones. Pulsa «Ejecutar».",
+      "noneFiltered": "No hay ejecuciones con ese estado.",
+      "expand": "Ver detalle",
+      "collapse": "Ocultar",
       "columns": {
         "id": "ID",
         "started": "Inicio",
         "duration": "Duración",
         "status": "Estado",
-        "trigger": "Trigger"
+        "source": "Origen",
+        "version": "Versión",
+        "actions": "Acciones"
       },
       "statuses": {
-        "success": "Exitoso",
-        "failed": "Fallido",
+        "success": "Exitosa",
+        "retried": "Exitosa con reintento",
+        "review": "En revisión",
+        "failed": "Fallida",
+        "stopped": "Sin acción",
+        "cancelled": "Detenida"
+      },
+      "stepStatus": {
+        "success": "Listo",
         "retry": "Reintento",
-        "running": "Corriendo"
+        "failed": "Falló",
+        "review": "A revisión",
+        "stopped": "Terminó",
+        "cancelled": "Detenido"
       },
-      "expand": "Ver detalle",
-      "collapse": "Ocultar",
+      "source": {
+        "manual": "Manual",
+        "trigger": "Automática",
+        "retry": "Reintento de {run}",
+        "approve": "Aprobación de {run}",
+        "replay": "Repetición de {run}"
+      },
+      "draft": "borrador",
+      "replay": "Repetir con el mismo ejemplo",
+      "sample": "ejemplo: {name}",
       "step": "Paso",
-      "stepDuration": "ms",
-      "viewPayload": "Ver payload"
-    },
-    "quotas": {
-      "title": "Uso del plan",
-      "plan": "Plan",
-      "planName": "Business",
-      "executions": "Ejecuciones",
-      "tokens": "Tokens IA",
-      "storage": "Storage",
-      "renewIn": "Renueva en",
-      "days": "días",
-      "upgrade": "Upgrade"
-    },
-    "marketplace": {
-      "title": "Marketplace de plantillas",
-      "subtitle": "Workflows listos para producción",
-      "categories": {
-        "all": "Todas",
-        "sales": "Ventas",
-        "ops": "Operaciones",
-        "ai": "IA",
-        "data": "Datos",
-        "marketing": "Marketing"
+      "attempt": "intento {n}",
+      "viewPayload": "Ver datos de entrada y salida",
+      "hidePayload": "Ocultar datos",
+      "waited": "Esperó {time} antes de reintentar.",
+      "csv": {
+        "id": "id",
+        "flujo": "flujo",
+        "inicio": "inicio",
+        "duracion_ms": "duracion_ms",
+        "estado": "estado",
+        "origen": "origen",
+        "version": "version",
+        "pasos": "pasos",
+        "resumen": "resumen"
       },
-      "templates": {
-        "crm": {
-          "name": "Sync CRM ↔ Sheets",
-          "desc": "Sincronización bidireccional con detección de cambios"
-        },
-        "emailAi": {
-          "name": "Asistente Email IA",
-          "desc": "Clasifica y redacta respuestas con LLM"
-        },
-        "stripeAlert": {
-          "name": "Stripe → Slack alerts",
-          "desc": "Notifica fallos de pago en tiempo real"
-        },
-        "leadEnrich": {
-          "name": "Lead enrichment",
-          "desc": "Enriquece leads con datos públicos + IA"
-        },
-        "rag": {
-          "name": "RAG sobre docs",
-          "desc": "Pipeline de embeddings + búsqueda semántica"
-        },
-        "etl": {
-          "name": "ETL diario",
-          "desc": "Extrae, transforma y carga en warehouse"
-        }
-      },
-      "use": "Usar plantilla",
-      "installs": "instalaciones",
-      "close": "Cerrar"
+      "fileName": "ejecuciones"
     },
-    "version": {
+    "usage": {
+      "title": "Uso y ahorro del mes",
+      "plan": "Plan Básico",
+      "runs": "Ejecuciones",
+      "savings": "Ahorro estimado",
+      "hours": "{hours} h",
+      "how": "¿Cómo se calcula?",
+      "hideHow": "Ocultar el cálculo",
+      "formula": "Ejecuciones exitosas del mes × minutos de trabajo manual que evita cada una. Cambia los minutos para ver el efecto. Cifras de ejemplo.",
+      "minutesFor": "Minutos por ejecución de {name}",
+      "renew": "Se reinicia el {date} (en {days, plural, one {# día} other {# días}})",
+      "plans": "Ver planes"
+    },
+    "versions": {
       "title": "Historial de versiones",
-      "current": "Actual",
-      "promote": "Promover esta versión",
-      "commits": {
-        "c1": "feat: agregar nodo de resumen IA",
-        "c2": "fix: retry con backoff exponencial",
-        "c3": "chore: actualizar credenciales Slack",
-        "c4": "feat: branch por plan de cliente",
-        "c5": "init: versión inicial del flujo"
+      "unsaved": "Cambios sin guardar",
+      "unsavedShort": "Sin guardar",
+      "saved": "Guardado como v{n}",
+      "empty": "Aún no hay versiones guardadas.",
+      "stepsCount": "{count, plural, one {# paso} other {# pasos}}",
+      "restore": "Restaurar",
+      "restoreAria": "Restaurar la versión v{n}",
+      "save": "Guardar versión",
+      "nothingToSave": "Sin cambios por guardar",
+      "saveTitle": "Guardar versión",
+      "noteLabel": "¿Qué cambió?",
+      "defaultNote": "Cambios en el flujo",
+      "savedToast": "Se guardó la versión v{n}.",
+      "restoreTitle": "¿Restaurar la versión v{n}?",
+      "restoreBody": "El lienzo vuelve a como estaba en esa versión. El historial no se borra.",
+      "restoreBodyDirty": "El lienzo vuelve a como estaba en esa versión y se pierden los cambios sin guardar. El historial no se borra.",
+      "restoredToast": "Se restauró la versión v{n}. Si cambias algo, guárdalo como una versión nueva."
+    },
+    "reviewCard": {
+      "title": "Para revisar",
+      "thisFlow": "Casos de este flujo",
+      "failed24": "Fallos (últimas 24 h)",
+      "hint": "Excepciones (algo no cuadró) y fallos (se agotaron los reintentos) de todos tus flujos.",
+      "open": "Revisar casos ({count})"
+    },
+    "review": {
+      "title": "Para revisar",
+      "subtitle": "Excepciones y fallos de tus flujos. Nada se pierde: aquí decides qué hacer con cada caso.",
+      "discardAll": "Descartar {count, plural, one {el caso abierto} other {los # casos abiertos}}",
+      "close": "Cerrar",
+      "tabs": {
+        "open": "Abiertos ({count})",
+        "closed": "Cerrados ({count})"
+      },
+      "emptyOpen": "No hay casos abiertos.",
+      "emptyClosed": "Aún no has cerrado casos.",
+      "kind": {
+        "exception": "Excepción",
+        "failure": "Fallo"
+      },
+      "goToFlow": "Ir al flujo",
+      "atStep": "En «{step}» · {run}",
+      "sample": "Ejemplo: {name}",
+      "fixLabel": "Completa el dato que falta ({path}) y reintenta:",
+      "fixPlaceholder": "Escribe el valor",
+      "working": "Procesando…",
+      "continue": "Aprobar y continuar",
+      "approve": "Aprobar",
+      "retry": "Reintentar",
+      "done": "Marcar como atendido",
+      "discard": "Descartar",
+      "stillOpen": "Sigue abierto después de {run}:",
+      "status": {
+        "resolved": "Atendido",
+        "discarded": "Descartado"
+      },
+      "discardAllTitle": "¿Descartar todos los casos abiertos?",
+      "discardAllBody": "{count, plural, one {El caso abierto pasa} other {Los # casos abiertos pasan}} a «Cerrados» como descartados. No se ejecuta nada.",
+      "toastDone": "Caso {id} marcado como atendido.",
+      "toastDiscarded": "Caso {id} descartado.",
+      "toastDiscardedAll": "{count, plural, one {Se descartó # caso} other {Se descartaron # casos}}.",
+      "res": {
+        "done": "atendido a mano",
+        "discarded": "descartado",
+        "approvedEnd": "aprobado; era el último paso",
+        "byRun": "resuelto con {run}"
       }
     },
-    "alerts": {
-      "title": "Alertas y DLQ",
-      "subtitle": "Gestión de errores y reintentos",
-      "dlqCount": "Mensajes en DLQ",
-      "alertsActive": "Alertas activas",
-      "reprocess": "Reprocesar",
-      "purge": "Purgar"
+    "templates": {
+      "button": "Plantillas",
+      "title": "Plantillas de procesos",
+      "subtitle": "Flujos de ejemplo para una distribuidora. Al usar una, se crea un flujo nuevo que puedes editar.",
+      "filter": "Filtrar plantillas",
+      "categories": {
+        "all": "Todas",
+        "finance": "Finanzas",
+        "sales": "Ventas",
+        "service": "Servicio al cliente",
+        "other": "En blanco"
+      },
+      "steps": "{count, plural, one {# paso} other {# pasos}}",
+      "desc": {
+        "invoices": "Lee la factura electrónica que llega al correo, la compara con la orden de compra y la registra como cuenta por pagar. Si no cuadra, va a revisión.",
+        "collections": "Cada mañana revisa la cartera, crea un enlace de pago y envía un recordatorio por WhatsApp a quien tiene facturas vencidas.",
+        "leads": "Clasifica los mensajes del formulario del sitio, asigna un comercial por ciudad, crea el contacto en el CRM y responde al cliente. Las quejas van a revisión.",
+        "assistant": "Responde preguntas por WhatsApp con las políticas de la empresa y cita la fuente. Lo que el asistente no sabe pasa a una persona.",
+        "blank": "Empieza con un formulario web como disparador y arma el flujo con la paleta."
+      },
+      "use": "Usar plantilla",
+      "created": "Se creó el flujo «{name}».",
+      "note": "Todas las plantillas usan datos y conectores simulados. En tu proyecto las armamos con tus sistemas y tus reglas."
     },
     "code": {
-      "title": "Editor de código",
-      "language": "Lenguaje",
+      "title": "Editor de código · {name}",
+      "subtitle": "JavaScript que se ejecuta de verdad en tu navegador, aislado y sin internet (máximo {seconds} s).",
+      "unsaved": "Cambios sin guardar",
+      "close": "Cerrar",
+      "save": "Guardar",
+      "run": "Ejecutar",
+      "running": "Ejecutando…",
+      "savedToast": "Se guardó el código de «{name}».",
+      "sample": "Datos de entrada del ejemplo",
+      "language": "JavaScript",
       "tabs": {
         "code": "Código",
-        "input": "Input",
-        "output": "Output"
+        "input": "Entrada",
+        "output": "Salida"
       },
-      "run": "Ejecutar",
-      "save": "Guardar",
-      "close": "Cerrar"
+      "help": "Usa «datos» para leer lo que llegó (por ejemplo, datos.factura.total) y devuelve un objeto con return. Tab inserta dos espacios.",
+      "ok": "Se ejecutó en {ms} ms.",
+      "timeout": "Se detuvo: tardó más de {seconds} s.",
+      "error": "Error: {error}",
+      "noOutput": "Pulsa «Ejecutar» para ver el resultado.",
+      "noInput": "No se pudo calcular la entrada.",
+      "blocked": "El ejemplo no llega a este paso: se detuvo en «{step}».",
+      "discardTitle": "¿Cerrar sin guardar?",
+      "discardBody": "Los cambios del código se pierden.",
+      "discard": "Cerrar sin guardar"
     },
-    "sdk": {
-      "title": "SDK · Custom Nodes",
-      "subtitle": "Construye tus propios nodos en TypeScript",
-      "install": "Instalación",
-      "snippet": "Snippet de ejemplo",
-      "docs": "Ver docs completas",
-      "close": "Cerrar"
+    "json": {
+      "title": "Definición del flujo (JSON)",
+      "subtitle": "Para equipos técnicos: así se guarda el flujo.",
+      "import": "Importar JSON",
+      "copy": "Copiar",
+      "download": "Descargar .json",
+      "copied": "Se copió el JSON.",
+      "copyFailed": "No se pudo copiar; usa «Descargar .json».",
+      "intro": "Puedes descargar este flujo, editarlo y volver a importarlo como un flujo nuevo.",
+      "note": "Si necesitas un conector que no está en la paleta, lo construimos en tu proyecto.",
+      "imported": "Se importó el flujo «{name}».",
+      "errors": {
+        "size": "El archivo es muy grande (máximo 200 KB).",
+        "json": "El archivo no es un JSON válido.",
+        "shape": "El JSON no tiene la forma de un flujo (name y steps).",
+        "count": "El flujo debe tener entre 1 y 20 pasos.",
+        "type": "El paso {n} tiene un tipo desconocido."
+      }
+    },
+    "flows": {
+      "label": "Flujo:",
+      "menu": "Tus flujos",
+      "yours": "Tus flujos ({count})",
+      "steps": "{count, plural, one {# paso} other {# pasos}}",
+      "rename": "Renombrar",
+      "renameTitle": "Renombrar el flujo",
+      "nameLabel": "Nombre del flujo",
+      "duplicate": "Duplicar",
+      "duplicated": "Se duplicó «{name}».",
+      "new": "Nuevo desde plantilla…",
+      "delete": "Eliminar flujo",
+      "deleteTitle": "¿Eliminar «{name}»?",
+      "deleteBody": "Se borran el flujo, sus versiones, sus ejecuciones y sus casos para revisar. No se puede deshacer, salvo con «Restablecer demo».",
+      "deleted": "Se eliminó «{name}».",
+      "copyName": "{name} (copia)",
+      "importedName": "Flujo importado"
+    },
+    "run": {
+      "sample": "Ejemplo para ejecutar",
+      "noSamples": "Sin ejemplos",
+      "stop": "Detener",
+      "button": "Ejecutar",
+      "runningSr": "Ejecutando el flujo…"
+    },
+    "footer": {
+      "lastRun": "Última ejecución: {when} · {id} ({status})",
+      "noRuns": "Este flujo aún no se ha ejecutado.",
+      "json": "Definición del flujo (JSON)"
+    },
+    "trigger": {
+      "title": "¿Cambiar el disparador?",
+      "body": "Un flujo tiene un solo disparador: «{from}» se reemplaza por «{to}». Los ejemplos para ejecutar cambian según el disparador.",
+      "confirm": "Cambiar disparador"
+    },
+    "toasts": {
+      "maxSteps": "Un flujo puede tener hasta 20 pasos.",
+      "stepRemoved": "Se eliminó «{name}».",
+      "noSample": "Elige un ejemplo para ejecutar.",
+      "stepGone": "El paso «{step}» ya no está en el flujo. Restaura la versión o descarta el caso.",
+      "waitRun": "Espera a que termine la ejecución en curso.",
+      "sameTrigger": "Ese ya es el disparador del flujo.",
+      "stepAdded": "Se agregó «{name}».",
+      "triggerChanged": "Ahora el disparador es «{name}»."
+    },
+    "samples": {
+      "invOk": "FE-5521 de Químicos La Sabana (cuadra)",
+      "invMismatch": "FE-10234 de Papeles del Valle (no cuadra)",
+      "invRetry": "FE-889 de Envases del Caribe (429 una vez)",
+      "invPartial": "FE-3307 de Plásticos Altiplano (XML incompleto)",
+      "colOk": "Minimercado El Trébol (12 días de vencida)",
+      "colRecent": "Droguería Santa Inés (3 días de vencida)",
+      "colNoPhone": "Hotel Brisas del Lago (sin celular)",
+      "leadMde": "Catalina Restrepo, Medellín (cotización)",
+      "leadBog": "Mauricio Pardo, Bogotá (pedido mensual)",
+      "leadComplaint": "Diana Ospina, Cali (queja)",
+      "chatShipping": "Jorge Castaño (envío gratis)",
+      "chatReturns": "Liliana Gómez (producto roto)",
+      "chatUnknown": "Fabio Quintero (algo que no vendemos)"
+    },
+    "log": {
+      "triggerEmail": "Llegó un correo de {from}.",
+      "triggerWebhook": "Llegó un formulario a {path}.",
+      "triggerSchedule": "Revisión programada de las {time}.",
+      "triggerChat": "Llegó un mensaje de {from}.",
+      "extractOk": "Factura {number} de {supplier} por {total} (confianza {conf} %).",
+      "extractLow": "Confianza {conf} %, por debajo del mínimo de {threshold} %. {count, plural, one {Problema} other {Problemas}}: {why}.",
+      "classifyOk": "Categoría «{category}» (confianza {conf} %); no se detectó la ciudad.",
+      "classifyOkCity": "Categoría «{category}», ciudad {city} (confianza {conf} %).",
+      "draftOk": "Texto listo ({chars} caracteres).",
+      "ragOk": "Respuesta encontrada en «{source}».",
+      "ragNone": "El asistente no encontró la respuesta en las políticas: pasa a una persona.",
+      "sheetOk": "Se encontró la fila con {column} = {value} en «{sheet}».",
+      "sheetNotFound": "No hay ninguna fila con {column} = {value} en «{sheet}».",
+      "accountingOk": "Se registró {number} por {amount} (simulado).",
+      "crmCreated": "Contacto {id} creado y asignado a {owner} (simulado).",
+      "crmUpdated": "El contacto ya existía ({id}); se actualizó y quedó con {owner} (simulado).",
+      "paymentOk": "Enlace de pago por {amount} con vencimiento a {days, plural, one {# día} other {# días}} (simulado).",
+      "httpOk": "{method} {url} respondió 200 (simulado: no salió a internet).",
+      "chatOk": "Mensaje por {channel} a {to} (simulado: no se envió).",
+      "emailOk": "Correo a {to} (simulado: no se envió).",
+      "condTrue": "Se cumple: {left} {op} {right}.",
+      "condTrueApprox": "Se cumple: {left} frente a {right}, diferencia de {diff} %.",
+      "condFalse": "No se cumple: {left} {op} {right} → {then}.",
+      "condFalseApprox": "No se cumple: {left} frente a {right}, diferencia de {diff} % → {then}.",
+      "wait": "Espera de {minutes} min (en la demo no se espera de verdad).",
+      "assignOk": "Responsable: {owner} (regla «{value}»).",
+      "assignDefault": "Responsable por defecto: {owner} (no hay regla para «{value}»).",
+      "jsOk": "El código se ejecutó en tu navegador.",
+      "mapOk": "{count, plural, one {Se armó # campo} other {Se armaron # campos}}."
+    },
+    "err": {
+      "missing": "Falta el dato {path}.",
+      "badSaveAs": "El nombre «{name}» no sirve para guardar el resultado: usa letras, números o _ sin espacios.",
+      "noCredential": "El paso no tiene credencial (pestaña «Credencial»).",
+      "rateLimited": "El sistema respondió 429: demasiadas solicitudes por ahora.",
+      "extractNothing": "El documento no parece una factura electrónica.",
+      "noCategory": "Ninguna regla aplicó y no hay una categoría de respaldo.",
+      "emptyTemplate": "El mensaje está vacío.",
+      "badColumn": "La columna «{column}» no existe en esa hoja.",
+      "badAmount": "El valor «{value}» no es un número mayor que cero.",
+      "badUrl": "La dirección «{url}» no es válida (debe empezar por https://).",
+      "badJson": "El cuerpo no es un JSON válido.",
+      "badPhone": "«{to}» no es un celular colombiano válido.",
+      "badEmail": "«{to}» no es un correo válido.",
+      "notNumber": "Para comparar, los dos valores deben ser números ({left} y {right}).",
+      "noRule": "No hay regla para «{value}» ni regla por defecto (*).",
+      "emptyCode": "El código está vacío.",
+      "js": "Error en el código: {error}",
+      "jsTimeout": "El código tardó más de {error} y se detuvo.",
+      "emptyMap": "No hay campos para mapear.",
+      "unknown": "Tipo de paso desconocido.",
+      "retriesExhausted": "Falló {attempts, plural, one {en el único intento} other {en los # intentos}}: el sistema no respondió.",
+      "noTrigger": "El flujo necesita un disparador como primer paso.",
+      "twoTriggers": "El flujo solo puede tener un disparador."
+    },
+    "sum": {
+      "success": "Exitosa: {count, plural, one {# paso} other {# pasos}}.",
+      "retried": "Exitosa con {retries, plural, one {# reintento} other {# reintentos}} ({count} pasos).",
+      "review": "Quedó en revisión en «{step}».",
+      "failed": "Falló en «{step}» y quedó en revisión.",
+      "stopped": "Terminó en «{step}»: no cumplía la condición.",
+      "cancelled": "La detuviste antes de «{step}»."
+    },
+    "fieldsInvoice": {
+      "numero": "sin número",
+      "fecha": "sin fecha",
+      "nit": "sin NIT",
+      "proveedor": "sin proveedor",
+      "subtotal": "sin subtotal",
+      "iva": "sin IVA",
+      "total": "sin total"
+    },
+    "issues": {
+      "dv": "el dígito de verificación del NIT no cuadra",
+      "sum": "subtotal + IVA no da el total"
+    },
+    "jsErrors": {
+      "notCloneable": "el resultado no se puede copiar (devuelve objetos, textos o números)",
+      "noWorker": "este navegador no permite ejecutar código aislado",
+      "invalid": "resultado no válido"
+    },
+    "seed": {
+      "company": "Distribuciones Nogal Andino S.A.S.",
+      "city": "Bogotá",
+      "you": "Tú",
+      "authors": {
+        "ops": "Laura Méndez",
+        "it": "Julián Herrera",
+        "sales": "Andrés Camacho"
+      },
+      "approved": "Aprobada",
+      "emailSubject": "Factura electrónica {number} de {supplier}",
+      "templates": {
+        "invoices": {
+          "name": "Facturas de proveedores",
+          "steps": {
+            "trigger": "Correo de facturas",
+            "extract": "Leer factura",
+            "lookup": "Buscar orden de compra",
+            "check": "¿Coincide con la orden?",
+            "post": "Registrar cuenta por pagar",
+            "notify": "Avisar a tesorería"
+          },
+          "config": {
+            "notify": {
+              "to": "Tesorería",
+              "message": "Se registró la factura {{factura.numero}} de {{factura.proveedor}} por {{factura.total|cop}} ({{registro.numero}})."
+            }
+          },
+          "versions": {
+            "v1": "Versión inicial: leer la factura del correo y registrarla",
+            "v2": "Validación contra la orden de compra (tolerancia del 1 %)",
+            "v3": "Aviso a tesorería por el chat del equipo"
+          }
+        },
+        "collections": {
+          "name": "Cobranza de cartera vencida",
+          "steps": {
+            "trigger": "Revisión diaria de cartera",
+            "lookup": "Consultar cartera",
+            "check": "¿Vencida hace más de 5 días?",
+            "link": "Crear enlace de pago",
+            "draft": "Redactar recordatorio",
+            "send": "Enviar por WhatsApp"
+          },
+          "config": {
+            "draft": {
+              "template": "Hola, {{cartera.cliente}}. Te recordamos que la factura {{cartera.factura}} por {{cartera.saldo|cop}} tiene {{cartera.diasVencida}} días de vencida. Puedes pagarla en este enlace: {{pago.enlace}}. Si ya pagaste, responde este mensaje con el soporte. Distribuciones Nogal Andino."
+            },
+            "send": {
+              "message": "{{borrador.texto}}"
+            }
+          },
+          "versions": {
+            "v1": "Versión inicial: recordatorio con enlace de pago",
+            "v2": "Solo se cobra lo vencido hace más de 5 días"
+          }
+        },
+        "leads": {
+          "name": "Leads del sitio web al CRM",
+          "steps": {
+            "trigger": "Formulario de contacto",
+            "classify": "Clasificar el mensaje",
+            "check": "¿Quiere comprar?",
+            "assign": "Asignar comercial por ciudad",
+            "crm": "Crear contacto en el CRM",
+            "reply": "Responder al cliente"
+          },
+          "config": {
+            "classify": {
+              "rules": "compra: cotizar, cotización, precio, comprar, pedido, volumen, distribuidor\nqueja: queja, reclamo, incompleto, roto, dañado, demora\npago: factura, pago, transferencia, certificado\notro:"
+            },
+            "check": {
+              "right": "compra"
+            },
+            "assign": {
+              "table": "Medellín = Valentina Ríos\nBogotá = Andrés Camacho\nCali = Paola Giraldo\n* = Mesa comercial"
+            },
+            "reply": {
+              "subject": "Recibimos tu solicitud, {{lead.nombre}}",
+              "message": "Hola, {{lead.nombre}}. Gracias por escribirnos. {{asignacion.responsable}}, de nuestro equipo comercial, te contactará hoy para preparar tu cotización. Distribuciones Nogal Andino."
+            }
+          },
+          "versions": {
+            "v1": "Versión inicial: del formulario al CRM con respuesta automática"
+          }
+        },
+        "assistant": {
+          "name": "Respuestas por WhatsApp con el asistente",
+          "steps": {
+            "trigger": "Mensaje de WhatsApp",
+            "rag": "Preguntar al asistente",
+            "reply": "Responder por WhatsApp"
+          },
+          "config": {
+            "reply": {
+              "message": "Hola, {{mensaje.nombre}}. {{respuesta.texto}} (Fuente: {{respuesta.fuente}})"
+            }
+          }
+        },
+        "blank": {
+          "name": "Flujo nuevo",
+          "steps": {
+            "trigger": "Formulario web"
+          }
+        }
+      },
+      "leads": {
+        "l1": {
+          "company": "Colegio Montecielo",
+          "message": "Hola, quiero cotizar 40 cajas de detergente y 60 galones de desinfectante para el colegio. ¿Manejan precio por volumen?"
+        },
+        "l2": {
+          "company": "Restaurante Fogón Sabanero",
+          "message": "Buenas. Necesito precio de toallas de papel y jabón líquido para tres sedes; sería un pedido mensual."
+        },
+        "l3": {
+          "company": "Tienda La Colmena",
+          "message": "El pedido de ayer llegó incompleto y con dos galones rotos. Quiero poner una queja."
+        }
+      },
+      "chats": {
+        "c1": "Hola, ¿cuál es el pedido mínimo para que el envío a Medellín sea gratis?",
+        "c2": "Buenas, me llegó un galón roto. ¿Lo puedo devolver?",
+        "c3": "¿Venden herramientas de ferretería?"
+      },
+      "kb": [
+        {
+          "source": "Política de envíos 2026, sección 2",
+          "answer": "Los pedidos desde $ 350.000 tienen envío sin costo en Bogotá y Medellín; en otras ciudades el envío se cotiza según el peso. Entregamos en 1 a 3 días hábiles.",
+          "keywords": "envío, envios, domicilio, mínimo, gratis, sin costo, entrega, despacho"
+        },
+        {
+          "source": "Política de devoluciones, sección 1",
+          "answer": "Si un producto llega dañado o incompleto, tienes 5 días hábiles para reportarlo con fotos; lo reponemos sin costo o te devolvemos el dinero.",
+          "keywords": "devolver, devolución, dañado, roto, cambio, garantía, incompleto"
+        },
+        {
+          "source": "Condiciones comerciales, sección 4",
+          "answer": "Damos crédito a 30 días a empresas con dos pedidos pagados a tiempo; se solicita con el RUT y el certificado de existencia.",
+          "keywords": "crédito, plazo, 30 días, financiación, cuotas"
+        },
+        {
+          "source": "Catálogo 2026, horarios",
+          "answer": "Recibimos pedidos de lunes a viernes de 7:00 a. m. a 5:00 p. m. y los sábados hasta el mediodía.",
+          "keywords": "horario, horarios, atienden, abren, sábado"
+        }
+      ],
+      "defaults": {
+        "ai_classify": {
+          "rules": "compra: cotizar, cotización, precio, comprar, pedido, volumen\nqueja: queja, reclamo, incompleto, roto, dañado\notro:"
+        },
+        "ai_draft": {
+          "template": "Hola, {{lead.nombre}}. Gracias por escribirnos; te respondemos hoy mismo. Distribuciones Nogal Andino."
+        },
+        "logic_assign": {
+          "table": "Medellín = Valentina Ríos\nBogotá = Andrés Camacho\n* = Mesa comercial"
+        },
+        "notify_chat": {
+          "to": "Tesorería",
+          "message": "Aviso del flujo: hay un caso nuevo para revisar."
+        },
+        "notify_email": {
+          "subject": "Novedad de tu solicitud",
+          "message": "Hola, {{lead.nombre}}. Te escribimos de Distribuciones Nogal Andino."
+        },
+        "code_js": {
+          "code": "// «datos» trae lo que llegó hasta este paso.\nconst total = Number(datos.factura?.total ?? 0);\nreturn {\n  prioridad: total > 3000000 ? 'alta' : 'normal',\n  revisarAntesDe: total > 3000000 ? 'hoy' : 'esta semana',\n};"
+        },
+        "code_map": {
+          "mapping": "nombre = {{lead.nombre}}\nciudad = {{lead.ciudad}}\nempresa = {{lead.empresa}}"
+        }
+      }
     }
   }
 }

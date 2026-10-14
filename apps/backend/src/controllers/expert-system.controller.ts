@@ -9,6 +9,8 @@ import { sistemaExperto } from '../services/expert-system.service';
 import { excelExpertService } from '../services/excel-expert.service';
 import { motorReglas } from '../services/expert-rules.service';
 import { logger } from '../utils/logger';
+import { AppError } from '../middleware/errorHandler';
+import { sendError } from '../utils/http-error';
 import { CuentaMedica } from '../models/CuentaMedica';
 
 /**
@@ -102,6 +104,7 @@ export async function procesarConSistemaExperto(req: Request, res: Response) {
       },
     });
   } catch (error: any) {
+    if (error instanceof AppError) return sendError(res, error.statusCode, error.code ?? 'bad_request', error.message);
     logger.error('Error procesando con sistema experto:', error);
     return res.status(500).json({
       success: false,
@@ -167,6 +170,7 @@ export async function generarExcelExperto(req: Request, res: Response) {
 
     return res.send(buffer);
   } catch (error: any) {
+    if (error instanceof AppError) return sendError(res, error.statusCode, error.code ?? 'bad_request', error.message);
     logger.error('Error generando Excel:', error);
     return res.status(500).json({
       success: false,
@@ -244,6 +248,7 @@ export async function procesarYDescargarExcel(req: Request, res: Response) {
 
     return res.send(buffer);
   } catch (error: any) {
+    if (error instanceof AppError) return sendError(res, error.statusCode, error.code ?? 'bad_request', error.message);
     logger.error('Error en procesar y descargar:', error);
     return res.status(500).json({
       success: false,

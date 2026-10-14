@@ -132,8 +132,8 @@ export function KpiCard({
   );
 }
 
-/** Pestañas accesibles (role=tab + aria-selected). */
-export function Tabs<K extends string>({
+/** Filtro de opciones excluyentes (botones con aria-pressed dentro de un grupo rotulado). */
+export function Segmented<K extends string>({
   value,
   onChange,
   items,
@@ -145,13 +145,12 @@ export function Tabs<K extends string>({
   label: string;
 }) {
   return (
-    <div role="tablist" aria-label={label} className="inline-flex rounded-lg border border-slate-700 p-0.5 bg-slate-900/60">
+    <div role="group" aria-label={label} className="inline-flex rounded-lg border border-slate-700 p-0.5 bg-slate-900/60">
       {items.map((it) => (
         <button
           key={it.key}
-          role="tab"
           type="button"
-          aria-selected={value === it.key}
+          aria-pressed={value === it.key}
           onClick={() => onChange(it.key)}
           className={cn(
             'px-3 py-1 text-xs rounded-md transition-colors',

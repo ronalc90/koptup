@@ -2,22 +2,27 @@
   "demoTelemed": {
     "meta": {
       "title": "Demo de telemedicina para IPS",
-      "description": "Demo interactiva de telemedicina con datos de ejemplo: pre-consulta y consentimientos del paciente, orientación de síntomas por reglas, agenda sin festivos, videoconsulta simulada con ficha, receta y órdenes, notas SOAP, resumen en PDF y pagos con factura y RIPS simulados.",
+      "description": "Demo interactiva de telemedicina para IPS con datos de ejemplo: orientación de síntomas por reglas, agenda conectada con la sala de espera, pre-consulta y consentimientos, videoconsulta simulada con ficha, receta y órdenes, notas SOAP, resumen en PDF y pagos con factura y RIPS simulados.",
       "breadcrumbHome": "Inicio",
       "breadcrumbDemos": "Demos",
       "breadcrumbName": "Telemedicina"
     },
     "header": {
-      "back": "Volver a demos",
+      "back": "Volver al catálogo de demos",
       "title": "Telemedicina para IPS",
-      "subtitle": "Recorre una jornada de teleconsulta en {ips}: paciente, profesional y facturación.",
+      "subtitle": "Para gerentes y directores médicos: recorre una jornada de teleconsulta en {ips}, desde la cita y la pre-consulta del paciente hasta la consulta, la receta, el cobro y el RIPS. Empieza por los primeros pasos.",
       "sampleBadge": "Datos de ejemplo",
       "simBadge": "Video, mensajes, pagos y RIPS simulados",
-      "dayBadge": "Jornada del {date}",
-      "request": "Solicitar propuesta",
+      "dayBadge": "Jornada de hoy: {date} · {time}",
       "reset": "Restablecer",
       "resetHint": "Vuelve a los datos de ejemplo y borra lo que hiciste en este navegador",
-      "tabsLabel": "Secciones de la demo"
+      "tabsLabel": "Secciones de la demo",
+      "kicker": "Demo interactiva · para IPS y consultorios",
+      "sampleHint": "La IPS, los pacientes, las EPS, los profesionales y los valores son ficticios.",
+      "dayBadgeLoading": "Jornada de hoy",
+      "clockHint": "El reloj de la demo arranca a las 09:30 al abrir la jornada y avanza en tiempo real.",
+      "guidedDemo": "Solicitar demo guiada",
+      "quote": "Cotizar"
     },
     "tabs": {
       "console": "Consultorio (profesional)",
@@ -38,13 +43,19 @@
       "pendingSub": "a pacientes (cuotas y particulares)"
     },
     "route": {
-      "title": "Recorrido sugerido (5 pasos, menos de 5 minutos)",
+      "title": "Primeros pasos: recorrido sugerido (unos 5 minutos)",
       "step": "Paso {n}",
-      "s1": "Como paciente, llena la pre-consulta y acepta los consentimientos obligatorios.",
-      "s2": "Describe síntomas: los signos de alarma derivan a urgencias; el resto agenda con la especialidad sugerida.",
-      "s3": "Como profesional, deriva a la paciente con dolor en el pecho y llama a Carlos Rodríguez.",
-      "s4": "Revisa ficha y laboratorios, registra el diagnóstico, firma la receta y las órdenes y finaliza.",
-      "s5": "Cobra la cuota con la pasarela simulada y revisa la factura y el RIPS de la atención."
+      "s1": "Como paciente, describe tus síntomas: si no hay signos de alarma, te sugiere la especialidad para agendar.",
+      "s2": "Agenda una cita para hoy con esa especialidad (el WhatsApp de confirmación es simulado).",
+      "s3": "Con la cita de hoy, llena la pre-consulta y los consentimientos: el paciente entra a la sala de espera.",
+      "s4": "Como profesional, deriva a María González (signo de alarma) y llama a un paciente, por ejemplo el que acabas de registrar.",
+      "s5": "Registra el diagnóstico, firma la receta y las órdenes y finaliza: se generan el resumen y la factura.",
+      "progress": "{done} de {total} hechos",
+      "intro": "Cada paso te lleva a su pestaña y se marca solo cuando lo haces. Así fluye una teleconsulta de punta a punta.",
+      "hide": "Ocultar",
+      "show": "Mostrar",
+      "done": "Hecho",
+      "s6": "Cobra lo que paga el paciente con la pasarela simulada y revisa la factura y el RIPS de la atención."
     },
     "priority": {
       "red": "Signo de alarma",
@@ -53,7 +64,7 @@
     },
     "queue": {
       "title": "Sala de espera virtual",
-      "subtitle": "Ordenada por prioridad de la pre-consulta y tiempo de espera",
+      "subtitle": "Pacientes de todas las especialidades, ordenados por prioridad y hora de llegada. A cada uno lo atiende el profesional de su especialidad.",
       "search": "Buscar paciente o motivo...",
       "filterLabel": "Filtrar por prioridad",
       "filter": {
@@ -67,7 +78,11 @@
       "call": "Llamar",
       "busy": "Finaliza la consulta actual para llamar a otro paciente.",
       "alarm": "Signo de alarma: no se atiende por teleconsulta. Hay que indicarle ir a urgencias o llamar a la línea 123.",
-      "refer": "Derivar a urgencias"
+      "refer": "Derivar a urgencias",
+      "countHint": "Mostrando {shown} de {total} pacientes en espera",
+      "specFilter": "Filtrar por especialidad",
+      "allSpecs": "Todas las especialidades",
+      "withAppt": "cita {code}"
     },
     "refer": {
       "title": "Derivar a urgencias",
@@ -97,7 +112,7 @@
       "recBadge": "REC · simulada",
       "end": "Finalizar",
       "simTag": "Video simulado",
-      "note": "El paciente es una imagen de ejemplo. Si enciendes tu cámara, la imagen se ve solo en tu pantalla: no se graba ni se envía.",
+      "note": "El paciente es una imagen de ejemplo. Si enciendes tu cámara (con el permiso del navegador), la imagen se ve solo en tu pantalla: no se graba ni se envía.",
       "camError": "No se pudo usar tu cámara. La consulta sigue con video simulado.",
       "errors": {
         "unsupported": "Este navegador no permite usar la cámara aquí.",
@@ -106,13 +121,14 @@
         "other": "No se pudo iniciar la cámara."
       },
       "selfSimulated": "Tu imagen (simulada)",
-      "noteNoCam": "El paciente y tu imagen son de ejemplo: no se usa la cámara ni el micrófono de tu equipo."
+      "noteNoCam": "El paciente y tu imagen son de ejemplo: no se usa la cámara ni el micrófono de tu equipo.",
+      "inConsult": "En consulta: {name}",
+      "since": "desde las {time}"
     },
     "chat": {
       "title": "Chat de la consulta",
       "scripted": "Respuestas con guion de ejemplo",
-      "hello": "Hola, doctora. Gracias por atenderme.",
-      "generic": "De acuerdo, gracias.",
+      "hello": "Hola, {who}. Gracias por atenderme.",
       "typing": "{name} está escribiendo...",
       "placeholder": "Escribe un mensaje al paciente...",
       "send": "Enviar mensaje"
@@ -198,7 +214,7 @@
         "dx": "Diagnóstico",
         "meds": "Medicamentos",
         "orders": "Órdenes de laboratorio",
-        "signature": "{reg} · Firma electrónica simulada · {time}"
+        "signature": "{reg} (registro de ejemplo) · Firma electrónica simulada · {time}"
       }
     },
     "soap": {
@@ -230,7 +246,7 @@
           "missing": "Sin análisis ni plan en las notas (recomendado)"
         }
       },
-      "billingPreview": "Se registrará la atención por {value} ({payer}). Paga el paciente: {share}. Se generan la factura y el RIPS (simulados).",
+      "billingPreview": "Se registrará la atención de {spec} por {value} ({payer}). Paga el paciente: {share}. Se generan la factura y el RIPS (simulados).",
       "goRx": "Ir a receta y diagnóstico",
       "continue": "Seguir en la consulta",
       "confirm": "Finalizar y generar resumen"
@@ -238,7 +254,7 @@
     "summary": {
       "title": "Resumen de la atención",
       "patient": "Paciente",
-      "duration": "{min} min",
+      "duration": "Duración {time}",
       "rxIncluded": "Receta {number} con {count} medicamento(s)",
       "noRx": "Sin receta",
       "orders": "{count} orden(es) de laboratorio",
@@ -279,7 +295,7 @@
       "reset": "Empezar de nuevo",
       "alarmTitle": "Signos de alarma: no esperes una teleconsulta",
       "alarmBody": "Ve al servicio de urgencias más cercano o llama a la línea de emergencias.",
-      "call123": "Línea de emergencias 123",
+      "call123": "Línea de emergencias: 123",
       "disclaimer": "Orientación por reglas fijas de ejemplo: no usa IA y no es un diagnóstico ni reemplaza el criterio médico. En tu proyecto, las reglas las define y valida tu equipo médico.",
       "rules": {
         "chest": "dolor en el pecho o dificultad para respirar",
@@ -306,18 +322,15 @@
         "mental": "Puedes agendar psicología. Si en algún momento piensas en hacerte daño, busca ayuda inmediata.",
         "chronic": "Agenda tu control con medicina interna o general y ten a mano tus últimas tomas de presión y glucosa.",
         "default": "Puedes agendar una teleconsulta con medicina general."
-      }
+      },
+      "call123Note": "En la demo no se marca ningún número. En tu proyecto, este aviso puede incluir un botón para llamar al 123 desde el celular del paciente."
     },
     "scheduling": {
       "title": "Agenda por especialidad",
-      "subtitle": "Hoy es {date}, {time} (jornada de ejemplo). Lunes a viernes jornada completa, sábados en la mañana; sin domingos ni festivos.",
+      "subtitle": "Hoy es {date}, {time} en el reloj de la demo. Lunes a viernes jornada completa, sábados en la mañana; sin domingos ni festivos de Colombia.",
       "specialty": "Especialidad",
       "professional": "Profesional",
       "modality": "Modalidad",
-      "modalities": {
-        "video": "Videoconsulta",
-        "phone": "Llamada"
-      },
       "today": "Hoy",
       "holiday": "Festivo",
       "closed": "Cerrado",
@@ -341,20 +354,32 @@
       "confirm": "Confirmar cita",
       "confirmedTitle": "Cita {code} confirmada",
       "waPreview": "Mensaje de WhatsApp para {phone}",
-      "waVideo": "Hola, {name}. Tu teleconsulta de {spec} con {pro} es el {date} a las {time}. Entra 5 minutos antes desde el enlace que te enviaremos ese día. Código: {code}.",
+      "waVideo": "Hola, {name}. Tu teleconsulta de {spec} con {pro} es el {date} a las {time}. Ese día te enviamos el enlace para llenar la pre-consulta y entrar a la sala de espera. Código: {code}.",
       "waPhone": "Hola, {name}. Tu consulta telefónica de {spec} con {pro} es el {date} a las {time}. Te llamaremos a este número. Código: {code}.",
       "copy": "Copiar mensaje",
-      "simSend": "Envío simulado: en tu proyecto sale por WhatsApp Business y correo",
+      "simSend": "Envío simulado: en tu proyecto sale por WhatsApp Business",
       "listTitle": "Citas agendadas en esta demo",
-      "listSubtitle": "Se guardan solo en este navegador.",
+      "listSubtitle": "Se guardan solo en este navegador. Las de hoy pasan a la sala de espera cuando el paciente hace su pre-consulta.",
       "listEmpty": "Aún no has agendado citas.",
-      "cancelAppt": "Cancelar cita"
+      "cancelAppt": "Cancelar cita",
+      "modalityValue": "Videoconsulta",
+      "patientPh": "Nombre y apellido",
+      "waToday": "Hola, {name}. Tu teleconsulta de {spec} con {pro} es hoy a las {time}. Llena tu pre-consulta con el enlace que te enviamos y entra a la sala de espera. Código: {code}.",
+      "todayNext": "La cita es hoy: haz la pre-consulta como paciente y entrará a la sala de espera con su especialidad.",
+      "doPreconsult": "Hacer la pre-consulta",
+      "laterNext": "El día de la cita, el paciente recibe el enlace a la pre-consulta. Para ver el ingreso a la sala en la demo, agenda una cita para hoy.",
+      "status": {
+        "booked": "Agendada",
+        "checkedIn": "En sala de espera",
+        "attended": "Atendida",
+        "referred": "Derivada a urgencias"
+      }
     },
     "patient": {
       "title": "Vista del paciente: pre-consulta",
-      "subtitle": "Así llena el paciente su pre-consulta desde el celular antes de entrar a la sala de espera. Lo que envíes aparece en el consultorio.",
+      "subtitle": "Así llena el paciente su pre-consulta desde el celular antes de entrar a la sala de espera. Quien tiene cita hoy hace aquí su ingreso. Lo que envíes aparece en el consultorio.",
       "who": "¿Quién llena la pre-consulta?",
-      "newPatient": "Paciente nuevo",
+      "newPatient": "Paciente nuevo (sin cita)",
       "inQueue": "en sala de espera",
       "name": "Nombre completo",
       "namePh": "Nombre y apellido",
@@ -395,8 +420,7 @@
       "alarm": "Tus síntomas son signos de alarma. No esperes la teleconsulta: ve a urgencias o llama a la línea 123.",
       "goConsole": "Ver en el consultorio",
       "waTitle": "Enlace que recibe el paciente",
-      "waMessage": "Hola, Carlos. {ips} te espera hoy a las 10:30 para tu teleconsulta de medicina general. Antes de entrar, llena tu pre-consulta aquí:",
-      "waNote": "Mensaje y enlace de ejemplo (no funcionan fuera de la demo). En tu proyecto se envían por WhatsApp Business o SMS.",
+      "waNote": "Mensaje y enlace de ejemplo: cambian según quién llena la pre-consulta y no funcionan fuera de la demo. En tu proyecto se envían por WhatsApp Business o SMS.",
       "camTitle": "Prueba tu cámara y micrófono",
       "camSubtitle": "Opcional. El navegador te pedirá permiso.",
       "camStart": "Probar cámara y micrófono",
@@ -405,7 +429,18 @@
       "camPreview": "Vista previa de tu cámara",
       "micLevel": "Nivel del micrófono: habla para verlo moverse",
       "noMic": "No se detectó micrófono",
-      "camPrivacy": "La imagen y el sonido se quedan en tu navegador: no se graban ni se envían a ningún servidor."
+      "camPrivacy": "La imagen y el sonido se quedan en tu navegador: no se graban ni se envían a ningún servidor.",
+      "withAppt": "Con cita hoy",
+      "inQueueGroup": "Ya en sala de espera (actualizar)",
+      "apptInfo": "Cita {code}: {spec} con {pro} hoy a las {time}. Completa los datos que faltan para entrar a la sala.",
+      "updateInfo": "Actualiza la pre-consulta de un paciente que ya espera ({spec}).",
+      "newInfo": "Sin cita: la orientación de síntomas elige la especialidad que lo atiende.",
+      "doneAlarm": "No esperes la teleconsulta.",
+      "doneSpec": "Te atiende: {spec} · {pro}.",
+      "waAppt": "Hola, {name}. {ips} te espera hoy a las {time} para tu teleconsulta de {spec} con {pro}. Antes de entrar, llena tu pre-consulta aquí:",
+      "waQueue": "Hola, {name}. Ya estás en la sala de espera de {ips} para tu teleconsulta de {spec}. Si algo cambió, actualiza tu pre-consulta aquí:",
+      "waNew": "Hola, {name}. {ips} te atiende hoy por teleconsulta. Antes de entrar, llena tu pre-consulta aquí:",
+      "waNewNoName": "Hola. {ips} te atiende hoy por teleconsulta. Antes de entrar, llena tu pre-consulta aquí:"
     },
     "lab": {
       "title": "Resultados de laboratorio",
@@ -491,7 +526,7 @@
         "card": "Tarjeta débito o crédito",
         "wallet": "Billetera digital"
       },
-      "gatewayNote": "Pasarela simulada: no se pide ni se envía ningún dato de pago. En tu proyecto se conecta a Wompi o PayU.",
+      "gatewayNote": "Pasarela simulada: no se pide ni se envía ningún dato de pago. En tu proyecto se conecta a la pasarela de pagos que elijas.",
       "payNow": "Pagar {amount} (simulado)",
       "processing": "Procesando pago simulado...",
       "approved": "Pago aprobado (simulado). Referencia {ref}.",
@@ -503,7 +538,8 @@
       "ripsGenerated": "Generado (simulado)",
       "ripsDownload": "Descargar RIPS (JSON)",
       "ripsNote": "RIPS simplificado y simulado. En tu proyecto se genera con la estructura vigente y se valida junto con la factura electrónica de venta en salud a través de tu proveedor autorizado.",
-      "ripsNa": "Las derivaciones a urgencias no generan factura ni RIPS en esta demo."
+      "ripsNa": "Las derivaciones a urgencias no generan factura ni RIPS en esta demo.",
+      "duration": "duración {time}"
     },
     "audit": {
       "title": "Registro de auditoría",
@@ -520,13 +556,13 @@
       },
       "actors": {
         "system": "Sistema",
-        "doctor": "Dra. Patricia Vargas",
+        "doctor": "Profesional",
         "patient": "Paciente",
         "billing": "Facturación"
       },
       "events": {
         "sessionStart": "Jornada de ejemplo abierta",
-        "consultStart": "Inició la teleconsulta con {patient}",
+        "consultStart": "Inició la teleconsulta de {spec} con {patient}",
         "consultEnd": "Finalizó la consulta con {patient} · duración {duration}",
         "referred": "Derivó a {patient} a urgencias (línea 123 indicada)",
         "camOn": "Encendió su cámara (solo local)",
@@ -549,11 +585,12 @@
         "csvExported": "Exportó {count} atención(es) a CSV",
         "ripsDownloaded": "Descargó el RIPS de la factura {invoice}",
         "labPdf": "Descargó los resultados de laboratorio de {patient}",
-        "apptBooked": "Cita de {spec} para {patient} el {date} a las {time}",
+        "apptBooked": "Cita {code} de {spec} para {patient} el {date} a las {time}",
         "apptCancelled": "Canceló la cita {code}",
-        "preconsultSent": "{patient} envió la pre-consulta · prioridad {priority}",
+        "preconsultSent": "{patient} envió la pre-consulta · {spec} · prioridad: {priority}",
         "camTest": "Probó su cámara y micrófono (solo local)",
-        "triageRun": "Orientación de síntomas · regla: {rule}"
+        "triageRun": "Orientación de síntomas · regla: {rule}",
+        "preconsultAppt": "{patient} hizo el ingreso de su cita {code} · {spec} · prioridad: {priority}"
       }
     },
     "how": {
@@ -564,18 +601,18 @@
       "items": {
         "video": {
           "title": "Videoconsulta",
-          "demo": "el paciente es una imagen de ejemplo; si el navegador y el sitio lo permiten, puedes encender tu cámara y se ve solo en tu pantalla.",
+          "demo": "el paciente es una imagen de ejemplo; puedes encender tu cámara y micrófono (con el permiso del navegador) y se ven solo en tu pantalla.",
           "project": "video entre paciente y profesional sin instalar apps, con un servicio WebRTC gestionado o autoalojado."
         },
         "whatsapp": {
           "title": "Recordatorios y enlaces",
-          "demo": "los mensajes de WhatsApp y correo se muestran, pero no se envían.",
+          "demo": "los mensajes de WhatsApp se muestran y cambian según el paciente, pero no se envían.",
           "project": "envío por WhatsApp Business, SMS o correo con tu marca."
         },
         "payments": {
           "title": "Pagos en línea",
           "demo": "pasarela simulada que marca el pago con una referencia de prueba.",
-          "project": "PSE, tarjetas y billeteras digitales con Wompi o PayU."
+          "project": "PSE, tarjetas y billeteras digitales con la pasarela de pagos que elijas."
         },
         "invoice": {
           "title": "Factura electrónica en salud y RIPS",
@@ -611,7 +648,7 @@
       "regulation": "La plataforma se diseña para apoyar los requisitos de la Resolución 2654 de 2019 (telesalud y telemedicina) y la Ley 1581 de 2012 (datos personales). La habilitación del servicio de telemedicina es responsabilidad de la IPS; la matriz normativa de cada proyecto se valida con su asesor."
     },
     "footer": {
-      "sampleNote": "Datos de ejemplo: {ips}, los pacientes, las EPS, la prepagada, los profesionales, los documentos y los valores son ficticios. Lo que hagas se guarda solo en este navegador; usa Restablecer para empezar de nuevo.",
+      "sampleNote": "Datos de ejemplo: {ips}, los pacientes, las EPS, la prepagada, los profesionales, los documentos y los valores son ficticios. La jornada es la de hoy y lo que hagas se guarda solo en este navegador; usa Restablecer para empezar de nuevo.",
       "cta": "Quiero telemedicina para mi IPS"
     },
     "pdf": {
@@ -624,7 +661,14 @@
       "pedia": "Pediatría",
       "derma": "Dermatología",
       "internal": "Medicina interna",
-      "psych": "Psicología"
+      "psych": "Psicología",
+      "honorific": {
+        "general": "doctora",
+        "pedia": "doctor",
+        "derma": "doctor",
+        "internal": "doctora",
+        "psych": "Iván"
+      }
     },
     "toasts": {
       "pdf": "Se descargó {name}",
@@ -639,7 +683,9 @@
       "copyFailed": "No se pudo copiar. Selecciona el texto y cópialo.",
       "apptCancelled": "Cita {code} cancelada; el horario quedó libre.",
       "camOk": "Cámara y micrófono funcionando.",
-      "reset": "Datos de ejemplo restablecidos."
+      "reset": "Datos de ejemplo restablecidos.",
+      "resumed": "Retomamos la consulta en curso con {name}.",
+      "newDay": "Empezó la jornada de hoy: los datos de ejemplo se restablecieron."
     },
     "dates": {
       "months": "ene,feb,mar,abr,may,jun,jul,ago,sep,oct,nov,dic",
@@ -649,6 +695,11 @@
       "cancel": "Cancelar",
       "close": "Cerrar",
       "simulated": "simulado"
+    },
+    "resetConfirm": {
+      "title": "¿Restablecer la demo?",
+      "body": "Vuelven los datos de ejemplo de la jornada de hoy y se borra lo que hiciste en este navegador: citas, pre-consultas, consultas, cobros y auditoría.",
+      "confirm": "Restablecer"
     }
   }
 }

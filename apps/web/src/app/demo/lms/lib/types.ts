@@ -126,11 +126,16 @@ export interface Coupon {
 export interface Certificate {
   id: string;
   courseId: string;
+  /** Nombre con el que se emitió: no cambia aunque cambies tu nombre después. */
   name: string;
   date: ISODate;
   hours: number;
   score: number;
   total: number;
+  /** Código del certificado que este reemplaza (reemisión con otro nombre). */
+  replaces?: string;
+  /** Si se reemitió, código del certificado nuevo: este queda anulado. */
+  replacedBy?: string;
 }
 
 export interface Note {
@@ -185,4 +190,6 @@ export interface LmsState {
   reminders: Record<string, ISODate>;
   live: Record<string, { reminder?: boolean; attended?: boolean }>;
   tutorQuestions: number;
+  /** Vistas de rol que ya abriste (marcan los primeros pasos). */
+  visited?: Partial<Record<Role, boolean>>;
 }

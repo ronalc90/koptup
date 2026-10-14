@@ -1,14 +1,35 @@
 'use client';
 
-import { useCallback, useMemo, useRef, useState } from 'react';
-import { ArrowPathIcon, ClockIcon, ForwardIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
+import {
+  ArrowLeftIcon,
+  ArrowPathIcon,
+  CalculatorIcon,
+  ClockIcon,
+  ForwardIcon,
+  InformationCircleIcon,
+  PauseIcon,
+  PlayIcon,
+  PresentationChartBarIcon,
+} from '@heroicons/react/24/outline';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
-import { BRANDS, CATEGORIES, type BrandId, type Category, type Channel, type KbArticle, type Priority } from './components/data';
+import {
+  BRANDS,
+  CATEGORIES,
+  SEED_SURVEY_IDS,
+  SEED_TICKET_IDS,
+  type BrandId,
+  type Category,
+  type Channel,
+  type KbArticle,
+  type Priority,
+} from './components/data';
 import { computeMetrics, customerText as customerTextOf } from './components/engine';
 import Inbox from './components/Inbox';
 import { EscalateModal, MacroBuilderModal, NewTicketModal, SurveyModal } from './components/Modals';
-import { MetricsRow, RoutingBanner } from './components/Overview';
+import { GettingStarted, MetricsRow, RoutingBanner, type GuideStep } from './components/Overview';
 import { AutoReplyPanel, CsatPanel, MacrosPanel } from './components/Panels';
 import PqrsPanel from './components/PqrsPanel';
 import Sidebar from './components/Sidebar';
@@ -16,6 +37,12 @@ import TicketDetail from './components/TicketDetail';
 import { Toast } from './components/ui';
 import { useHelpdeskStore, type IncomingResult } from './components/useHelpdeskStore';
 import { useHelpdeskText } from './components/useHelpdeskText';
+
+/** Salidas comerciales: demo guiada con la demo ya elegida y cotización del producto. */
+const REQUEST_DEMO_HREF = '/solicitar-demo?demos=helpdesk-ia';
+const QUOTE_HREF = '/contact?service=helpdesk-ia';
+/** Preferencia de este navegador: los primeros pasos plegados. */
+const GUIDE_KEY = 'koptup.helpdesk.guideHidden';
 
 export default function HelpdeskIaDemoPage() {
   const hd = useHelpdeskText();
@@ -35,7 +62,27 @@ export default function HelpdeskIaDemoPage() {
   const [routing, setRouting] = useState<IncomingResult | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [confirmReset, setConfirmReset] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(true);
   const detailRef = useRef<HTMLElement>(null);
+
+  // Se lee después de montar para que el primer render sea igual en el servidor y en el navegador.
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem(GUIDE_KEY) === '1') setGuideOpen(false);
+    } catch {
+      /* sin almacenamiento: los pasos quedan abiertos */
+    }
+  }, []);
+
+  const toggleGuide = () => {
+    const next = !guideOpen;
+    setGuideOpen(next);
+    try {
+      window.localStorage.setItem(GUIDE_KEY, next ? '0' : '1');
+    } catch {
+      /* sin almacenamiento: solo cambia en esta visita */
+    }
+  };
 
   const notify = useCallback((msg: string) => setToast(msg), []);
   const clearToast = useCallback(() => setToast(null), []);
@@ -61,6 +108,58 @@ export default function HelpdeskIaDemoPage() {
     }
   };
 
+  /** Lleva al cuadro «Tu respuesta» del ticket seleccionado (o del primero sin resolver). */
+  const goToReply = () => {
+    const target = selected && selected.status !== 'resolved' ? selected : tickets.find((tk) => tk.status !== 'resolved');
+    if (!target) return;
+    setSelectedId(target.id);
+    window.setTimeout(() => {
+      const el = document.getElementById('hd-reply');
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el?.focus({ preventScroll: true });
+    }, 60);
+  };
+
+  const advanceClock = () => {
+    dispatch({ type: 'tick', minutes: 15 });
+    dispatch({ type: 'tourSla' });
+    notify(t('clock.advanced'));
+  };
+
+  const togglePause = () => {
+    dispatch({ type: 'pause', paused: !state.paused });
+    notify(state.paused ? t('clock.resumedToast') : t('clock.pausedToast'));
+  };
+
+  const guideSteps: GuideStep[] = [
+    {
+      id: 'incoming',
+      done: tickets.some((tk) => !SEED_TICKET_IDS.has(tk.id)),
+      onAction: () => setNewOpen(true),
+    },
+    {
+      id: 'reply',
+      done: tickets.some((tk) => tk.messages.some((m) => m.from === 'agent' && m.author === 'you')),
+      onAction: goToReply,
+    },
+    {
+      id: 'resolve',
+      done: state.surveys.some((sv) => !SEED_SURVEY_IDS.has(sv.id)),
+      onAction: () => {
+        if (!selected) setSelectedId(tickets.find((tk) => tk.status !== 'resolved')?.id ?? null);
+        requestAnimationFrame(() => detailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+      },
+    },
+    {
+      id: 'sla',
+      done: state.tourSla,
+      onAction: () => {
+        dispatch({ type: 'tourSla' });
+        document.getElementById('hd-pqrs-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      },
+    },
+  ];
+
   const insertText = (text: string) => {
     if (!selected) return;
     setDraft(selected.id, draft.trim() ? `${draft.trim()}\n\n${text}` : text);
@@ -78,21 +177,47 @@ export default function HelpdeskIaDemoPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-secondary-50 dark:from-secondary-950 dark:via-black dark:to-secondary-950 py-8 sm:py-12 overflow-x-hidden">
       <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Encabezado */}
+        {/* Volver al catálogo y salidas comerciales */}
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 mb-3">
+          <Link
+            href="/demo"
+            className="inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-secondary-700 hover:text-secondary-900 dark:text-secondary-300 dark:hover:text-white"
+          >
+            <ArrowLeftIcon className="h-4 w-4" aria-hidden="true" />
+            {t('shell.back')}
+          </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button size="sm" variant="outline" asChild>
+              <Link href={REQUEST_DEMO_HREF} className="gap-1.5">
+                <PresentationChartBarIcon className="h-4 w-4" aria-hidden="true" />
+                {t('shell.requestDemo')}
+              </Link>
+            </Button>
+            <Button size="sm" asChild>
+              <Link href={QUOTE_HREF} className="gap-1.5">
+                <CalculatorIcon className="h-4 w-4" aria-hidden="true" />
+                {t('shell.quote')}
+              </Link>
+            </Button>
+          </div>
+        </div>
+
+        {/* Encabezado: qué es, para quién y filtros de marca y área */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-rose-600 to-rose-800 p-6 sm:p-8 shadow-lg mb-4">
           <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_25%_25%,white,transparent_45%)]" aria-hidden="true" />
           <div className="relative flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
             <div className="min-w-0">
-              <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white">{t('pageTitle')}</h1>
-              <p className="text-sm sm:text-base text-rose-100 mt-2 max-w-3xl">{t('pageSubtitle')}</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-rose-100">{t('shell.kicker')}</p>
+              <h1 className="mt-1 text-3xl md:text-4xl font-bold tracking-tight text-white">{t('pageTitle')}</h1>
+              <p className="text-sm sm:text-base text-rose-50 mt-2 max-w-3xl">{t('pageSubtitle')}</p>
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap lg:flex-nowrap lg:flex-shrink-0 gap-3">
               <label className="block">
                 <span className="block text-xs font-medium text-rose-100 mb-1">{t('brandLabel')}</span>
                 <select
                   value={brand}
                   onChange={(e) => setBrand(e.target.value as BrandId | 'all')}
-                  className="px-3 py-2 rounded-lg border border-white/30 bg-white/95 text-sm text-secondary-900 focus:outline-none focus:ring-2 focus:ring-white"
+                  className="pl-3 pr-9 py-2 rounded-lg border border-white/30 bg-white/95 text-sm text-secondary-900 focus:outline-none focus:ring-2 focus:ring-white"
                 >
                   <option value="all">{t('brands.all')}</option>
                   {BRANDS.map((b) => (
@@ -107,7 +232,7 @@ export default function HelpdeskIaDemoPage() {
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value as Category | 'all')}
-                  className="px-3 py-2 rounded-lg border border-white/30 bg-white/95 text-sm text-secondary-900 focus:outline-none focus:ring-2 focus:ring-white"
+                  className="pl-3 pr-9 py-2 rounded-lg border border-white/30 bg-white/95 text-sm text-secondary-900 focus:outline-none focus:ring-2 focus:ring-white"
                 >
                   <option value="all">{t('categories.all')}</option>
                   {CATEGORIES.map((c) => (
@@ -122,7 +247,7 @@ export default function HelpdeskIaDemoPage() {
         </div>
 
         {/* Rótulo de datos de ejemplo, qué es real, reloj y restablecer */}
-        <div className="flex flex-col lg:flex-row lg:items-start gap-3 mb-6">
+        <div className="flex flex-col lg:flex-row lg:items-start gap-3 mb-4">
           <span
             className="self-start inline-flex items-center rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-800 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-200"
             title={t('sampleBadgeHint')}
@@ -151,17 +276,13 @@ export default function HelpdeskIaDemoPage() {
             >
               <ClockIcon className="h-4 w-4" aria-hidden="true" />
               {t('clock.label', { date: hd.date(Math.floor(clock / 1440)), time: hd.hhmm(clock) })}
+              {state.paused && <span className="font-semibold text-amber-700 dark:text-amber-300">{t('clock.pausedLabel')}</span>}
             </span>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => {
-                dispatch({ type: 'tick', minutes: 15 });
-                notify(t('clock.advanced'));
-              }}
-              className="gap-1"
-              title={t('clock.advanceHint')}
-            >
+            <Button size="sm" variant="ghost" onClick={togglePause} className="gap-1" aria-pressed={state.paused} title={t('clock.pauseHint')}>
+              {state.paused ? <PlayIcon className="h-4 w-4" aria-hidden="true" /> : <PauseIcon className="h-4 w-4" aria-hidden="true" />}
+              {state.paused ? t('clock.resume') : t('clock.pause')}
+            </Button>
+            <Button size="sm" variant="ghost" onClick={advanceClock} className="gap-1" title={t('clock.advanceHint')}>
               <ForwardIcon className="h-4 w-4" aria-hidden="true" />
               {t('clock.advance')}
             </Button>
@@ -197,6 +318,8 @@ export default function HelpdeskIaDemoPage() {
             )}
           </div>
         </div>
+
+        <GettingStarted hd={hd} steps={guideSteps} open={guideOpen} onToggle={toggleGuide} />
 
         <MetricsRow hd={hd} m={metrics} />
 

@@ -22,6 +22,11 @@ export function useFmt() {
     const [y, m, d] = iso.split('-').map(Number);
     return t('fmt.date', { d, m: t(`months.${m}`), y });
   };
+  /** «oct 2026» a partir de AAAA-MM o AAAA-MM-DD. */
+  const month = (key: string) => {
+    const [y, m] = key.split('-').map(Number);
+    return t('fmt.month', { m: t(`months.${m}`), y });
+  };
   return {
     locale,
     num: (n: number) => num(n, locale),
@@ -30,6 +35,8 @@ export function useFmt() {
     dec: (n: number) => dec(n, locale),
     signed: (n: number) => signed(n, locale),
     date,
+    month,
+    monthLong: (key: string) => t(`monthsLong.${Number(key.split('-')[1])}`),
     weekday: (n: number) => t(`weekdays.${n}`),
     weekdayPlural: (n: number) => t(`weekdaysPlural.${n}`),
     dayLabel: (iso: string, weekday: number) => `${t(`weekdays.${weekday}`)} · ${date(iso)}`,
@@ -72,7 +79,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
 /* --------------------------------- Modal --------------------------------- */
 
-/** Modal accesible montado en <body>: cierra con Escape o clic afuera. */
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+/**
+ * Modal accesible montado en <body>: recibe el foco, lo retiene con Tab,
+ * cierra con Escape o clic afuera y devuelve el foco al control que lo abrió.
+ */
 export function Modal({
   title,
   subtitle,
@@ -93,12 +105,33 @@ export function Modal({
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
   useEffect(() => {
+    const opener = document.activeElement as HTMLElement | null;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onCloseRef.current();
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        onCloseRef.current();
+        return;
+      }
+      if (e.key !== 'Tab' || !ref.current) return;
+      const items = Array.from(ref.current.querySelectorAll<HTMLElement>(FOCUSABLE)).filter((el) => el.offsetParent !== null);
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement;
+      if (e.shiftKey && (active === first || active === ref.current)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     window.addEventListener('keydown', onKey);
     ref.current?.focus();
-    return () => window.removeEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      if (opener && document.contains(opener)) opener.focus();
+    };
   }, []);
   const width = size === 'sm' ? 'max-w-sm' : size === 'lg' ? 'max-w-2xl' : 'max-w-lg';
   return createPortal(
@@ -124,7 +157,7 @@ export function Modal({
               type="button"
               onClick={onClose}
               aria-label={t('common.close')}
-              className="p-2 -m-1 hover:bg-secondary-100 dark:hover:bg-secondary-800 rounded-lg text-secondary-600 dark:text-secondary-300"
+              className="p-2 -m-1 hover:bg-secondary-100 dark:hover:bg-secondary-800 rounded-lg text-secondary-600 dark:text-secondary-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
             >
               <XMarkIcon className="h-5 w-5" />
             </button>
@@ -169,7 +202,7 @@ export function Toggle({ checked, onChange, label }: { checked: boolean; onChang
       aria-checked={checked}
       aria-label={label}
       onClick={() => onChange(!checked)}
-      className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${checked ? 'bg-primary-600' : 'bg-secondary-300 dark:bg-secondary-700'}`}
+      className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-secondary-900 ${checked ? 'bg-primary-600' : 'bg-secondary-300 dark:bg-secondary-700'}`}
     >
       <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${checked ? 'translate-x-5' : 'translate-x-0.5'}`} />
     </button>
@@ -201,6 +234,9 @@ export function KpiBox({
     </div>
   );
 }
+
+/** Anillo de foco visible para botones propios (los de la librería ya lo traen). */
+export const focusRing = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-1 dark:focus-visible:ring-offset-secondary-900';
 
 /** Rótulo pequeño "ejemplo" para cifras que no salen de lo que haces en la demo. */
 export function SampleTag() {

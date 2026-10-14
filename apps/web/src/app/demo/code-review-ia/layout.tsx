@@ -6,7 +6,7 @@ import { generateMetadata as metadataBase, getBreadcrumbSchema } from '@/lib/seo
  * Metadata propia y traducida: describe lo que la demo hace de verdad (datos de
  * ejemplo, comentarios de IA pregenerados, integraciones simuladas y un
  * analizador de reglas local). Conserva canonical, Open Graph e imagen de la
- * entrada compartida de seo-config.
+ * entrada compartida de seo-config (con un texto alternativo propio).
  */
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('demoCodeReview.meta');
@@ -18,12 +18,17 @@ export async function generateMetadata(): Promise<Metadata> {
   const titulo = t('title');
   const descripcion = t('description');
   const tituloCompleto = plantilla.replace('%s', titulo);
+  // La imagen social conserva su archivo, pero su texto alternativo describe esta demo.
+  const imagenes = base.openGraph?.images;
+  const imagenesOg = Array.isArray(imagenes)
+    ? imagenes.map((img) => (typeof img === 'object' && img !== null && !(img instanceof URL) ? { ...img, alt: tituloCompleto } : img))
+    : imagenes;
 
   return {
     ...base,
     title: { default: titulo, template: plantilla },
     description: descripcion,
-    openGraph: { ...base.openGraph, title: tituloCompleto, description: descripcion },
+    openGraph: { ...base.openGraph, title: tituloCompleto, description: descripcion, images: imagenesOg },
     twitter: { ...base.twitter, title: tituloCompleto, description: descripcion },
   };
 }

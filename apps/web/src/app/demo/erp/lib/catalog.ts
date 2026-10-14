@@ -5,9 +5,12 @@
  */
 import type { Bom, Customer, Employee, Item, Supplier, WarehouseId } from './types';
 
-/** Fecha de trabajo de la demo: las operaciones nuevas se registran con esta fecha. */
-export const WORK_DATE = '2026-09-30';
-export const OPEN_MONTH = '2026-09';
+/**
+ * Fecha de trabajo con la que se generaron las primeras versiones de la demo.
+ * La fecha real de cada sesión la calcula lib/calendar.ts (cierre del mes
+ * anterior a hoy); esta se usa en las pruebas y para migrar datos guardados.
+ */
+export const REFERENCE_WORK_DATE = '2026-09-30';
 /** Monto (IVA incluido) desde el cual una OC requiere aprobación de Gerencia. */
 export const PO_LEVEL2_THRESHOLD = 20_000_000;
 /** Retención en la fuente por compras (tarifa de ejemplo). */
@@ -94,16 +97,16 @@ export function explodeBom(sku: string): { sku: string; qty: number }[] {
 }
 
 export const CUSTOMERS: Customer[] = [
-  { id: 'C01', name: 'Autoservicio Los Almendros S.A.S.', nit: '900736215', city: 'Bogotá', warehouse: 'bog', termDays: 30, phone: '+57 300 555 0101', payer: 'punctual', companies: ['com', 'log'] },
-  { id: 'C02', name: 'Supermercado La Colina S.A.S.', nit: '901204588', city: 'Bogotá', warehouse: 'bog', termDays: 30, phone: '+57 300 555 0102', payer: 'punctual', companies: ['com'] },
-  { id: 'C03', name: 'Minimercado El Portal S.A.S.', nit: '901377410', city: 'Soacha', warehouse: 'bog', termDays: 30, phone: '+57 300 555 0103', payer: 'late', companies: ['com'] },
-  { id: 'C04', name: 'Casino Industrial Fontibón S.A.S.', nit: '900958132', city: 'Bogotá', warehouse: 'bog', termDays: 45, phone: '+57 300 555 0104', payer: 'punctual', companies: ['com'] },
-  { id: 'C05', name: 'Autoservicio Laureles S.A.S.', nit: '901066794', city: 'Medellín', warehouse: 'med', termDays: 30, phone: '+57 300 555 0105', payer: 'punctual', companies: ['com'] },
-  { id: 'C06', name: 'Tiendas El Vecino Itagüí S.A.S.', nit: '901290356', city: 'Itagüí', warehouse: 'med', termDays: 30, phone: '+57 300 555 0106', payer: 'slow', companies: ['com'] },
-  { id: 'C07', name: 'Comercializadora Costa Brisa S.A.S.', nit: '900845603', city: 'Barranquilla', warehouse: 'baq', termDays: 60, phone: '+57 300 555 0107', payer: 'late', companies: ['com', 'log'] },
-  { id: 'C08', name: 'Supermercado El Prado S.A.S.', nit: '901118427', city: 'Barranquilla', warehouse: 'baq', termDays: 30, phone: '+57 300 555 0108', payer: 'punctual', companies: ['com'] },
-  { id: 'C09', name: 'Hotel Mirador del Río S.A.S.', nit: '900677941', city: 'Soledad', warehouse: 'baq', termDays: 30, phone: '+57 300 555 0109', payer: 'slow', companies: ['com'] },
-  { id: 'C10', name: 'Importadora Ruta Norte S.A.S.', nit: '901433902', city: 'Bogotá', warehouse: 'bog', termDays: 30, phone: '+57 300 555 0110', payer: 'punctual', companies: ['log'] },
+  { id: 'C01', name: 'Autoservicio Los Almendros S.A.S.', nit: '900736215', city: 'Bogotá', warehouse: 'bog', termDays: 30, payer: 'punctual', companies: ['com', 'log'] },
+  { id: 'C02', name: 'Supermercado La Colina S.A.S.', nit: '901204588', city: 'Bogotá', warehouse: 'bog', termDays: 30, payer: 'punctual', companies: ['com'] },
+  { id: 'C03', name: 'Minimercado El Portal S.A.S.', nit: '901377410', city: 'Soacha', warehouse: 'bog', termDays: 30, payer: 'late', companies: ['com'] },
+  { id: 'C04', name: 'Casino Industrial Fontibón S.A.S.', nit: '900958132', city: 'Bogotá', warehouse: 'bog', termDays: 45, payer: 'punctual', companies: ['com'] },
+  { id: 'C05', name: 'Autoservicio Laureles S.A.S.', nit: '901066794', city: 'Medellín', warehouse: 'med', termDays: 30, payer: 'punctual', companies: ['com'] },
+  { id: 'C06', name: 'Tiendas El Vecino Itagüí S.A.S.', nit: '901290356', city: 'Itagüí', warehouse: 'med', termDays: 30, payer: 'slow', companies: ['com'] },
+  { id: 'C07', name: 'Comercializadora Costa Brisa S.A.S.', nit: '900845603', city: 'Barranquilla', warehouse: 'baq', termDays: 60, payer: 'late', companies: ['com', 'log'] },
+  { id: 'C08', name: 'Supermercado El Prado S.A.S.', nit: '901118427', city: 'Barranquilla', warehouse: 'baq', termDays: 30, payer: 'punctual', companies: ['com'] },
+  { id: 'C09', name: 'Hotel Mirador del Río S.A.S.', nit: '900677941', city: 'Soledad', warehouse: 'baq', termDays: 30, payer: 'slow', companies: ['com'] },
+  { id: 'C10', name: 'Importadora Ruta Norte S.A.S.', nit: '901433902', city: 'Bogotá', warehouse: 'bog', termDays: 30, payer: 'punctual', companies: ['log'] },
 ];
 
 export const CUSTOMER_BY_ID: Record<string, Customer> = Object.fromEntries(CUSTOMERS.map((c) => [c.id, c]));

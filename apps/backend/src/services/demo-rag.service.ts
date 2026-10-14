@@ -83,8 +83,12 @@ const FALLBACK_CHUNKS = 3;
 /** Chunks más largos que esto se parten (acota tokens y costo por pregunta). */
 const MAX_CHUNK_CHARS = 1200;
 const SPLIT_CHUNK_CHARS = 1000;
-/** Tope de texto por documento (red de seguridad de memoria). */
-const MAX_TEXT_CHARS = 400_000;
+/**
+ * Tope de texto por documento (red de seguridad de memoria). Un PDF de 30
+ * páginas o menos puede pasarlo si es muy denso: se rechaza con su propio
+ * código (`too_much_text`), no como "demasiadas páginas".
+ */
+export const MAX_TEXT_CHARS = 400_000;
 /** Tope de documentos simultáneos en memoria. */
 const MAX_DOCS_IN_MEMORY = 200;
 /** Mensajes previos (pregunta/respuesta) que se envían como historial. */
@@ -121,10 +125,12 @@ export type DemoErrorCode =
   | 'invalid_format'
   | 'file_too_large'
   | 'too_many_pages'
+  | 'too_much_text'
   | 'empty_document'
   | 'unreadable_document'
   | 'invalid_email'
   | 'consent_required'
+  | 'lead_unavailable'
   | 'invalid_request'
   | 'daily_limit'
   | 'rate_limited'
@@ -142,10 +148,18 @@ const ERROR_DEFS: Record<DemoErrorCode, { status: number; message: string }> = {
   invalid_format: { status: 415, message: 'Formato no permitido. Sube un archivo PDF, DOCX o TXT.' },
   file_too_large: { status: 413, message: 'El archivo supera 5 MB.' },
   too_many_pages: { status: 422, message: 'El documento supera 30 páginas.' },
+  too_much_text: {
+    status: 422,
+    message: 'El documento tiene demasiado texto para esta demo (más de 400.000 caracteres). Sube una versión más corta o solo las páginas que quieres consultar.',
+  },
   empty_document: { status: 422, message: 'No pudimos extraer texto del documento.' },
   unreadable_document: { status: 422, message: 'No pudimos leer el documento. Revisa que no esté dañado ni protegido con contraseña.' },
   invalid_email: { status: 400, message: 'Escribe un email válido.' },
   consent_required: { status: 400, message: 'Debes autorizar el tratamiento de tus datos personales para subir el documento.' },
+  lead_unavailable: {
+    status: 503,
+    message: 'No pudimos registrar tu prueba en este momento, así que no procesamos tu documento. Intenta de nuevo en unos minutos.',
+  },
   invalid_request: { status: 400, message: 'Solicitud inválida.' },
   daily_limit: { status: 429, message: 'Llegaste al límite de 3 documentos por día.' },
   rate_limited: { status: 429, message: 'Demasiadas solicitudes. Espera unos minutos y vuelve a intentarlo.' },
@@ -562,7 +576,7 @@ export async function ingestDocument(input: {
   const extracted = await extractDocument(input.kind, input.buffer);
   if (extracted.pages > DEMO_LIMITS.maxPages) throw new DemoRagError('too_many_pages');
   const totalChars = extracted.sections.reduce((acc, s) => acc + s.length, 0);
-  if (totalChars > MAX_TEXT_CHARS) throw new DemoRagError('too_many_pages');
+  if (totalChars > MAX_TEXT_CHARS) throw new DemoRagError('too_much_text');
 
   const docId = crypto.randomBytes(16).toString('hex');
   const name = cleanFileName(input.originalName);

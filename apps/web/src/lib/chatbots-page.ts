@@ -33,13 +33,15 @@ export const CHATBOTS_USE_CASES: readonly { key: string; sector?: RagSectorId }[
 
 /**
  * Valores de los marcadores `{…}` de la página: los de /rag (precios "COP … (USD …)"
- * y semanas por plan) más `essentialFrom` y `pilotFrom`, solo en COP, para la
- * frase "Desde COP 9.900.000, o piloto de COP 3.900.000".
+ * y semanas por plan) más `pilotFrom`, `essentialFrom` y `essentialMonthlyFrom`,
+ * solo en COP, para la frase "Piloto: COP 3.900.000, pago único. Planes desde
+ * COP 9.900.000 de implementación + COP 1.490.000 al mes".
  */
 export function getChatbotsPageValues(locale = 'es'): Record<string, string> {
   return {
     ...getRagFaqValues(locale),
     essentialFrom: formatRagCOP(getRagPlan('esencial').setup.cop, locale),
+    essentialMonthlyFrom: formatRagCOP(getRagPlan('esencial').monthly?.cop ?? 0, locale),
     pilotFrom: formatRagCOP(getRagPlan('piloto').setup.cop, locale),
   };
 }

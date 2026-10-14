@@ -2,7 +2,17 @@ import { Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { logger } from '../utils/logger';
 import { AuthRequest } from '../types';
+import { parseDurationSeconds } from '../utils/duration';
+import { sendError } from '../utils/http-error';
 
+/**
+ * Exige un `Authorization: Bearer` válido. Errores con el formato único
+ * (`utils/http-error.ts`):
+ *  - 401 `unauthorized`: no hay token.
+ *  - 401 `TOKEN_EXPIRED`: el token venció (la web lo renueva y reintenta).
+ *  - 401 `invalid_token`: el token no es válido.
+ *  - 500 `server_misconfigured`: falta JWT_SECRET en el servidor.
+ */
 export const authenticate = async (
   req: AuthRequest,
   res: Response,
@@ -12,10 +22,7 @@ export const authenticate = async (
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      res.status(401).json({
-        success: false,
-        message: 'No token provided',
-      });
+      sendError(res, 401, 'unauthorized', 'Inicia sesión para continuar.');
       return;
     }
 
@@ -24,10 +31,7 @@ export const authenticate = async (
 
     if (!jwtSecret) {
       logger.error('JWT_SECRET not configured');
-      res.status(500).json({
-        success: false,
-        message: 'Server configuration error',
-      });
+      sendError(res, 500, 'server_misconfigured', 'El servicio no está disponible en este momento. Intenta de nuevo más tarde.');
       return;
     }
 
@@ -43,48 +47,16 @@ export const authenticate = async (
       next();
     } catch (error) {
       if (error instanceof jwt.TokenExpiredError) {
-        res.status(401).json({
-          success: false,
-          message: 'Token expired',
-          code: 'TOKEN_EXPIRED',
-        });
+        sendError(res, 401, 'TOKEN_EXPIRED', 'Tu sesión expiró. Inicia sesión de nuevo.');
         return;
       }
 
-      res.status(401).json({
-        success: false,
-        message: 'Invalid token',
-      });
+      sendError(res, 401, 'invalid_token', 'Tu sesión no es válida. Inicia sesión de nuevo.');
     }
   } catch (error) {
     logger.error('Authentication error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Authentication failed',
-    });
+    sendError(res, 500, 'internal_error', 'No pudimos verificar tu sesión. Intenta de nuevo.');
   }
-};
-
-export const authorize = (...roles: string[]) => {
-  return (req: AuthRequest, res: Response, next: NextFunction): void => {
-    if (!req.user) {
-      res.status(401).json({
-        success: false,
-        message: 'Unauthorized',
-      });
-      return;
-    }
-
-    if (!roles.includes(req.user.role)) {
-      res.status(403).json({
-        success: false,
-        message: 'Forbidden - Insufficient permissions',
-      });
-      return;
-    }
-
-    next();
-  };
 };
 
 export const generateAccessToken = (payload: {
@@ -99,14 +71,30 @@ export const generateAccessToken = (payload: {
   return jwt.sign(payload, jwtSecret, { expiresIn } as jwt.SignOptions);
 };
 
+/**
+ * Vida máxima (y por defecto) del token de renovación: 7 días, lo mismo que
+ * dura la cookie `refreshToken` que guarda la web.
+ */
+export const MAX_REFRESH_TTL_SECONDS = 7 * 24 * 60 * 60;
+
+/**
+ * Vida del token de renovación en segundos, según JWT_REFRESH_EXPIRES_IN
+ * (`7d`, `12h`, `3600`…). La misma cifra firma el JWT y vence la copia en
+ * Redis, así que acortarla acorta la sesión de verdad. Un valor inválido o
+ * mayor de 7 días usa 7 días (config/env.ts lo avisa al arrancar).
+ */
+export function refreshTokenTtlSeconds(env: NodeJS.ProcessEnv = process.env): number {
+  const parsed = parseDurationSeconds(env.JWT_REFRESH_EXPIRES_IN);
+  return parsed === null ? MAX_REFRESH_TTL_SECONDS : Math.min(parsed, MAX_REFRESH_TTL_SECONDS);
+}
+
 export const generateRefreshToken = (payload: {
   id: string;
   email: string;
 }): string => {
   const jwtRefreshSecret = process.env.JWT_REFRESH_SECRET!;
-  const expiresIn: string = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
 
-  return jwt.sign(payload, jwtRefreshSecret, { expiresIn } as jwt.SignOptions);
+  return jwt.sign(payload, jwtRefreshSecret, { expiresIn: refreshTokenTtlSeconds() });
 };
 
 export const verifyRefreshToken = (token: string): any => {

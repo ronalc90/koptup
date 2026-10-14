@@ -1,8 +1,9 @@
 {
   "offeringsCatalog": {
     "section": {
+      "eyebrow": "Looking for something other than an assistant that answers from your documents?",
       "title": "Other custom solutions",
-      "subtitle": "Choose how to work with us: buy the software (we hand over the source code) or subscribe to the monthly SaaS (we host it for you)."
+      "subtitle": "The plans above are for the RAG assistant. What follows are other products with their own prices: buy the software (we hand over the source code) or subscribe to the monthly SaaS (we host it for you)."
     },
     "search": "Search...",
     "modality": {
@@ -22,7 +23,7 @@
       "label": "Currency",
       "cop": "COP",
       "usd": "USD",
-      "trmReference": "Prices are set in COP. The USD value is a reference calculated at an exchange rate of {value} per dollar."
+      "trmReference": "These solutions are priced in COP; the USD value is a reference calculated at an exchange rate of {value} per dollar. (The RAG plans above have fixed prices in COP and USD.)"
     },
     "card": {
       "viewMore": "View more details",
@@ -58,7 +59,7 @@
     },
     "banner": {
       "title": "How we scale",
-      "body": "Colombia-based team operating Mon–Fri 8AM–5PM. We build software aligned with HIPAA/SOC 2/ISO 27001 but formal certification is the customer's responsibility. If you need more than the Enterprise tier, we provide a custom quote within 48 business hours."
+      "body": "Colombia-based team, available Monday to Friday, 8:00 a.m. to 6:00 p.m. (Colombia time). If your project must meet standards such as ISO 27001, SOC 2 or HIPAA, we design it with those requirements; formal certification is handled by your company. If you need more than the highest tier, we provide a custom quote within 48 business hours."
     },
     "supportSLA": {
       "email-24h": "Email business hours · 24h business response",

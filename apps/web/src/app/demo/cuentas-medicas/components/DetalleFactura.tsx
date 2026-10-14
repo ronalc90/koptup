@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import {
@@ -13,7 +13,7 @@ import {
 } from '@heroicons/react/24/outline';
 import Card, { CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { ApiError, auditoriaAPI, esErrorDeAcceso } from '../api';
+import { auditoriaAPI, esErrorDeAcceso, tipoDeError, type TipoError } from '../api';
 import type { DetalleFactura as Detalle } from '../tipos-auditoria';
 import {
   CLAVE_ESTADO_FACTURA,
@@ -26,6 +26,8 @@ import {
   valorPropuesto,
 } from '../lib/formato';
 import { leerLectura, type LecturaGuardada } from '../lib/memoria';
+import { recordarDetalle } from '../lib/espacio';
+import { resumirRevision } from '../lib/revision';
 import { exportarDetalleCSV, exportarDetallePDF } from '../lib/reportes';
 import { tarifaDe } from '../lib/tarifarioDemo';
 import MensajeError from './MensajeError';
@@ -34,7 +36,7 @@ import TarjetaGlosa, { type CambiosGlosa } from './TarjetaGlosa';
 interface Props {
   facturaId: string;
   onVolver: () => void;
-  onErrorAcceso: () => void;
+  onErrorAcceso: (error: unknown) => void;
   onCambioDatos: () => void;
 }
 
@@ -43,24 +45,37 @@ export default function DetalleFactura({ facturaId, onVolver, onErrorAcceso, onC
   const locale = useLocale();
   const [detalle, setDetalle] = useState<Detalle | null>(null);
   const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState<'network' | 'server' | 'notFound' | null>(null);
+  const [error, setError] = useState<TipoError | null>(null);
   const [ocupado, setOcupado] = useState<string | null>(null);
   const [confirmandoBorrado, setConfirmandoBorrado] = useState(false);
   const [eliminando, setEliminando] = useState(false);
   const [lectura, setLectura] = useState<LecturaGuardada | null>(null);
 
-  const etiquetas = { prestador: t('entities.provider'), pagador: t('entities.payer') };
+  const etiquetas = { prestador: t('entities.provider'), pagador: t('entities.payer'), nit: t('entities.nit') };
+  // Al pedir confirmación para eliminar, el foco pasa a «No» (la opción segura).
+  const botonNo = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (confirmandoBorrado) botonNo.current?.focus();
+  }, [confirmandoBorrado]);
+
+  /** Mensaje de una acción que falló: el motivo concreto si lo hay, o el genérico. */
+  const mensajeAccion = (e: unknown, generico: string) => {
+    const tipo = tipoDeError(e);
+    if (tipo === 'rateLimited' || tipo === 'unavailable' || tipo === 'network' || tipo === 'notFound') return t(`errors.${tipo}`);
+    return t(generico);
+  };
 
   const cargar = useCallback(
     async (silencioso = false) => {
       if (!silencioso) setCargando(true);
       setError(null);
       try {
-        setDetalle(await auditoriaAPI.obtenerFactura(facturaId));
+        const datos = await auditoriaAPI.obtenerFactura(facturaId);
+        recordarDetalle(datos.factura, datos.glosas ?? []);
+        setDetalle(datos);
       } catch (e) {
-        if (esErrorDeAcceso(e)) onErrorAcceso();
-        else if (e instanceof ApiError && e.status === 404) setError('notFound');
-        else setError(e instanceof ApiError && e.status === 0 ? 'network' : 'server');
+        if (esErrorDeAcceso(e)) onErrorAcceso(e);
+        else setError(tipoDeError(e));
       } finally {
         setCargando(false);
       }
@@ -82,8 +97,8 @@ export default function DetalleFactura({ facturaId, onVolver, onErrorAcceso, onC
       toast.success(t('denials.saved'));
       return true;
     } catch (e) {
-      if (esErrorDeAcceso(e)) onErrorAcceso();
-      else toast.error(t('errors.saveDecision'));
+      if (esErrorDeAcceso(e)) onErrorAcceso(e);
+      else toast.error(mensajeAccion(e, 'errors.saveDecision'));
       return false;
     } finally {
       setOcupado(null);
@@ -99,8 +114,8 @@ export default function DetalleFactura({ facturaId, onVolver, onErrorAcceso, onC
       onCambioDatos();
       onVolver();
     } catch (e) {
-      if (esErrorDeAcceso(e)) onErrorAcceso();
-      else toast.error(t('errors.delete'));
+      if (esErrorDeAcceso(e)) onErrorAcceso(e);
+      else toast.error(mensajeAccion(e, 'errors.delete'));
       setEliminando(false);
     }
   };
@@ -148,7 +163,10 @@ export default function DetalleFactura({ facturaId, onVolver, onErrorAcceso, onC
 
   const { factura, atenciones, procedimientos, glosas } = detalle;
   const atencion = atenciones[0];
-  const claveEstado = CLAVE_ESTADO_FACTURA[factura.estado];
+  // Estado según la revisión del auditor (el servidor no lo cambia al decidir glosas).
+  const revision = resumirRevision(factura, glosas);
+  const claveEstado = CLAVE_ESTADO_FACTURA[revision.estado];
+  const etiquetaEstado = claveEstado ? t(`states.${claveEstado}`) : revision.estado;
   const decididas = glosas.filter((g) => decisionDeGlosa(g, valorPropuesto(g, procedimientos)) !== 'pendiente').length;
   const conDiferencia = procedimientos.filter((p) => (p.diferenciaTarifa || 0) > 0).length;
   const nombrePaciente = [atencion?.paciente?.nombres, atencion?.paciente?.apellidos].filter(Boolean).join(' ').trim();
@@ -175,8 +193,8 @@ export default function DetalleFactura({ facturaId, onVolver, onErrorAcceso, onC
                 <h2 className="break-all text-2xl font-bold text-gray-900 dark:text-white">
                   {t('detail.title', { number: factura.numeroFactura })}
                 </h2>
-                <span className={`rounded-full px-2.5 py-1 text-sm font-medium ${COLOR_ESTADO_FACTURA[factura.estado] ?? 'bg-gray-100 text-gray-800'}`}>
-                  {claveEstado ? t(`states.${claveEstado}`) : factura.estado}
+                <span className={`rounded-full px-2.5 py-1 text-sm font-medium ${COLOR_ESTADO_FACTURA[revision.estado] ?? 'bg-gray-100 text-gray-800'}`}>
+                  {etiquetaEstado}
                 </span>
               </div>
               <p className="text-gray-700 dark:text-gray-300">
@@ -187,14 +205,20 @@ export default function DetalleFactura({ facturaId, onVolver, onErrorAcceso, onC
               </p>
             </div>
             {confirmandoBorrado ? (
-              <div className="flex flex-wrap items-center gap-2 rounded-lg bg-red-50 p-3 dark:bg-red-950" role="alert">
+              <div
+                className="flex flex-wrap items-center gap-2 rounded-lg bg-red-50 p-3 dark:bg-red-950"
+                role="alert"
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape' && !eliminando) setConfirmandoBorrado(false);
+                }}
+              >
                 <span className="text-sm text-red-800 dark:text-red-200">
                   {t('invoices.deleteQuestion', { number: factura.numeroFactura })}
                 </span>
                 <Button size="sm" variant="danger" onClick={eliminar} isLoading={eliminando} disabled={eliminando}>
                   {t('common.confirmDelete')}
                 </Button>
-                <Button size="sm" variant="ghost" onClick={() => setConfirmandoBorrado(false)} disabled={eliminando}>
+                <Button ref={botonNo} size="sm" variant="ghost" onClick={() => setConfirmandoBorrado(false)} disabled={eliminando}>
                   {t('common.keep')}
                 </Button>
               </div>
@@ -232,7 +256,7 @@ export default function DetalleFactura({ facturaId, onVolver, onErrorAcceso, onC
           <CardTitle className="text-lg">{t('detail.review.title')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {!factura.auditoriaCompletada && (
+          {!factura.auditoriaCompletada && !revision.cerrada && (
             <p className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
               {t('detail.review.flagged')}
             </p>
@@ -248,8 +272,12 @@ export default function DetalleFactura({ facturaId, onVolver, onErrorAcceso, onC
                 <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700" aria-hidden="true">
                   <div className="h-full rounded-full bg-green-500 transition-all" style={{ width: `${(decididas / glosas.length) * 100}%` }} />
                 </div>
-                {decididas === glosas.length && (
-                  <p className="mt-2 text-sm font-medium text-green-700 dark:text-green-300">{t('detail.review.complete')}</p>
+                {revision.cerrada ? (
+                  <p className="mt-2 text-sm font-medium text-green-700 dark:text-green-300" role="status">
+                    {t('detail.review.complete', { state: etiquetaEstado })}
+                  </p>
+                ) : (
+                  <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">{t('detail.review.pendingHint')}</p>
                 )}
               </div>
               <h3 className="font-semibold text-gray-900 dark:text-white">{t('denials.title', { count: glosas.length })}</h3>

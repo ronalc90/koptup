@@ -22,7 +22,7 @@ import { Modal, Toggle, SampleNote, StatusBadge } from './ui';
 
 type Period = 7 | 30;
 const CATEGORY_COLORS: Record<string, string> = {
-  tech: '#2563eb', fashion: '#db2777', home: '#16a34a', sports: '#f59e0b', beauty: '#9333ea', wines: '#dc2626',
+  tech: '#2563eb', fashion: '#db2777', home: '#16a34a', coffee: '#92400e', sports: '#f59e0b', beauty: '#9333ea', wines: '#dc2626',
 };
 const COMPLIANCE = ['dian', 'habeasData', 'retracto', 'pci'] as const;
 
@@ -65,11 +65,11 @@ export default function AdminView() {
   return (
     <div className="mx-auto max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
       <header className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-secondary-900 dark:text-white sm:text-3xl">{t('admin.title')}</h1>
+        <div className="min-w-0 lg:flex-1">
+          <h2 className="text-2xl font-bold text-secondary-900 dark:text-white sm:text-3xl">{t('admin.title')}</h2>
           <p className="text-sm text-secondary-500">{t('admin.subtitle')}</p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 lg:shrink-0 lg:justify-end">
           <div className="inline-flex rounded-lg border border-secondary-300 p-0.5 dark:border-secondary-700" role="group" aria-label={t('admin.period')}>
             {([7, 30] as Period[]).map((p) => (
               <button key={p} type="button" aria-pressed={period === p} onClick={() => setPeriod(p)} className={`rounded-md px-3 py-1 text-sm font-medium ${period === p ? 'bg-primary-600 text-white' : 'text-secondary-700 dark:text-secondary-300'}`}>

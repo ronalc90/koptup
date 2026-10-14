@@ -1,13 +1,14 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import Card, { CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import HomeHighlights from '@/components/home/HomeHighlights';
 import { DEMO_COUNT } from '@/lib/demos';
-import { MEDICAL_ACCOUNTS_DEMO_PATH } from '@/lib/rag-page';
+import { MEDICAL_ACCOUNTS_DEMO_PATH, RAG_PATH, RAG_SECTORS, getRagFaqValues } from '@/lib/rag-page';
+import { RAG_SECTOR_ICONS } from '@/components/rag/RagSectorLanding';
 import DemoAccessBadge from '@/components/demo/DemoAccessBadge';
 import { demoSlugFromPath, gatedInfo, useDemoCatalog } from '@/lib/use-demo-catalog';
 import {
@@ -22,6 +23,7 @@ import {
   PaintBrushIcon,
   CurrencyDollarIcon,
   CheckCircleIcon,
+  ArrowRightIcon,
 } from '@heroicons/react/24/outline';
 
 /**
@@ -33,6 +35,8 @@ export default function HomeContent() {
   // Modo de acceso real de cada demo (las que no son abiertas llevan su etiqueta).
   const demoCatalog = useDemoCatalog();
   const th = useTranslations('homePage');
+  const ts = useTranslations('ragSectors');
+  const ragValues = getRagFaqValues(useLocale());
 
   const services = [
     {
@@ -183,6 +187,53 @@ export default function HomeContent() {
 
           {/* Datos verificables (sin cifras de clientes ni calificaciones) */}
           <HomeHighlights className="mt-20" />
+        </div>
+      </section>
+
+      {/* Franja RAG: sectores, precio del piloto y tratamiento de datos */}
+      <section className="border-y border-secondary-200 dark:border-secondary-800 bg-white dark:bg-secondary-950">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid gap-6 lg:grid-cols-3 lg:items-center">
+          <div>
+            <h2 className="text-sm font-bold uppercase tracking-wide text-secondary-500 dark:text-secondary-400 mb-3">
+              {th('demos.band.sectorsTitle')}
+            </h2>
+            <ul className="flex flex-wrap gap-2">
+              {RAG_SECTORS.map((sector) => {
+                const SectorIcon = RAG_SECTOR_ICONS[sector.id];
+                return (
+                  <li key={sector.id}>
+                    <Link
+                      href={sector.path}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-primary-200 dark:border-primary-800 bg-primary-50 dark:bg-primary-950/50 px-3 py-1.5 text-sm font-semibold text-primary-700 dark:text-primary-300 hover:border-primary-400 transition-colors"
+                    >
+                      <SectorIcon className="h-4 w-4" aria-hidden="true" />
+                      {ts(`${sector.id}.name`)}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+          <div className="text-sm text-secondary-700 dark:text-secondary-300">
+            <p className="font-semibold">{th('demos.band.pilot', ragValues)}</p>
+            <Link
+              href="/services#planes-rag"
+              className="mt-1 inline-flex items-center gap-1 font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+            >
+              {th('demos.band.plansLink')}
+              <ArrowRightIcon className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          </div>
+          <div className="text-sm text-secondary-700 dark:text-secondary-300">
+            <p className="font-semibold">{th('demos.band.data')}</p>
+            <Link
+              href={`${RAG_PATH}#seguridad`}
+              className="mt-1 inline-flex items-center gap-1 font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+            >
+              {th('demos.band.dataLink')}
+              <ArrowRightIcon className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          </div>
         </div>
       </section>
 

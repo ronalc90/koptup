@@ -1,16 +1,29 @@
 {
   "demoErp": {
     "meta": {
-      "title": "ERP Modular",
+      "title": "ERP modular",
       "subtitle": "Ventas, inventario en tres bodegas, compras con aprobaciones, producción, contabilidad, cartera y nómina de una empresa ficticia. Lo que haces en un módulo se refleja en los demás.",
       "sampleBadge": "Datos de ejemplo",
-      "sampleHint": "Empresa y cifras ficticias generadas para la demo (enero–septiembre de 2026). La DIAN, los bancos y WhatsApp están simulados.",
+      "sampleHint": "Empresa y cifras ficticias generadas para la demo: van desde enero hasta el cierre del mes pasado. La DIAN, los bancos y WhatsApp están simulados.",
       "seoTitle": "Demo ERP: ventas, inventario, compras y contabilidad",
       "seoDescription": "Prueba un ERP modular con datos de ejemplo: cotización, pedido y factura que descuentan inventario y generan el asiento contable, compras con aprobación, conciliación bancaria, cartera por edades, nómina y producción. La validación DIAN está simulada.",
       "breadcrumbHome": "Inicio",
       "breadcrumbDemos": "Demos"
     },
+    "intro": {
+      "back": "Volver al catálogo",
+      "guidedDemo": "Solicitar demo guiada",
+      "quote": "Cotizar tu ERP",
+      "kicker": "Demo interactiva · ERP para pymes",
+      "forWhomLabel": "Para quién:",
+      "forWhom": "gerentes, contadores y jefes de operación de pymes que quieren ver cómo se conectan ventas, inventario, compras, cartera y contabilidad en un solo sistema.",
+      "startLabel": "Por dónde empezar:",
+      "start": "sigue el recorrido de 5 pasos. El primero: en Ventas, convierte una cotización en pedido y factúrala.",
+      "startCta": "Empezar el recorrido"
+    },
+    "loading": "Preparando los datos de ejemplo al cierre del mes pasado…",
     "topbar": {
+      "aria": "Filtros de la demo",
       "company": "Empresa",
       "companyAll": "Grupo Montevera (consolidado)",
       "currency": "Moneda",
@@ -20,27 +33,23 @@
       "search": "Buscar",
       "searchPlaceholder": "Factura, cliente, SKU…",
       "clearSearch": "Borrar búsqueda",
+      "filtering": "Filtrando por «{q}» en todos los módulos.",
       "resultsIn": "Coincidencias en:",
-      "workDate": "Período abierto: septiembre de 2026 · las operaciones nuevas quedan con fecha {date}",
+      "viewing": "Viendo del {from} al {to}",
+      "workDate": "Período abierto: {month} · las operaciones nuevas quedan con fecha {date}",
       "trmNote": "USD convertido con una TRM fija de ejemplo de {trm}",
       "savedLocally": "Tus cambios se guardan solo en este navegador",
       "reset": "Restablecer datos de ejemplo",
       "resetTitle": "¿Restablecer los datos de ejemplo?",
       "resetBody": "Se borran las cotizaciones, facturas, órdenes, pagos y demás cambios que hiciste en esta demo, y vuelves a los datos originales.",
       "resetConfirm": "Sí, restablecer",
-      "resetDone": "Listo: volviste a los datos de ejemplo."
+      "resetDone": "Listo: volviste a los datos de ejemplo.",
+      "newMonth": "Empezó un mes nuevo: los datos de ejemplo ahora cierran en {month} y los cambios que habías hecho se borraron.",
+      "periodSwitched": "Cambiamos el período a {month} para que veas la operación."
     },
     "periods": {
-      "2026-09": "Septiembre 2026",
-      "2026-08": "Agosto 2026",
-      "2026-07": "Julio 2026",
-      "q3": "3.er trimestre 2026",
-      "ytd": "Año 2026 (ene–sep)",
-      "prev_2026-09": "agosto 2026",
-      "prev_2026-08": "julio 2026",
-      "prev_2026-07": "junio 2026",
-      "prev_q3": "2.º trimestre 2026",
-      "prev_ytd": "—"
+      "q": "Últimos 3 meses",
+      "ytd": "Año corrido {year}"
     },
     "modules": {
       "aria": "Módulos del ERP",
@@ -57,7 +66,7 @@
       "cancel": "Cancelar",
       "showMore": "Ver más ({shown} de {total})",
       "exportCsv": "Exportar CSV",
-      "csvDone": "Descargaste un CSV con {n} filas.",
+      "csvDone": "Descargaste un CSV con {n, plural, one {1 fila} other {# filas}}.",
       "noResults": "No hay resultados para tu búsqueda en este período.",
       "currency": "Moneda",
       "moduleNames": {
@@ -81,8 +90,9 @@
       "arOverdue": "Vencida > 60 días: {value}",
       "vs": "vs. {period}",
       "ytdNote": "Acumulado del año",
-      "deltaUp": "Subió frente al período anterior",
-      "deltaDown": "Bajó frente al período anterior"
+      "deltaUp": "Subió {value} frente a {period}",
+      "deltaDown": "Bajó {value} frente a {period}",
+      "deltaFlat": "Sin cambio frente a {period}"
     },
     "flow": {
       "title": "Recorrido de punta a punta",
@@ -108,7 +118,7 @@
         },
         "ledger": {
           "module": "Contabilidad",
-          "text": "Mira los asientos automáticos de tu factura y los estados financieros actualizados."
+          "text": "Abre el libro diario y mira el asiento automático de tu factura: está entre los más recientes, marcado como TUYO."
         }
       }
     },
@@ -118,7 +128,7 @@
       "baq": "Barranquilla"
     },
     "entryDesc": {
-      "opening": "Saldos iniciales al 31 de diciembre de 2025",
+      "opening": "Saldos iniciales al {date}",
       "sale": "Factura de venta {doc} · {third}",
       "creditNote": "Nota crédito {doc} (devolución de {ref}) · {third}",
       "receipt_pse": "Recaudo PSE de {doc} · {third}",
@@ -138,7 +148,8 @@
       "exp_unidentified": "Consignación por identificar · {month}",
       "payroll": "Nómina y aportes · {month}",
       "taxVat": "Pago de IVA del bimestre que termina en {month}",
-      "taxWithholding": "Pago de retención en la fuente de {month}"
+      "taxWithholding": "Pago de retención en la fuente de {month}",
+      "closing": "Cierre del ejercicio {year}: traslado del resultado a utilidades acumuladas"
     },
     "accounts": {
       "1105": "Caja",
@@ -210,7 +221,7 @@
         "subtotal": "Subtotal",
         "vat": "IVA",
         "total": "Total",
-        "open": "Saldo al 30/09/2026",
+        "open": "Saldo al {date}",
         "dian": "DIAN",
         "currency": "Moneda"
       },
@@ -225,7 +236,6 @@
         "receivable": "Por cobrar"
       },
       "yours": "TUYA",
-      "periodSwitched": "Cambiamos el período a septiembre de 2026 para que veas la operación.",
       "toasts": {
         "ordered": "{doc} ahora es un pedido.",
         "invoiced": "Factura {doc} emitida. Validación DIAN simulada en curso…",
@@ -300,6 +310,7 @@
         "item": "Producto o servicio",
         "qty": "Cantidad",
         "available": "Disponible: {qty}",
+        "plusVat": "+ IVA {vat} %",
         "removeLine": "Quitar línea",
         "addLine": "Agregar línea",
         "totals": "Subtotal {subtotal} · IVA {vat} · Total {total}",
@@ -327,7 +338,6 @@
       "title": "Inventario por bodega",
       "subtitle": "Existencias y valor al {date}. Haz clic en un SKU para ver su kardex.",
       "noInventoryLog": "Montevera Logística presta servicios de almacenamiento y no maneja inventario propio. Elige «Surtidora Montevera» o el consolidado.",
-      "periodSwitched": "Cambiamos el período a septiembre de 2026 para que veas la operación.",
       "toasts": {
         "poCreated": "Orden de compra {doc} creada para {supplier}: apruébala en Compras.",
         "transferred": "Traslado {doc}: {qty} de {item} de {from} a {to}."
@@ -343,7 +353,7 @@
         "status": "Estado"
       },
       "status": {
-        "ok": "OK",
+        "ok": "Normal",
         "low": "Bajo reorden",
         "out": "Agotado"
       },
@@ -390,7 +400,7 @@
         "createPo": "Crear OC por {qty}",
         "produce": "Programar producción",
         "transfer": "Trasladar desde Bogotá",
-        "pastPeriod": "Estás viendo un período cerrado: las acciones se habilitan en septiembre de 2026."
+        "pastPeriod": "Estás viendo un período cerrado: las acciones se habilitan en {month}."
       },
       "kardex": {
         "open": "Ver kardex de {sku}",
@@ -443,7 +453,7 @@
         "total": "Total",
         "withholding": "Retención",
         "payable": "Por pagar",
-        "open": "Saldo al 30/09/2026"
+        "open": "Saldo al {date}"
       },
       "status": {
         "pending": "Por aprobar",
@@ -490,9 +500,9 @@
         "rejected": "{doc} rechazada.",
         "created": "Orden de compra {doc} creada. Ahora apruébala."
       },
-      "periodSwitched": "Cambiamos el período a septiembre de 2026 para que veas la operación.",
       "detail": {
         "title": "Orden de compra",
+        "nit": "NIT {nit}",
         "item": "Producto",
         "qty": "Cant.",
         "cost": "Costo",
@@ -578,7 +588,7 @@
         "title": "Libro diario (PUC)",
         "subtitle": "Asientos por partida doble generados por cada operación. Haz clic en un comprobante para ver su origen.",
         "empty": "No hay asientos en este período.",
-        "totals": "Totales ({n} comprobantes)"
+        "totals": "Totales ({n, plural, one {1 comprobante} other {# comprobantes}})"
       },
       "cols": {
         "date": "Fecha",
@@ -586,6 +596,7 @@
         "company": "Empresa",
         "account": "Cuenta",
         "description": "Descripción / tercero",
+        "descriptionCsv": "Descripción",
         "third": "Tercero",
         "debit": "Débito",
         "credit": "Crédito"
@@ -597,11 +608,11 @@
         "subtitle": "Comprobante de ajuste: los débitos deben ser iguales a los créditos.",
         "company": "Empresa",
         "desc": "Descripción",
-        "descPlaceholder": "Ej.: reclasificación de gastos de septiembre",
+        "descPlaceholder": "Ej.: reclasificación de gastos de {month}",
         "removeLine": "Quitar línea",
         "addLine": "Agregar línea",
         "sums": "Débitos {debit} · Créditos {credit} · Diferencia {diff}",
-        "note": "Se registra con fecha 30 sep 2026 y afecta de inmediato el balance de prueba y los estados financieros.",
+        "note": "Se registra con fecha {date} y afecta de inmediato el balance de prueba y los estados financieros.",
         "save": "Registrar asiento",
         "done": "Asiento {doc} registrado.",
         "errorDesc": "Escribe una descripción.",
@@ -609,7 +620,6 @@
         "errorBoth": "Cada línea debe tener débito o crédito, no ambos.",
         "errorBalance": "Los débitos y los créditos deben ser iguales y mayores que cero."
       },
-      "periodSwitched": "Cambiamos el período a septiembre de 2026 para que veas la operación.",
       "entry": {
         "title": "Comprobante",
         "goSource": "Ver el documento en {module}",
@@ -628,7 +638,8 @@
           "payroll": "Generado automáticamente al liquidar la nómina.",
           "tax": "Generado automáticamente al pagar el impuesto (saldo de la cuenta al corte).",
           "prodStart": "Generado automáticamente al iniciar la orden de producción.",
-          "prodFinish": "Generado automáticamente al terminar la orden de producción."
+          "prodFinish": "Generado automáticamente al terminar la orden de producción.",
+          "closing": "Cierre del ejercicio: las cuentas de ingresos, costos y gastos pasan a utilidades acumuladas."
         }
       },
       "trial": {
@@ -673,7 +684,6 @@
       }
     },
     "finance": {
-      "periodSwitched": "Cambiamos el período a septiembre de 2026 para que veas la operación.",
       "cash": {
         "title": "Flujo de caja",
         "subtitle": "Entradas y salidas de caja y bancos por mes, calculadas con los asientos.",
@@ -686,7 +696,7 @@
       "aging": {
         "ar": "Cartera por edades",
         "ap": "Cuentas por pagar por edades",
-        "cutoff": "Corte {date} · {n} documentos",
+        "cutoff": "Corte {date} · {n, plural, one {1 documento} other {# documentos}}",
         "buckets": {
           "current": "Sin vencer",
           "d30": "Vencida 1–30 días",
@@ -735,6 +745,7 @@
           "all": "Todos"
         },
         "nonePending": "No hay movimientos pendientes por conciliar en este período.",
+        "none": "No hay movimientos en esta vista para el período.",
         "note": "Los movimientos de la demo son de ejemplo. En tu proyecto se importan los extractos en Excel o CSV de tu banco; la conexión directa depende de cada banco.",
         "imported": "importado",
         "matchedByYou": "Conciliado por ti con {doc}",
@@ -779,17 +790,17 @@
       "import": {
         "title": "Importar extracto bancario",
         "subtitle": "Archivo CSV con columnas: fecha, descripción, valor.",
-        "save": "Importar {n} movimientos",
+        "save": "Importar {n, plural, one {1 movimiento} other {# movimientos}}",
         "company": "Cuenta de la empresa",
         "choose": "Elegir archivo CSV",
         "sample": "Descargar CSV de ejemplo",
-        "format": "Fechas AAAA-MM-DD o DD/MM/AAAA entre el 1 de enero de 2026 y el {max}. Valores positivos para entradas y negativos para salidas. Separador ; o ,.",
-        "preview": "{n} movimientos listos para importar ({skipped} filas omitidas por formato).",
+        "format": "Fechas del mes abierto, entre el {min} y el {max} (AAAA-MM-DD o DD/MM/AAAA): los meses anteriores son de consulta. Valores positivos para entradas y negativos para salidas. Separador ; o ,.",
+        "preview": "{n, plural, one {1 movimiento listo} other {# movimientos listos}} para importar ({skipped, plural, =0 {ninguna fila omitida} one {1 fila omitida} other {# filas omitidas}} por formato o por fecha fuera del mes abierto).",
         "date": "Fecha",
         "desc": "Descripción",
         "amount": "Valor",
         "note": "El archivo se lee en tu navegador y no se envía a ningún servidor.",
-        "done": "Importaste {n} movimientos. Revísalos en «Pendientes».",
+        "done": "{n, plural, one {Importaste 1 movimiento. Revísalo en «Pendientes».} other {Importaste # movimientos. Revísalos en «Pendientes».}}",
         "errors": {
           "tooBig": "El archivo pesa más de 1 MB.",
           "empty": "El archivo está vacío.",
@@ -872,7 +883,6 @@
     "manufacturing": {
       "title": "Producción",
       "noManufacturingLog": "Montevera Logística no produce. Elige «Surtidora Montevera» o el consolidado.",
-      "periodSwitched": "Cambiamos el período a septiembre de 2026 para que veas la operación.",
       "yours": "TUYA",
       "toasts": {
         "started": "{doc} iniciada: los materiales salieron del inventario.",
@@ -932,6 +942,19 @@
       "sample": "Datos de ejemplo: Surtidora Montevera S.A.S. y Montevera Logística S.A.S. son empresas ficticias; clientes, proveedores, personas, NIT y cifras son inventados.",
       "integrations": "La validación de la DIAN (factura y nómina electrónica), los extractos bancarios y los recordatorios por WhatsApp están simulados en la demo. En tu proyecto se conectan a un proveedor tecnológico autorizado, a los extractos de tu banco y a WhatsApp Business o correo.",
       "storage": "Lo que haces aquí se guarda solo en este navegador y puedes restablecerlo cuando quieras."
+    },
+    "files": {
+      "sales": "ventas",
+      "inventory": "inventario",
+      "inventoryAvg": "promedio-ponderado",
+      "inventoryFifo": "peps",
+      "purchases": "compras",
+      "journal": "libro-diario",
+      "trial": "balance-de-prueba",
+      "receivables": "cartera",
+      "bankSample": "extracto-ejemplo",
+      "supplierInvoice": "factura-proveedor",
+      "sampleSuffix": "ejemplo"
     }
   }
 }

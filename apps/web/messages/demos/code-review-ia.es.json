@@ -1,21 +1,30 @@
 {
   "demoCodeReview": {
     "meta": {
-      "title": "Demo de code review con IA: revisión de pull requests",
-      "description": "Demo interactiva con datos de ejemplo: seis pull requests de una fintech ficticia con comentarios de IA pregenerados, hallazgos de seguridad, pruebas sugeridas y una simulación de cómo llegan a GitHub, GitLab, Bitbucket o Azure DevOps. Incluye un analizador de reglas que revisa tu diff en el navegador.",
+      "title": "Demo de revisión de código con IA (code review) en pull requests",
+      "description": "Demo interactiva con datos de ejemplo de revisión de código (code review) con IA: seis pull requests de una fintech ficticia con comentarios de IA escritos de antemano, hallazgos de seguridad, pruebas sugeridas y una simulación de cómo llegan a GitHub, GitLab, Bitbucket o Azure DevOps. Incluye un analizador de reglas que revisa tu diff en el navegador, sin IA.",
       "breadcrumbHome": "Inicio",
       "breadcrumbDemos": "Demos",
-      "breadcrumbName": "Code review con IA"
+      "breadcrumbName": "Revisión de código con IA"
     },
     "header": {
-      "title": "Code review con IA",
+      "title": "Revisión de código con IA",
       "sampleBadge": "Datos de ejemplo",
-      "subtitle": "Así se ve la revisión automática de pull requests en {company}, una fintech ficticia: resumen y riesgo, comentarios de la IA anclados al diff, seguridad, pruebas sugeridas y cómo llega todo a tu repositorio. Los comentarios de la IA están pregenerados para esta demo.",
+      "subtitle": "Revisión automática de pull requests (PR) en {company}, una fintech ficticia: riesgo y puntaje, comentarios de la IA en cada línea del diff, seguridad, pruebas sugeridas y cómo llega todo a tu repositorio. Los comentarios de la IA están escritos de antemano para esta demo.",
       "searchPlaceholder": "Buscar PR por título, número, repositorio, autor o archivo",
       "tryDiff": "Prueba con tu diff",
       "requestDemo": "Solicitar demo guiada",
       "reset": "Restablecer",
-      "resetHint": "Devuelve los PR de ejemplo a su estado inicial"
+      "resetHint": "Devuelve los PR de ejemplo a su estado inicial y borra tus diff y tu avance",
+      "back": "Volver al catálogo de demos",
+      "sampleHint": "Empresa, personas, pull requests y fechas inventados; los comentarios de la IA están escritos de antemano para esta demo",
+      "audience": "Para líderes técnicos, CTO y equipos de desarrollo: una primera revisión en minutos en cada PR, en español y con las reglas de tu equipo.",
+      "start": "Por dónde empezar: sigue los primeros pasos de abajo. El PR #218 ya está abierto con 4 comentarios de la IA.",
+      "ctaLabel": "Contacto comercial",
+      "quote": "Cotizar para tu equipo",
+      "resetConfirm": "¿Restablecer la demo? Los PR de ejemplo vuelven a su estado inicial y se borran tus diff y el avance de los primeros pasos.",
+      "resetYes": "Sí, restablecer",
+      "resetNo": "Cancelar"
     },
     "stats": {
       "openPrs": "PR abiertos",
@@ -87,7 +96,9 @@
       "userAuthor": "tú",
       "userBranch": "tu rama",
       "userNote": "Lo pegaste tú y se analizó con reglas locales en tu navegador (sin IA). No se guarda: desaparece al recargar la página.",
-      "deleteUserPr": "Eliminar este análisis"
+      "deleteUserPr": "Eliminar este análisis",
+      "resetPr": "Volver este PR al inicio",
+      "resetPrHint": "Deshace lo que hiciste en este PR (también la fusión)"
     },
     "tabs": {
       "label": "Secciones del PR",
@@ -112,20 +123,14 @@
       "score": "Puntaje",
       "scoreFormula": "100 menos {blocking} por bloqueante, {warning} por advertencia, {suggestion} por sugerencia y {info} por nota pendiente.",
       "files": "Archivos",
-      "activity": "Actividad",
-      "tryTitle": "Prueba esto",
-      "try1": "Lee los comentarios y aplica una sugerencia: el diff y el puntaje cambian.",
-      "try2": "Mira cada comentario anclado a su línea del diff.",
-      "try3": "Mira cómo llega el comentario a GitHub, GitLab, Bitbucket o Azure DevOps (simulado).",
-      "try4": "Pega tu propio diff y revísalo con las reglas locales.",
-      "go": "Ir"
+      "activity": "Actividad"
     },
     "events": {
       "bot": "Revisor IA",
       "localBot": "Reglas locales",
       "opened": "{who} abrió el PR",
-      "aiReview": "{who} publicó su revisión ({detail} hallazgos)",
-      "localReview": "Análisis con reglas locales: {detail} hallazgos",
+      "aiReview": "{who} publicó su revisión ({count, plural, =0 {sin hallazgos} one {# hallazgo} other {# hallazgos}})",
+      "localReview": "Análisis con reglas locales: {count, plural, =0 {sin hallazgos} one {# hallazgo} other {# hallazgos}}",
       "approved": "{who} aprobó el PR",
       "changesRequested": "{who} pidió cambios",
       "merged": "{who} fusionó el PR en main",
@@ -192,7 +197,7 @@
     },
     "diff": {
       "title": "Diff con comentarios",
-      "subtitle": "Cada comentario aparece debajo de la línea que revisa. Al aplicar una sugerencia, el diff se actualiza.",
+      "subtitle": "Cada comentario aparece debajo de la línea que revisa (en «Lado a lado», debajo del archivo). Al aplicar una sugerencia, el diff se actualiza.",
       "viewLabel": "Vista del diff",
       "unified": "Unificado",
       "split": "Lado a lado",
@@ -201,7 +206,9 @@
       "newFile": "Archivo nuevo",
       "testFile": "Prueba agregada",
       "noFile": "Este PR no tiene archivos.",
-      "emptySide": "(vacío)"
+      "emptySide": "(vacío)",
+      "lineLabel": "Línea {line}",
+      "splitComments": "{count, plural, one {# comentario en este archivo} other {# comentarios en este archivo}}"
     },
     "security": {
       "title": "Seguridad",
@@ -264,7 +271,7 @@
         "github": "GitHub App",
         "gitlab": "integración por webhook de GitLab",
         "bitbucket": "integración por webhook de Bitbucket",
-        "azure": "service hook de Azure DevOps"
+        "azure": "enlace de servicio (service hook) de Azure DevOps"
       },
       "plan": {
         "github": "plan Básico en adelante",
@@ -300,7 +307,7 @@
         "bitbucket": "Aplicar cambio",
         "azure": "Aplicar cambio"
       },
-      "checkBlocked": "{count, plural, one {Revisión automática: # bloqueante sin resolver. El merge queda bloqueado.} other {Revisión automática: # bloqueantes sin resolver. El merge queda bloqueado.}}",
+      "checkBlocked": "{count, plural, one {Revisión automática: # bloqueante sin resolver. La fusión queda bloqueada.} other {Revisión automática: # bloqueantes sin resolver. La fusión queda bloqueada.}}",
       "checkOk": "Revisión automática: sin bloqueantes. El chequeo pasa.",
       "copyMarkdown": "Copiar comentario (Markdown)",
       "viewPlans": "Ver planes"
@@ -315,7 +322,7 @@
       "minutes": "{value} min",
       "instant": "al instante",
       "byCategory": "Hallazgos por categoría",
-      "openDone": "{open} pendientes · {done} atendidos",
+      "openDone": "{open, plural, one {# pendiente} other {# pendientes}} · {done, plural, one {# atendido} other {# atendidos}}",
       "legendDone": "Atendidos",
       "legendOpen": "Pendientes",
       "byStatus": "PR por estado",
@@ -375,7 +382,8 @@
       "userPrCreated": "{count, plural, one {Análisis local listo: # hallazgo.} other {Análisis local listo: # hallazgos.}}",
       "userPrClean": "Análisis local listo: las reglas no encontraron hallazgos.",
       "userPrDeleted": "Análisis eliminado.",
-      "reset": "La demo volvió a su estado inicial."
+      "reset": "La demo volvió a su estado inicial.",
+      "prReset": "El PR #{number} volvió a su estado inicial."
     },
     "csv": {
       "pr": "PR",
@@ -394,11 +402,41 @@
       "score": "Puntaje",
       "open": "Pendientes",
       "done": "Atendidos",
-      "firstReview": "Primera revisión (min)"
+      "firstReview": "Primera revisión (min)",
+      "securityFile": "code-review-pr-{number}-seguridad.csv",
+      "metricsFile": "code-review-metricas-equipo.csv",
+      "sbomNote": "Datos de ejemplo de la demo /demo/code-review-ia",
+      "sbomRecommend": "Actualizar {name} a {version} o superior"
     },
     "footer": {
-      "sampleNote": "Datos de ejemplo: {company} es una empresa ficticia y los PR, las personas y los NIT son inventados. Los comentarios de la IA están pregenerados para esta demo; las vulnerabilidades de dependencias citan avisos públicos reales. Tus cambios en los PR de ejemplo se guardan solo en este navegador (usa Restablecer para empezar de nuevo).",
-      "cta": "Solicitar demo guiada"
+      "sampleNote": "Datos de ejemplo: {company} es una empresa ficticia y los PR, las personas y los NIT son inventados; las fechas se calculan a partir de hoy. Los comentarios de la IA están escritos de antemano para esta demo; las vulnerabilidades de dependencias citan avisos públicos reales. Tus cambios en los PR de ejemplo se guardan solo en este navegador (usa Restablecer para empezar de nuevo)."
+    },
+    "steps": {
+      "title": "Primeros pasos",
+      "progress": "{done} de {total} hechos",
+      "doneSr": "(hecho)",
+      "pendingSr": "(pendiente)",
+      "allDone": "Completaste los primeros pasos. ¿Quieres verlo con el código y las reglas de tu equipo?",
+      "apply": {
+        "title": "Aplica una sugerencia de la IA",
+        "hint": "PR #218 › Comentarios: el diff y el puntaje cambian."
+      },
+      "diff": {
+        "title": "Mira el comentario en su línea",
+        "hint": "Pestaña Diff: cada comentario va debajo de la línea que revisa."
+      },
+      "repo": {
+        "title": "Mira cómo llega a tu repositorio",
+        "hint": "GitHub, GitLab, Bitbucket o Azure DevOps (simulado)."
+      },
+      "merge": {
+        "title": "Aprueba y fusiona el PR",
+        "hint": "Solo se puede sin hallazgos bloqueantes pendientes."
+      },
+      "own": {
+        "title": "Revisa tu propio diff",
+        "hint": "Pégalo y lo revisan reglas locales en tu navegador (sin IA)."
+      }
     }
   }
 }

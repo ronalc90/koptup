@@ -301,10 +301,16 @@ export function dateRange(tasks: Task[], milestones: Milestone[], fallback: ISOD
 
 export const STATUS_ORDER: Record<StatusId, number> = { todo: 0, doing: 1, review: 2, client: 3, done: 4 };
 
-/** CSV con separador ";" y BOM para que Excel en español lo abra con tildes y columnas. */
-export function toCSV(rows: (string | number)[][]): string {
+/**
+ * CSV con separador ";" y BOM para que Excel en español lo abra con tildes y columnas.
+ * Un texto que empieza por =, +, -, @ o tabulador se antepone con ' para que la
+ * hoja de cálculo no lo ejecute como fórmula (los títulos los escribe quien usa la demo).
+ * Los números llevan la coma decimal en español (1,5 h) para que Excel los lea como números.
+ */
+export function toCSV(rows: (string | number)[][], decimal: ',' | '.' = ','): string {
   const esc = (v: string | number) => {
-    const s = String(v);
+    const raw = typeof v === 'number' ? String(v).replace('.', decimal) : v;
+    const s = typeof v === 'string' && /^[=+\-@\t\r]/.test(raw) ? `'${raw}` : raw;
     return /[";\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
   };
   return '﻿' + rows.map((r) => r.map(esc).join(';')).join('\r\n');
@@ -339,4 +345,19 @@ export function nextInvoiceNumber(ws: Workspace): string {
     return Math.max(n, num);
   }, 0);
   return `PF-${String(max + 1).padStart(4, '0')}`;
+}
+
+/** Valor proporcional a lo terminado de un sprint cerrado (antes de IVA). */
+export function progressAmount(m: Milestone): number {
+  return Math.round((m.billing * (m.closedProgress ?? 100)) / 100);
+}
+
+/** Valor facturado (o por facturar) de un hito, antes de IVA. */
+export function invoiceAmount(m: Milestone): number {
+  return m.invoice?.amount ?? m.billing;
+}
+
+/** IVA general de Colombia (19 %) sobre un valor antes de IVA. */
+export function ivaOf(amount: number): number {
+  return Math.round(amount * 0.19);
 }

@@ -1,208 +1,247 @@
 'use client';
 
+import { useEffect, useMemo, useRef, useState, type DragEvent } from 'react';
 import { useTranslations } from 'next-intl';
-import {
-  BoltIcon,
-  FunnelIcon,
-  GlobeAltIcon,
-  SparklesIcon,
-  ArrowsRightLeftIcon,
-  ChatBubbleLeftEllipsisIcon,
-  Squares2X2Icon,
-  CheckCircleIcon,
-  ExclamationTriangleIcon,
-  ArrowPathIcon,
-} from '@heroicons/react/24/outline';
-import type { NodeKind, NodeStatus, WorkflowNode } from './types';
+import { ArrowPathIcon, CheckCircleIcon, ExclamationTriangleIcon, MinusCircleIcon, NoSymbolIcon, XCircleIcon } from '@heroicons/react/24/outline';
+import { TYPE_DEFS, isTrigger, typeKey } from '../lib/catalog';
+import { BRANCH_H, BRANCH_W, NODE_H, branchPos, computeLayout, dropIndex, edgePath } from '../lib/layout';
+import type { Live, NodeVisual } from '../lib/store';
+import type { Step, StepType } from '../lib/types';
+import { CATEGORY_COLORS, TYPE_ICONS } from './icons';
+import { DRAG_NEW } from './NodePalette';
+import { SimTag, focusRing } from './ui';
+
+export const DRAG_STEP = 'application/x-koptup-step';
 
 interface Props {
-  nodes: WorkflowNode[];
-  selectedId: NodeKind | null;
-  onSelect: (id: NodeKind) => void;
-  running: boolean;
-  activeEdgeIndex: number;
+  steps: Step[];
+  selectedId: string | null;
+  onSelect: (id: string) => void;
+  live: Live;
+  onDropNew: (type: StepType, index: number) => void;
+  onMove: (id: string, index: number) => void;
+  onDelete: (id: string) => void;
 }
 
-const NODE_ICONS: Record<NodeKind, React.ComponentType<{ className?: string }>> = {
-  trigger: BoltIcon,
-  filter: FunnelIcon,
-  http: GlobeAltIcon,
-  llm: SparklesIcon,
-  transform: ArrowsRightLeftIcon,
-  slack: ChatBubbleLeftEllipsisIcon,
-  subflow: Squares2X2Icon,
-};
-
-const NODE_COLORS: Record<NodeKind, string> = {
-  trigger: 'from-amber-500/20 to-amber-600/10 border-amber-500/50 text-amber-300',
-  filter: 'from-sky-500/20 to-sky-600/10 border-sky-500/50 text-sky-300',
-  http: 'from-emerald-500/20 to-emerald-600/10 border-emerald-500/50 text-emerald-300',
-  llm: 'from-fuchsia-500/20 to-fuchsia-600/10 border-fuchsia-500/50 text-fuchsia-300',
-  transform: 'from-indigo-500/20 to-indigo-600/10 border-indigo-500/50 text-indigo-300',
-  slack: 'from-rose-500/20 to-rose-600/10 border-rose-500/50 text-rose-300',
-  subflow: 'from-teal-500/20 to-teal-600/10 border-teal-500/50 text-teal-300',
-};
-
-function StatusDot({ status }: { status: NodeStatus }) {
-  if (status === 'success') {
-    return <CheckCircleIcon className="h-4 w-4 text-emerald-400" />;
+function StatusIcon({ status }: { status: NodeVisual }) {
+  const t = useTranslations('demoAutomation.canvas.status');
+  const label = t(status);
+  switch (status) {
+    case 'success':
+      return <CheckCircleIcon className="h-4 w-4 text-emerald-400" aria-label={label} />;
+    case 'running':
+      return <ArrowPathIcon className="h-4 w-4 animate-spin text-sky-400 motion-reduce:animate-none" aria-label={label} />;
+    case 'retry':
+      return <ArrowPathIcon className="h-4 w-4 text-amber-400" aria-label={label} />;
+    case 'failed':
+      return <XCircleIcon className="h-4 w-4 text-rose-400" aria-label={label} />;
+    case 'review':
+      return <ExclamationTriangleIcon className="h-4 w-4 text-amber-400" aria-label={label} />;
+    case 'stopped':
+      return <MinusCircleIcon className="h-4 w-4 text-secondary-400" aria-label={label} />;
+    case 'cancelled':
+      return <NoSymbolIcon className="h-4 w-4 text-secondary-400" aria-label={label} />;
+    default:
+      return <span className="inline-block h-2 w-2 rounded-full bg-secondary-600" aria-label={label} />;
   }
-  if (status === 'error') {
-    return <ExclamationTriangleIcon className="h-4 w-4 text-rose-400" />;
-  }
-  if (status === 'running') {
-    return <ArrowPathIcon className="h-4 w-4 text-sky-400 animate-spin" />;
-  }
-  return <span className="h-2 w-2 rounded-full bg-secondary-600 inline-block" />;
 }
 
-export default function WorkflowCanvas({
-  nodes,
-  selectedId,
-  onSelect,
-  running,
-  activeEdgeIndex,
-}: Props) {
+export default function WorkflowCanvas({ steps, selectedId, onSelect, live, onDropNew, onMove, onDelete }: Props) {
   const t = useTranslations('demoAutomation');
-  const tn = useTranslations('demoAutomation.canvas.nodes');
+  const outer = useRef<HTMLDivElement>(null);
+  const inner = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
+  const [dropAt, setDropAt] = useState<number | null>(null);
 
-  const NODE_W = 180;
-  const NODE_H = 76;
+  useEffect(() => {
+    const el = outer.current;
+    if (!el) return;
+    const update = () => setWidth(el.clientWidth);
+    update();
+    if (typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
-  // Build curved SVG path between two node centers (right side of A → left side of B)
-  const buildPath = (a: WorkflowNode, b: WorkflowNode) => {
-    const ax = a.x + NODE_W;
-    const ay = a.y + NODE_H / 2;
-    const bx = b.x;
-    const by = b.y + NODE_H / 2;
-    const dx = Math.max(40, (bx - ax) / 2);
-    return `M ${ax} ${ay} C ${ax + dx} ${ay}, ${bx - dx} ${by}, ${bx} ${by}`;
+  const layout = useMemo(() => computeLayout(steps.length, width || 880), [steps.length, width]);
+  const { positions, nodeW } = layout;
+
+  const pointFromEvent = (e: DragEvent) => {
+    const rect = inner.current?.getBoundingClientRect();
+    if (!rect) return null;
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
   };
 
-  const edges: Array<[WorkflowNode, WorkflowNode]> = [];
-  for (let i = 0; i < nodes.length - 1; i++) {
-    edges.push([nodes[i], nodes[i + 1]]);
-  }
+  const accepts = (e: DragEvent) => e.dataTransfer.types.includes(DRAG_NEW) || e.dataTransfer.types.includes(DRAG_STEP);
 
-  // Compute viewBox bounds
-  const maxX = Math.max(...nodes.map((n) => n.x)) + NODE_W + 40;
-  const maxY = Math.max(...nodes.map((n) => n.y)) + NODE_H + 40;
+  const onDragOver = (e: DragEvent) => {
+    if (!accepts(e)) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = e.dataTransfer.types.includes(DRAG_STEP) ? 'move' : 'copy';
+    const p = pointFromEvent(e);
+    if (p) setDropAt(dropIndex(layout, p.x, p.y));
+  };
+
+  const onDrop = (e: DragEvent) => {
+    if (!accepts(e)) return;
+    e.preventDefault();
+    const p = pointFromEvent(e);
+    setDropAt(null);
+    if (!p) return;
+    const index = dropIndex(layout, p.x, p.y);
+    const moving = e.dataTransfer.getData(DRAG_STEP);
+    if (moving) {
+      onMove(moving, index);
+      return;
+    }
+    const type = e.dataTransfer.getData(DRAG_NEW) as StepType;
+    if (type && type in TYPE_DEFS) onDropNew(type, index);
+  };
+
+  // Marca de inserción mientras se arrastra.
+  const marker = (() => {
+    if (dropAt === null || !positions.length) return null;
+    const prev = positions[dropAt - 1];
+    const next = positions[dropAt];
+    if (prev && next) {
+      if (prev.row === next.row) {
+        const x = prev.dir === 1 ? (prev.x + nodeW + next.x) / 2 : (prev.x + next.x + nodeW) / 2;
+        return { x, y: prev.y + NODE_H / 2 };
+      }
+      return { x: prev.x + nodeW / 2, y: (prev.y + NODE_H + next.y) / 2 };
+    }
+    if (prev) {
+      if (layout.cols === 1) return { x: prev.x + nodeW / 2, y: prev.y + NODE_H + 18 };
+      return { x: prev.dir === 1 ? prev.x + nodeW + 18 : prev.x - 18, y: prev.y + NODE_H / 2 };
+    }
+    return null;
+  })();
+
+  const activeEdge = live.running ? live.reached - 1 : -1;
 
   return (
-    <div className="relative w-full h-full overflow-auto bg-secondary-950 rounded-xl border border-secondary-800">
-      {/* Grid background */}
+    <div
+      ref={outer}
+      role="group"
+      aria-label={t('canvas.title')}
+      onDragOver={onDragOver}
+      onDragLeave={(e) => {
+        if (!outer.current?.contains(e.relatedTarget as Node)) setDropAt(null);
+      }}
+      onDrop={onDrop}
+      style={{ ['--canvas-h' as string]: `${Math.min(620, Math.max(336, layout.height + 2))}px` }}
+      className={`relative w-full overflow-auto rounded-xl border bg-secondary-950 lg:h-[var(--canvas-h)] ${dropAt !== null ? 'border-primary-500/70' : 'border-secondary-800'}`}
+    >
       <div
-        className="absolute inset-0 opacity-30 pointer-events-none"
-        style={{
-          backgroundImage:
-            'radial-gradient(circle, rgba(148,163,184,0.18) 1px, transparent 1px)',
-          backgroundSize: '24px 24px',
-        }}
+        className="pointer-events-none absolute inset-0 opacity-30"
+        style={{ backgroundImage: 'radial-gradient(circle, rgba(148,163,184,0.18) 1px, transparent 1px)', backgroundSize: '24px 24px' }}
       />
-
-      <div className="relative" style={{ minWidth: maxX, minHeight: maxY }}>
-        {/* Edges */}
-        <svg
-          className="absolute inset-0 pointer-events-none"
-          width={maxX}
-          height={maxY}
-        >
+      <div ref={inner} className="relative" style={{ width: Math.max(layout.width, 10), minWidth: '100%', height: layout.height }}>
+        <svg className="pointer-events-none absolute left-0 top-0" width={layout.width} height={layout.height} aria-hidden>
           <defs>
-            <marker
-              id="arrow"
-              viewBox="0 0 10 10"
-              refX="9"
-              refY="5"
-              markerWidth="6"
-              markerHeight="6"
-              orient="auto-start-reverse"
-            >
+            <marker id="auto-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
               <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b" />
             </marker>
-            <marker
-              id="arrow-active"
-              viewBox="0 0 10 10"
-              refX="9"
-              refY="5"
-              markerWidth="6"
-              markerHeight="6"
-              orient="auto-start-reverse"
-            >
+            <marker id="auto-arrow-lit" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
               <path d="M 0 0 L 10 5 L 0 10 z" fill="#38bdf8" />
             </marker>
           </defs>
-          {edges.map(([a, b], idx) => {
-            const isActive = running && idx <= activeEdgeIndex;
+          {positions.slice(0, -1).map((a, i) => {
+            const b = positions[i + 1];
+            const lit = i + 1 <= live.reached;
+            const d = edgePath(a, b, nodeW);
             return (
-              <g key={`${a.id}-${b.id}`}>
-                <path
-                  d={buildPath(a, b)}
-                  stroke={isActive ? '#38bdf8' : '#475569'}
-                  strokeWidth={isActive ? 2.5 : 1.5}
-                  fill="none"
-                  markerEnd={isActive ? 'url(#arrow-active)' : 'url(#arrow)'}
-                  className={isActive ? 'drop-shadow-[0_0_6px_rgba(56,189,248,0.5)]' : ''}
-                />
-                {isActive && (
+              <g key={`e-${steps[i].id}-${steps[i + 1].id}`}>
+                <path d={d} stroke={lit ? '#38bdf8' : '#475569'} strokeWidth={lit ? 2.5 : 1.5} fill="none" markerEnd={lit ? 'url(#auto-arrow-lit)' : 'url(#auto-arrow)'} />
+                {lit && i === activeEdge && (
                   <circle r="4" fill="#38bdf8">
-                    <animateMotion
-                      dur="1.4s"
-                      repeatCount="indefinite"
-                      path={buildPath(a, b)}
-                    />
+                    <animateMotion dur="1.2s" repeatCount="indefinite" path={d} />
                   </circle>
                 )}
               </g>
             );
           })}
+          {steps.map((st, i) => {
+            if (st.type !== 'logic.condition') return null;
+            const p = positions[i];
+            const b = branchPos(p, nodeW);
+            const x = b.x + BRANCH_W / 2;
+            const lit = live.statuses[st.id] === 'review' || live.statuses[st.id] === 'stopped';
+            return <path key={`b-${st.id}`} d={`M ${x} ${p.y + NODE_H} L ${x} ${b.y}`} stroke={lit ? '#fbbf24' : '#64748b'} strokeWidth={1.5} strokeDasharray="4 3" fill="none" />;
+          })}
+          {marker && <circle cx={marker.x} cy={marker.y} r={7} fill="#3b82f6" stroke="#bfdbfe" strokeWidth={2} />}
         </svg>
 
-        {/* Nodes */}
-        {nodes.map((node) => {
-          const Icon = NODE_ICONS[node.kind];
-          const isSelected = node.id === selectedId;
-          const titleKey = node.kind;
-          const descKey = `${node.kind}Desc`;
+        {steps.map((st, i) => {
+          if (st.type !== 'logic.condition') return null;
+          const b = branchPos(positions[i], nodeW);
+          const onFalse = String(st.config.onFalse) === 'stop' ? 'stop' : 'review';
+          const lit = live.statuses[st.id] === 'review' || live.statuses[st.id] === 'stopped';
+          return (
+            <span
+              key={`bp-${st.id}`}
+              className={`pointer-events-none absolute flex items-center justify-center truncate rounded-full border px-1.5 text-[10px] font-medium ${
+                lit ? 'border-amber-400 bg-amber-500/20 text-amber-100' : 'border-secondary-600 bg-secondary-900 text-secondary-300'
+              }`}
+              style={{ left: b.x, top: b.y, width: BRANCH_W, height: BRANCH_H }}
+            >
+              {t(onFalse === 'stop' ? 'canvas.branchStop' : 'canvas.branchReview')}
+            </span>
+          );
+        })}
+
+        {steps.map((st, i) => {
+          const p = positions[i];
+          const def = TYPE_DEFS[st.type];
+          const Icon = TYPE_ICONS[st.type];
+          const status: NodeVisual = live.statuses[st.id] ?? 'idle';
+          const selected = st.id === selectedId;
+          const trigger = isTrigger(st.type);
           return (
             <button
-              key={node.id}
+              key={st.id}
               type="button"
-              onClick={() => onSelect(node.id)}
-              style={{
-                left: node.x,
-                top: node.y,
-                width: NODE_W,
-                height: NODE_H,
+              data-step-id={st.id}
+              onClick={() => onSelect(st.id)}
+              onKeyDown={(e) => {
+                if ((e.key === 'Delete' || e.key === 'Backspace') && !trigger) {
+                  e.preventDefault();
+                  onDelete(st.id);
+                }
               }}
-              className={`absolute group rounded-lg border bg-gradient-to-br backdrop-blur-sm transition-all text-left p-3 hover:scale-[1.03] ${
-                NODE_COLORS[node.kind]
-              } ${
-                isSelected
-                  ? 'ring-2 ring-primary-400 shadow-lg shadow-primary-500/30 scale-[1.02]'
-                  : 'hover:shadow-md hover:shadow-secondary-900'
-              } ${node.status === 'running' ? 'animate-pulse' : ''}`}
+              draggable={!trigger}
+              onDragStart={(e) => {
+                e.dataTransfer.setData(DRAG_STEP, st.id);
+                e.dataTransfer.setData('text/plain', st.name);
+                e.dataTransfer.effectAllowed = 'move';
+              }}
+              aria-pressed={selected}
+              aria-label={t('canvas.nodeLabel', { n: i + 1, name: st.name, type: t(`types.${typeKey(st.type)}.name`), status: t(`canvas.status.${status}`) })}
+              style={{ left: p.x, top: p.y, width: nodeW, height: NODE_H }}
+              className={`absolute flex flex-col justify-between rounded-lg border bg-gradient-to-br p-2.5 text-left transition-shadow ${CATEGORY_COLORS[def.category]} ${
+                selected ? 'shadow-lg shadow-primary-500/30 ring-2 ring-primary-400' : 'hover:shadow-md hover:shadow-secondary-900'
+              } ${status === 'running' ? 'animate-pulse motion-reduce:animate-none' : ''} ${focusRing}`}
             >
-              <div className="flex items-center gap-2 mb-1">
-                <Icon className="h-4 w-4 flex-shrink-0" />
-                <span className="text-xs font-semibold text-white truncate">
-                  {tn(titleKey)}
+              <span className="flex w-full items-center gap-1.5">
+                <Icon className="h-4 w-4 shrink-0" />
+                <span className="min-w-0 flex-1 truncate text-xs font-semibold text-white">{st.name}</span>
+                <StatusIcon status={status} />
+              </span>
+              <span className="flex w-full items-center gap-1.5">
+                <span className="min-w-0 flex-1 truncate text-[10.5px] text-secondary-300">
+                  {i + 1}. {t(`types.${typeKey(st.type)}.name`)}
                 </span>
-                <span className="ml-auto">
-                  <StatusDot status={node.status} />
-                </span>
-              </div>
-              <p className="text-[11px] text-secondary-300 font-mono truncate">
-                {tn(descKey)}
-              </p>
+                {def.simulated && <SimTag />}
+              </span>
             </button>
           );
         })}
 
-        {/* Hint */}
-        {!running && (
-          <div className="absolute bottom-3 left-3 text-[11px] text-secondary-500 font-mono pointer-events-none">
-            {t('canvas.runHint')}
-          </div>
+        {!live.running && steps.length <= 1 && (
+          <p className="pointer-events-none absolute left-6 text-[11px] text-secondary-500" style={{ top: NODE_H + 44 }}>
+            {t('canvas.emptyHint')}
+          </p>
         )}
       </div>
     </div>

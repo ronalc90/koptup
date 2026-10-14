@@ -36,7 +36,7 @@ import {
 import { classify, matchKeywords, normalize } from './engine';
 import AiDraftPanel from './AiDraftPanel';
 import SlaBadge from './SlaBadge';
-import { ChannelBadge, Note, PriorityBadge, sectionTitleCls, smallInputCls } from './ui';
+import { ChannelBadge, Note, PriorityBadge, sectionTitleCls, smallInputCls, smallSelectCls } from './ui';
 import type { HdText } from './useHelpdeskText';
 
 interface Props {
@@ -120,7 +120,8 @@ export default function TicketDetail(props: Props) {
               <Badge variant={resolved ? 'success' : ticket.status === 'pending' ? 'warning' : 'info'} size="sm">
                 {t(`statuses.${ticket.status}`)}
               </Badge>
-              <SlaBadge hd={hd} ticket={ticket} clock={clock} />
+              {/* Resuelto: el estado ya lo dice; la insignia de SLA solo se muestra mientras corre. */}
+              {!resolved && <SlaBadge hd={hd} ticket={ticket} clock={clock} />}
               {c.language !== hd.lang && (
                 <Badge variant="outline" size="sm" className="text-secondary-600 dark:text-secondary-300 gap-1">
                   <LanguageIcon className="h-3 w-3" aria-hidden="true" />
@@ -190,7 +191,7 @@ export default function TicketDetail(props: Props) {
             <select
               value={ticket.assignee ?? ''}
               onChange={(e) => props.onAssign((e.target.value || null) as AgentId | null)}
-              className={`${smallInputCls} mt-0.5`}
+              className={`${smallSelectCls} mt-0.5`}
             >
               <option value="">{t('inbox.unassigned')}</option>
               {AGENTS.map((a) => (
@@ -202,7 +203,7 @@ export default function TicketDetail(props: Props) {
           </label>
           <label className="text-[11px] text-secondary-600 dark:text-secondary-400">
             {t('detail.priority')}
-            <select value={ticket.priority} onChange={(e) => props.onPriority(e.target.value as Priority)} className={`${smallInputCls} mt-0.5`}>
+            <select value={ticket.priority} onChange={(e) => props.onPriority(e.target.value as Priority)} className={`${smallSelectCls} mt-0.5`}>
               {PRIORITIES.map((p) => (
                 <option key={p} value={p}>
                   {t(`priorities.${p}`)}
@@ -212,7 +213,7 @@ export default function TicketDetail(props: Props) {
           </label>
           <label className="text-[11px] text-secondary-600 dark:text-secondary-400">
             {t('detail.area')}
-            <select value={ticket.category} onChange={(e) => props.onCategory(e.target.value as Category)} className={`${smallInputCls} mt-0.5`}>
+            <select value={ticket.category} onChange={(e) => props.onCategory(e.target.value as Category)} className={`${smallSelectCls} mt-0.5`}>
               {CATEGORIES.map((cat) => (
                 <option key={cat} value={cat}>
                   {t(`categories.${cat}`)}
@@ -384,7 +385,7 @@ export default function TicketDetail(props: Props) {
                   {t('detail.macro')}
                 </label>
                 <div className="flex gap-2">
-                  <select id="hd-macro" value={macroId} onChange={(e) => setMacroId(e.target.value)} className={smallInputCls}>
+                  <select id="hd-macro" value={macroId} onChange={(e) => setMacroId(e.target.value)} className={smallSelectCls}>
                     <option value="">{t('detail.macroPlaceholder')}</option>
                     {activeMacros.map((m) => (
                       <option key={m.id} value={m.id}>
@@ -414,7 +415,7 @@ export default function TicketDetail(props: Props) {
                   id="hd-pqrs"
                   value={ticket.pqrs?.type ?? ''}
                   onChange={(e) => props.onPqrs((e.target.value || null) as PqrsType | null)}
-                  className={smallInputCls}
+                  className={smallSelectCls}
                 >
                   <option value="">{t('detail.pqrsNone')}</option>
                   {PQRS_TYPES.map((p) => (

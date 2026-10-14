@@ -79,3 +79,20 @@ export const PUBLIC_DEMO_SLUGS: readonly string[] = DEMO_ACCESS_DEFAULTS.filter(
 
 /** Slugs válidos en una URL (?demos=a,b): minúsculas, números y guiones. */
 export const DEMO_SLUG_PATTERN = /^[a-z0-9-]{2,60}$/;
+
+/**
+ * Páginas dentro de una demo con acceso controlado que son públicas: la
+ * verificación del certificado del LMS es lo que abre el código QR del
+ * certificado, y quien la consulta (un tercero) no tiene acceso a la demo. La
+ * página solo verifica los datos que trae su propia URL (contra el registro de
+ * ejemplo guardado en el navegador); no llama al backend. La usan
+ * el middleware (no pide acceso) y DemoAccessWatcher (no vigila el acceso).
+ */
+export const PUBLIC_DEMO_SUBPATHS: ReadonlySet<string> = new Set(['/demo/lms/verificar']);
+
+/** ¿La ruta es una página pública dentro de una demo? (sin query; tolera la barra final y mayúsculas). */
+export function isPublicDemoSubpath(pathname: string | null | undefined): boolean {
+  if (!pathname) return false;
+  const normalized = pathname.length > 1 ? pathname.replace(/\/+$/, '').toLowerCase() : pathname;
+  return PUBLIC_DEMO_SUBPATHS.has(normalized);
+}

@@ -14,6 +14,12 @@ import type { PR } from './analyzer';
 export const DEMO_USER = 'daniela.v';
 export const COMPANY = 'Billetera Andina';
 export const BASE_BRANCH = 'main';
+/**
+ * Día que los datos de ejemplo toman como "hoy" (viernes). En el navegador,
+ * después de montar, las fechas se corren semanas completas para que los PR
+ * queden en los días anteriores a la fecha real (ver sampleShiftDays).
+ */
+export const SAMPLE_TODAY = '2026-10-09';
 
 export const SAMPLE_PRS: PR[] = [
   // ---------------------------------------------------------------------------
@@ -21,11 +27,11 @@ export const SAMPLE_PRS: PR[] = [
     id: 'p218',
     number: 218,
     title: {
-      es: 'feat(pagos): webhook de confirmación de pagos PSE (sandbox)',
+      es: 'feat(pagos): webhook de confirmación de pagos PSE (modo de pruebas)',
       en: 'feat(payments): PSE payment confirmation webhook (sandbox)',
     },
     summary: {
-      es: 'Agrega el endpoint que recibe la confirmación de la pasarela de pagos (PSE en modo sandbox) y marca el pago como aprobado.',
+      es: 'Agrega la ruta del servidor que recibe la confirmación de la pasarela de pagos (PSE en modo de pruebas) y marca el pago como aprobado.',
       en: 'Adds the endpoint that receives the payment gateway confirmation (PSE in sandbox mode) and marks the payment as approved.',
     },
     repo: 'billetera-andina/api-pagos',

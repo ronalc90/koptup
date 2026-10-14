@@ -6,17 +6,17 @@ import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
-import { COMPANIES, EMPLOYEES, EMPLOYEE_BY_ID, PAYROLL_BENEFITS_FACTOR, PAYROLL_EMPLOYER_FACTOR, WORK_DATE } from '../lib/catalog';
-import { inCompany, periodRange } from '../lib/engine';
+import { COMPANIES, EMPLOYEES, EMPLOYEE_BY_ID, PAYROLL_BENEFITS_FACTOR, PAYROLL_EMPLOYER_FACTOR } from '../lib/catalog';
+import { inCompany } from '../lib/engine';
 import { matches } from '../lib/format';
 import { useErp } from '../lib/store';
 import { Empty, MoreButton, Note, SectionHeader, Th, btn, rowCls, theadCls, useFmt, usePager } from './ui';
 
 export default function HrModule() {
   const t = useTranslations('demoErp.hr');
-  const { state, filters, dispatch, transmitPayroll, goTo, locale } = useErp();
+  const { workDate: WORK_DATE, state, filters, dispatch, transmitPayroll, goTo, locale } = useErp();
   const f = useFmt();
-  const r = periodRange(filters.period);
+  const r = useErp().range;
   const staff = useMemo(() => EMPLOYEES.filter((e) => inCompany(e.company, filters.company)), [filters.company]);
   const onVacation = new Set(state.vacations.filter((v) => v.status === 'approved' && v.from <= WORK_DATE && v.to >= WORK_DATE).map((v) => v.employeeId));
   const runs = state.payroll.filter((p) => inCompany(p.company, filters.company) && p.date >= r.start && p.date <= r.end).sort((a, b) => (b.month > a.month ? 1 : b.month < a.month ? -1 : a.company.localeCompare(b.company)));

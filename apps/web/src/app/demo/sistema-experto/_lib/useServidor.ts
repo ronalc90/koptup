@@ -38,22 +38,30 @@ export function useServidor() {
   const cargar = useCallback(async () => {
     setEstado('cargando');
     // /api/expert/estadisticas ya incluye la configuración actual del motor
-    // (la misma de GET /api/expert/configuracion): 3 llamadas en lugar de 4.
-    const [experto, cups, vector] = await Promise.allSettled([
+    // (la misma de GET /api/expert/configuracion), y la vectorización trae el
+    // total del catálogo: el detalle por categoría solo se pide si hay códigos.
+    // Así una carga usa 2 consultas del cupo general de la API (100 cada 15 min).
+    const [experto, vector] = await Promise.allSettled([
       apiMotor.estadisticas(),
-      apiMotor.estadisticasCups(),
       apiMotor.estadisticasVectorizacion(),
     ]);
+    const hayCatalogo = vector.status === 'fulfilled' && vector.value.totalCUPS > 0;
+    const [cups] = hayCatalogo ? await Promise.allSettled([apiMotor.estadisticasCups()]) : [undefined];
     if (!montado.current) return;
 
-    const resultados = [experto, cups, vector];
+    const resultados = [experto, vector, ...(cups ? [cups] : [])];
     const errores = resultados
       .filter((r): r is PromiseRejectedResult => r.status === 'rejected')
       .map((r) => tipoDe(r.reason));
 
+    const cupsVacio: EstadisticasCups | undefined =
+      vector.status === 'fulfilled' && !hayCatalogo
+        ? { totalCUPS: 0, cupsActivos: 0, cupsInactivos: 0, cupsPorCategoria: {}, cupsConTarifaISS2004: 0 }
+        : undefined;
+
     setDatos({
       experto: experto.status === 'fulfilled' ? experto.value : undefined,
-      cups: cups.status === 'fulfilled' ? cups.value : undefined,
+      cups: cups?.status === 'fulfilled' ? cups.value : cupsVacio,
       vector: vector.status === 'fulfilled' ? vector.value : undefined,
       config: experto.status === 'fulfilled' ? experto.value.configuracionActual : undefined,
     });

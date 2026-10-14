@@ -8,7 +8,7 @@ import Button from '@/components/ui/Button';
 import { ArrowsRightLeftIcon, ExclamationTriangleIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
 import { PRESETS } from './data';
 import type { PosStore } from './usePosStore';
-import { inputCls, selectCls, useFmt } from './ui';
+import { inputCls, panelTitleProps, selectCls, useFmt } from './ui';
 
 /** Consola central: ventas por sede, existencias de todas las sedes, traslados y precio central. */
 export function ConsolePanel({ store, notify }: { store: PosStore; notify: (m: string, tone?: 'ok' | 'error') => void }) {
@@ -39,11 +39,14 @@ export function ConsolePanel({ store, notify }: { store: PosStore; notify: (m: s
     if (state.offline) return setTrErr(t('console.transfer.errors.offline'));
     if (tr.from === tr.to) return setTrErr(t('console.transfer.errors.same'));
     if (!Number.isFinite(qty) || qty <= 0 || (!product.byWeight && !Number.isInteger(qty))) return setTrErr(t('console.transfer.errors.qty'));
-    const have = data.stock[tr.from]?.[tr.productId] ?? 0;
-    if (qty > have) return setTrErr(t('console.transfer.errors.stock', { n: f.qty(have, product.byWeight) }));
+    // Lo que está en un ticket abierto de la sede de origen no se puede trasladar.
+    const have = Math.max(0, Math.round(((data.stock[tr.from]?.[tr.productId] ?? 0) - store.reserved(tr.productId, tr.from)) * 1000) / 1000);
+    if (qty > have + 1e-9) return setTrErr(t('console.transfer.errors.stock', { n: f.qty(have, product.byWeight) }));
     if (store.transfer(tr.productId, tr.from, tr.to, qty)) {
       notify(t('console.transfer.done', { qty: f.qty(qty, product.byWeight), name: product.name }));
       setTr({ ...tr, qty: '' });
+    } else {
+      setTrErr(t('console.transfer.errors.stock', { n: f.qty(have, product.byWeight) }));
     }
   };
 
@@ -63,7 +66,9 @@ export function ConsolePanel({ store, notify }: { store: PosStore; notify: (m: s
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 dark:text-white">{t('console.title', { business: p.business.name })}</h2>
+        <h2 {...panelTitleProps} className="text-xl sm:text-2xl font-bold text-secondary-900 dark:text-white focus:outline-none">
+          {t('console.title', { business: p.business.name })}
+        </h2>
         <p className="text-sm text-secondary-500">{t('console.subtitle')}</p>
       </div>
 
@@ -248,7 +253,7 @@ export function ConsolePanel({ store, notify }: { store: PosStore; notify: (m: s
               const pr = p.products.find((y) => y.id === x.productId);
               return (
                 <li key={x.id}>
-                  {x.at} · {f.qty(x.qty, pr?.byWeight)} {pr?.name} · {sedeName(x.from)} → {sedeName(x.to)}
+                  {f.clock(x.at)} · {f.qty(x.qty, pr?.byWeight)} {pr?.name} · {sedeName(x.from)} → {sedeName(x.to)}
                 </li>
               );
             })}

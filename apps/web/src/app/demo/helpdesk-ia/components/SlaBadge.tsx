@@ -44,7 +44,7 @@ export default function SlaBadge({ hd, ticket, clock }: { hd: HdText; ticket: Ti
     return (
       <Badge variant="danger" size="sm" className={cls} title={t('sla.policyHint')}>
         <ExclamationTriangleIcon className="h-3.5 w-3.5" aria-hidden="true" />
-        {t('sla.breached', { time: hd.duration(-remaining) })}
+        {-remaining < 1 ? t('sla.breachedNow') : t('sla.breached', { time: hd.duration(-remaining) })}
       </Badge>
     );
   }

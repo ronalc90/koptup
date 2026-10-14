@@ -46,6 +46,7 @@ export default function StorefrontView() {
   const [sort, setSort] = useState<SortId>('relevance');
   const [showSuggest, setShowSuggest] = useState(false);
   const [activeId, setActiveId] = useState<number | null>(null);
+  const [heroFailed, setHeroFailed] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -90,39 +91,40 @@ export default function StorefrontView() {
 
   return (
     <div>
-      <section className="relative mx-auto mb-8 max-w-7xl overflow-hidden rounded-2xl">
-        <div className="relative h-[400px] w-full sm:h-[360px] md:h-[440px]">
-          <Image src={heroImageUrl(HERO_PHOTO_ID)} alt={t('hero.imageAlt')} fill priority sizes="(max-width: 768px) 100vw, 1600px" className="object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-r from-secondary-950/80 via-secondary-950/40 to-transparent" />
-          <div className="absolute inset-0 flex items-center">
-            <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-              <div className="max-w-xl text-white">
-                <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary-600/90 px-3 py-1 backdrop-blur">
-                  <SparklesIcon className="h-4 w-4" />
-                  <span className="text-xs font-semibold uppercase tracking-wide">{t('hero.badge')}</span>
-                </div>
-                <h1 className="mb-3 text-3xl font-bold leading-tight sm:text-4xl md:text-5xl">{t('hero.title')}</h1>
-                <p className="mb-6 text-base opacity-90 sm:text-lg">{t('hero.subtitle')}</p>
-                <div className="flex flex-wrap gap-3">
-                  <Badge className="flex items-center gap-2 bg-white px-3 py-2 font-bold text-primary-700">
-                    <TruckIcon className="h-4 w-4" />
-                    {state.rules.freeShipping ? t('hero.freeShipping', { amount: formatPrice(FREE_SHIPPING_FROM) }) : t('hero.shippingFlat')}
-                  </Badge>
-                  <Badge className="flex items-center gap-2 bg-white px-3 py-2 font-bold text-primary-700">
-                    <TagIcon className="h-4 w-4" />
-                    {t('hero.pricesNote')}
-                  </Badge>
-                </div>
-              </div>
+      <div className="mx-auto mb-8 max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-secondary-800 to-primary-900">
+        {!heroFailed && (
+          <Image src={heroImageUrl(HERO_PHOTO_ID)} alt={t('hero.imageAlt')} fill priority sizes="(max-width: 768px) 100vw, 1280px" className="object-cover" onError={() => setHeroFailed(true)} />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-r from-secondary-950/85 via-secondary-950/50 to-secondary-950/10" />
+        {/* El alto lo da el contenido (con un mínimo), así el texto nunca se corta en el celular. */}
+        <div className="relative flex min-h-[300px] items-center px-5 py-8 sm:px-8 md:min-h-[380px] lg:px-10">
+          <div className="max-w-xl text-white">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary-600/90 px-3 py-1 backdrop-blur">
+              <SparklesIcon className="h-4 w-4" aria-hidden="true" />
+              <span className="text-xs font-semibold uppercase tracking-wide">{t('hero.badge')}</span>
+            </div>
+            <h2 className="mb-3 text-3xl font-bold leading-tight sm:text-4xl md:text-5xl">{t('hero.title')}</h2>
+            <p className="mb-6 text-base opacity-90 sm:text-lg">{t('hero.subtitle')}</p>
+            <div className="flex flex-wrap gap-3">
+              <Badge className="flex items-center gap-2 bg-white px-3 py-2 font-bold text-primary-700 dark:bg-white dark:text-primary-700">
+                <TruckIcon className="h-4 w-4" aria-hidden="true" />
+                {state.rules.freeShipping ? t('hero.freeShipping', { amount: formatPrice(FREE_SHIPPING_FROM) }) : t('hero.shippingFlat')}
+              </Badge>
+              <Badge className="flex items-center gap-2 bg-white px-3 py-2 font-bold text-primary-700 dark:bg-white dark:text-primary-700">
+                <TagIcon className="h-4 w-4" aria-hidden="true" />
+                {t('hero.pricesNote')}
+              </Badge>
             </div>
           </div>
         </div>
       </section>
+      </div>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-6 space-y-4">
           <div ref={searchRef} className="relative">
-            <MagnifyingGlassIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-secondary-400" />
+            <MagnifyingGlassIcon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-secondary-400" aria-hidden="true" />
             <input
               type="search"
               value={search}
@@ -131,6 +133,12 @@ export default function StorefrontView() {
                 setShowSuggest(true);
               }}
               onFocus={() => setShowSuggest(true)}
+              onKeyDown={(e) => {
+                // Escape cierra las sugerencias; si ya están cerradas, borra la búsqueda.
+                if (e.key !== 'Escape') return;
+                if (showSuggest && suggestions.length) setShowSuggest(false);
+                else setSearch('');
+              }}
               placeholder={t('search.placeholder')}
               aria-label={t('search.placeholder')}
               className="w-full rounded-xl border border-secondary-300 bg-white py-3 pl-12 pr-4 text-base text-secondary-900 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-secondary-700 dark:bg-secondary-900 dark:text-white"
@@ -318,11 +326,11 @@ function ProductCard({ product, name, bestseller, isWish, onWish, onAdd, onView 
         <div className="relative aspect-square overflow-hidden bg-secondary-100 dark:bg-secondary-800">
           <ProductImage product={product} alt={name} size={600} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover transition-transform duration-500 group-hover:scale-110" />
           <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
-            {stock === 0 && <Badge className="bg-secondary-800 font-bold text-white">{t('product.badges.soldOut')}</Badge>}
-            {discount && <Badge className="bg-red-600 font-bold text-white">-{discount}%</Badge>}
-            {product.badges.includes('new') && <Badge className="bg-green-600 font-bold text-white">{t('product.badges.new')}</Badge>}
-            {bestseller && <Badge className="bg-amber-500 font-bold text-white">★ {t('product.badges.bestseller')}</Badge>}
-            {product.badges.includes('eco') && <Badge className="bg-emerald-600 font-bold text-white">{t('product.badges.eco')}</Badge>}
+            {stock === 0 && <Badge className="bg-secondary-800 font-bold text-white dark:bg-secondary-950 dark:text-white">{t('product.badges.soldOut')}</Badge>}
+            {discount && <Badge className="bg-red-600 font-bold text-white dark:bg-red-600 dark:text-white">-{discount}%</Badge>}
+            {product.badges.includes('new') && <Badge className="bg-green-600 font-bold text-white dark:bg-green-600 dark:text-white">{t('product.badges.new')}</Badge>}
+            {bestseller && <Badge className="bg-amber-700 font-bold text-white dark:bg-amber-700 dark:text-white">★ {t('product.badges.bestseller')}</Badge>}
+            {product.badges.includes('eco') && <Badge className="bg-emerald-700 font-bold text-white dark:bg-emerald-700 dark:text-white">{t('product.badges.eco')}</Badge>}
           </div>
           <div className="absolute right-3 top-3 flex flex-col gap-2 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
             <IconButton onClick={onWish} label={isWish ? t('product.wishlistRemove') : t('product.wishlistAdd')} pressed={isWish}>

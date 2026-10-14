@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { API_BASE } from '@/lib/backend-url';
 import { STAFF_ROLES, adminRolesFor, hasRole, homePathForRole, prospectCanAccess } from '@/lib/auth-roles';
-import { DEMO_DEFAULTS_BY_SLUG, type DemoAccessMode, isKnownDemoSlug } from '@/lib/demo-access-defaults';
+import { DEMO_DEFAULTS_BY_SLUG, type DemoAccessMode, isKnownDemoSlug, isPublicDemoSubpath } from '@/lib/demo-access-defaults';
 
 /**
  * Guardia del lado del servidor para las áreas privadas de la web y para las
  * demos que requieren acceso.
  *
- * 1) /admin, /dashboard, /liquidacion y /test: verifica la sesión con el
+ * 1) /admin, /dashboard y /liquidacion: verifica la sesión con el
  *    backend (`GET /api/auth/me`, que lee el usuario y su rol vigente de la
  *    base de datos) usando la cookie `accessToken` que deja el login. Si el
  *    token venció pero hay `refreshToken`, lo renueva y deja la cookie nueva.
@@ -38,7 +38,6 @@ export const config = {
     '/dashboard/:path*',
     '/liquidacion',
     '/liquidacion/:path*',
-    '/test',
     '/demo/:path+',
   ],
 };
@@ -48,7 +47,6 @@ type Area = { roles: readonly string[] | 'any' };
 function areaFor(pathname: string): Area {
   if (pathname === '/admin' || pathname.startsWith('/admin/')) return { roles: adminRolesFor(pathname) };
   if (pathname === '/liquidacion' || pathname.startsWith('/liquidacion/')) return { roles: STAFF_ROLES };
-  if (pathname === '/test') return { roles: ['admin'] };
   return { roles: 'any' };
 }
 
@@ -296,10 +294,19 @@ function accessScreen(
   return res;
 }
 
+// Las páginas públicas dentro de una demo con acceso controlado (la
+// verificación del certificado del LMS) están en PUBLIC_DEMO_SUBPATHS de
+// lib/demo-access-defaults: DemoAccessWatcher usa la misma lista.
+
 async function demoGate(req: NextRequest): Promise<NextResponse> {
   const slug = req.nextUrl.pathname.split('/')[2]?.toLowerCase() ?? '';
   // Rutas que no son una demo conocida: las resuelve Next (404 si no existen).
   if (!isKnownDemoSlug(slug)) return NextResponse.next();
+  if (isPublicDemoSubpath(req.nextUrl.pathname)) {
+    const res = NextResponse.next();
+    res.headers.set('X-Robots-Tag', 'noindex');
+    return res;
+  }
 
   const entry = await catalogEntry(slug);
   if (entry.accessMode === 'publico' && entry.activo) return NextResponse.next();
@@ -323,7 +330,11 @@ async function demoGate(req: NextRequest): Promise<NextResponse> {
     result = renewedToken ? await fetchDemoAccess(slug, renewedToken, extra, prefetch) : { status: 'expired' };
   }
 
-  if (result.status === 'not_found') return NextResponse.next();
+  // El backend no conoce esta demo (catálogo y tabla de la web desalineados):
+  // falla cerrada, se muestra la pantalla de acceso (sin caché ni índice).
+  if (result.status === 'not_found') {
+    return accessScreen(req, slug, { motivo: 'desactivada', modo: entry.accessMode }, renewedToken);
+  }
   if (result.status === 'error') {
     return accessScreen(req, slug, { motivo: 'no_disponible', modo: entry.accessMode }, renewedToken);
   }

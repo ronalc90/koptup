@@ -15,7 +15,7 @@ export function useReportPdf() {
   const t = useTranslations(NS);
   const fmt = useFmt();
   const labels = useLabels();
-  const { ctx, period, company, dataset, alerts, findings, notify } = useDashboard();
+  const { ctx, period, company, dataset, alerts, findings, notify, markGuide } = useDashboard();
   const { alertTitle, alertText, findingText, range } = useNarrative();
   const [busy, setBusy] = useState(false);
 
@@ -26,7 +26,7 @@ export function useReportPdf() {
       {
         label: t('kpis.sales.title'),
         value: fmt.moneyM(k.sales),
-        note: k.compliance !== null ? t('kpis.sales.note', { pct: fmt.pct(k.compliance, 0), budget: fmt.moneyM(k.budget ?? 0) }) : t('kpis.sales.noGoal'),
+        note: k.compliance !== null ? t('kpis.sales.note', { pct: fmt.compliance(k.compliance), budget: fmt.moneyM(k.budget ?? 0) }) : t('kpis.sales.noGoal'),
       },
     ];
     if (k.margin !== null)
@@ -60,7 +60,7 @@ export function useReportPdf() {
       title: t('report.byCity', { dim: labels.cityDimPlural.toLowerCase() }),
       table: {
         headers: [labels.cityDim, t('report.sales'), t('report.goal'), t('report.compliance'), t('report.share')],
-        rows: ctx.cities.map((c) => [c.key, fmt.moneyM(c.sales), c.budget !== null ? fmt.moneyM(c.budget) : '—', c.compliance !== null ? fmt.pct(c.compliance, 0) : '—', fmt.pct(c.share, 0)]),
+        rows: ctx.cities.map((c) => [c.key, fmt.moneyM(c.sales), c.budget !== null ? fmt.moneyM(c.budget) : '—', c.compliance !== null ? fmt.compliance(c.compliance) : '—', fmt.pct(c.share, 0)]),
         widths: [30, 18, 18, 16, 14],
         align: ['l', 'r', 'r', 'r', 'r'],
       },
@@ -109,7 +109,14 @@ export function useReportPdf() {
     if (ctx.cash) {
       sections.push({
         title: t('report.cash', { date: fmt.date(dataset.cutoff) }),
-        paragraphs: [t('report.cashNote', { start: fmt.moneyM(ctx.cash.start), min: fmt.moneyM(ctx.cash.min.balance), week: fmt.date(ctx.cash.min.start) })],
+        paragraphs: [
+          t('report.cashNote', {
+            start: fmt.moneyM(ctx.cash.start),
+            min: fmt.moneyM(ctx.cash.min.balance),
+            week: fmt.date(ctx.cash.min.start),
+            floor: fmt.moneyM(ctx.params.thresholds.cashFloor * 1e6),
+          }),
+        ],
         table: {
           headers: [t('finance.cash.week'), t('finance.cash.inflows'), t('finance.cash.outflows'), t('finance.cash.balance')],
           rows: ctx.cash.weeks.map((w) => [
@@ -131,7 +138,7 @@ export function useReportPdf() {
     sections.push({
       title: t('report.method'),
       paragraphs: [
-        t('report.methodGoal', { goal: fmt.num(ctx.params.goalGrowth, 1) }),
+        t('report.methodGoal', { goal: fmt.param(ctx.params.goalGrowth) }),
         fq ? t('report.methodForecast', { range: range(fq.months[0], fq.months[fq.months.length - 1]), sigma: fmt.pct(ctx.fc.sigma) }) : t('report.noForecast'),
         sample ? t('report.methodSample') : t('report.methodUpload'),
       ],
@@ -158,12 +165,13 @@ export function useReportPdf() {
       const data = build();
       buildReportPdf(data).save(data.fileName);
       notify(t('report.done', { file: data.fileName }));
+      markGuide('pdf');
     } catch {
       notify(t('report.error'), 'error');
     } finally {
       setBusy(false);
     }
-  }, [build, notify, t]);
+  }, [build, notify, t, markGuide]);
 
   return { download, busy };
 }

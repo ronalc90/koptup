@@ -2,7 +2,7 @@
 
 > Qué cambió en el sitio para que KopTup se presente como lo que vende primero: **sistemas RAG**, una IA que responde con los documentos de cada empresa y cita la fuente. Resume la especificación del dueño, las páginas nuevas y modificadas, los planes, la demo "Prueba con tu documento", la medición para anuncios, las decisiones técnicas y lo que falta para publicar.
 >
-> El trabajo está **terminado** en la rama **`rag-reposicionamiento`** (13 commits sobre `main`, ya subidos a `origin`): las 7 etapas están hechas y pasaron la auditoría final. **No está fusionada ni publicada**: producción sigue mostrando el sitio anterior hasta que el dueño apruebe el merge. Estado al **8 de octubre de 2026**.
+> **Fusionado en `main` (PR #113).** Las 7 etapas están hechas y pasaron la auditoría final. La persistencia del chatbot en MongoDB, la propiedad de los bots, los topes de IA, el widget real y la verificación final del producto (14 de octubre de 2026) están en la rama `ccr-55ceecf7-dpc10i`, **pendientes de merge**. En producción el chatbot no funciona mientras el backend de Railway no responda ([Correcciones pendientes, 0.1](16-Correcciones-Pendientes.md#p0-riesgo-o-bloqueo)). Estado al **14 de octubre de 2026**.
 >
 > Páginas relacionadas: [Sistemas RAG](Producto-chatbot-rag-ia.md) (página del producto), [Flujo del cliente](03-Flujo-del-Cliente.md), [Sistema de demos](04-Sistema-de-Demos.md), [Backend y API](09-Backend-y-API.md), [Servicios y precios](Seccion-Servicios-y-Precios.md), [Landings SEO](Seccion-Landings-SEO.md), [Comercial, marketing y legal](11-Comercial-Marketing-y-Legal.md) y [Roadmap](12-Roadmap.md).
 
@@ -10,7 +10,7 @@
 
 ## En una mirada
 
-- **Estado:** implementado en la rama, pendiente de merge. Las 7 etapas (E1 a E7) están hechas; build, typecheck, lint y `npm run check-titles` de web y backend pasan sin errores.
+- **Estado:** fusionado en `main` (PR #113). Las 7 etapas (E1 a E7) están hechas; build, typecheck, lint y `npm run check-titles` de web y backend pasan sin errores. Lo que vino después (persistencia, widget, topes de IA y la verificación final) está en la rama `ccr-55ceecf7-dpc10i`, pendiente de merge.
 - **Mensaje nuevo:** "IA que responde con los documentos de tu empresa". El sitio deja de presentarse como agencia genérica de software a medida.
 - **Páginas nuevas:** `/rag` y tres landings por sector (`/rag/salud`, `/rag/legal`, `/rag/soporte`), con "RAG" en el menú y en el footer.
 - **Precios publicados:** cuatro planes RAG arriba de `/services` (Piloto, Esencial, Profesional y Empresarial) en COP y USD fijos. El resto del catálogo queda debajo como **"Otras soluciones a medida"**.
@@ -95,7 +95,7 @@ Capturas reales de un build de la rama `rag-reposicionamiento` en su estado fina
 
 *Inicio completo: el texto usa el conteo real de 26 demos y pone el chatbot RAG y el "Sistema experto para salud" como primeras tarjetas.*
 
-![Después: /rag con el H1 "Sistemas RAG para empresas en Colombia", botones "Prueba con tu documento" y "Agenda un piloto" y el inicio de "¿Qué es RAG?"](images/despues/rag-pagina-rag.jpg)
+![Después: /rag: H1 "Sistemas RAG: IA que responde con los documentos de tu empresa", botones "Prueba con tu documento" y "Cotizar el piloto", el precio del piloto y el índice de la página (sector, cómo funciona, tus datos, precios, preguntas)](images/despues/rag-pagina-rag.jpg)
 
 *`/rag`: H1 "Sistemas RAG para empresas en Colombia", con "Prueba con tu documento" y "Agenda un piloto" como CTA.*
 
@@ -143,7 +143,7 @@ La especificación del dueño divide el trabajo en 7 fases. En esta wiki se llam
 
 ## Páginas nuevas y modificadas
 
-Todas están hechas en la rama `rag-reposicionamiento` y pendientes de merge.
+Todas están en `main` (PR #113). Los ajustes posteriores (por ejemplo, las funciones de los planes rotuladas «se construye en tu proyecto») están en la rama `ccr-55ceecf7-dpc10i`.
 
 | Ruta o pieza | Tipo | Qué cambia | Etapa |
 |---|---|---|---|
@@ -313,7 +313,7 @@ Commits de la rama `rag-reposicionamiento` sobre `main` (`git log --oneline orig
 | E6. "Prueba con tu documento" | Hecha (apagada por defecto) |
 | E7. Medición | Hecha (sin IDs reales todavía) |
 | Auditoría final | Hecha: build, typecheck, lint y `check-titles` sin errores; rastreo de las 43 URLs del sitemap y de las rutas clave sin problemas de SEO |
-| Merge en `main` y despliegue | **Pendiente:** requiere la aprobación del dueño ([Para publicar](#para-publicar)) |
+| Merge en `main` y despliegue | **Merge hecho (PR #113).** El despliegue del backend en Railway está caído y la rama `ccr-55ceecf7-dpc10i` falta por integrar ([Para publicar](#para-publicar)) |
 
 ---
 
@@ -384,12 +384,12 @@ Lo que la auditoría final dejó anotado por etapa. Ninguno bloquea el merge, pe
 - `robots.txt` y `llms.txt` son estáticos: si cambia el dominio, hay que actualizarlos a mano.
 
 **E2. Inicio**
-- El `FAQPage` del JSON-LD de la home tiene 5 preguntas que no se ven en la página (ya estaba así; Google pide que el marcado coincida con el contenido visible).
+- ~~El `FAQPage` del JSON-LD de la home tiene 5 preguntas que no se ven en la página~~: se quitó del inicio en la verificación final (14 de octubre de 2026).
 - Las descripciones de `Organization` y `LocalBusiness` en el JSON-LD siguen diciendo "software a medida (GPT-4, Claude AI)".
 
 **E3. `/rag` y landings**
 - El JSON-LD de `/rag` (`Service` y `FAQPage`) está solo en español.
-- `/rag` presenta Drive, SharePoint, WhatsApp y el widget web por plan. Esas piezas se construyen en la Fase 2 y deben existir antes de entregar el primer plan Esencial o Profesional ([Sistemas RAG](Producto-chatbot-rag-ia.md), tareas 12–14).
+- `/rag` presenta Drive, SharePoint, WhatsApp, bases de datos y APIs por plan, y desde la verificación final dice que **se construyen en el proyecto** (igual que las tarjetas de planes, `/chatbots-ia`, el JSON-LD y `llms.txt`). El widget web ya existe (`widget.js` + `/embed/chatbot/<id>`). Los conectores y el canal de WhatsApp deben existir antes de entregar el primer plan que los incluya ([Sistemas RAG](Producto-chatbot-rag-ia.md), tareas 12–14).
 
 **E4. Precios**
 - El panel privado de ejemplo todavía recomienda "Chatbot RAG con IA" a 489.000 al mes con "24/7" ([Portal del cliente](06-Portal-del-Cliente.md), [Panel de administración](05-Panel-de-Administracion.md)).
@@ -414,7 +414,7 @@ Lo que la auditoría final dejó anotado por etapa. Ninguno bloquea el merge, pe
 - La CSP solo agrega el dominio de país de Google para Colombia; los visitantes de otros países pueden perder algunas señales de remarketing.
 
 **Antes de enviar tráfico pagado (Fase 0)**
-- Persistencia y seguridad del chatbot: autorización en servidor, topes de costo y rate-limit compartido ([Sistemas RAG](Producto-chatbot-rag-ia.md), tareas 1–3). Cuando cambie dónde se guardan los datos, hay que actualizar la sección de seguridad de `/rag`.
+- ~~Persistencia y seguridad del chatbot: autorización en servidor, topes de costo y cupos por IP~~: hechos en la rama `ccr-55ceecf7-dpc10i` (pendiente de merge). Falta integrar la rama, volver a desplegar el backend y rotar credenciales.
 
 ---
 
@@ -422,7 +422,8 @@ Lo que la auditoría final dejó anotado por etapa. Ninguno bloquea el merge, pe
 
 - [ ] **Configurar las variables** de la [tabla](#variables-de-entorno) en Vercel y en Railway (sin valores en el repositorio). Redesplegar la web después de crear las `NEXT_PUBLIC_*`.
 - [ ] **Revisar la vista previa de Vercel de la rama** `rag-reposicionamiento`: inicio, `/rag` y sus 3 landings, `/services#planes-rag`, `/chatbots-ia`, `/soluciones-ia`, `/demo/chatbot` y el banner de cookies (rechazar no carga scripts; aceptar sí).
-- [ ] **Hacer merge en `main` cuando el dueño lo apruebe**, y desplegar.
+- [x] **Hacer merge en `main` cuando el dueño lo apruebe** (PR #113).
+- [ ] **Volver a desplegar el backend en Railway** (hoy responde "Application not found") e **integrar la rama `ccr-55ceecf7-dpc10i`** en `main`: trae la persistencia, el widget, los bots de ejemplo compartidos (`POST /api/chatbot/sample-bots`) y la verificación final. Si cambia el dominio del backend, actualizar `NEXT_PUBLIC_API_URL` en Vercel.
 - [ ] **Activar `DEMO_UPLOAD_ENABLED=true`** solo cuando Redis y `OPENAI_API_KEY` estén listos en Railway (y `TRUST_PROXY_HOPS` verificada). Probar una subida completa, su borrado a la hora y el mensaje al alcanzar el tope. Antes de enviar pauta a la subida, el [Roadmap](12-Roadmap.md#fase-1-el-primer-entregable-es-el-reposicionamiento-rag) pide además la pasarela de IA con topes (paquete 2) y la política de tratamiento publicada (paquete 4).
 
 Después de publicar:
@@ -439,11 +440,11 @@ Lo que falta para cerrar el reposicionamiento. La numeración es la de la tabla 
 
 | # | Tarea | Fase | Prioridad | Esfuerzo | Criterio de aceptación |
 |---|---|---|---|---|---|
-| 1–3 | Persistencia del chatbot, autorización en servidor con topes de costo y rate-limit, rotación de credenciales y dependencias | Fase 0 — Endurecimiento | P0 | M + M + S | Tras redesplegar, los bots siguen disponibles; superar el cupo devuelve un mensaje claro; sin vulnerabilidades altas ni críticas en `npm audit --omit=dev` |
-| 4 | Revisión con el dueño, merge en `main` y despliegue ([Para publicar](#para-publicar)) | Fase 1 — Funnel y solicitud de demos | P0 | M | En producción la home muestra el H1 nuevo; `/rag` y sus 3 landings responden 200 y están en el sitemap; `/services#planes-rag` muestra los montos exactos |
-| 5 | E6 "Prueba con tu documento" con todos sus límites, lead `demo-rag` y borrado a la hora | Fase 1 — Funnel y solicitud de demos | P0 | M | **Hecha en la rama `rag-reposicionamiento` (pendiente de merge).** Falta encenderla en producción y comprobar con un PDF real que la respuesta cita la página |
-| 6 | E7 Medición: banner de consentimiento, GA4, Google Ads, LinkedIn Insight y los 5 eventos; variables en el README | Fase 1 — Funnel y solicitud de demos | P0 | S | **Hecha en la rama `rag-reposicionamiento` (pendiente de merge).** Falta probarla con los IDs reales |
-| 7 | Coherencia pendiente: metadata de `/demo/chatbot` y restos de "$499" en `/desarrollo-web-colombia` y `/bienvenido-producthunt` | Fase 1 — Funnel y solicitud de demos | P1 | S | **Hecha en la rama `rag-reposicionamiento` (pendiente de merge).** Los restos que quedan están en [Pendientes conocidos](#pendientes-conocidos) |
+| 1–3 | Persistencia del chatbot, autorización en servidor con topes de costo y rate-limit, rotación de credenciales y dependencias | Fase 0 — Endurecimiento | P0 | M + M + S | **Persistencia, autorización, topes y cupos hechos en la rama `ccr-55ceecf7-dpc10i` (pendiente de merge).** Falta rotar credenciales. Criterio: tras redesplegar, los bots siguen disponibles; superar el cupo devuelve un mensaje claro; sin vulnerabilidades altas ni críticas en `npm audit --omit=dev` |
+| 4 | Revisión con el dueño, merge en `main` y despliegue ([Para publicar](#para-publicar)) | Fase 1 — Funnel y solicitud de demos | P0 | M | **Merge hecho (PR #113).** Falta que el backend de Railway vuelva a responder e integrar la rama `ccr-55ceecf7-dpc10i`. Criterio: en producción la home muestra el H1 nuevo; `/rag` y sus 3 landings responden 200 y están en el sitemap; `/services#planes-rag` muestra los montos exactos |
+| 5 | E6 "Prueba con tu documento" con todos sus límites, lead `demo-rag` y borrado a la hora | Fase 1 — Funnel y solicitud de demos | P0 | M | **Hecha (en `main`).** Comprobada en local con un PDF real que cita la página (verificación final, 14 de octubre de 2026). Falta encenderla en producción |
+| 6 | E7 Medición: banner de consentimiento, GA4, Google Ads, LinkedIn Insight y los 5 eventos; variables en el README | Fase 1 — Funnel y solicitud de demos | P0 | S | **Hecha (en `main`).** Falta probarla con los IDs reales |
+| 7 | Coherencia pendiente: metadata de `/demo/chatbot` y restos de "$499" en `/desarrollo-web-colombia` y `/bienvenido-producthunt` | Fase 1 — Funnel y solicitud de demos | P1 | S | **Hecha (en `main`).** Los restos que quedan están en [Pendientes conocidos](#pendientes-conocidos) |
 
 ---
 
@@ -468,9 +469,9 @@ Metas iniciales a validar con 8 semanas de pauta; no son resultados actuales. La
 
 | Fase del roadmap | Qué aporta al producto RAG |
 |---|---|
-| Fase 0 — Endurecimiento | Persistencia del chatbot, autorización en servidor, topes de costo de IA y rate-limit, credenciales rotadas |
-| **Fase 1 — Funnel y solicitud de demos** | **Este reposicionamiento (E1–E7), implementado en la rama y pendiente de merge**, Lead unificado con origen `demo_rag`, kit del Piloto |
-| Fase 2 — Demos vendibles | Núcleo RAG con citas por página, widget embebible real, conectores Drive y SharePoint, canal WhatsApp, demo por sector |
+| Fase 0 — Endurecimiento | Persistencia del chatbot, autorización en servidor, topes de costo de IA y rate-limit (hechos en la rama `ccr-55ceecf7-dpc10i`), credenciales rotadas (pendiente) |
+| **Fase 1 — Funnel y solicitud de demos** | **Este reposicionamiento (E1–E7), fusionado en `main` (PR #113)**, Lead unificado con origen `demo_rag`, kit del Piloto |
+| Fase 2 — Demos vendibles | Núcleo RAG con citas por página, ~~widget embebible real~~ (hecho en la rama `ccr-55ceecf7-dpc10i`), conectores Drive y SharePoint, canal WhatsApp, demo por sector |
 | Fase 3 — Propuestas y conversión | Propuestas de los planes RAG con el crédito del Piloto |
 | Fase 4 — Productos SaaS reales | SaaS multi-tenant del RAG con medición de preguntas y cobro recurrente |
 | Fase 5 — Escala | Casos de estudio, nuevas landings por sector y contenido en inglés |

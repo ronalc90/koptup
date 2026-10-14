@@ -18,7 +18,7 @@
   "hero": {
     "badge": "RAG systems for businesses",
     "title": "AI that answers with your company's documents",
-    "subtitle": "RAG systems with cited answers from your manuals, contracts and policies. Pilot with your documents in 2 weeks.",
+    "subtitle": "Cited answers from your manuals, contracts and policies: the AI searches your documents and shows you where each fact comes from. Pilot with your documents in 2 weeks.",
     "cta1": "Try the demo",
     "cta2": "View plans"
   },
@@ -37,11 +37,11 @@
     "demos": {
       "sectionBadge": "Interactive Demos",
       "sectionTitle": "Solutions for Every Industry",
-      "sectionSubtitle": "Explore {count} navigable prototypes that showcase the range of solutions we build. Two of them (RAG chatbot and LinkedIn Ads generator) use live OpenAI; the rest are interactive mockups with simulated data so you can feel how each solution would look before hiring us to build it. Open demos need no sign-up; the ones that require access can be requested.",
+      "sectionSubtitle": "Explore {count} interactive demos that show the kind of solutions we build. Some use real AI, like the RAG chatbot; most run on sample data so you can see how each solution would look before hiring us. Each demo says what is real and what is sample data. Open demos need no sign-up; the ones that require access can be requested.",
       "exploreDemo": "Explore demo →",
       "ecommerce": {
         "title": "Full E-Commerce",
-        "description": "Modern online store with cart, checkout, product management and real-time sales dashboard.",
+        "description": "Sample online store with cart, simulated checkout, order panel, logistics and sales reports.",
         "category": "Retail & Sales"
       },
       "chatbot": {
@@ -51,53 +51,60 @@
       },
       "medicalAudit": {
         "title": "Healthcare expert system",
-        "description": "Audits medical claims with rules, CUPS and ICD-10 codes and fee schedules, and flags potential denials. AI extracts the invoice data.",
+        "description": "Audits medical claims with rules and a sample fee schedule, and flags potential denials. AI extracts the invoice data.",
         "category": "Medical claims auditing"
       },
       "dashboard": {
         "title": "Executive Dashboard",
-        "description": "Management control panel with KPIs, financial metrics, sales analysis and interactive reports.",
+        "description": "Management dashboard with KPIs, finance, receivables, cash flow and reports, using sample data.",
         "category": "Business Intelligence"
       },
       "projects": {
         "title": "Project Management",
-        "description": "Complete agile management system with Kanban boards, sprints, tasks and team collaboration.",
+        "description": "Board, timeline, hours and budget per project, plus a portal where the client approves deliverables (sample data).",
         "category": "Productivity"
       },
       "documents": {
         "title": "Document Manager",
-        "description": "Organize, search and share documents with tags, semantic search and version control.",
+        "description": "Upload documents and the AI summarizes and tags them; search them by meaning and ask it to explain them.",
         "category": "Document Management"
       },
       "cms": {
         "title": "Advanced CMS",
-        "description": "Manage content, pages and blog with a visual editor, SEO tools and scheduled publishing.",
+        "description": "Pages and blog with preview, approval workflow, scheduled publishing and an AI writing assistant (sample data).",
         "category": "Digital Marketing"
       },
       "reservations": {
         "title": "Booking System",
-        "description": "Complete online booking platform with calendar, notifications and availability management.",
+        "description": "Booking page with a step-by-step calendar and a panel to manage appointments (sample data).",
         "category": "Services"
       },
       "whyTitle": "Why choose KopTup for your project?",
+      "band": {
+        "sectorsTitle": "Where would you use it?",
+        "pilot": "{pilotWeeks}-week pilot with your documents: {pilotPrice}, plus VAT if applicable.",
+        "plansLink": "See plans and pricing",
+        "data": "Your documents don't train the AI, and every answer cites its source.",
+        "dataLink": "How we handle your data"
+      },
       "benefit1Title": "Tailored Solutions",
       "benefit1Desc": "Custom development adapted to the specific needs of your industry and business model.",
-      "benefit2Title": "Cutting-Edge Technology",
-      "benefit2Desc": "React, Next.js, TypeScript, artificial intelligence and modern development best practices.",
+      "benefit2Title": "Published prices",
+      "benefit2Desc": "RAG plans are priced in COP and USD, and you start with a 2-week pilot with your documents before signing up.",
       "benefit3Title": "Ongoing Support",
       "benefit3Desc": "Updates, maintenance and technical support to ensure your solution evolves with your business."
     }
   },
   "services": {
-    "title": "Technology Services",
-    "subtitle": "End-to-end solutions to grow your business",
+    "title": "We also build custom software",
+    "subtitle": "If you need something other than an assistant with your documents, we build that too.",
     "ecommerce": {
       "title": "Custom E-commerce",
       "description": "Online stores optimized with payments, inventory and great UX"
     },
     "chatbots": {
-      "title": "Chatbots & AI",
-      "description": "Automate sales and support with intelligent assistants"
+      "title": "AI assistants",
+      "description": "They answer from your company's documents and cite the source"
     },
     "integrations": {
       "title": "API Integrations",
@@ -296,161 +303,173 @@
   },
   "privacyPage": {
     "hero": {
-      "title": "Privacy Policy",
-      "subtitle": "How we collect, use and protect your personal information"
+      "title": "Privacy and data processing policy",
+      "subtitle": "What data we collect, what we use it for, who we share it with and how you exercise your rights under Colombian Law 1581 of 2012"
     },
-    "updatedBadge": "Updated: October 2026",
-    "heroClaim": "Your trust is our priority",
+    "updatedBadge": "Version 2026-10 · October 2026",
+    "heroClaim": "You can review, correct or ask us to delete your data",
     "intro": {
-      "title": "Introduction",
-      "p1": "KopTup - Tech Solutions (\"we\", \"our\" or \"the company\") is committed to protecting the privacy of our clients and users. This Privacy Policy describes how we collect, use, share and protect personal information when you use our software development, technology consulting and digital solutions services.",
-      "p2": "By using our services, you agree to the practices described in this policy. If you do not agree with this policy, please do not use our services."
+      "title": "Data controller",
+      "p1": "KopTup, located at Av. 68 #1-63, Bogotá, Colombia, is the controller of the personal data collected by this site (www.koptup.com) and its platform. For anything related to personal data, write to ronald@koptup.com or call +57 302 479 4842.",
+      "p2": "This policy explains what data we collect, what we use it for, who we share it with, how long we keep it and how you exercise your rights. When you submit a form you tick an authorization box: we store the date, the version of this policy and a hashed fingerprint of your IP address as proof of that authorization."
     },
     "s1": {
-      "title": "1. Information We Collect",
+      "title": "1. What data we collect and why",
       "c1": {
-        "subtitle": "1.1 Personal Information",
-        "text": "We collect information you provide directly to us, including: name, email address, phone number, company, billing information and any other information you choose to share with us when using our services."
+        "subtitle": "1.1 Contact form",
+        "text": "Your name and email and, if you fill them in, your phone, company, the service you are interested in, budget, when you want to start and your message. We use them to answer you, prepare a quote and follow up commercially. The team gets a notice by email and, if enabled, by WhatsApp."
       },
       "c2": {
-        "subtitle": "1.2 Usage Information",
-        "text": "We automatically collect information about your interaction with our services, including: IP address, browser type, pages visited, time spent, cookies and web analytics data."
+        "subtitle": "1.2 Demo request",
+        "text": "Your name, company, job title, email, phone, country, company size, the demos you are interested in, your use case and the page you came from (including the campaign parameters in the address). We use them to review your request, create your demo access account if we approve it and send you the request emails: the acknowledgment, the approval with the activation link and the notice before your access expires."
       },
       "c3": {
-        "subtitle": "1.3 Project Information",
-        "text": "When you hire our services, we collect information related to the project: technical requirements, documentation, shared files and communications related to development."
+        "subtitle": "1.3 \"Try it with your document\"",
+        "text": "Your email and the document you upload. The document is processed only in the server's memory and is deleted automatically one hour later. To answer your questions, the parts of the document related to each question are sent to OpenAI. Your email is recorded as a sales contact."
+      },
+      "c4": {
+        "subtitle": "1.4 Account and client portal",
+        "text": "If you create an account, or we create it when we approve a demo: name, email, password (stored only as a hash, never in plain text), company, phone and last sign-in date. If you sign in with Google, we receive your name, email and profile picture. If you are a client, we store your projects, orders, deliverables, invoices and messages with the team."
+      },
+      "c5": {
+        "subtitle": "1.5 Chatbot",
+        "text": "In \"Build your own\" we store your bot's settings, the documents or pages you load into it and the questions asked through the widget on your site or the direct link, which are deleted automatically after 30 days. Questions in \"Try the assistant\" and in the preview are not stored. To write each answer, the question and the matching passages are sent to OpenAI."
+      },
+      "c6": {
+        "subtitle": "1.6 Browsing and security",
+        "text": "When you use the site, the server logs technical data (IP address, browser, requested page and time) to operate, limit abuse and fix errors. In the team's action log and in the proof of your authorizations, the IP is kept only as a hashed fingerprint. Cookies and browser storage are explained in the Cookie policy."
       }
     },
     "s2": {
-      "title": "2. How We Use Your Information",
+      "title": "2. Who we share your data with",
       "c1": {
-        "subtitle": "2.1 Service Delivery",
-        "text": "We use your information to provide, maintain and improve our software development, technology consulting and digital solutions services."
+        "subtitle": "2.1 Hosting and databases",
+        "text": "Vercel hosts the website; Railway, the platform server; MongoDB is the database where records are stored, and Redis keeps temporary information such as sessions and usage limits. If we enable it, Amazon Web Services (S3) stores the files you upload to the document manager. They act as processors: they handle data on our behalf to provide their service."
       },
       "c2": {
-        "subtitle": "2.2 Communication",
-        "text": "To communicate with you about your projects, service updates, technical support and to answer your queries."
+        "subtitle": "2.2 Artificial intelligence",
+        "text": "OpenAI processes the text of the AI features (the chatbot, \"Try it with your document\" and the AI demos). It only receives what is needed to answer: the question, passages from the documents and the recent conversation history. We do not send it the data from the forms."
       },
       "c3": {
-        "subtitle": "2.3 Service Improvement",
-        "text": "We analyze the use of our services to improve user experience, develop new features and optimize our processes."
+        "subtitle": "2.3 Email and WhatsApp",
+        "text": "The email provider (SMTP) we use to send notices to the team and your request emails and, if enabled, the WhatsApp provider through which the team receives the notice of a new contact with your data."
       },
       "c4": {
-        "subtitle": "2.4 Marketing",
-        "text": "With your consent, we may send you information about new services, updates and special offers. You may unsubscribe at any time."
+        "subtitle": "2.4 Measurement and advertising, only if you accept them",
+        "text": "Google Analytics, Google Ads and LinkedIn receive data about your browsing only if you accept those cookies in the cookie notice or in the Cookie policy. You can withdraw that consent at any time."
+      },
+      "c5": {
+        "subtitle": "2.5 Sign in with Google",
+        "text": "If you choose to sign in with your Google account, Google confirms your identity and gives us your name, email and profile picture."
+      },
+      "c6": {
+        "subtitle": "2.6 Authorities and sale of data",
+        "text": "We only hand data over to an authority when a law or an order requires it. We do not sell, rent or transfer your personal data."
       }
     },
     "s3": {
-      "title": "3. Data Protection",
+      "title": "3. How long we keep your data",
       "c1": {
-        "subtitle": "3.1 Security Measures",
-        "text": "We implement appropriate technical and organizational security measures to protect your personal information against unauthorized access, alteration, disclosure or destruction. This includes SSL/TLS encryption, firewalls, access controls and regular security audits."
+        "subtitle": "3.1 Prospects and requests",
+        "text": "Rejected demo requests are anonymized automatically 24 months after they were rejected, and so is the data of people who have had no activity with us for 24 months (no account and no contract): name, email, phone and messages are deleted, and only statistical information remains."
       },
       "c2": {
-        "subtitle": "3.2 Limited Access",
-        "text": "Access to your personal information is limited to employees, contractors and agents who need to know this information to process it on our behalf and are subject to confidentiality obligations."
+        "subtitle": "3.2 Accounts and clients",
+        "text": "Your account data is kept while you have the account. Data from a contractual relationship (accepted proposals, payments, projects, invoices) is kept while it lasts and afterwards for as long as accounting, tax and commercial rules require."
       },
       "c3": {
-        "subtitle": "3.3 Storage",
-        "text": "Your data is stored on secure servers located in certified data centers. We use trusted cloud service providers like AWS that comply with international security standards."
+        "subtitle": "3.3 Chatbot and documents",
+        "text": "\"Try it with your document\" files: 1 hour. Questions to a bot's widget: 30 days. Bots from \"Build your own\" are deleted after 12 months without use, together with their documents and history."
+      },
+      "c4": {
+        "subtitle": "3.4 Sessions and links",
+        "text": "A signed-in session lasts at most 7 days; after that you sign in again. Activation links expire after 72 hours and password reset links after one hour."
       }
     },
     "s4": {
-      "title": "4. Sharing Information",
+      "title": "4. How we protect your data",
       "c1": {
-        "subtitle": "4.1 Service Providers",
-        "text": "We share information with external service providers who help us operate our business (hosting, analytics, payment processing), who are obligated to protect your information."
+        "subtitle": "4.1 Measures we apply",
+        "text": "Encrypted connection (HTTPS), passwords stored as hashes, admin panel access only for authorized team members according to their role, a log of the team's actions on requests and access, and submission limits against abuse."
       },
       "c2": {
-        "subtitle": "4.2 Legal Requirements",
-        "text": "We may disclose your information if required by law, a court order, or to protect our rights, property or safety."
-      },
-      "c3": {
-        "subtitle": "4.3 Business Transfers",
-        "text": "In the event of a merger, acquisition or sale of assets, your personal information may be transferred. We will notify you before your information is transferred and becomes subject to a different privacy policy."
-      },
-      "c4": {
-        "subtitle": "4.4 No Data Sale",
-        "text": "KopTup does NOT sell, rent or commercialize your personal information to third parties for advertising purposes."
+        "subtitle": "4.2 What we ask of you",
+        "text": "The demos are for testing: do not upload confidential information or other people's personal data to them. Use public or sample documents."
       }
     },
     "s5": {
-      "title": "5. Data Retention",
+      "title": "5. Authorization and sensitive data",
       "c1": {
-        "subtitle": "5.1 Retention Period",
-        "text": "We retain your personal information for as long as necessary to fulfill the purposes set out in this policy, unless the law requires or permits a longer retention period."
+        "subtitle": "5.1 Legal basis",
+        "text": "The authorization you give us by ticking the box on each form, or the need to perform the contract when you are a client. You can revoke the authorization at any time, except when the law or a current contract requires us to keep the data."
       },
       "c2": {
-        "subtitle": "5.2 Project Data",
-        "text": "Data related to projects is retained for the duration of the project and an additional period for support and warranty purposes, typically 1-3 years after completion."
-      },
-      "c3": {
-        "subtitle": "5.3 Deletion",
-        "text": "When we no longer need your information, we will securely delete it or anonymize it so that you cannot be identified."
+        "subtitle": "5.2 Sensitive data",
+        "text": "We do not ask for sensitive data (such as health data, ethnic origin or biometric data) and you are not required to provide it. If a document you upload to a demo contains it, it is processed like the rest of the document and deleted within the stated period."
       }
     },
     "rights": {
-      "title": "Your Rights",
-      "subtitle": "You have the right to control your personal information. Below are your rights:",
+      "title": "Your rights",
+      "subtitle": "As the owner of your data, Colombian Law 1581 of 2012 gives you these rights:",
       "r1": {
-        "title": "Access",
-        "description": "Request a copy of the personal information we hold about you."
+        "title": "Know and correct",
+        "description": "Know, update and rectify your data, including when it is incomplete or misleading."
       },
       "r2": {
-        "title": "Rectification",
-        "description": "Request correction of inaccurate or incomplete information."
+        "title": "Proof of authorization",
+        "description": "Request proof of the authorization you gave us (date and policy version)."
       },
       "r3": {
-        "title": "Deletion",
-        "description": "Request deletion of your personal information under certain circumstances."
+        "title": "Know how we use it",
+        "description": "Be told what data we hold about you and what we use it for."
       },
       "r4": {
-        "title": "Portability",
-        "description": "Receive your information in a structured and commonly used format."
+        "title": "Complain to the SIC",
+        "description": "File complaints with the Superintendence of Industry and Commerce after making your inquiry or claim with us."
       },
       "r5": {
-        "title": "Objection",
-        "description": "Object to the processing of your information for certain purposes."
+        "title": "Revoke and erase",
+        "description": "Revoke your authorization and ask us to delete your data, unless the law or a current contract requires us to keep it."
       },
       "r6": {
-        "title": "Restriction",
-        "description": "Request that we restrict the processing of your information."
+        "title": "Free access",
+        "description": "Access your personal data free of charge."
       },
-      "exerciseTitle": "How to Exercise Your Rights",
-      "exerciseText": "To exercise any of these rights, contact us through:",
-      "responseTime": "We will respond to your request within 30 business days."
+      "exerciseTitle": "How to exercise your rights",
+      "exerciseText": "Write to us from the email you used to contact us (or tell us how to verify that you are the data subject), with your name, what you are asking for and, for a claim, the facts and supporting documents:",
+      "responseTime": "We answer inquiries within 10 business days (extendable by 5 more business days, with notice) and claims within 15 business days (extendable by 8 more business days, with notice). If a claim is incomplete, we will ask you for what is missing within the following 5 days; if 2 months go by without it, we will consider the claim withdrawn."
     },
     "s6": {
-      "title": "6. Cookies and Similar Technologies",
-      "p1": "We use cookies and similar technologies to improve your experience, analyze the use of our services, measure the results of our ads and personalize content. Analytics and marketing cookies (Google Analytics, Google Ads and LinkedIn) are only activated with consent. Cookies are small text files stored on your device.",
-      "p2": "You can control the use of cookies through your browser settings. However, please note that disabling cookies may affect the functionality of our services.",
-      "p3": "For more information, see our",
-      "link": "Cookie Policy"
+      "title": "6. Cookies and browser storage",
+      "p1": "We use cookies and your browser's local storage to keep you signed in and remember your language, theme and cookie choice. Measurement (Google Analytics) and advertising (Google Ads and LinkedIn) cookies are only enabled if you accept them.",
+      "p2": "You can change your choice at any time from the Cookie policy or delete cookies from your browser.",
+      "p3": "To see each cookie and storage key with its purpose and duration, see the",
+      "link": "Cookie policy"
     },
     "s7": {
-      "title": "7. International Transfers",
-      "p1": "Your information may be transferred and stored on servers located outside Colombia. We take measures to ensure your information receives an adequate level of protection wherever it is processed.",
-      "p2": "By using our services, you consent to these international transfers of your information."
+      "title": "7. International transfers",
+      "p1": "Several of our providers (Vercel, Railway, OpenAI, Google and LinkedIn, among others) may store or process data outside Colombia, mainly in the United States.",
+      "p2": "The authorization you give us includes these providers processing your data on our behalf and only for the purposes of this policy."
     },
     "s8": {
-      "title": "8. Children's Privacy",
-      "p1": "Our services are not directed at individuals under 18 years of age. We do not intentionally collect personal information from minors. If we discover we have collected information from a minor without appropriate parental consent, we will delete that information immediately."
+      "title": "8. Minors",
+      "p1": "The site is aimed at businesses and is not intended for people under 18. If you wrote to us on behalf of a minor, let us know so we can erase their data."
     },
     "s9": {
-      "title": "9. Changes to this Policy",
-      "p1": "We may update this Privacy Policy periodically to reflect changes in our practices or for other operational, legal or regulatory reasons. The \"Last updated\" date at the top indicates when the policy was last reviewed.",
-      "p2": "We will notify you of material changes by posting the new policy on our website and, where appropriate, by email. We recommend reviewing this policy periodically."
+      "title": "9. Changes to this policy",
+      "p1": "If we change this policy, we publish the new version here with its date. Each authorization is stored with the version in force when you gave it, and if a change affects the purpose of the processing we will ask you for a new authorization.",
+      "p2": "Current version: 2026-10."
     },
     "s10": {
       "title": "10. Contact",
-      "text": "If you have questions, concerns or requests related to this Privacy Policy or our data handling practices, contact us:",
+      "text": "For questions about this policy or about your data, write to us:",
       "labelEmail": "Email:",
       "labelPhone": "Phone:",
       "labelAddress": "Address:"
     },
     "footer": {
-      "updated": "Last updated: October 2026",
-      "copyright": "© 2025 KopTup - Tech Solutions. All rights reserved."
+      "updated": "Last updated: October 2026 (version 2026-10)",
+      "copyright": "© {year} KopTup. All rights reserved."
     }
   },
   "termsPage": {
@@ -458,7 +477,7 @@
       "title": "Terms & Conditions",
       "subtitle": "Legal framework governing the use of our services"
     },
-    "updatedBadge": "Updated: November 2025",
+    "updatedBadge": "Updated October 2026",
     "heroClaim": "Transparency and clarity in our business relationships",
     "intro": {
       "title": "Welcome to KopTup",
@@ -490,6 +509,10 @@
       "c3": {
         "subtitle": "2.3 Scope Changes",
         "text": "Any changes to the original project scope must be agreed in writing and may result in timeline and budget adjustments. Significant changes may require an addendum to the original contract."
+      },
+      "c4": {
+        "subtitle": "2.4 Demos and AI features",
+        "text": "The demos on this site use sample data and are meant for you to evaluate our solutions; they are not a production service. AI-generated answers may contain errors: review them before using them. Do not upload confidential information or other people's personal data to the demos. How we process your data is explained in the Privacy policy."
       }
     },
     "s3": {
@@ -605,158 +628,180 @@
       "labelWeb": "Website:"
     },
     "footer": {
-      "updated": "Last updated: November 2025",
-      "copyright": "© 2025 KopTup - Tech Solutions. All rights reserved.",
+      "updated": "Last updated: October 2026",
+      "copyright": "© {year} KopTup. All rights reserved.",
       "linkPrivacy": "Privacy Policy",
       "linkCookies": "Cookie Policy"
     }
   },
   "cookiesPage": {
     "hero": {
-      "title": "Cookie Policy",
-      "subtitle": "Information about cookies and how we use them"
+      "title": "Cookie policy",
+      "subtitle": "Which cookies and browser data this site uses, what for and for how long"
     },
-    "updatedBadge": "Updated: October 2026",
-    "heroClaim": "Transparent preferences controlled by you",
+    "updatedBadge": "Updated October 2026",
+    "heroClaim": "Measurement and advertising cookies are only enabled if you accept them",
     "intro": {
-      "title": "What are Cookies?",
-      "p1": "Cookies are small text files stored on your device (computer, tablet or mobile) when you visit a website. Cookies allow the website to remember your actions and preferences over a period of time, so you don't have to re-enter them every time you return to the site or navigate from one page to another.",
-      "p2": "At KopTup we use cookies to improve your browsing experience, analyze the use of our site, measure the results of our ads and personalize content. This policy explains what cookies we use and why."
+      "title": "What are cookies?",
+      "p1": "Cookies are small files a site stores in your browser. Besides cookies, this site uses your browser's local storage (localStorage and sessionStorage) to remember some things without sending them to any server.",
+      "p2": "Here is the full list of what we use, checked against the site's code. Essential ones are needed for the site to work. Analytics and advertising ones are optional: they are only created if you accept them and if we have that measurement enabled."
     },
     "types": {
-      "title": "Types of Cookies We Use",
-      "subtitle": "Below are the different types of cookies we use on our website",
-      "alwaysActive": "Always Active",
+      "title": "Cookies and browser data we use",
+      "subtitle": "By category, with their purpose and duration",
+      "alwaysActive": "Always active",
       "colName": "Name",
       "colPurpose": "Purpose",
       "colDuration": "Duration",
       "colType": "Type",
-      "ct1": {
-        "title": "Essential Cookies",
-        "description": "Cookies necessary for the basic functioning of the website",
-        "ck1": {
-          "purpose": "Maintain user session",
-          "duration": "Session",
-          "type": "First party"
-        },
-        "ck2": {
-          "purpose": "Authentication and security",
-          "duration": "7 days",
-          "type": "First party"
-        },
-        "ck3": {
-          "purpose": "Protection against CSRF attacks",
-          "duration": "Session",
-          "type": "First party"
-        },
-        "ck4": {
-          "purpose": "Store cookie preferences",
-          "duration": "Until deleted",
-          "type": "First party (local storage)"
+      "essential": {
+        "title": "Essential",
+        "description": "Needed to sign in, remember your choices and make the demos work. They are not used to track you or for advertising.",
+        "rows": {
+          "accessToken": {
+            "purpose": "Keeps you signed in to the admin panel or the portal.",
+            "duration": "15 minutes (renewed while you use the site)",
+            "type": "First-party cookie"
+          },
+          "refreshToken": {
+            "purpose": "Renews your session without asking for your password again.",
+            "duration": "7 days",
+            "type": "First-party cookie"
+          },
+          "locale": {
+            "purpose": "Remembers the language you chose. Only created if you change the language.",
+            "duration": "1 year",
+            "type": "First-party cookie"
+          },
+          "cookie_preferences": {
+            "purpose": "Stores your cookie choice.",
+            "duration": "Until you delete it",
+            "type": "Local storage"
+          },
+          "theme": {
+            "purpose": "Remembers whether you prefer the light or dark theme.",
+            "duration": "Until you delete it",
+            "type": "Local storage"
+          },
+          "user": {
+            "purpose": "Your name, email and role, to display the panel or portal while you are signed in.",
+            "duration": "Until you sign out",
+            "type": "Local storage"
+          },
+          "redirectAfterLogin": {
+            "purpose": "The page you return to after signing in.",
+            "duration": "Until you close the tab",
+            "type": "Session storage"
+          },
+          "preferences": {
+            "purpose": "Portal and panel preferences, such as notices you dismissed.",
+            "duration": "Until you delete them",
+            "type": "Local storage"
+          },
+          "demos": {
+            "purpose": "Sample data and changes you make in the demos, and the owner keys of the bots you create in the chatbot.",
+            "duration": "Until you delete them",
+            "type": "Local storage"
+          }
         }
       },
-      "ct2": {
-        "title": "Functional Cookies",
-        "description": "Cookies that enhance functionality and personalization",
-        "ck1": {
-          "purpose": "Remember language preference",
-          "duration": "1 year",
-          "type": "First party"
-        },
-        "ck2": {
-          "purpose": "Remember theme (light/dark)",
-          "duration": "1 year",
-          "type": "First party"
-        },
-        "ck3": {
-          "purpose": "Store user settings",
-          "duration": "6 months",
-          "type": "First party"
+      "analytics": {
+        "title": "Analytics (optional)",
+        "description": "Google Analytics 4 tells us which pages are visited and where visits come from. Only enabled if you accept it.",
+        "rows": {
+          "_ga": {
+            "purpose": "Distinguishes visitors to count visits.",
+            "duration": "2 years",
+            "type": "Google Analytics cookie"
+          },
+          "_ga_ID": {
+            "purpose": "Stores the Google Analytics session state.",
+            "duration": "2 years",
+            "type": "Google Analytics cookie"
+          }
         }
       },
-      "ct3": {
-        "title": "Analytics Cookies",
-        "description": "Cookies that help us understand how the site is used",
-        "ck1": {
-          "purpose": "Google Analytics - Distinguish users",
-          "duration": "2 years",
-          "type": "Third party (Google)"
-        },
-        "ck2": {
-          "purpose": "Google Analytics - Persist session state",
-          "duration": "2 years",
-          "type": "Third party (Google)"
-        }
-      },
-      "ct4": {
-        "title": "Marketing Cookies",
-        "description": "Cookies that measure the results of our ads on Google Ads and LinkedIn",
-        "ck1": {
-          "purpose": "Google Ads - Attribute conversions to ads",
-          "duration": "90 days",
-          "type": "Third party (Google)"
-        },
-        "ck2": {
-          "purpose": "Google Ads - Store the ad click that brought the visitor to the site",
-          "duration": "90 days",
-          "type": "Third party (Google)"
-        },
-        "ck3": {
-          "purpose": "LinkedIn - Ad conversion tracking and retargeting",
-          "duration": "30 days",
-          "type": "Third party (LinkedIn)"
-        },
-        "ck4": {
-          "purpose": "LinkedIn - Identify the browser",
-          "duration": "1 year",
-          "type": "Third party (LinkedIn)"
+      "marketing": {
+        "title": "Advertising (optional)",
+        "description": "Google Ads and LinkedIn Insight Tag measure which ads lead to contacts or demo requests. Only enabled if you accept them.",
+        "rows": {
+          "_gcl_au": {
+            "purpose": "Measures Google ad conversions.",
+            "duration": "90 days",
+            "type": "Google Ads cookie"
+          },
+          "_gcl_aw": {
+            "purpose": "Stores the Google ad click that brought you to the site.",
+            "duration": "90 days",
+            "type": "Google Ads cookie"
+          },
+          "li_fat_id": {
+            "purpose": "Links a LinkedIn ad click to the conversion.",
+            "duration": "30 days",
+            "type": "LinkedIn cookie"
+          },
+          "bcookie": {
+            "purpose": "Identifies the browser on LinkedIn.",
+            "duration": "1 year",
+            "type": "LinkedIn cookie (linkedin.com domain)"
+          },
+          "lidc": {
+            "purpose": "Routes traffic across LinkedIn's servers.",
+            "duration": "1 day",
+            "type": "LinkedIn cookie (linkedin.com domain)"
+          },
+          "UserMatchHistory": {
+            "purpose": "Syncs the LinkedIn identifier to measure ads.",
+            "duration": "30 days",
+            "type": "LinkedIn cookie (linkedin.com domain)"
+          }
         }
       }
     },
     "preferences": {
-      "title": "Manage Cookie Preferences",
-      "subtitle": "You can change your cookie preferences at any time using the controls below",
-      "acceptAll": "Accept All",
-      "essentialOnly": "Essential Only",
-      "savePreferences": "Save Preferences",
-      "alertSaved": "Preferences saved successfully",
-      "alertAccepted": "All cookies have been accepted",
-      "alertEssential": "Only essential cookies are enabled"
+      "title": "Your preferences",
+      "subtitle": "Turn analytics and advertising on or off above and save, or pick one of the quick options. You can change your choice at any time.",
+      "acceptAll": "Accept all",
+      "essentialOnly": "Essential only",
+      "savePreferences": "Save preferences",
+      "alertSaved": "Your preferences were saved.",
+      "alertAccepted": "You accepted all cookies.",
+      "alertEssential": "We will only use essential cookies."
     },
     "control": {
-      "title": "How to Control Cookies",
-      "p1": "You can control and/or delete cookies as you wish. For more details, see",
+      "title": "How to control cookies",
+      "p1": "Besides this page, you can view and delete the site's cookies and storage from your browser settings. To learn more, visit",
       "aboutCookiesLink": "aboutcookies.org",
-      "browserTitle": "Browser Settings",
-      "browserP1": "Most web browsers allow you to control cookies through their settings. For information on how to do this in popular browsers:",
-      "browserWarning": "Please note that if you block or delete cookies, some parts of our website may not work correctly."
+      "browserTitle": "Browser settings",
+      "browserP1": "These are the guides for the most used browsers:",
+      "browserWarning": "If you delete or block essential cookies, you will be signed out and the site will forget your language and choices."
     },
     "thirdParty": {
-      "title": "Third-Party Cookies",
-      "p1": "Some of our business partners use cookies on our site (e.g., Google Analytics, Google Ads and LinkedIn), which are only activated with consent. We have no access to or control over these cookies. This cookie policy covers the use of cookies by KopTup and not the use of cookies by third parties.",
-      "googleTitle": "Google Analytics and Google Ads",
-      "googleP1": "We use Google Analytics to analyze the use of our website and Google Ads to measure the results of our ads. For more information on how Google uses data, visit",
-      "googleLink": "Google's policies",
-      "linkedinTitle": "LinkedIn Insight Tag",
-      "linkedinP1": "We use the LinkedIn Insight Tag to measure the results of our LinkedIn campaigns. More information in the",
-      "linkedinLink": "LinkedIn cookie policy"
+      "title": "Third-party cookies",
+      "p1": "Analytics and advertising cookies are created and read by Google and LinkedIn, under their own policies:",
+      "googleTitle": "Google (Analytics and Ads)",
+      "googleP1": "How Google uses data from sites that use its services:",
+      "googleLink": "policies.google.com",
+      "linkedinTitle": "LinkedIn (Insight Tag)",
+      "linkedinP1": "LinkedIn cookie policy:",
+      "linkedinLink": "linkedin.com/legal/cookie-policy"
     },
     "updates": {
-      "title": "Updates to this Policy",
-      "p1": "We may update this Cookie Policy periodically to reflect changes in the cookies we use or for other operational, legal or regulatory reasons.",
-      "p2": "We recommend that you review this page regularly to stay informed about our use of cookies and related technologies."
+      "title": "Changes to this policy",
+      "p1": "If we add or remove a cookie, we update this list and the date above.",
+      "p2": "How we process your personal data is explained in the Privacy policy."
     },
     "contact": {
       "title": "Contact",
-      "text": "If you have questions about our Cookie Policy, contact us:",
+      "text": "If you have questions about cookies or your data, write to us:",
       "labelEmail": "Email:",
       "labelPhone": "Phone:"
     },
     "footer": {
       "updated": "Last updated: October 2026",
-      "copyright": "© 2025 KopTup - Tech Solutions. All rights reserved.",
-      "linkPrivacy": "Privacy Policy",
-      "linkTerms": "Terms & Conditions"
+      "copyright": "© {year} KopTup. All rights reserved.",
+      "linkPrivacy": "Privacy policy",
+      "linkTerms": "Terms and conditions"
     }
   },
   "cookieBanner": {
@@ -768,21 +813,162 @@
     "accept": "Accept"
   },
   "notFoundPage": {
+    "metaTitle": "Page not found",
     "badge": "Page not found",
     "title": "We couldn’t find what you’re looking for",
     "subtitle": "The link may have changed or the page no longer exists",
     "homeButton": "Go to Home",
     "backButton": "Go Back"
   },
+  "productHuntPage": {
+    "badge": "For the Product Hunt community",
+    "title": "Welcome to KopTup 👋",
+    "subtitle": "We build custom software and RAG systems, with demos you can try right now, before hiring us.",
+    "subtitle2": "AI chatbots, online stores, dashboards and more. Team in Bogotá, Colombia.",
+    "pricesTitle": "Published prices",
+    "pricesBody": "{weeks}-week RAG pilot for {price} ({usd}), plus VAT if applicable.",
+    "offerEnded": "The Product Hunt launch offer (15% off) has ended.",
+    "ctaDemos": "Try the demos →",
+    "ctaQuote": "Request a quote",
+    "whatTitle": "What is KopTup?",
+    "whatSubtitle": "A software studio that builds what your business needs: with the source code for you or as a monthly subscription.",
+    "features": [
+      "Custom software or a monthly subscription",
+      "Interactive demos before you hire us",
+      "RAG chatbots with OpenAI that cite the source",
+      "Online stores integrated with the payment gateway you choose",
+      "This site's stack: Next.js, Node.js and MongoDB",
+      "Team in Bogotá, Colombia",
+      "Published prices: RAG pilot for {price} / {usd}",
+      "Implementation times published for each RAG plan"
+    ],
+    "demosTitle": "Try our demos now",
+    "demosSubtitle": "Open demos need no sign-up or card. Each one says what is real and what uses sample data.",
+    "demos": {
+      "chatbot": {
+        "title": "RAG chatbot",
+        "desc": "Ask about documents with real AI and see the cited source; in “Build your own” you create your own assistant and its embed code."
+      },
+      "ecommerce": {
+        "title": "Online store",
+        "desc": "Catalog, cart, simulated checkout and store panel, with sample data."
+      },
+      "dashboard": {
+        "title": "Executive dashboard",
+        "desc": "KPIs, finance, receivables and reports calculated with sample data."
+      },
+      "projects": {
+        "title": "Project management",
+        "desc": "Board, timeline, hours and a portal where the client approves deliverables, with sample data."
+      }
+    },
+    "cardCta": "Try demo →",
+    "allDemos": "See all demos ({count} in total)",
+    "ctaTitle": "Have a project in mind?",
+    "ctaSubtitle": "Tell us what you need. We reply within 24 business hours, with no commitment.",
+    "ctaTeam": "Talk to the team",
+    "ctaPrices": "See pricing"
+  },
+  "passwordRecovery": {
+    "forgot": {
+      "title": "Recover password",
+      "subtitle": "We will send you a link to reset your password",
+      "email": "Email",
+      "emailPlaceholder": "you@email.com",
+      "submit": "Send recovery link",
+      "submitting": "Sending...",
+      "error": "Something went wrong sending the email. Please try again.",
+      "successTitle": "Check your email",
+      "successBody": "If there is an account with <strong>{email}</strong>, we sent you a link to reset your password.",
+      "successHint": "Check your inbox (and spam folder) and follow the instructions. If it does not arrive in a few minutes, write to us from Contact.",
+      "backToLogin": "Back to sign in",
+      "backHome": "Back to home"
+    },
+    "reset": {
+      "title": "New password",
+      "subtitle": "Create a new password for your account",
+      "password": "New password",
+      "passwordPlaceholder": "At least 8 characters",
+      "confirm": "Confirm password",
+      "confirmPlaceholder": "Repeat the password",
+      "show": "Show password",
+      "hide": "Hide password",
+      "submit": "Reset password",
+      "submitting": "Saving...",
+      "errorInvalidLink": "The recovery link is invalid or expired. Request a new one.",
+      "errorLength": "The password must have at least 8 characters.",
+      "errorMismatch": "The passwords do not match.",
+      "errorGeneric": "The password could not be reset. The link may have expired.",
+      "successTitle": "Password updated",
+      "successBody": "Your password was changed. You can now sign in with it.",
+      "goToLogin": "Go to sign in",
+      "backToLogin": "Back to sign in"
+    }
+  },
+  "pageTitles": {
+    "login": "Sign in",
+    "register": "Create account",
+    "forgotPassword": "Recover password",
+    "resetPassword": "New password",
+    "authCallback": "Signing in",
+    "proposal": "Proposal",
+    "admin": {
+      "default": "Admin panel",
+      "suffix": "Admin",
+      "home": "Home",
+      "solicitudes": "Demo requests",
+      "accesos": "Demo access",
+      "catalogo-demos": "Demo catalog",
+      "orders": "Orders",
+      "deliverables": "Deliverables",
+      "invoices": "Invoices",
+      "conversations": "Conversations",
+      "users": "Users",
+      "contacts": "Contacts",
+      "settings": "Settings",
+      "leads": "Leads",
+      "propuestas": "Proposals",
+      "proposals": "Proposals",
+      "auditoria": "Audit log",
+      "privacidad": "Privacy"
+    },
+    "dashboard": {
+      "default": "My portal",
+      "suffix": "My portal",
+      "home": "Home",
+      "demos": "My demos",
+      "orders": "My orders",
+      "projects": "Projects",
+      "deliverables": "Deliverables",
+      "billing": "Billing",
+      "messages": "Messages",
+      "notifications": "Notifications",
+      "profile": "My profile",
+      "settings": "Settings",
+      "propuestas": "Proposals",
+      "proposals": "Proposals"
+    }
+  },
   "footer": {
-    "description": "We build innovative technology solutions that transform businesses.",
+    "description": "RAG systems and custom software for businesses, from Bogotá.",
     "services": "Services",
     "rag": "RAG systems",
+    "webDev": "Custom web development",
+    "chatbots": "RAG chatbots",
+    "aiSolutions": "AI solutions",
+    "ecommerce": "E-commerce",
+    "demoEcommerce": "Online store",
+    "demoChatbot": "RAG chatbot",
+    "demoDashboard": "Executive dashboard",
+    "demoDocuments": "Document manager",
+    "demoBookings": "Booking system",
+    "allDemos": "All demos",
     "company": "Company",
     "legal": "Legal",
     "privacy": "Privacy",
     "terms": "Terms",
     "cookies": "Cookies",
+    "social": "KopTup on {network}",
     "allRightsReserved": "All rights reserved"
   },
   "nav": {
@@ -797,7 +983,7 @@
     "login": "Sign in",
     "dashboard": "Dashboard",
     "requestDemo": "Request a demo",
-    "wantThis": "I want this",
+    "wantThis": "See pricing",
     "myAccount": "My account",
     "customer": "Customer",
     "myDemos": "My demos",
@@ -806,7 +992,9 @@
     "support": "Support",
     "logout": "Sign out",
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "switchLanguage": "Switch to Spanish",
+    "switchTheme": "Switch between light and dark theme"
   },
   "execDashboard": {
     "menu": {
@@ -1459,7 +1647,10 @@
     "errorNotFound": "We couldn't find an account with this email. Would you like to create a new account?",
     "errorNetwork": "Could not connect to the server. Please check your internet connection.",
     "createAccount": "Create account",
-    "errorNotActivated": "Your account is not activated yet. Use the activation link we sent you or ask the KopTup team for a new one."
+    "errorNotActivated": "Your account is not activated yet. Use the activation link we sent you or ask the KopTup team for a new one.",
+    "redirectNotice": "Sign in to continue to <strong>{target}</strong>",
+    "emailPlaceholder": "you@email.com",
+    "guestLink": "Continue as a guest and see the demos"
   },
   "registerPage": {
     "title": "Create Account",
@@ -1495,142 +1686,446 @@
     "errorPasswordMismatch": "Passwords do not match.",
     "errorPasswordLength": "Password must be at least 8 characters.",
     "errorTerms": "You must accept the terms and privacy.",
-    "fromContact": "We got your message and will reply to the email you gave us. Creating an account is optional."
+    "errorGeneric": "We could not create the account. Please try again.",
+    "fromContact": "We got your message and will reply to the email you gave us. Creating an account is optional.",
+    "chosenPlan": "Your chosen plan",
+    "chosenPlanNote": "Creating an account does not purchase the plan. To purchase it, request a quote and we will send you a proposal.",
+    "quotePlan": "Request a quote for this plan",
+    "changePlan": "Change plan",
+    "createAndContinue": "Create account and continue"
   },
   "aboutPage": {
-    "badge": "About Us",
+    "badge": "About KopTup",
     "hero": {
-      "title": "We Transform Ideas into Digital Reality",
-      "subtitle": "We are a team passionate about technology, dedicated to creating innovative solutions that drive our clients' success"
-    },
-    "stats": {
-      "projects": "Projects Completed",
-      "clients": "Satisfied Clients",
-      "experience": "Years of Experience",
-      "satisfaction": "Satisfaction Rate"
-    },
-    "mission": {
-      "title": "Our Mission",
-      "text1": "At KopTup, our mission is to empower businesses through innovative and customized technological solutions. We believe that technology should be accessible, efficient and scalable for everyone.",
-      "text2": "We specialize in turning complex challenges into elegant solutions, combining creativity with technical excellence to deliver products that not only meet but exceed expectations.",
-      "points": {
-        "custom": "Tailored custom solutions",
-        "modern": "Cutting-edge technologies",
-        "support": "Continuous support and maintenance"
+      "title": "KopTup",
+      "subtitle": "A custom software studio in Bogotá. We build RAG systems (AI that answers with your company's documents) and software for businesses. Before talking to us you can try {demoCount} demos: each one says what really works and what uses sample data.",
+      "ctaDemos": "See the {demoCount} demos",
+      "ctaContact": "Talk to us",
+      "stats": {
+        "demos": "demos you can try",
+        "plans": "RAG plans with published prices",
+        "pilotValue": "{weeks} weeks",
+        "pilot": "RAG pilot with your documents",
+        "baseValue": "Bogotá",
+        "base": "team in Colombia"
       }
     },
-    "values": {
-      "title": "Our Values",
-      "subtitle": "The principles that guide every decision and project we undertake",
-      "items": {
-        "innovation": {
-          "title": "Constant Innovation",
-          "description": "We adopt the latest technologies and methodologies to offer cutting-edge solutions."
-        },
-        "excellence": {
-          "title": "Passion for Excellence",
-          "description": "Every project is an opportunity to exceed expectations and create exceptional products."
-        },
-        "creativity": {
-          "title": "Limitless Creativity",
-          "description": "We think outside the box to solve complex problems with elegant solutions."
-        },
-        "transparency": {
-          "title": "Total Transparency",
-          "description": "Clear, honest and constant communication at every stage of the project."
-        },
-        "clientFirst": {
-          "title": "Client at the Center",
-          "description": "Your success is our success. We work as an extension of your team."
-        },
-        "results": {
-          "title": "Measurable Results",
-          "description": "We focus on delivering real value and demonstrable ROI in every project."
-        }
+    "facts": {
+      "badge": "Verifiable facts",
+      "title": "What you can check today",
+      "subtitle": "No client counts or years of experience: only what is published on this site and you can review yourself.",
+      "demos": {
+        "label": "Interactive demos",
+        "sub": "Each one says what really works and what uses sample data.",
+        "cta": "See the demos"
+      },
+      "prices": {
+        "value": "COP",
+        "label": "Published prices",
+        "sub": "RAG plans in COP and USD, and a catalog of solutions with reference prices.",
+        "cta": "See plans and pricing"
+      },
+      "pilot": {
+        "value": "{weeks} wks",
+        "label": "RAG pilot",
+        "sub": "{price} with your documents and an accuracy report with 50 questions.",
+        "cta": "See the pilot"
+      },
+      "ragDemo": {
+        "value": "PDF",
+        "label": "Try it with your document",
+        "sub": "Upload a document to the RAG demo and see how it answers citing the source.",
+        "cta": "Try the RAG demo"
+      },
+      "base": {
+        "value": "CO",
+        "label": "Based in Bogotá",
+        "sub": "Write to us or book a 30-minute call.",
+        "cta": "Go to contact"
       }
+    },
+    "whoWeAre": {
+      "badge": "Who we are",
+      "title": "A technical team, not an agency",
+      "p1": "KopTup is the studio of <strong>Ronald Cipagauta</strong>, a full-stack developer in Bogotá. When a project needs it, we bring in specialized collaborators in design, AI and DevOps: we are a flexible team, not an agency with a fixed payroll.",
+      "p2": "We work in two ways: <strong>custom software</strong>, with the source code for you, or a <strong>monthly subscription</strong>, where we host and run it. The {demoCount} demos on this site show the kind of systems we build; each one explains what is real and what is sample data.",
+      "points": [
+        "Custom software with the source code for you",
+        "Or a monthly subscription: we host and run it",
+        "This site's stack: Next.js, Node.js, MongoDB and OpenAI",
+        "We work in Spanish and English, from Colombia"
+      ],
+      "cardName": "Ronald Cipagauta",
+      "cardRole": "Founder · Full-stack developer"
     },
     "team": {
-      "title": "Our Team",
-      "subtitle": "Passionate professionals with experience in cutting-edge technologies",
-      "members": {
-        "ronald": {
-          "name": "Ronald Cipagauta",
-          "role": "CEO & Full Stack Developer",
-          "description": "Full Stack Developer with experience in frontend, backend, and AI integration. Specialized in building scalable solutions with React, Node.js, and OpenAI."
+      "badge": "Team",
+      "title": "Who is behind KopTup",
+      "subtitle": "A small technical core. We add specialists depending on the project.",
+      "founder": {
+        "name": "Ronald Cipagauta",
+        "role": "Founder · Full-stack and applied AI",
+        "bio": "Designs, builds and runs the KopTup stack: frontend, backend, applied AI and deployment."
+      },
+      "collaborators": {
+        "name": "Collaborator network",
+        "role": "Design, AI, DevOps and QA · per project",
+        "bio": "When a project needs extra expertise (dedicated UX/UI, AI for non-standard cases, complex infrastructure or QA), we bring in independent collaborators. A flexible structure, without a fixed payroll."
+      }
+    },
+    "tech": {
+      "badge": "Tech stack",
+      "title": "Technologies",
+      "subtitle": "The ones this site uses and the ones we can use if your project needs them.",
+      "site": {
+        "title": "What this site uses",
+        "description": "The site, the admin panel and the demos you can try are built with these.",
+        "items": [
+          {
+            "name": "Next.js 14",
+            "note": "App Router and server components"
+          },
+          {
+            "name": "React 18",
+            "note": "site and demo UI"
+          },
+          {
+            "name": "TypeScript",
+            "note": "web and backend"
+          },
+          {
+            "name": "Tailwind CSS",
+            "note": "styles and dark mode"
+          },
+          {
+            "name": "next-intl",
+            "note": "Spanish and English"
+          },
+          {
+            "name": "Zod",
+            "note": "data validation in the backend"
+          },
+          {
+            "name": "Node.js",
+            "note": "backend"
+          },
+          {
+            "name": "Express",
+            "note": "REST API"
+          },
+          {
+            "name": "MongoDB + Mongoose",
+            "note": "database"
+          },
+          {
+            "name": "Redis",
+            "note": "usage limits and cache"
+          },
+          {
+            "name": "OpenAI SDK",
+            "note": "AI in the RAG demo"
+          },
+          {
+            "name": "JWT + bcrypt",
+            "note": "sessions and passwords"
+          },
+          {
+            "name": "Nodemailer",
+            "note": "emails"
+          },
+          {
+            "name": "Twilio",
+            "note": "WhatsApp notifications"
+          },
+          {
+            "name": "AWS S3 SDK",
+            "note": "files"
+          },
+          {
+            "name": "Jest",
+            "note": "unit and integration tests"
+          },
+          {
+            "name": "Playwright",
+            "note": "end-to-end tests"
+          },
+          {
+            "name": "Testing Library",
+            "note": "component tests"
+          },
+          {
+            "name": "ESLint",
+            "note": "code quality"
+          },
+          {
+            "name": "Swagger / OpenAPI",
+            "note": "API documentation"
+          },
+          {
+            "name": "Turborepo",
+            "note": "monorepo"
+          },
+          {
+            "name": "GitHub Actions",
+            "note": "continuous integration"
+          },
+          {
+            "name": "Vercel",
+            "note": "web deployment"
+          },
+          {
+            "name": "Railway",
+            "note": "backend deployment"
+          }
+        ]
+      },
+      "project": {
+        "title": "If your project needs it",
+        "description": "We assess them with you when quoting. If one requires deep expertise, we bring in a specialist and tell you before we start.",
+        "items": [
+          {
+            "name": "Python",
+            "note": "FastAPI or Django"
+          },
+          {
+            "name": "PostgreSQL",
+            "note": "with pgvector for semantic search"
+          },
+          {
+            "name": "Managed vector databases",
+            "note": "for RAG over many documents"
+          },
+          {
+            "name": "GraphQL",
+            "note": "if your team already uses it"
+          },
+          {
+            "name": "WebSockets",
+            "note": "live updates"
+          },
+          {
+            "name": "React Native",
+            "note": "mobile apps"
+          },
+          {
+            "name": "Docker and Kubernetes",
+            "note": "if your team already runs them"
+          },
+          {
+            "name": "Terraform",
+            "note": "infrastructure as code"
+          },
+          {
+            "name": "Payment gateways",
+            "note": "Wompi, PayU or Stripe"
+          },
+          {
+            "name": "WhatsApp Business API",
+            "note": "customer service channel"
+          },
+          {
+            "name": "DIAN e-invoicing",
+            "note": "through a technology provider"
+          }
+        ]
+      }
+    },
+    "ai": {
+      "badge": "Applied AI",
+      "title": "AI: what you can try and what we build",
+      "subtitle": "We separate what already works in the demos from what we implement in your project.",
+      "tryTitle": "You can try it today",
+      "try": {
+        "rag": {
+          "title": "Answers from your documents (RAG)",
+          "desc": "Upload a document to the demo and ask: the AI searches the text and answers citing the source.",
+          "cta": "Try the RAG demo"
         },
-        "johan": {
-          "name": "Johan Mendieta",
-          "role": "Senior Developer",
-          "description": "Software developer with experience in frontend, backend, and microservices architecture. Leading OpenAI-powered solutions with embeddings and semantic search."
+        "builder": {
+          "title": "Configurable assistants",
+          "desc": "In “Build your own”, inside the same demo, you create an assistant with your texts and test it.",
+          "cta": "Build an assistant"
         },
-        "juan_vargas": {
-          "name": "Juan Vargas",
-          "role": "Full Stack Developer",
-          "description": "Full Stack Developer specialized in API development, business reporting, and cloud integration with Microsoft 365 and Azure. Expert in AI-powered chatbots."
+        "content": {
+          "title": "AI copywriting",
+          "desc": "The LinkedIn post generator writes copy with AI based on your product.",
+          "cta": "See the demo"
+        }
+      },
+      "buildTitle": "We build it in your project",
+      "build": [
+        "WhatsApp and website assistants that answer with your documents",
+        "Data extraction from documents (invoices, forms, contracts)",
+        "Classification and routing of messages or tickets",
+        "Summaries and reply drafts for your team",
+        "Search over your documents with role-based permissions",
+        "Assistants that query your systems through their APIs"
+      ],
+      "buildNote": "We quote and implement it with you: these are not ready-made products or services running today."
+    },
+    "sectors": {
+      "badge": "Industries",
+      "title": "Industries with a demo",
+      "subtitle": "For each one there is a demo with sample data that shows the kind of system we build.",
+      "cta": "See the demo",
+      "items": {
+        "health": {
+          "title": "Healthcare",
+          "desc": "Telemedicine and medical claims auditing."
         },
-        "juan_pablo": {
-          "name": "Juan Pablo Caicedo",
-          "role": "Full Stack Developer",
-          "description": "Full Stack Developer specialized in design, development, and deployment of web applications. Expert in JavaScript, Microsoft D365, and database management."
+        "legal": {
+          "title": "Legal",
+          "desc": "Electronic document signing."
+        },
+        "commerce": {
+          "title": "Commerce",
+          "desc": "Online store and point of sale."
+        },
+        "logistics": {
+          "title": "Logistics",
+          "desc": "Warehouses (WMS) and deliveries."
+        },
+        "education": {
+          "title": "Education",
+          "desc": "Course platform (LMS) with certificates."
+        },
+        "sales": {
+          "title": "Sales",
+          "desc": "AI-powered CRM."
+        },
+        "finance": {
+          "title": "Finance",
+          "desc": "Electronic invoicing."
+        },
+        "operations": {
+          "title": "Operations",
+          "desc": "Modular ERP."
+        },
+        "support": {
+          "title": "Support",
+          "desc": "AI help desk."
         }
       }
     },
-    "history": {
-      "title": "Our History",
-      "subtitle": "The journey that brought us to where we are today",
-      "milestones": {
-        "2019": {
-          "title": "Independent Beginnings",
-          "description": "Colombian team collaborating with professionals in Mexico. University projects and for small businesses."
+    "method": {
+      "badge": "How we work",
+      "title": "How we work",
+      "subtitle": "This is how we organize a custom project. The exact scope and timeline go in the proposal.",
+      "steps": [
+        {
+          "title": "Discovery",
+          "description": "We map goals, risks and deliverables before quoting."
         },
-        "2021": {
-          "title": "Backend and Systems Projects",
-          "description": "Development in Java and Python for e-commerce. Cluster configuration and replication on CentOS. Technical focus on backend."
+        {
+          "title": "Design",
+          "description": "Prototypes of the key screens to validate them before coding."
         },
-        "2022": {
-          "title": "AI Application",
-          "description": "Machine learning and deep learning models for clients in Costa Rica. Chatbot development for HR processes."
+        {
+          "title": "Weekly progress",
+          "description": "We review progress with you every week and adjust."
         },
-        "2023": {
-          "title": "Official Registration",
-          "description": "Chamber of Commerce registration on 03/26/2023. Formalization of operations and service expansion."
+        {
+          "title": "Continuous integration",
+          "description": "Every change goes through automated tests before it is published."
         },
-        "2025": {
-          "title": "Healthcare Sector Project",
-          "description": "Development of solution for presentation to the Ministry of Health in Colombia."
+        {
+          "title": "Testing",
+          "description": "Unit, integration and end-to-end tests, depending on the project."
+        },
+        {
+          "title": "Staging",
+          "description": "You see every version in a staging environment before it goes to production."
+        },
+        {
+          "title": "Go-live",
+          "description": "We publish to your cloud or ours, depending on the model you choose."
+        },
+        {
+          "title": "Support",
+          "description": "Post-delivery support is what your plan or contract defines."
         }
-      }
+      ]
     },
-    "technologies": {
-      "title": "Technologies We Master",
-      "subtitle": "Modern tech stack for world-class solutions",
-      "searchPlaceholder": "Search technologies...",
-      "noResults": "No technologies found matching \"{query}\"",
-      "showLess": "Show less",
-      "viewAll": "View all"
+    "tooling": {
+      "title": "How we coordinate with you",
+      "subtitle": "We use your team's tools or suggest the ones that fit best.",
+      "groups": [
+        {
+          "label": "Meetings",
+          "items": [
+            "Google Meet",
+            "Zoom",
+            "Microsoft Teams"
+          ]
+        },
+        {
+          "label": "Messaging",
+          "items": [
+            "WhatsApp",
+            "Email",
+            "Slack"
+          ]
+        },
+        {
+          "label": "Code",
+          "items": [
+            "GitHub",
+            "GitLab",
+            "Bitbucket"
+          ]
+        },
+        {
+          "label": "Docs",
+          "items": [
+            "Notion",
+            "Confluence",
+            "Google Docs"
+          ]
+        },
+        {
+          "label": "Tasks",
+          "items": [
+            "GitHub Issues",
+            "Jira",
+            "Linear"
+          ]
+        },
+        {
+          "label": "Files",
+          "items": [
+            "Google Drive",
+            "OneDrive",
+            "SharePoint"
+          ]
+        }
+      ]
     },
     "cta": {
-      "title": "Ready to Work Together?",
-      "subtitle": "Join the companies that already trust us to drive their digital transformation",
-      "button1": "Let's Talk About Your Project",
-      "button2": "View Our Services"
-    }
+      "title": "Shall we start?",
+      "subtitle": "Try the open demos without signing up or book a 30-minute call to assess your project.",
+      "ctaDemos": "See the {demoCount} demos",
+      "ctaContact": "Talk to us"
+    },
+    "breadcrumbHome": "Home",
+    "breadcrumbAbout": "About"
   },
   "contactPage": {
     "badge": "Contact",
     "hero": {
       "title": "Let's Talk About Your Project",
-      "subtitle": "Ready to turn your vision into reality. Schedule a free consultation"
+      "subtitle": "Tell us about your case and we'll reply within 24 business hours, Monday to Friday.",
+      "quoteTitle": "Get a quote for the {plan} plan",
+      "quoteSubtitle": "Fill in the short form and we'll reply within 24 business hours to schedule a 30-minute call. You don't pay anything yet."
     },
     "form": {
       "title": "Send Us a Message",
-      "subtitle": "Fill out the form and we'll respond within 24 hours",
+      "subtitle": "Fill out the form and we'll reply within 24 business hours",
       "name": "Full name",
       "email": "Email",
       "phone": "Phone",
       "company": "Company",
       "service": "Service of interest",
-      "budget": "Estimated budget",
+      "budget": "Estimated budget (Colombian pesos, before VAT)",
       "message": "Tell us about your project",
       "namePlaceholder": "Your name",
       "emailPlaceholder": "you@email.com",
@@ -1642,9 +2137,38 @@
       "submit": "Send message",
       "submitting": "Sending...",
       "errorSubmit": "Error sending message. Please try again or contact us directly via WhatsApp.",
+      "errorValidation": "Check the required fields: name, a valid email, the service and the message.",
+      "errorRateLimit": "You sent several messages in a row. Wait a minute and try again.",
+      "errorNetwork": "We could not reach the server. Check your connection and try again, or write to us on WhatsApp.",
+      "errorCheckFields": "Check the highlighted fields.",
+      "consent": "I authorize KopTup to process my personal data to answer this message, under Colombian Law 1581 of 2012 and the <link>privacy policy</link>.",
+      "honeypot": "Do not fill in this field",
+      "fieldErrors": {
+        "name": "Enter your name (up to 120 characters).",
+        "email": "Enter a valid email.",
+        "phone": "Check the phone number (up to 40 characters).",
+        "company": "Check the company name (up to 160 characters).",
+        "service": "Choose the service you are interested in.",
+        "budget": "Choose a budget from the list.",
+        "message": "Tell us about your project (up to 5,000 characters).",
+        "timeline": "Choose when you want to start from the list.",
+        "consentimiento": "Check the authorization box to send the message.",
+        "quote": "The quote is not valid: choose the service from the list."
+      },
+      "timeline": "When do you want to start?",
+      "timelinePlaceholder": "Select an option",
+      "timelineOptions": {
+        "now": "Right away, as soon as possible",
+        "1m": "Within the next month",
+        "3m": "In 2-3 months",
+        "open": "Not defined yet, just exploring"
+      },
       "success": {
         "title": "Message sent!",
-        "subtitle": "Thanks for contacting us. We'll respond soon.",
+        "titlePlan": "Done! We received your request for the {plan} plan",
+        "subtitle": "We'll email {email} within 24 business hours (Monday to Friday) to schedule a 30-minute call.",
+        "noAutoEmail": "We don't send an automatic confirmation email: if you don't hear from us, write to ronald@koptup.com.",
+        "another": "Send another message",
         "nextStep": "While we get back to you, you can try our RAG assistant in the demo.",
         "nextStepCta": "Try the demo"
       }
@@ -1652,7 +2176,7 @@
     "services": {
       "rag": "RAG system",
       "ecommerce": "E-Commerce",
-      "chatbot": "AI Chatbot",
+      "chatbot": "Other kind of chatbot",
       "webDev": "Web Development",
       "mobileDev": "Mobile Development",
       "apiIntegrations": "API Integrations",
@@ -1664,15 +2188,36 @@
       "label": "You are requesting a quote for",
       "prefilled": "Pre-filled request",
       "plan": "{plan} plan",
+      "tier": "{tier} tier",
       "message": "Hi, I would like a quote for {service}.",
-      "messageWithPlan": "Hi, I would like a quote for {service} ({plan} plan)."
+      "messageWithDetail": "Hi, I would like a quote for {service} ({detail}).",
+      "messageGuidedDemo": "Hi, I would like a guided demo of the RAG assistant with my case.",
+      "priceOnce": "{price}, one-time",
+      "priceMonthly": "Implementation {setup} + {monthly} per month",
+      "priceFrom": "Implementation from {setup} + monthly fee based on the service level",
+      "vat": "plus VAT if applicable",
+      "messageHelpRag": "It helps to tell us: how many documents you have, where they live (folders, Drive, SharePoint), who would use the assistant and whether there is confidential information.",
+      "nextSteps": {
+        "title": "What happens next",
+        "call": "We email you within 24 business hours to schedule a 30-minute call.",
+        "scope": "On the call we understand your case and agree on the scope.",
+        "pilot": "For the pilot you send us up to 100 documents from a single origin and 50 real questions with the answer you expect; in 2 weeks you get the assistant with your documents and the accuracy report.",
+        "plan": "We send you a proposal with the scope, the total price and the timeline.",
+        "noPayment": "Sending this form doesn't commit you: you don't pay anything yet."
+      },
+      "legacyServices": {
+        "agente-ia-ventas": "AI sales agent",
+        "desarrollo-web": "Custom web development",
+        "auditoria-cups": "CUPS code auditing",
+        "liquidacion": "Healthcare claims settlement"
+      }
     },
     "budgetRanges": {
-      "1": "Less than $1,000",
-      "2": "$1,000 - $5,000",
-      "3": "$5,000 - $10,000",
-      "4": "$10,000 - $25,000",
-      "5": "More than $25,000"
+      "1": "Under COP 5,000,000",
+      "2": "COP 5,000,000 to 15,000,000",
+      "3": "COP 15,000,000 to 30,000,000",
+      "4": "COP 30,000,000 to 60,000,000",
+      "5": "Over COP 60,000,000"
     },
     "info": {
       "email": {
@@ -1686,16 +2231,16 @@
       },
       "hours": {
         "title": "Hours",
-        "value": "Mon - Fri: 8am - 6pm"
+        "value": "Monday to Friday, 8:00 a.m. to 6:00 p.m. (Colombia time)"
       }
     },
     "social": {
       "title": "Follow Us on Social Media"
     },
     "schedule": {
-      "title": "Schedule a Call",
-      "subtitle": "Schedule a free 30-minute consultation",
-      "button": "Schedule now",
+      "title": "Request a call by email",
+      "subtitle": "Your email app opens with a ready-made message to ronald@koptup.com; we reply with times for a free 30-minute call.",
+      "button": "Open my email",
       "opening": "Opening...",
       "emailSubject": "Call Scheduling Request - KopTup",
       "emailBody": "Hello KopTup team,\n\nI would like to schedule a call to discuss my technology needs.\n\nPlease confirm availability so we can set up a meeting.\n\nBest regards"
@@ -1710,11 +2255,11 @@
         },
         "guarantee": {
           "question": "Do you offer a guarantee?",
-          "answer": "Yes, 30-day guarantee and post-delivery support."
+          "answer": "Yes. Each project contract sets a warranty period of 30 to 90 days to fix errors in what we deliver, as stated in the terms and conditions. Support after that period depends on your plan or contract."
         },
         "startups": {
           "question": "Do you work with startups?",
-          "answer": "Absolutely! We have flexible plans and guidance."
+          "answer": "Yes. You can start small, with the 2-week RAG pilot or the Basic tier of a catalog solution, and grow later."
         }
       }
     }
@@ -1832,9 +2377,14 @@
     "title": "Want something like this for your business?",
     "titleWithName": "Need a {demoName} like this?",
     "description": "We develop custom software tailored to your company's needs. Request a no-obligation quote.",
-    "requestQuote": "Request Quote",
-    "viewPricing": "View Plans & Pricing",
-    "requestGuidedDemo": "Request a guided demo"
+    "requestQuote": "Request a quote",
+    "viewPricing": "View plans and pricing",
+    "requestGuidedDemo": "Request a guided demo",
+    "rag": {
+      "title": "Want this assistant with your company's documents?",
+      "description": "We start with a pilot on your own documents: the assistant answers with the source and says when something isn't there. Connections to your systems and channels are built in your project. Request a no-obligation quote.",
+      "requestQuote": "Get a pilot quote"
+    }
   },
   "demoEcommerce": {
     "title": "Demo Store",
@@ -1914,6 +2464,9 @@
     "perUnit": "ea",
     "clientDescription": "Client project description",
     "attachments": "Attachments",
+    "downloadAttachment": "Download {name}",
+    "attachmentGone": "{name} is no longer on the server: ask the client to upload it again.",
+    "attachmentError": "We couldn't download {name}. Please try again.",
     "rejectionReason": "Rejection reason",
     "orderApproval": "Order approval",
     "reApprove": "Re-approve",
@@ -2060,7 +2613,7 @@
   },
   "billingPage": {
     "title": "Billing & Payments",
-    "subtitle": "Manage your invoices and make payments",
+    "subtitle": "Review your invoices and how to pay them",
     "pending": "Pending",
     "overdue": "Overdue",
     "paid": "Paid",
@@ -2071,7 +2624,14 @@
     "details": "Details",
     "noDescription": "No description",
     "downloadPdf": "Download PDF",
-    "payNow": "Pay Now"
+    "payNow": "How to pay",
+    "payHide": "Hide",
+    "payTransferTitle": "Pay by bank transfer",
+    "payReference": "Use {number} as the payment reference.",
+    "payConfirmNote": "Once the KopTup team confirms your payment, the invoice will show as paid."
+  },
+  "authCallback": {
+    "completing": "Completing sign-in…"
   },
   "messagesPage": {
     "title": "Messages",
@@ -2606,29 +3166,30 @@
       "title": "Custom Web Development & Software Company in Colombia",
       "subtitle": "Hire KopTup to develop your web application, chatbot, e-commerce or enterprise system. Free quote.",
       "cta1": "Request Free Quote",
-      "cta2": "View Demos"
+      "cta2": "View Demos",
+      "reach": "We work remotely from Bogotá, in Spanish and English."
     },
     "servicesTitle": "What can we develop for your business?",
     "servicesSubtitle": "Complete technology solutions, from design to deployment",
     "sv1t": "Custom Web Applications",
     "sv1d": "Enterprise systems, management portals, CRMs, ERPs and any web application your business needs. Modern stack with React and Node.js.",
     "sv2t": "AI-Powered Chatbots",
-    "sv2d": "Intelligent chatbots with WhatsApp Business, GPT-4 and Claude AI that answer at any hour, with lead capture and automated sales. From {essentialFrom}, or a {pilotFrom} pilot (plus VAT where applicable).",
+    "sv2d": "RAG chatbots for WhatsApp and your website that answer with your company's documents, cite the source and are available at any hour. From {essentialFrom}, or a {pilotFrom} pilot (plus VAT if applicable).",
     "sv3t": "E-commerce Stores",
-    "sv3d": "Professional online sales platforms with shopping cart, inventory management and payment gateways.",
+    "sv3d": "Online stores with shopping cart, inventory management and integration with the payment gateway you choose.",
     "sv4t": "Mobile Applications",
-    "sv4d": "Native and cross-platform apps for Android and iOS with React Native or Flutter. Integrated with your existing systems.",
+    "sv4d": "Android and iOS apps integrated with your existing systems. We quote them based on scope.",
     "sv5t": "Dashboards & Business Intelligence",
-    "sv5d": "Executive dashboards with real-time KPIs, business metrics, interactive charts and automatic reports.",
+    "sv5d": "Executive dashboards with KPIs, business metrics, charts and reports connected to your data.",
     "sv6t": "AI Automation",
     "sv6d": "We automate repetitive processes using artificial intelligence: document processing, data analysis, report generation.",
     "whyTitle": "Why hire KopTup?",
     "w1t": "Clean and scalable code",
     "w1d": "We develop with industry best practices. Maintainable, documented code ready to grow with your business.",
-    "w2t": "Specialized team in Colombia",
-    "w2d": "Colombian technical team with experience in real projects for national and international companies.",
-    "w3t": "Fast and guaranteed delivery",
-    "w3d": "Agile methodology with weekly deliveries. Your project will be ready on time. We guarantee the result.",
+    "w2t": "Technical team in Colombia",
+    "w2d": "Technical team in Bogotá. When the project needs it, we bring in specialists in design, AI or infrastructure.",
+    "w3t": "Weekly progress and agreed timelines",
+    "w3d": "Agile methodology with partial deliveries every week. Timelines and scope are written into the proposal.",
     "w4t": "Post-delivery support",
     "w4d": "We don't disappear after launch. We offer support, maintenance and continuous evolution of your product.",
     "processTitle": "How we work",
@@ -2639,25 +3200,78 @@
     "p3t": "3. Development",
     "p3d": "We develop with agile methodology. Partial deliveries each week so you can see progress.",
     "p4t": "4. Launch",
-    "p4d": "We deploy to production, train your team and support you in the first months.",
-    "techTitle": "Technologies we use",
-    "techSubtitle": "Modern, proven and scalable stack",
+    "p4d": "We deploy to production, train your team and support you according to the agreed support plan.",
+    "techTitle": "Technologies",
+    "techSubtitle": "The first ones are what this site uses; the rest we define with you when quoting.",
     "faqTitle": "Frequently Asked Questions",
     "q1q": "How much does it cost to hire a software development company in Colombia?",
-    "q1a": "We publish our prices at www.koptup.com/services, in COP with a USD reference (plus VAT where applicable). RAG systems start with a {pilotFrom} pilot, and our other custom solutions are priced per plan according to scope. We offer a free, no-commitment quote to evaluate your specific case.",
+    "q1a": "We publish our prices at www.koptup.com/services, in COP with a USD reference (plus VAT if applicable). RAG systems start with a {pilotFrom} pilot, and our other custom solutions are priced per plan according to scope. We offer a free, no-commitment quote to evaluate your specific case.",
     "q2q": "How long does it take to develop a web application?",
     "q2a": "It depends on the scope. An MVP (initial functional version) can be ready in 4-8 weeks. A complex system with multiple modules can take 3-6 months. In the initial analysis we define exact timelines.",
     "q3q": "Can KopTup develop chatbots for WhatsApp?",
-    "q3a": "Yes. It's one of our flagship services. We integrate chatbots with the official WhatsApp Business API using GPT-4 or Claude AI. The chatbot can serve customers at any hour, capture leads, process orders and transfer to human agents. From {essentialFrom}, or a {pilotFrom} pilot (plus VAT where applicable).",
+    "q3a": "Yes. From the Professional plan, in your project we build the WhatsApp channel with the official WhatsApp Business API; the chatbot uses OpenAI models. They answer with your company's documents at any hour and, if they cannot find the answer, they say so. From {essentialFrom}, or a {pilotFrom} pilot (plus VAT if applicable).",
     "q4q": "Do you work with companies throughout Colombia or only in Bogotá?",
-    "q4a": "We work with companies throughout Colombia and Latin America 100% remotely. We have clients in Bogotá, Medellín, Cali, Barranquilla, Bucaramanga and in countries like Mexico, Argentina and Chile.",
+    "q4a": "We work remotely with companies in any city: meetings are by video call and we work in Spanish and English.",
     "q5q": "Do you offer maintenance after delivering the project?",
     "q5a": "Yes. We offer monthly maintenance and support plans. We also evolve the product according to your business needs. We don't leave you alone after launch.",
     "q6q": "Can I see examples of KopTup's work?",
-    "q6a": "Yes. We have {count} navigable prototypes at www.koptup.com/demo — two of them (RAG chatbot and LinkedIn Ads generator) use live OpenAI; the rest are interactive mockups with simulated data so you can see how each solution would look before hiring us. Open demos need no registration or credit card; the ones that require access can be requested at www.koptup.com/solicitar-demo.",
+    "q6a": "Yes. At www.koptup.com/demo there are {count} interactive demos: some use real AI, like the RAG chatbot, and most run on sample data; each demo says what is real. Open demos need no registration or credit card; the ones that require access can be requested at www.koptup.com/solicitar-demo.",
     "ctaTitle": "Ready to develop your project?",
-    "ctaSubtitle": "Tell us what you need. We respond within 24 hours with a personalized proposal.",
-    "ctaButton": "Request Free Quote"
+    "ctaSubtitle": "Tell us what you need. We reply within 24 business hours.",
+    "ctaButton": "Request Free Quote",
+    "ctaPlans": "See plans and pricing",
+    "techGroups": [
+      {
+        "category": "Frontend (this site)",
+        "techs": [
+          "Next.js",
+          "React",
+          "TypeScript",
+          "Tailwind CSS"
+        ]
+      },
+      {
+        "category": "Backend (this site)",
+        "techs": [
+          "Node.js",
+          "Express",
+          "MongoDB",
+          "Redis"
+        ]
+      },
+      {
+        "category": "AI (this site)",
+        "techs": [
+          "OpenAI",
+          "RAG with cited sources"
+        ]
+      },
+      {
+        "category": "Deployment (this site)",
+        "techs": [
+          "Vercel",
+          "Railway",
+          "GitHub Actions"
+        ]
+      },
+      {
+        "category": "Depending on your project",
+        "techs": [
+          "Python",
+          "PostgreSQL",
+          "React Native",
+          "Docker"
+        ]
+      },
+      {
+        "category": "Integrations for your project",
+        "techs": [
+          "WhatsApp Business API",
+          "Payment gateways",
+          "E-invoicing"
+        ]
+      }
+    ]
   },
   "demoProjectsPro": {
     "section": {
@@ -3042,7 +3656,7 @@
     "preview": {
       "cuentasMedicas": {
         "title": "Healthcare expert system",
-        "description": "Audits medical claims with rules, CUPS and ICD-10 codes and fee schedules, and flags potential denials. AI extracts the invoice data.",
+        "description": "Audits medical claims with rules and a sample fee schedule, and flags potential denials. AI extracts the invoice data.",
         "features": {
           "0": "Audit rules with CUPS and ICD-10 codes",
           "1": "Fee schedules and potential-denial flags",
@@ -3232,6 +3846,7 @@
     "conversations": "Conversations",
     "users": "Users",
     "contacts": "Contacts",
+    "privacy": "Privacy",
     "settings": "Settings",
     "viewSite": "View site",
     "logout": "Sign out",
@@ -3242,6 +3857,81 @@
       "manager": "Manager",
       "sales": "Sales",
       "other": "Team"
+    }
+  },
+  "adminPrivacy": {
+    "title": "Privacy: data subject rights",
+    "subtitle": "Look up a person by email to see everything KopTup stores about them, hand it over as a file, or erase it (Colombian Law 1581 of 2012).",
+    "rules": {
+      "deadlines": "Legal deadlines: answer inquiries within 10 business days and claims (correct, update or erase) within 15 business days.",
+      "identity": "Before handing over or erasing data, check that the requester is the data subject (for example, that they write from that same email).",
+      "retention": "Even without a request, the system anonymizes rejected requests and inactive prospects when the retention period ends, and deletes chatbot questions when they expire."
+    },
+    "emailLabel": "Data subject's email",
+    "emailPlaceholder": "person@company.com",
+    "search": "Search",
+    "searching": "Searching…",
+    "export": "Export JSON",
+    "exporting": "Exporting…",
+    "erase": "Erase data",
+    "result": {
+      "title": "Data for {email}",
+      "total": "{count, plural, one {# record found} other {# records found}}",
+      "empty": "We found no data stored with that email.",
+      "searchedAs": "Searched as: {emails}",
+      "retention": "Current periods: anonymized after {months} months without activity; chatbot questions, {days} days.",
+      "note": "Passwords and link codes are never shown or exported: only their hashed fingerprint is stored."
+    },
+    "blocks": {
+      "team_account": "Cannot erase: this is a team account. Remove its role in Users first.",
+      "contractual_records": "Cannot erase for now: there are records of a contractual relationship that must be kept while the obligation lasts."
+    },
+    "categories": {
+      "cuentas": "Account",
+      "contactos": "Contact messages",
+      "solicitudesDemo": "Demo requests",
+      "accesosDemo": "Demo access",
+      "enlacesDeUnSoloUso": "Activation or recovery links",
+      "leads": "Lead (sales pipeline)",
+      "actividadesLead": "Lead activity",
+      "propuestas": "Proposals",
+      "conversacionesChatbot": "Chatbot questions that mention the email",
+      "notificaciones": "Notifications",
+      "documentos": "Document manager files",
+      "registroActividad": "Activity log",
+      "pedidos": "Orders",
+      "proyectos": "Projects",
+      "facturas": "Invoices",
+      "entregables": "Deliverables",
+      "conversacionesPortal": "Portal conversations",
+      "bitacora": "Team audit log"
+    },
+    "erased": {
+      "title": "Data erased",
+      "reference": "Erasure reference: {ref}. Give it to the data subject as proof; the audit log keeps it without their data.",
+      "counts": "{deleted} records deleted and {anonymized} audit log entries stripped of personal data."
+    },
+    "confirm": {
+      "title": "Erase this person's data",
+      "body": "You are about to delete everything the system stores about this person.",
+      "deletes": "Their account, messages, requests, access, lead, non-accepted proposals, chatbot questions and documents are deleted.",
+      "audit": "The audit log keeps the team's actions, without their data, plus a record with a reference.",
+      "irreversible": "This cannot be undone.",
+      "label": "Type {email} to confirm",
+      "cancel": "Cancel",
+      "submit": "Erase permanently",
+      "erasing": "Erasing…"
+    },
+    "errors": {
+      "search": "The search failed. Check the email and try again.",
+      "network": "Cannot reach the server. Try again in a few minutes.",
+      "export": "The file could not be downloaded. Try again.",
+      "erase": "The erasure could not be completed. Try again."
+    },
+    "contactConsent": {
+      "label": "Data authorization",
+      "given": "Authorized on {date} (policy {version})",
+      "none": "No authorization on record (message sent before the checkbox existed or from another source)"
     }
   },
   "adminDemos": {

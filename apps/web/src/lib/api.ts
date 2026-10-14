@@ -3,7 +3,6 @@ import Cookies from 'js-cookie';
 import type {
   RegisterData,
   ContactFormData,
-  QuoteRequestData,
   CreateProjectData,
   UpdateProjectData,
   CreateTaskData,
@@ -11,7 +10,7 @@ import type {
   CreateOrderData,
   UploadDeliverableData,
   CreateInvoiceData,
-  PayInvoiceData,
+  InvoicePaymentMethod,
 } from '@/types/api.types';
 import { BACKEND_URL as API_URL } from './backend-url';
 
@@ -238,10 +237,17 @@ class ApiClient {
     return `${API_URL}/api/auth/google`;
   }
 
-  // Handle OAuth callback (save tokens from URL params)
-  handleOAuthCallback(accessToken: string, refreshToken: string) {
+  /**
+   * Fin del inicio de sesión con Google: canjea el código de un solo uso que
+   * el backend dejó en el fragmento de /auth/callback (#code=…) por la sesión.
+   * Los tokens nunca viajan en la URL.
+   */
+  async exchangeGoogleCode(code: string) {
+    const response = await this.client.post('/api/auth/google/exchange', { code });
+    const { accessToken, refreshToken, user } = response.data.data;
     Cookies.set('accessToken', accessToken, { expires: 1/96 }); // 15 minutes
     Cookies.set('refreshToken', refreshToken, { expires: 7 }); // 7 days
+    return { user };
   }
 
   // Get current user
@@ -283,30 +289,9 @@ class ApiClient {
     return response.data;
   }
 
-  // Chat endpoints
-  async sendChatMessage(sessionId: string, message: string, documentIds?: string[]) {
-    const response = await this.client.post('/api/chat/message', {
-      sessionId,
-      message,
-      documentIds,
-    });
-    return response.data;
-  }
-
-  async createChatSession() {
-    const response = await this.client.post('/api/chat/session');
-    return response.data;
-  }
-
   // Contact form
   async submitContactForm(data: ContactFormData) {
     const response = await this.client.post('/api/contact', data);
-    return response.data;
-  }
-
-  // Quote request
-  async requestQuote(data: QuoteRequestData) {
-    const response = await this.client.post('/api/quotes', data);
     return response.data;
   }
 
@@ -381,6 +366,18 @@ class ApiClient {
     return response.data;
   }
 
+  /**
+   * Descarga un adjunto de un pedido (dueño del pedido o equipo). Devuelve el
+   * archivo; un 410 significa que el archivo ya no está en el servidor.
+   */
+  async downloadOrderAttachment(orderId: string, attachmentId: string): Promise<Blob> {
+    const response = await this.client.get(
+      `/api/orders/${encodeURIComponent(orderId)}/attachments/${encodeURIComponent(attachmentId)}`,
+      { responseType: 'blob' },
+    );
+    return response.data as Blob;
+  }
+
   // Deliverables endpoints
   async getDeliverables(status?: string, projectId?: string) {
     const response = await this.client.get('/api/deliverables', { params: { status, projectId } });
@@ -423,9 +420,15 @@ class ApiClient {
     return response.data.data;
   }
 
-  async payInvoice(id: string, paymentData: PayInvoiceData) {
-    const response = await this.client.post(`/api/invoices/${id}/pay`, paymentData);
-    return response.data;
+  /**
+   * Métodos de pago que el equipo configuró (Admin › Configuración). El
+   * cliente no marca sus facturas como pagadas: paga por el medio indicado y
+   * el equipo registra el pago.
+   */
+  async getInvoicePaymentMethods(): Promise<InvoicePaymentMethod[]> {
+    const response = await this.client.get('/api/invoices/payment-methods');
+    const metodos = response.data?.data?.metodos;
+    return Array.isArray(metodos) ? metodos : [];
   }
 
   async downloadInvoice(id: string) {

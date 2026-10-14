@@ -62,7 +62,7 @@ export default function Ask() {
   const t = useTranslations(`${NS}.ask`);
   const fmt = useFmt();
   const labels = useLabels();
-  const { ctx, period, dataset } = useDashboard();
+  const { ctx, period, dataset, markGuide } = useDashboard();
   const [text, setText] = useState('');
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [miss, setMiss] = useState<string | null>(null);
@@ -135,16 +135,16 @@ export default function Ask() {
         const worst = list[0];
         return {
           headline: worst
-            ? t('a.cityGoal', { dim: labels.cityDim.toLowerCase(), city: worst.key, pct: fmt.pct(worst.compliance ?? 0, 0), gap: fmt.moneyM((worst.budget ?? 0) - worst.sales), period: pName })
+            ? t('a.cityGoal', { dim: labels.cityDim.toLowerCase(), city: worst.key, pct: fmt.compliance(worst.compliance ?? 0), gap: fmt.moneyM((worst.budget ?? 0) - worst.sales), period: pName })
             : t('a.noData'),
           rows: list.map((c) => ({
             label: c.key,
-            value: fmt.pct(c.compliance ?? 0, 0),
+            value: fmt.compliance(c.compliance ?? 0),
             extra: `${fmt.moneyM(c.sales)} / ${fmt.moneyM(c.budget ?? 0)}`,
             bar: Math.min(1.2, c.compliance ?? 0) / 1.2,
             tone: (c.compliance ?? 0) >= 1 ? ('good' as const) : ('bad' as const),
           })),
-          how: t('how.cityGoal', { goal: fmt.num(ctx.params.goalGrowth, 1), prevYear: period.year - 1 }),
+          how: t('how.cityGoal', { goal: fmt.param(ctx.params.goalGrowth), prevYear: period.year - 1 }),
         };
       }
       case 'overdue': {
@@ -189,6 +189,7 @@ export default function Ask() {
     setMiss(null);
     const a = compute(q);
     setAnswers((list) => [{ id: ++seq.current, question, period: fmt.period(period), ...a }, ...list].slice(0, 10));
+    markGuide('ask');
   };
 
   const onSubmit = (e: FormEvent) => {
@@ -204,7 +205,7 @@ export default function Ask() {
 
   return (
     <div className="space-y-6">
-      <section className={`${card} p-5 sm:p-6`} aria-labelledby="ask-title">
+      <section className={`${card} p-5 sm:p-6 scroll-mt-72 md:scroll-mt-56`} aria-labelledby="ask-title" id="ask-section">
         <SectionTitle
           title={
             <span id="ask-title" className="inline-flex items-center gap-2">
