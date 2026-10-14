@@ -8,10 +8,12 @@ import {
 } from '@heroicons/react/24/outline';
 import { COMPANY } from './lib/data';
 import { nitWithDv } from './lib/nit';
-import { DemoProvider, useDemo } from './lib/store';
+import { DemoProvider, TOUR_STEPS, useDemo } from './lib/store';
 import { TABS, type SourceId, type Tab } from './lib/types';
+import Intro from './components/Intro';
 import Sidebar from './components/Sidebar';
-import Tour from './components/Tour';
+import Tour, { TOUR_ID } from './components/Tour';
+import { Modal, btn } from './components/ui';
 import Overview from './components/Overview';
 import Builder from './components/Builder';
 import Changes from './components/Changes';
@@ -21,6 +23,7 @@ import History from './components/History';
 import Compliance from './components/Compliance';
 import ReviewPanel from './components/ReviewPanel';
 import { RunNotice } from './components/RunNotice';
+import { notify } from './lib/notify';
 
 const TAB_ICONS: Record<Tab, typeof ChartBarSquareIcon> = {
   overview: ChartBarSquareIcon,
@@ -42,15 +45,28 @@ export default function ScrapingDemoPage() {
 
 function Shell() {
   const t = useTranslations('demoScraping');
-  const { s, ready, running, setTab, runNow } = useDemo();
+  const { s, ready, running, setTab, runNow, update, reset } = useDemo();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [confirmReset, setConfirmReset] = useState(false);
   const custom = s.customSources.find((c) => c.id === s.activeId) ?? null;
   const sourceId = custom ? null : (s.activeId as SourceId);
   const paused = !!sourceId && s.paused.includes(sourceId);
   const isRunning = !!running;
 
+  /** «Empezar el recorrido»: muestra el recorrido, lo trae a la vista y pone el foco en el siguiente paso pendiente. */
+  const startTour = () => {
+    const next = TOUR_STEPS.find((k) => !s.tour[k]) ?? TOUR_STEPS[0];
+    update((p) => (p.tourHidden ? { ...p, tourHidden: false } : p));
+    window.setTimeout(() => {
+      document.getElementById(TOUR_ID)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.querySelector<HTMLElement>(`[data-tour-step="${next}"]`)?.focus({ preventScroll: true });
+    }, 60);
+    notify.info(t('tour.stepToast', { n: TOUR_STEPS.indexOf(next) + 1, total: TOUR_STEPS.length, title: t(`tour.steps.${next}.title`), hint: t(`tour.steps.${next}.hint`) }), 'scraping-tour');
+  };
+
   return (
     <div className="min-h-screen bg-secondary-950 text-secondary-100">
+      <Intro onStartTour={startTour} onReset={() => setConfirmReset(true)} />
       <header className="relative z-30 border-b border-secondary-800 bg-secondary-950/95 backdrop-blur lg:sticky lg:top-20">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3">
           <button
@@ -67,8 +83,12 @@ function Shell() {
               <ArrowsRightLeftIcon className="h-5 w-5 text-white" />
             </div>
             <div className="min-w-0">
-              <h1 className="truncate text-sm font-semibold leading-tight text-white sm:text-base">{t('meta.title')}</h1>
-              <p className="truncate text-xs text-secondary-400">{t('meta.company', { company: COMPANY.name, nit: nitWithDv(COMPANY.nit) })}</p>
+              <p className="truncate text-sm font-semibold leading-tight text-white sm:text-base">
+                {custom ? custom.name : t(`sources.${sourceId ?? 'contratacion'}.name`)}
+              </p>
+              <p className="truncate text-xs text-secondary-400" title={t('meta.company', { company: COMPANY.name, nit: nitWithDv(COMPANY.nit) })}>
+                {t('meta.company', { company: COMPANY.name, nit: nitWithDv(COMPANY.nit) })}
+              </p>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -130,7 +150,7 @@ function Shell() {
       </header>
 
       <div className="relative flex">
-        <Sidebar open={menuOpen} onClose={() => setMenuOpen(false)} />
+        <Sidebar open={menuOpen} onClose={() => setMenuOpen(false)} onReset={() => setConfirmReset(true)} />
         <div className="min-w-0 flex-1 space-y-5 p-4 lg:p-6" id="demo-scraping-main">
           <Tour />
           {!ready ? (
@@ -153,6 +173,24 @@ function Shell() {
           ) : null}
         </div>
       </div>
+
+      <Modal open={confirmReset} onClose={() => setConfirmReset(false)} title={t('actions.resetTitle')}>
+        <p className="text-sm text-secondary-300">{t('actions.resetConfirm')}</p>
+        <div className="mt-5 flex justify-end gap-2">
+          <button type="button" className={btn.secondary} onClick={() => setConfirmReset(false)}>{t('actions.cancel')}</button>
+          <button
+            type="button"
+            className={btn.primary}
+            onClick={() => {
+              reset();
+              setConfirmReset(false);
+              setMenuOpen(false);
+            }}
+          >
+            {t('actions.reset')}
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 }

@@ -8,9 +8,9 @@
  */
 import {
   CATALOG_YESTERDAY, CIIU, NORMS_TODAY, NORMS_YESTERDAY, PROCESSES_TODAY, PROCESSES_YESTERDAY, RECORD_SELECTOR, SOURCES,
-  STORES, SUPPLIER_DOCS, catalogToday, storeHtml, type Process, type SupplierDoc,
+  STORES, SUPPLIER_DOCS, catalogToday, normsFor, processesFor, storeHtml, type Process, type SupplierDoc,
 } from './data';
-import { DEMO_TODAY, DEMO_YESTERDAY, addDays, daysBetween, norm } from './format';
+import { BASE_DAY, addDays, daysBetween, norm, shiftIso } from './format';
 import { formatNit, verificationDigit } from './nit';
 import { extract, quality as qualityOf } from './selectors';
 import type {
@@ -18,6 +18,8 @@ import type {
 } from './types';
 
 export interface SourceConfigs {
+  /** Días que se corren las fechas de ejemplo (de `BASE_DAY` al día de los datos). No cambia la firma. */
+  shift: number;
   fields: Field[];
   recordSelector: string;
   simulated: number;
@@ -206,7 +208,7 @@ function processRow(p: Process, m: ProcessMatch): Row {
 }
 
 export function runContratacion(c: SourceConfigs, at: string, trigger: RunResult['trigger']): RunResult {
-  const pick = (list: Process[]) => list.map((p) => ({ p, m: matchProcess(p, c.radar) })).filter((x) => x.m.ok).map((x) => processRow(x.p, x.m));
+  const pick = (list: Process[]) => processesFor(list, c.shift).map((p) => ({ p, m: matchProcess(p, c.radar) })).filter((x) => x.m.ok).map((x) => processRow(x.p, x.m));
   const rows = pick(PROCESSES_TODAY);
   const before = pick(PROCESSES_YESTERDAY);
   const changes = diffRows(before, rows, PROCESS_COLUMNS, (r) => String(r.ref), (r) => ({
@@ -242,7 +244,7 @@ export const NORM_COLUMNS: Column[] = [
 
 export function runNormativa(c: SourceConfigs, at: string, trigger: RunResult['trigger']): RunResult {
   const kw = norm(c.normativa.keyword.trim());
-  const pick = (list: typeof NORMS_TODAY) => list
+  const pick = (list: typeof NORMS_TODAY) => normsFor(list, c.shift)
     .filter((d) => c.normativa.entities.includes(d.entity) && (!kw || norm(`${d.title} ${d.number}`).includes(kw)))
     .map((d) => ({ id: d.id, number: d.number, type: d.type, entity: d.entity, title: d.title, date: d.date, url: d.url }));
   const rows = pick(NORMS_TODAY);
@@ -295,20 +297,21 @@ export function docColumns(selected: string[]): Column[] {
 
 export const OPTIONAL_DOC_COLUMNS = ALL_DOC_COLUMNS.filter((c) => c.key !== 'file' && c.key !== 'status');
 
-function docRow(d: SupplierDoc, threshold: number): Row {
+function docRow(d: SupplierDoc, threshold: number, shift: number): Row {
   const st = docStatus(d, threshold);
   return {
     id: d.id, file: d.file, docType: d.docType, nit: `${formatNit(d.nit)}-${d.dvRead}`, nitDigits: d.nit, name: d.name,
-    legalRep: d.legalRep, ciiu: `${d.ciiu} — ${CIIU[d.ciiu] ?? ''}`, docDate: d.docDate, confidence: d.confidence, status: st.status,
+    legalRep: d.legalRep, ciiu: `${d.ciiu} — ${CIIU[d.ciiu] ?? ''}`, docDate: shiftIso(d.docDate, shift), confidence: d.confidence, status: st.status,
   };
 }
 
 export function runDocumentos(c: SourceConfigs, at: string, trigger: RunResult['trigger']): RunResult {
   const columns = docColumns(c.docs.columns);
-  const today = SUPPLIER_DOCS.filter((d) => d.processed <= DEMO_TODAY);
-  const yesterday = SUPPLIER_DOCS.filter((d) => d.processed <= DEMO_YESTERDAY);
-  const rows = today.map((d) => docRow(d, c.docs.threshold));
-  const before = yesterday.map((d) => docRow(d, c.docs.threshold));
+  // La carpeta de ejemplo se compara en las fechas originales (hoy = BASE_DAY); solo se corren las fechas que se muestran.
+  const today = SUPPLIER_DOCS.filter((d) => d.processed <= BASE_DAY);
+  const yesterday = SUPPLIER_DOCS.filter((d) => d.processed <= addDays(BASE_DAY, -1));
+  const rows = today.map((d) => docRow(d, c.docs.threshold, c.shift));
+  const before = yesterday.map((d) => docRow(d, c.docs.threshold, c.shift));
   const changes = diffRows(before, rows, columns, (r) => String(r.id), (r) => ({ title: String(r.file), subtitle: String(r.name), meta: { status: String(r.status) } }));
   const validated = rows.filter((r) => r.status === 'validated').length;
   const q = rows.length ? Math.round((validated / rows.length) * 1000) / 10 : 0;
@@ -339,8 +342,13 @@ export function runSource(id: SourceId, c: SourceConfigs, at: string, trigger: R
 
 export interface AlertHit { ruleId: string; key: string; params: Record<string, string | number> }
 
-/** Evalúa las reglas activas contra la última ejecución. Los montos se formatean en el componente. */
-export function evaluateRules(result: RunResult | null, rules: Rule[], ctx: { corrections: Record<string, number> }): AlertHit[] {
+/**
+ * Evalúa las reglas activas contra la última ejecución. Los montos se formatean
+ * en el componente. `today` es la fecha de hoy en Colombia (para "cierra en N días").
+ * Si dos reglas avisan lo mismo (p. ej. la regla general "baja 10 %" y una creada
+ * para ese producto), el aviso sale una sola vez.
+ */
+export function evaluateRules(result: RunResult | null, rules: Rule[], ctx: { corrections: Record<string, number>; today: string }): AlertHit[] {
   if (!result) return [];
   const hits: AlertHit[] = [];
   for (const rule of rules) {
@@ -376,7 +384,7 @@ export function evaluateRules(result: RunResult | null, rules: Rule[], ctx: { co
       case 'closingSoon':
         for (const r of result.rows) {
           if (r.status !== 'open' || !r.closes) continue;
-          const days = daysBetween(DEMO_TODAY, String(r.closes));
+          const days = daysBetween(ctx.today, String(r.closes));
           if (days >= 0 && days <= Number(rule.value) && scoped(String(r.ref))) hits.push({ ruleId: rule.id, key: 'closingSoon', params: { ref: String(r.ref), entity: String(r.entity), days } });
         }
         break;
@@ -400,7 +408,13 @@ export function evaluateRules(result: RunResult | null, rules: Rule[], ctx: { co
         break;
     }
   }
-  return hits;
+  const seen = new Set<string>();
+  return hits.filter((h) => {
+    const id = `${h.key}|${JSON.stringify(h.params)}`;
+    if (seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -419,11 +433,12 @@ const PAST_CHANGES: Record<SourceId, number[]> = {
   documentos: [0, 0, 1, 0, 0, 0],
 };
 
-export function seedHistory(): HistoryEntry[] {
+/** Ejecuciones de ejemplo de los 6 días anteriores a `today` (día de los datos). */
+export function seedHistory(today: string): HistoryEntry[] {
   const out: HistoryEntry[] = [];
   for (const s of SOURCES) {
     for (let i = 0; i < 6; i++) {
-      const day = addDays(DEMO_TODAY, i - 6);
+      const day = addDays(today, i - 6);
       const records = s.series[7 + i];
       const changes = PAST_CHANGES[s.id][i];
       const at = `${day}T${RUN_TIME[s.id]}`;
@@ -448,11 +463,11 @@ export function historyFromResult(r: RunResult, id: string): HistoryEntry {
   return { id, sourceId: r.sourceId, at: r.at, trigger: r.trigger, status: r.status, records: r.rows.length, changes: r.changes.length, quality: r.quality, log: r.log };
 }
 
-/** 14 días: 13 de ejemplo + el resultado de la última ejecución de hoy. */
-export function chartSeries(id: SourceId, todayRecords: number | null): { date: string; value: number; today: boolean }[] {
+/** 14 días: 13 de ejemplo + el resultado de la última ejecución (día `today` de los datos). */
+export function chartSeries(id: SourceId, todayRecords: number | null, today: string): { date: string; value: number; today: boolean }[] {
   const meta = SOURCES.find((s) => s.id === id)!;
-  const pts = meta.series.map((v, i) => ({ date: addDays(DEMO_TODAY, i - 13), value: v, today: false }));
-  pts.push({ date: DEMO_TODAY, value: todayRecords ?? 0, today: true });
+  const pts = meta.series.map((v, i) => ({ date: addDays(today, i - 13), value: v, today: false }));
+  pts.push({ date: today, value: todayRecords ?? 0, today: true });
   return pts;
 }
 

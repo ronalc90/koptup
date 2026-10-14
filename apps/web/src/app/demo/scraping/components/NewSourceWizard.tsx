@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { notify } from '../lib/notify';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import type { SchedulePreset } from '../lib/cron';
-import { DEMO_NOW, addMinutes } from '../lib/format';
+import { colombiaNow } from '../lib/format';
 import { useDemo } from '../lib/store';
 import type { SourceKind } from '../lib/types';
 import { Chip, Modal, btn, inputCls } from './ui';
@@ -74,7 +74,7 @@ export default function NewSourceWizard({ open, onClose, onCreated }: { open: bo
       nextRuleId: p.nextRuleId + 1,
       customSources: [
         ...p.customSources,
-        { id, name: name.trim().slice(0, 60), url: url.trim().slice(0, 300), kind, fields: fields.map(label), preset, destination, createdAt: addMinutes(DEMO_NOW, p.manualRuns * 2) },
+        { id, name: name.trim().slice(0, 60), url: url.trim().slice(0, 300), kind, fields: fields.map(label), preset, destination, createdAt: colombiaNow() },
       ].slice(-10),
     }));
     selectSource(id);

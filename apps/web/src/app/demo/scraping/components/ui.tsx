@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 import { ArrowDownTrayIcon, ChevronUpDownIcon, MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { cop, date as fmtDate, num, pct, type Loc } from '../lib/format';
+import { dismissNotices } from '../lib/notify';
 import type { CellValue, Column, Row } from '../lib/types';
 
 export type T = ReturnType<typeof useTranslations>;
@@ -65,21 +66,50 @@ export const btn = {
 
 export const inputCls = 'w-full rounded-md border border-secondary-700 bg-secondary-950 px-2.5 py-1.5 text-sm text-white outline-none placeholder:text-secondary-500 focus:border-emerald-500';
 
+/**
+ * Ventana modal: pone el foco en ella al abrir, lo mantiene adentro con Tab,
+ * se cierra con Escape o con clic afuera y devuelve el foco al control que la abrió.
+ */
 export function Modal({ open, onClose, title, children, wide = false }: { open: boolean; onClose: () => void; title: string; children: ReactNode; wide?: boolean }) {
   const t = useTranslations('demoScraping');
   const ref = useRef<HTMLDivElement>(null);
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
   useEffect(() => {
     if (!open) return;
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    // Un aviso abajo taparía los botones de la ventana (sobre todo en el celular).
+    dismissNotices();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        closeRef.current();
+        return;
+      }
+      if (e.key !== 'Tab' || !ref.current) return;
+      const items = Array.from(ref.current.querySelectorAll<HTMLElement>('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'));
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && (document.activeElement === first || document.activeElement === ref.current)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     window.addEventListener('keydown', onKey);
     ref.current?.focus();
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      // Devuelve el foco al botón que abrió la ventana (si sigue en la página).
+      if (opener && opener.isConnected) opener.focus();
+    };
+  }, [open]);
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-0 sm:items-center sm:p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-[120] flex items-end justify-center bg-black/60 p-0 sm:items-center sm:p-4" onClick={onClose}>
       <div
         ref={ref}
         tabIndex={-1}

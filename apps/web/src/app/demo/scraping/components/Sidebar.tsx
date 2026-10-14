@@ -6,18 +6,17 @@ import { ArrowUturnLeftIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { SOURCES } from '../lib/data';
 import { dateTime, norm, num } from '../lib/format';
 import { useDemo } from '../lib/store';
-import { Modal, btn, inputCls } from './ui';
+import { btn, inputCls } from './ui';
 import NewSourceWizard from './NewSourceWizard';
 
 type Filter = 'all' | 'active' | 'paused' | 'review';
 
-export default function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
+export default function Sidebar({ open, onClose, onReset }: { open: boolean; onClose: () => void; onReset: () => void }) {
   const t = useTranslations('demoScraping');
-  const { s, ready, loc, selectSource, reset } = useDemo();
+  const { s, ready, loc, selectSource } = useDemo();
   const [filter, setFilter] = useState<Filter>('all');
   const [q, setQ] = useState('');
   const [wizard, setWizard] = useState(false);
-  const [confirmReset, setConfirmReset] = useState(false);
 
   const items = [
     ...SOURCES.map((m) => {
@@ -68,7 +67,19 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
         </div>
         <label className="block">
           <span className="sr-only">{t('sidebar.search')}</span>
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('sidebar.search')} className={`${inputCls} !py-1.5 !text-xs`} />
+          <input
+            type="search"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape' && q) {
+                e.preventDefault();
+                setQ('');
+              }
+            }}
+            placeholder={t('sidebar.search')}
+            className={`${inputCls} !py-1.5 !text-xs`}
+          />
         </label>
         <div className="flex flex-wrap gap-1 text-[11px]">
           {(['all', 'active', 'paused', 'review'] as Filter[]).map((f) => (
@@ -120,29 +131,12 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
           })}
         </ul>
         <p className="text-[11px] leading-relaxed text-secondary-500">{t('sidebar.note')}</p>
-        <button type="button" onClick={() => setConfirmReset(true)} className={`${btn.ghost} w-full justify-start`}>
+        <button type="button" onClick={onReset} className={`${btn.ghost} w-full justify-start`}>
           <ArrowUturnLeftIcon className="h-3.5 w-3.5" />
           {t('actions.reset')}
         </button>
       </div>
       <NewSourceWizard open={wizard} onClose={() => setWizard(false)} onCreated={() => onClose()} />
-      <Modal open={confirmReset} onClose={() => setConfirmReset(false)} title={t('actions.resetTitle')}>
-        <p className="text-sm text-secondary-300">{t('actions.resetConfirm')}</p>
-        <div className="mt-5 flex justify-end gap-2">
-          <button type="button" className={btn.secondary} onClick={() => setConfirmReset(false)}>{t('actions.cancel')}</button>
-          <button
-            type="button"
-            className={btn.primary}
-            onClick={() => {
-              reset();
-              setConfirmReset(false);
-              onClose();
-            }}
-          >
-            {t('actions.reset')}
-          </button>
-        </div>
-      </Modal>
     </aside>
   );
 }

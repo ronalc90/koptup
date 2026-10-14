@@ -8,14 +8,28 @@
       "breadcrumbDemos": "Demos",
       "company": "{company} · NIT {nit} · fictional company",
       "sampleBadge": "Sample data",
-      "sampleHint": "The company, public entities, stores, suppliers and figures are fictional. Cut-off date: Oct 8, 2026.",
+      "sampleHint": "The company, public entities, stores, suppliers and figures are fictional. Dates are calculated from today's date in Colombia.",
       "responsibleSeal": "Responsible extraction",
       "responsibleHint": "Open the source's compliance sheet",
       "running": "Updating {source}",
       "menu": "Open sources",
       "closeMenu": "Close sources",
       "tabsLabel": "Source sections",
-      "loading": "Loading sample data…"
+      "loading": "Loading sample data…",
+      "movedToToday": "We brought the demo up to today: your settings were kept and the runs were rebuilt with today's date."
+    },
+    "intro": {
+      "back": "Back to the demo catalog",
+      "guidedDemo": "Request a guided demo",
+      "quote": "Get a quote",
+      "kicker": "Interactive demo · Data from websites and documents",
+      "subtitle": "A dashboard that watches public sources and documents for you: procurement processes, competitor prices, regulations and supplier documents. It detects what changed, alerts you and delivers the data in Excel.",
+      "resetHint": "Clears what you did in this browser and goes back to the sample data",
+      "forWhomLabel": "Who it's for:",
+      "forWhom": "sales, purchasing or bidding managers who need to learn in time what is happening outside, without copying data by hand.",
+      "startLabel": "Where to start:",
+      "start": "follow the 5-step tour (open a radar process, create a field with one click and see what changed) or pick a source in “My sources”.",
+      "startCta": "Start the tour"
     },
     "actions": {
       "runNow": "Update now",
@@ -117,6 +131,8 @@
       "show": "Show",
       "hide": "Hide",
       "done": "Done",
+      "nextLabel": "Next step",
+      "stepToast": "Step {n} of {total}: {title}. {hint}",
       "steps": {
         "radar": {
           "title": "Procurement radar",
@@ -139,12 +155,13 @@
           "hint": "Terms of use, robots.txt and Colombia's Law 1581 per source."
         }
       },
-      "cta": "Which source do you need? Tell us and we will check whether it can be extracted before quoting."
+      "cta": "Which source do you need? Tell us and we will check whether it can be extracted before quoting.",
+      "completed": "Tour complete! We can walk you through the demo with your sources or run a trial extraction with the one you need."
     },
     "overview": {
       "kpis": {
         "records": "Records",
-        "newToday": "New today",
+        "newToday": "New",
         "otherChanges": "Other changes",
         "quality": "Quality",
         "updated": "Last update"
@@ -153,12 +170,13 @@
         "fields": "required fields filled",
         "docs": "documents validated without review"
       },
+      "newHint": "vs. the previous day",
       "chartTitle": "Records per run (last 14 days)",
-      "chartHint": "One scheduled run per day; today's bar is your latest run.",
-      "chartAria": "Bar chart of records per day; today: {today}",
+      "chartHint": "One scheduled run per day; the last bar is your latest run.",
+      "chartAria": "Bar chart of records per day; latest run: {today}",
       "barTitle": "{date}: {value} records",
       "today": "Today",
-      "alertsTitle": "Today's alerts",
+      "alertsTitle": "Alerts from the latest run",
       "configureAlerts": "Configure",
       "noAlerts": "No active rule matches the latest run.",
       "tableTitle": "Data from the latest run",
@@ -175,7 +193,7 @@
         "sendAll": "Send pending to the assistant ({count})",
         "send": "Send",
         "note": "Simulated in the demo: in your project, these documents are loaded into your RAG assistant's knowledge base so it answers citing the regulation.",
-        "chatbotLink": "See the RAG assistant demo"
+        "chatbotLink": "Try the RAG assistant demo separately"
       },
       "process": {
         "open": "See details of process {ref}",
@@ -387,7 +405,7 @@
       "departments": "Departments",
       "minAmount": "Minimum amount (COP)",
       "simulatedNote": "Changes apply on the next run. Sample data: fictional entities.",
-      "previewTitle": "With these criteria {matched} of today's {total} processes match",
+      "previewTitle": "With these criteria, {matched} of {total} processes in the day's file match",
       "previewHint": "Preview over the day's sample file.",
       "fits": "Matches",
       "noFit": "No match",
@@ -428,7 +446,7 @@
     },
     "changes": {
       "title": "Detected changes",
-      "subtitle": "Field-by-field comparison between yesterday's run ({before}) and the latest one ({after}).",
+      "subtitle": "Field-by-field comparison between the previous day's run ({before}) and the latest one ({after}).",
       "filterLabel": "Filter by change type",
       "kinds": {
         "all": "All",
@@ -436,7 +454,7 @@
         "modified": "Modified",
         "removed": "Removed"
       },
-      "none": "No changes since yesterday's run.",
+      "none": "No changes since the previous day's run.",
       "noneFiltered": "No changes of this type.",
       "badge": {
         "added": "New",
@@ -479,7 +497,7 @@
       "nextRuns": "Next 5 runs",
       "noRuns": "No runs in the next two years with this expression.",
       "pausedNote": "The source is paused: these runs will not happen until you resume it.",
-      "demoClock": "Calculated from the demo clock ({now}). Nothing runs on its own in the demo: use “Update now”.",
+      "demoClock": "Calculated from Colombia time when you opened the demo ({now}). Nothing runs on its own in the demo: use “Update now”.",
       "rulesTitle": "Alert rules",
       "rulesHint": "They are evaluated against the latest run; the result shows in the Overview and in the message on the right.",
       "noRules": "This source has no rules.",
@@ -510,7 +528,7 @@
         "teams": "Microsoft Teams",
         "whatsapp": "WhatsApp Business"
       },
-      "previewTitle": "Today's message ({count, plural, one {# alert} other {# alerts}})",
+      "previewTitle": "Message with the latest run's alerts ({count, plural, one {# alert} other {# alerts}})",
       "message": {
         "header": "{source} · {date}",
         "none": "No alerts with the active rules.",
@@ -560,8 +578,30 @@
         "runAt": "Run date"
       },
       "api": {
-        "title": "API or webhook",
-        "text": "After each run, your system gets a notice with the changes (webhook) or queries the data through an API."
+        "title": "API or automatic notice (webhook)",
+        "text": "After each run, your system gets a notice with the changes (webhook) or queries the data through an API.",
+        "eventName": "run.completed",
+        "keys": {
+          "event": "event",
+          "source": "source",
+          "runAt": "run_at",
+          "records": "records",
+          "quality": "quality",
+          "changes": "changes",
+          "type": "type",
+          "key": "key",
+          "title": "title",
+          "fields": "fields",
+          "field": "field",
+          "before": "before",
+          "after": "after",
+          "sampleRecord": "sample_record"
+        },
+        "kinds": {
+          "added": "added",
+          "modified": "modified",
+          "removed": "removed"
+        }
       },
       "notify": {
         "title": "Alerts by email, Teams or WhatsApp",
@@ -589,7 +629,7 @@
         "selectorApproved": "An engineer approved the new selector and the run completed."
       },
       "repairTitle": "What happens when a page changes?",
-      "repairText": "Quality monitoring detects empty fields or fewer records than usual (see October 5 in Prices). In your project, AI proposes the new selector, an engineer approves it and the run is repeated; repair time depends on the plan."
+      "repairText": "Quality monitoring detects empty fields or fewer records than usual (see the {date} run in Prices). In your project, AI proposes the new selector, an engineer approves it and the run is repeated; repair time depends on the plan."
     },
     "compliance": {
       "title": "Source compliance",
@@ -620,8 +660,7 @@
           "personalData": "Not extracted: only entity, purpose, amount, dates and process status.",
           "legalBasis": "Public information (Colombia's Law 1712 of 2014 on transparency).",
           "retention": "24 months.",
-          "owner": "Sales coordination (sample).",
-          "reviewed": "Sep 1, 2026"
+          "owner": "Sales coordination (sample)."
         },
         "precios": {
           "sourceType": "Public online store pages (three fictional stores in the demo).",
@@ -632,8 +671,7 @@
           "personalData": "Excluded: no reviews, names or buyer data are extracted.",
           "legalBasis": "Public commercial information; no personal data.",
           "retention": "12 months.",
-          "owner": "Sales management (sample).",
-          "reviewed": "Sep 15, 2026"
+          "owner": "Sales management (sample)."
         },
         "normativa": {
           "sourceType": "Public regulation pages of entities (fictional in the demo).",
@@ -644,8 +682,7 @@
           "personalData": "Only number, date, entity, title and link to the public PDF.",
           "legalBasis": "Public information (Colombia's Law 1712 of 2014 on transparency).",
           "retention": "While the regulation is in force.",
-          "owner": "Legal department (sample).",
-          "reviewed": "Sep 20, 2026"
+          "owner": "Legal department (sample)."
         },
         "documentos": {
           "sourceType": "Documents your suppliers hand in for onboarding (RUT, certificates, invoices).",
@@ -656,8 +693,7 @@
           "personalData": "Only the legal representative's name (if you choose to extract it). No ID numbers, phone numbers or personal emails are extracted.",
           "legalBasis": "Supplier authorization and contractual relationship (Colombia's Law 1581 of 2012).",
           "retention": "Per your data processing policy (example: for the duration of the business relationship).",
-          "owner": "Purchasing (sample).",
-          "reviewed": "Sep 28, 2026"
+          "owner": "Purchasing (sample)."
         }
       },
       "sheetTitle": "Sheet: {source}",
@@ -745,7 +781,7 @@
         "csv": "Excel or CSV",
         "sheets": "Google Sheets",
         "bi": "Power BI or database",
-        "api": "API or webhook",
+        "api": "API or automatic notice (webhook)",
         "email": "Email summary"
       },
       "reviewNote": "The source stays “in review”. In a real project we review terms of use, robots.txt and personal data before building the extractor; if the source does not allow it, we tell you.",
@@ -755,7 +791,7 @@
     "review": {
       "summaryTitle": "Trial extraction request",
       "fields": "Data you need",
-      "subtitle": "Source in review since {when}. Not extracted yet.",
+      "subtitle": "Not extracted yet: in review since {when}",
       "checksTitle": "Review before extracting",
       "checks": {
         "terms": "Source terms of use",

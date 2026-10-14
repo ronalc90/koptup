@@ -4,6 +4,10 @@
  * Estado de la demo en el navegador. Se guarda en localStorage (clave
  * `demo:scraping:v1`) para que tu configuración, tus reglas y tus ejecuciones
  * sigan ahí al volver; "Reiniciar demo" lo borra. Nada sale del navegador.
+ *
+ * Fechas: los datos de ejemplo se corren al día de hoy en Colombia (ver
+ * `DemoClock`), calculado después de montar. Si lo guardado es de otro día, se
+ * conserva tu configuración y se vuelven a armar las ejecuciones con la fecha de hoy.
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
@@ -13,7 +17,7 @@ import {
   DEFAULT_DOCS, DEFAULT_FIELDS, DEFAULT_NORMATIVA, DEFAULT_RADAR, DEFAULT_RULES, RECORD_SELECTOR, SIMULATED_STORE_CHANGES, SOURCES, SOURCE_IDS,
 } from './data';
 import { historyFromResult, runSource, scheduledTime, seedHistory, signatureOf, type SourceConfigs } from './engine';
-import { DEMO_NOW, DEMO_TODAY, addMinutes, type Loc } from './format';
+import { BASE_CLOCK, BASE_DAY, clockAt, colombiaNow, dayShift, type DemoClock, type Loc } from './format';
 import type {
   Channel, CustomSource, DocsConfig, Field, HistoryEntry, NormativaConfig, RadarConfig, Rule, RunResult, Schedule, SentAlert, SourceId, Tab,
 } from './types';
@@ -25,6 +29,8 @@ export type TourStep = 'radar' | 'field' | 'change' | 'download' | 'legal';
 export const TOUR_STEPS: TourStep[] = ['radar', 'field', 'change', 'download', 'legal'];
 
 export interface DemoState {
+  /** Día de los datos (`AAAA-MM-DD`) con el que se armaron las ejecuciones guardadas. */
+  day: string;
   activeId: string;
   tab: Tab;
   fieldsSaved: Field[];
@@ -52,8 +58,9 @@ export interface DemoState {
   tourHidden: boolean;
 }
 
-export function defaultState(): DemoState {
+export function defaultState(day: string = BASE_DAY): DemoState {
   return {
+    day,
     activeId: 'contratacion',
     tab: 'overview',
     fieldsSaved: DEFAULT_FIELDS,
@@ -92,6 +99,8 @@ function restore(raw: unknown): DemoState {
   if (!isObj(raw)) return base;
   const out: DemoState = { ...base };
   const r = raw as Partial<DemoState>;
+  // Sin día (versión con fecha fija) se marca vacío para volver a armar las ejecuciones.
+  out.day = typeof r.day === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(r.day) ? r.day : '';
   if (typeof r.activeId === 'string') out.activeId = r.activeId;
   if (typeof r.tab === 'string' && TABS.includes(r.tab)) out.tab = r.tab;
   const validField = (f: unknown): f is Field => isObj(f) && typeof f.id === 'string' && typeof f.name === 'string' && typeof f.selector === 'string' && typeof f.type === 'string' && typeof f.required === 'boolean' && (f.scope === 'record' || f.scope === 'page');
@@ -133,17 +142,24 @@ function restore(raw: unknown): DemoState {
 }
 
 export function configsOf(s: DemoState): SourceConfigs {
-  return { fields: s.fieldsSaved, recordSelector: s.recordSelector, simulated: s.simulated, radar: s.radar, normativa: s.normativa, docs: s.docs };
+  return { shift: dayShift(s.day || BASE_DAY), fields: s.fieldsSaved, recordSelector: s.recordSelector, simulated: s.simulated, radar: s.radar, normativa: s.normativa, docs: s.docs };
 }
 
-/** Completa la ejecución programada de hoy (6:00 a. m.) de cada fuente que no tenga resultado. */
-function withScheduledRuns(st: DemoState): DemoState {
+/** Pone lo guardado al día `day`: si es de otro día, conserva la configuración y descarta las ejecuciones. */
+export function alignToDay(st: DemoState, day: string): { state: DemoState; moved: boolean } {
+  if (st.day === day) return { state: st, moved: false };
+  const hadRuns = Object.keys(st.results).length > 0 || st.history.length > 0;
+  return { state: { ...st, day, results: {}, history: [], sentAlerts: [], manualRuns: 0 }, moved: hadRuns };
+}
+
+/** Completa la ejecución programada del día (6:00 a. m.) de cada fuente que no tenga resultado. */
+export function withScheduledRuns(st: DemoState): DemoState {
   const cfg = configsOf(st);
   const results = { ...st.results };
   const history = [...st.history];
   for (const id of SOURCE_IDS) {
     if (results[id]) continue;
-    const res = runSource(id, cfg, `${DEMO_TODAY}T${scheduledTime(id)}`, 'scheduled');
+    const res = runSource(id, cfg, `${st.day}T${scheduledTime(id)}`, 'scheduled');
     results[id] = res;
     if (!history.some((h) => h.id === `today-${id}`)) history.push(historyFromResult(res, `today-${id}`));
   }
@@ -156,6 +172,8 @@ interface Ctx {
   s: DemoState;
   ready: boolean;
   loc: Loc;
+  /** Reloj de la demo (hora de Colombia), calculado al montar. */
+  clock: DemoClock;
   running: Running | null;
   update: (fn: (s: DemoState) => DemoState) => void;
   selectSource: (id: string) => void;
@@ -178,23 +196,29 @@ export function useDemo(): Ctx {
 export function DemoProvider({ children }: { children: ReactNode }) {
   const t = useTranslations('demoScraping');
   const loc: Loc = useLocale() === 'en' ? 'en' : 'es';
-  const [s, setS] = useState<DemoState>(defaultState);
+  const [s, setS] = useState<DemoState>(() => defaultState());
+  const [clock, setClock] = useState<DemoClock>(BASE_CLOCK);
   const [ready, setReady] = useState(false);
   const [running, setRunning] = useState<Running | null>(null);
   const tRef = useRef(t);
   tRef.current = t;
 
-  // 1) Cargar lo guardado y calcular la ejecución programada de hoy (6:00 a. m.) que falte.
+  // 1) Calcular la fecha de hoy en Colombia, cargar lo guardado (puesto al día) y
+  //    calcular la ejecución programada del día (6:00 a. m.) que falte.
   useEffect(() => {
-    let restored = defaultState();
+    const c = clockAt(new Date());
+    let restored = defaultState(c.day);
     try {
       const raw = window.localStorage.getItem(KEY);
       if (raw) restored = restore(JSON.parse(raw));
     } catch {
-      restored = defaultState();
+      restored = defaultState(c.day);
     }
-    setS(withScheduledRuns(restored));
+    const { state, moved } = alignToDay(restored, c.day);
+    setClock(c);
+    setS(withScheduledRuns(state));
     setReady(true);
+    if (moved) notify.info(tRef.current('meta.movedToToday'), 'scraping-moved-to-today');
   }, []);
 
   // 2) Guardar cada cambio, solo después de cargar lo guardado (si no, el estado
@@ -220,7 +244,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       setS((prev) => ({
         ...prev,
         results: { ...prev.results, [res.sourceId]: res },
-        history: [...prev.history, historyFromResult(res, `m-${prev.manualRuns + 1}`)].slice(-60),
+        history: [...prev.history, historyFromResult(res, `m-${String(prev.manualRuns + 1).padStart(4, '0')}`)].slice(-60),
         manualRuns: prev.manualRuns + 1,
       }));
       setRunning(null);
@@ -255,7 +279,10 @@ export function DemoProvider({ children }: { children: ReactNode }) {
 
   const runNow = useCallback((id: SourceId) => {
     if (running) return;
-    const at = addMinutes(DEMO_NOW, s.manualRuns * 2);
+    // Hora real de Colombia (nunca antes de la última ejecución guardada de la fuente).
+    const now = colombiaNow();
+    const last = s.results[id]?.at ?? '';
+    const at = now > last ? now : last;
     let result: RunResult;
     try {
       result = runSource(id, configsOf(s), at, 'manual');
@@ -273,7 +300,9 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       /* sin almacenamiento */
     }
     setRunning(null);
-    setS(withScheduledRuns(defaultState()));
+    const c = clockAt(new Date());
+    setClock(c);
+    setS(withScheduledRuns(defaultState(c.day)));
     notify.success(tRef.current('actions.resetDone'));
   }, []);
 
@@ -283,11 +312,14 @@ export function DemoProvider({ children }: { children: ReactNode }) {
   }, [s]);
 
   const fullHistory = useMemo(
-    () => [...seedHistory(), ...s.history].sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : a.id < b.id ? 1 : -1)),
-    [s.history],
+    () => [...seedHistory(s.day || BASE_DAY), ...s.history].sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : a.id < b.id ? 1 : -1)),
+    [s.history, s.day],
   );
 
-  const value = useMemo<Ctx>(() => ({ s, ready, loc, running, update, selectSource, setTab, runNow, markTour, reset, pendingConfig, fullHistory }), [s, ready, loc, running, update, selectSource, setTab, runNow, markTour, reset, pendingConfig, fullHistory]);
+  const value = useMemo<Ctx>(
+    () => ({ s, ready, loc, clock, running, update, selectSource, setTab, runNow, markTour, reset, pendingConfig, fullHistory }),
+    [s, ready, loc, clock, running, update, selectSource, setTab, runNow, markTour, reset, pendingConfig, fullHistory],
+  );
 
   return <DemoCtx.Provider value={value}>{children}</DemoCtx.Provider>;
 }

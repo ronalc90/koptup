@@ -1,9 +1,15 @@
 /**
  * Datos de ejemplo de la demo. Empresa, entidades, tiendas, proveedores,
  * documentos y cifras son ficticios; las tiendas usan dominios `.example`
- * (reservados para ejemplos, no existen). Fecha de corte: 8 oct. 2026.
+ * (reservados para ejemplos, no existen).
+ *
+ * Las fechas se escribieron con `BASE_DAY` (8 oct. 2026) como "hoy"; la demo
+ * las corre al día de hoy en Colombia con `processesFor`, `normsFor` y
+ * `shiftIso`, así que siempre quedan en el mismo lugar respecto a hoy (un
+ * proceso que cierra "en 7 días" sigue cerrando en 7 días).
  */
 import type { SchedulePreset } from './cron';
+import { shiftIso } from './format';
 import type { DocsConfig, Field, NormativaConfig, RadarConfig, Rule, SourceId, SourceKind } from './types';
 
 export const COMPANY = {
@@ -17,16 +23,18 @@ export interface SourceMeta {
   kind: SourceKind;
   /** Origen técnico mostrado en la ficha (texto de ejemplo, no se consulta). */
   origin: string;
-  /** Serie de registros de las 13 ejecuciones diarias anteriores (25 sept. – 7 oct.). */
+  /** Serie de registros de las 13 ejecuciones diarias anteriores (de hace 13 días a ayer). */
   series: number[];
   defaultPreset: SchedulePreset;
+  /** Última revisión de la ficha legal (fecha de ejemplo, se corre con `shiftIso`). */
+  reviewed: string;
 }
 
 export const SOURCES: SourceMeta[] = [
-  { id: 'contratacion', kind: 'api', origin: 'datos-abiertos.example/api/procesos', series: [1, 1, 1, 2, 2, 3, 4, 4, 4, 4, 4, 5, 5], defaultPreset: 'daily6' },
-  { id: 'precios', kind: 'web', origin: 'la-tuerca.example · el-martillo.example · casa-del-tornillo.example', series: [15, 15, 15, 15, 15, 16, 16, 16, 16, 16, 16, 16, 16], defaultPreset: 'daily6' },
-  { id: 'normativa', kind: 'web', origin: 'normas-demo.example/novedades', series: [2, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 5], defaultPreset: 'daily6' },
-  { id: 'documentos', kind: 'documents', origin: 'Carpeta compartida «Proveedores/Documentos» (ejemplo)', series: [0, 0, 0, 0, 1, 1, 2, 2, 2, 3, 3, 3, 3], defaultPreset: 'daily6' },
+  { id: 'contratacion', kind: 'api', origin: 'datos-abiertos.example/api/procesos', series: [1, 1, 1, 2, 2, 3, 4, 4, 4, 4, 4, 5, 5], defaultPreset: 'daily6', reviewed: '2026-09-01' },
+  { id: 'precios', kind: 'web', origin: 'la-tuerca.example · el-martillo.example · casa-del-tornillo.example', series: [15, 15, 15, 15, 15, 16, 16, 16, 16, 16, 16, 16, 16], defaultPreset: 'daily6', reviewed: '2026-09-15' },
+  { id: 'normativa', kind: 'web', origin: 'normas-demo.example/novedades', series: [2, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 5], defaultPreset: 'daily6', reviewed: '2026-09-20' },
+  { id: 'documentos', kind: 'documents', origin: 'Carpeta compartida «Proveedores/Documentos» (ejemplo)', series: [0, 0, 0, 0, 1, 1, 2, 2, 2, 3, 3, 3, 3], defaultPreset: 'daily6', reviewed: '2026-09-28' },
 ];
 
 export const SOURCE_IDS: SourceId[] = SOURCES.map((s) => s.id);
@@ -42,6 +50,7 @@ export function sourceMeta(id: SourceId): SourceMeta {
 export type Modality = 'minima' | 'abreviada' | 'licitacion' | 'directa';
 
 export interface Process {
+  /** Referencia `PROC-AA-NNNN`: el año sale de la fecha de publicación (ver `processesFor`). */
   ref: string;
   entity: string;
   object: string;
@@ -57,35 +66,46 @@ export interface Process {
 export const DEPARTMENTS = ['Risaralda', 'Caldas', 'Quindío', 'Antioquia', 'Valle del Cauca'];
 
 const P_YESTERDAY: Process[] = [
-  { ref: 'PROC-26-0371', entity: 'Gobernación Demo del Eje', object: 'Suministro de elementos de ferretería y herramientas para el mantenimiento de vías terciarias', modality: 'abreviada', department: 'Risaralda', city: 'Pereira', amount: 486_200_000, published: '2026-09-28', closes: '2026-10-15', status: 'open' },
-  { ref: 'PROC-26-0384', entity: 'Hospital Departamental Ejemplo', object: 'Compra de pintura epóxica y materiales para la adecuación del área de urgencias', modality: 'minima', department: 'Caldas', city: 'Manizales', amount: 74_800_000, published: '2026-09-30', closes: '2026-10-09', status: 'open' },
-  { ref: 'PROC-26-0390', entity: 'Empresa de Servicios Públicos Demo E.S.P.', object: 'Suministro de tubería, válvulas y accesorios para redes de acueducto', modality: 'licitacion', department: 'Quindío', city: 'Armenia', amount: 1_385_000_000, published: '2026-09-22', closes: '2026-10-07', status: 'open' },
-  { ref: 'PROC-26-0402', entity: 'Universidad Pública Ejemplo', object: 'Servicio de vigilancia y seguridad privada para las sedes', modality: 'licitacion', department: 'Antioquia', city: 'Medellín', amount: 2_140_000_000, published: '2026-09-25', closes: '2026-10-20', status: 'open' },
-  { ref: 'PROC-26-0408', entity: 'Corporación Autónoma Demo del Río', object: 'Suministro de herramientas de mano y equipos para brigadas forestales', modality: 'minima', department: 'Risaralda', city: 'Dosquebradas', amount: 42_300_000, published: '2026-10-01', closes: '2026-10-14', status: 'open' },
-  { ref: 'PROC-26-0415', entity: 'Terminal de Transporte Demo S.A.', object: 'Suministro de materiales eléctricos para el cambio de luminarias', modality: 'minima', department: 'Caldas', city: 'Manizales', amount: 18_900_000, published: '2026-10-02', closes: '2026-10-12', status: 'open' },
-  { ref: 'PROC-26-0421', entity: 'Empresa Social del Estado Demo Salud', object: 'Suministro de alimentos para pacientes hospitalizados', modality: 'abreviada', department: 'Quindío', city: 'Calarcá', amount: 356_000_000, published: '2026-10-05', closes: '2026-10-19', status: 'open' },
-  { ref: 'PROC-26-0433', entity: 'Alcaldía Demo de Villa Montaña', object: 'Compra de materiales de ferretería para el programa de mejoramiento de vivienda', modality: 'abreviada', department: 'Valle del Cauca', city: 'Tuluá', amount: 728_000_000, published: '2026-10-06', closes: '2026-10-23', status: 'open' },
-  { ref: 'PROC-26-0437', entity: 'Secretaría de Educación Demo', object: 'Suministro de pintura y elementos de ferretería para instituciones educativas', modality: 'minima', department: 'Antioquia', city: 'Rionegro', amount: 61_500_000, published: '2026-10-06', closes: '2026-10-16', status: 'open' },
+  { ref: '0371', entity: 'Gobernación Demo del Eje', object: 'Suministro de elementos de ferretería y herramientas para el mantenimiento de vías terciarias', modality: 'abreviada', department: 'Risaralda', city: 'Pereira', amount: 486_200_000, published: '2026-09-28', closes: '2026-10-15', status: 'open' },
+  { ref: '0384', entity: 'Hospital Departamental Ejemplo', object: 'Compra de pintura epóxica y materiales para la adecuación del área de urgencias', modality: 'minima', department: 'Caldas', city: 'Manizales', amount: 74_800_000, published: '2026-09-30', closes: '2026-10-09', status: 'open' },
+  { ref: '0390', entity: 'Empresa de Servicios Públicos Demo E.S.P.', object: 'Suministro de tubería, válvulas y accesorios para redes de acueducto', modality: 'licitacion', department: 'Quindío', city: 'Armenia', amount: 1_385_000_000, published: '2026-09-22', closes: '2026-10-07', status: 'open' },
+  { ref: '0402', entity: 'Universidad Pública Ejemplo', object: 'Servicio de vigilancia y seguridad privada para las sedes', modality: 'licitacion', department: 'Antioquia', city: 'Medellín', amount: 2_140_000_000, published: '2026-09-25', closes: '2026-10-20', status: 'open' },
+  { ref: '0408', entity: 'Corporación Autónoma Demo del Río', object: 'Suministro de herramientas de mano y equipos para brigadas forestales', modality: 'minima', department: 'Risaralda', city: 'Dosquebradas', amount: 42_300_000, published: '2026-10-01', closes: '2026-10-14', status: 'open' },
+  { ref: '0415', entity: 'Terminal de Transporte Demo S.A.', object: 'Suministro de materiales eléctricos para el cambio de luminarias', modality: 'minima', department: 'Caldas', city: 'Manizales', amount: 18_900_000, published: '2026-10-02', closes: '2026-10-12', status: 'open' },
+  { ref: '0421', entity: 'Empresa Social del Estado Demo Salud', object: 'Suministro de alimentos para pacientes hospitalizados', modality: 'abreviada', department: 'Quindío', city: 'Calarcá', amount: 356_000_000, published: '2026-10-05', closes: '2026-10-19', status: 'open' },
+  { ref: '0433', entity: 'Alcaldía Demo de Villa Montaña', object: 'Compra de materiales de ferretería para el programa de mejoramiento de vivienda', modality: 'abreviada', department: 'Valle del Cauca', city: 'Tuluá', amount: 728_000_000, published: '2026-10-06', closes: '2026-10-23', status: 'open' },
+  { ref: '0437', entity: 'Secretaría de Educación Demo', object: 'Suministro de pintura y elementos de ferretería para instituciones educativas', modality: 'minima', department: 'Antioquia', city: 'Rionegro', amount: 61_500_000, published: '2026-10-06', closes: '2026-10-16', status: 'open' },
 ];
 
 const P_NEW_TODAY: Process[] = [
-  { ref: 'PROC-26-0446', entity: 'Universidad Pública Ejemplo', object: 'Suministro de herramientas y materiales de ferretería para el mantenimiento de sedes', modality: 'abreviada', department: 'Antioquia', city: 'Medellín', amount: 684_500_000, published: '2026-10-08', closes: '2026-10-22', status: 'open' },
-  { ref: 'PROC-26-0449', entity: 'Instituto Demo de Vías Departamentales', object: 'Suministro de materiales eléctricos y luminarias para túneles viales', modality: 'licitacion', department: 'Antioquia', city: 'Santa Fe de Antioquia', amount: 1_240_000_000, published: '2026-10-08', closes: '2026-10-30', status: 'open' },
-  { ref: 'PROC-26-0451', entity: 'Colegio Oficial Ejemplo La Esperanza', object: 'Compra de pintura y elementos de ferretería para el mantenimiento de aulas', modality: 'minima', department: 'Risaralda', city: 'Santa Rosa de Cabal', amount: 38_700_000, published: '2026-10-08', closes: '2026-10-13', status: 'open' },
-  { ref: 'PROC-26-0453', entity: 'Aeropuerto Regional Ejemplo', object: 'Suministro de tubería y accesorios en PVC para redes sanitarias', modality: 'abreviada', department: 'Valle del Cauca', city: 'Cartago', amount: 512_000_000, published: '2026-10-08', closes: '2026-10-26', status: 'open' },
-  { ref: 'PROC-26-0455', entity: 'Secretaría de Infraestructura Demo', object: 'Suministro de herramientas menores y equipos de ferretería para cuadrillas de obra', modality: 'abreviada', department: 'Antioquia', city: 'Envigado', amount: 596_300_000, published: '2026-10-08', closes: '2026-10-27', status: 'open' },
-  { ref: 'PROC-26-0458', entity: 'Concejo Municipal Demo', object: 'Servicio de aseo y cafetería', modality: 'minima', department: 'Caldas', city: 'Chinchiná', amount: 64_000_000, published: '2026-10-08', closes: '2026-10-15', status: 'open' },
+  { ref: '0446', entity: 'Universidad Pública Ejemplo', object: 'Suministro de herramientas y materiales de ferretería para el mantenimiento de sedes', modality: 'abreviada', department: 'Antioquia', city: 'Medellín', amount: 684_500_000, published: '2026-10-08', closes: '2026-10-22', status: 'open' },
+  { ref: '0449', entity: 'Instituto Demo de Vías Departamentales', object: 'Suministro de materiales eléctricos y luminarias para túneles viales', modality: 'licitacion', department: 'Antioquia', city: 'Santa Fe de Antioquia', amount: 1_240_000_000, published: '2026-10-08', closes: '2026-10-30', status: 'open' },
+  { ref: '0451', entity: 'Colegio Oficial Ejemplo La Esperanza', object: 'Compra de pintura y elementos de ferretería para el mantenimiento de aulas', modality: 'minima', department: 'Risaralda', city: 'Santa Rosa de Cabal', amount: 38_700_000, published: '2026-10-08', closes: '2026-10-13', status: 'open' },
+  { ref: '0453', entity: 'Aeropuerto Regional Ejemplo', object: 'Suministro de tubería y accesorios en PVC para redes sanitarias', modality: 'abreviada', department: 'Valle del Cauca', city: 'Cartago', amount: 512_000_000, published: '2026-10-08', closes: '2026-10-26', status: 'open' },
+  { ref: '0455', entity: 'Secretaría de Infraestructura Demo', object: 'Suministro de herramientas menores y equipos de ferretería para cuadrillas de obra', modality: 'abreviada', department: 'Antioquia', city: 'Envigado', amount: 596_300_000, published: '2026-10-08', closes: '2026-10-27', status: 'open' },
+  { ref: '0458', entity: 'Concejo Municipal Demo', object: 'Servicio de aseo y cafetería', modality: 'minima', department: 'Caldas', city: 'Chinchiná', amount: 64_000_000, published: '2026-10-08', closes: '2026-10-15', status: 'open' },
 ];
 
-export const PROCESSES_YESTERDAY: Process[] = P_YESTERDAY;
-export const PROCESSES_TODAY: Process[] = [
+const P_TODAY: Process[] = [
   ...P_YESTERDAY.map((p) => {
-    if (p.ref === 'PROC-26-0390') return { ...p, status: 'closed' as const };
-    if (p.ref === 'PROC-26-0408') return { ...p, closes: '2026-10-21' };
+    if (p.ref === '0390') return { ...p, status: 'closed' as const };
+    if (p.ref === '0408') return { ...p, closes: '2026-10-21' };
     return p;
   }),
   ...P_NEW_TODAY,
 ];
+
+/** Procesos corridos `shift` días, con la referencia completa (`PROC-26-0371`). */
+export function processesFor(list: Process[], shift: number): Process[] {
+  return list.map((p) => {
+    const published = shiftIso(p.published, shift);
+    return { ...p, ref: `PROC-${published.slice(2, 4)}-${p.ref}`, published, closes: shiftIso(p.closes, shift) };
+  });
+}
+
+/** Archivo de ejemplo de ayer y de hoy (sin correr: usa `processesFor`). */
+export const PROCESSES_YESTERDAY: Process[] = P_YESTERDAY;
+export const PROCESSES_TODAY: Process[] = P_TODAY;
 
 export const DEFAULT_RADAR: RadarConfig = {
   keywords: ['ferretería', 'herramientas', 'pintura', 'materiales eléctricos', 'tubería'],
@@ -191,10 +211,12 @@ export const DEFAULT_FIELDS: Field[] = [
 export interface NormDoc {
   id: string;
   type: 'resolucion' | 'circular' | 'decreto' | 'concepto';
+  /** Número sin el año (`Resolución 1874`); `normsFor` agrega «de AAAA» con el año de la fecha. */
   number: string;
   date: string;
   entity: string;
   title: string;
+  /** Nombre del PDF sin el año (`resolucion-1874`). */
   url: string;
 }
 
@@ -206,18 +228,27 @@ export const NORM_ENTITIES = [
 ];
 
 const N_YESTERDAY: NormDoc[] = [
-  { id: 'N1', type: 'circular', number: 'Circular externa 009 de 2026', date: '2026-09-15', entity: NORM_ENTITIES[0], title: 'Uso de documentos tipo en procesos de obra pública', url: 'https://normas-demo.example/circular-009-2026.pdf' },
-  { id: 'N2', type: 'resolucion', number: 'Resolución 1874 de 2026', date: '2026-09-21', entity: NORM_ENTITIES[1], title: 'Requisitos de etiquetado para herramientas eléctricas portátiles', url: 'https://normas-demo.example/resolucion-1874-2026.pdf' },
-  { id: 'N3', type: 'concepto', number: 'Concepto 220-31 de 2026', date: '2026-09-29', entity: NORM_ENTITIES[2], title: 'Publicidad de precios con descuento en tiendas en línea', url: 'https://normas-demo.example/concepto-220-31-2026.pdf' },
-  { id: 'N4', type: 'decreto', number: 'Decreto 0612 de 2026', date: '2026-10-01', entity: NORM_ENTITIES[3], title: 'Subsidios para el mejoramiento de vivienda rural', url: 'https://normas-demo.example/decreto-0612-2026.pdf' },
-  { id: 'N5', type: 'circular', number: 'Circular 011 de 2026', date: '2026-10-05', entity: NORM_ENTITIES[0], title: 'Plazos para observaciones en procesos de mínima cuantía', url: 'https://normas-demo.example/circular-011-2026.pdf' },
+  { id: 'N1', type: 'circular', number: 'Circular externa 009', date: '2026-09-15', entity: NORM_ENTITIES[0], title: 'Uso de documentos tipo en procesos de obra pública', url: 'circular-009' },
+  { id: 'N2', type: 'resolucion', number: 'Resolución 1874', date: '2026-09-21', entity: NORM_ENTITIES[1], title: 'Requisitos de etiquetado para herramientas eléctricas portátiles', url: 'resolucion-1874' },
+  { id: 'N3', type: 'concepto', number: 'Concepto 220-31', date: '2026-09-29', entity: NORM_ENTITIES[2], title: 'Publicidad de precios con descuento en tiendas en línea', url: 'concepto-220-31' },
+  { id: 'N4', type: 'decreto', number: 'Decreto 0612', date: '2026-10-01', entity: NORM_ENTITIES[3], title: 'Subsidios para el mejoramiento de vivienda rural', url: 'decreto-0612' },
+  { id: 'N5', type: 'circular', number: 'Circular 011', date: '2026-10-05', entity: NORM_ENTITIES[0], title: 'Plazos para observaciones en procesos de mínima cuantía', url: 'circular-011' },
 ];
+
+/** Normas corridas `shift` días, con el año en el número y en el enlace al PDF. */
+export function normsFor(list: NormDoc[], shift: number): NormDoc[] {
+  return list.map((d) => {
+    const date = shiftIso(d.date, shift);
+    const year = date.slice(0, 4);
+    return { ...d, date, number: `${d.number} de ${year}`, url: `https://normas-demo.example/${d.url}-${year}.pdf` };
+  });
+}
 
 export const NORMS_YESTERDAY = N_YESTERDAY;
 export const NORMS_TODAY: NormDoc[] = [
   ...N_YESTERDAY,
-  { id: 'N6', type: 'resolucion', number: 'Resolución 2031 de 2026', date: '2026-10-07', entity: NORM_ENTITIES[1], title: 'Reglamento técnico de seguridad para pulidoras y taladros', url: 'https://normas-demo.example/resolucion-2031-2026.pdf' },
-  { id: 'N7', type: 'circular', number: 'Circular externa 014 de 2026', date: '2026-10-07', entity: NORM_ENTITIES[0], title: 'Garantías exigibles en contratos de suministro', url: 'https://normas-demo.example/circular-014-2026.pdf' },
+  { id: 'N6', type: 'resolucion', number: 'Resolución 2031', date: '2026-10-07', entity: NORM_ENTITIES[1], title: 'Reglamento técnico de seguridad para pulidoras y taladros', url: 'resolucion-2031' },
+  { id: 'N7', type: 'circular', number: 'Circular externa 014', date: '2026-10-07', entity: NORM_ENTITIES[0], title: 'Garantías exigibles en contratos de suministro', url: 'circular-014' },
 ];
 
 export const DEFAULT_NORMATIVA: NormativaConfig = { entities: [...NORM_ENTITIES], keyword: '' };

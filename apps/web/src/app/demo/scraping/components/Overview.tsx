@@ -5,9 +5,9 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { notify } from '../lib/notify';
 import { BellAlertIcon, CheckBadgeIcon, PauseCircleIcon, PlayCircleIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline';
-import { PROCESSES_TODAY, SUPPLIER_DOCS, sourceMeta } from '../lib/data';
+import { PROCESSES_TODAY, SUPPLIER_DOCS, processesFor, sourceMeta } from '../lib/data';
 import { chartSeries, docStatus, evaluateRules, matchProcess, type AlertHit } from '../lib/engine';
-import { DEMO_TODAY, cop, dateTime, daysBetween, num, pct, shortDate, signedPct, type Loc } from '../lib/format';
+import { cop, dateTime, dayShift, daysBetween, num, pct, shortDate, signedPct, type Loc } from '../lib/format';
 import { formatNit, verificationDigit } from '../lib/nit';
 import { useDemo } from '../lib/store';
 import type { Row, SourceId } from '../lib/types';
@@ -22,16 +22,17 @@ export function alertText(t: T, hit: AlertHit, loc: Loc): string {
   return t(`alertsText.${hit.key}`, p);
 }
 
-export function csvName(id: SourceId, ext: string) {
-  return `koptup-demo-${id}-${DEMO_TODAY}.${ext}`;
+/** Nombre del archivo con la fecha de hoy en Colombia (`koptup-demo-precios-2026-10-14.csv`). */
+export function csvName(id: SourceId, ext: string, today: string) {
+  return `koptup-demo-${id}-${today}.${ext}`;
 }
 
 export default function Overview({ sourceId }: { sourceId: SourceId }) {
   const t = useTranslations('demoScraping');
-  const { s, loc, update, setTab, markTour } = useDemo();
+  const { s, loc, clock, update, setTab, markTour } = useDemo();
   const r = s.results[sourceId];
   const { columns, rows } = useMemo(() => displayData(sourceId, s), [sourceId, s]);
-  const hits = useMemo(() => evaluateRules(r ?? null, s.rules, { corrections: s.corrections }), [r, s.rules, s.corrections]);
+  const hits = useMemo(() => evaluateRules(r ?? null, s.rules, { corrections: s.corrections, today: clock.today }), [r, s.rules, s.corrections, clock.today]);
   const [detail, setDetail] = useState<Row | null>(null);
   const [fixing, setFixing] = useState<Row | null>(null);
   const paused = s.paused.includes(sourceId);
@@ -39,14 +40,15 @@ export default function Overview({ sourceId }: { sourceId: SourceId }) {
 
   const added = r.changes.filter((c) => c.kind === 'added').length;
   const other = r.changes.length - added;
-  const series = chartSeries(sourceId, r.rows.length);
+  const series = chartSeries(sourceId, r.rows.length, s.day);
   const max = Math.max(1, ...series.map((p) => p.value));
   const meta = sourceMeta(sourceId);
 
   const download = () => {
-    downloadText(csvName(sourceId, 'csv'), buildCsv(columns, rows, t, loc), 'text/csv;charset=utf-8');
+    const file = csvName(sourceId, 'csv', clock.today);
+    downloadText(file, buildCsv(columns, rows, t, loc), 'text/csv;charset=utf-8');
     markTour('download');
-    notify.success(t('delivery.downloaded', { file: csvName(sourceId, 'csv') }));
+    notify.success(t('delivery.downloaded', { file }));
   };
 
   const sendToRag = (ids: string[]) => {
@@ -57,7 +59,7 @@ export default function Overview({ sourceId }: { sourceId: SourceId }) {
 
   const kpis = [
     { k: 'records', v: num(r.rows.length, loc) },
-    { k: 'newToday', v: num(added, loc) },
+    { k: 'newToday', v: num(added, loc), hint: t('overview.newHint') },
     { k: 'otherChanges', v: num(other, loc) },
     { k: 'quality', v: pct(r.quality, loc, Number.isInteger(r.quality) ? 0 : 1), hint: t(`overview.qualityHint.${sourceId === 'documentos' ? 'docs' : 'fields'}`) },
     { k: 'updated', v: dateTime(r.at, loc), hint: t(`values.trigger.${r.trigger}`) },
@@ -114,8 +116,8 @@ export default function Overview({ sourceId }: { sourceId: SourceId }) {
           </div>
           <div className="mt-1 flex gap-1">
             {series.map((p, i) => (
-              <span key={p.date} className={`min-w-0 flex-1 truncate text-center text-[9px] text-secondary-500 ${!p.today && i % 4 !== 1 ? 'max-sm:invisible' : ''}`}>
-                {p.today ? t('overview.today') : i % 2 === 1 ? shortDate(p.date, loc) : ''}
+              <span key={p.date} className={`flex min-w-0 flex-1 justify-center whitespace-nowrap text-[9px] text-secondary-500 ${!p.today && i % 4 !== 1 ? 'max-sm:invisible' : ''}`}>
+                {p.today ? (p.date === clock.today ? t('overview.today') : shortDate(p.date, loc)) : i % 2 === 1 ? shortDate(p.date, loc) : ''}
               </span>
             ))}
           </div>
@@ -217,10 +219,10 @@ export default function Overview({ sourceId }: { sourceId: SourceId }) {
 
 function ProcessDetail({ row, onClose }: { row: Row | null; onClose: () => void }) {
   const t = useTranslations('demoScraping');
-  const { s, loc } = useDemo();
-  const p = row ? PROCESSES_TODAY.find((x) => x.ref === row.ref) : null;
+  const { s, loc, clock } = useDemo();
+  const p = row ? processesFor(PROCESSES_TODAY, dayShift(s.day)).find((x) => x.ref === row.ref) : null;
   const m = p ? matchProcess(p, s.radar) : null;
-  const days = p ? daysBetween(DEMO_TODAY, p.closes) : 0;
+  const days = p ? daysBetween(clock.today, p.closes) : 0;
   return (
     <Modal open={!!p} onClose={onClose} title={p ? p.ref : ''}>
       {p && m && (

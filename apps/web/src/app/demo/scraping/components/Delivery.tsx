@@ -16,7 +16,7 @@ type Open = 'sheets' | 'bi' | 'api' | null;
 
 export default function Delivery({ sourceId }: { sourceId: SourceId }) {
   const t = useTranslations('demoScraping');
-  const { s, loc, markTour, setTab } = useDemo();
+  const { s, loc, clock, markTour, setTab } = useDemo();
   const [open, setOpen] = useState<Open>(null);
   const r = s.results[sourceId];
   const { columns, rows } = useMemo(() => displayData(sourceId, s), [sourceId, s]);
@@ -24,15 +24,23 @@ export default function Delivery({ sourceId }: { sourceId: SourceId }) {
   const payload = useMemo(() => {
     if (!r) return '';
     const pick = (row: Record<string, unknown>) => Object.fromEntries(columns.map((c) => [c.key, exportCell(c, row[c.key] as never, t)]));
+    // Las claves del aviso van en el idioma de la demo (en tu proyecto se acuerdan con tu equipo).
+    const k = (key: string) => t(`delivery.api.keys.${key}`);
+    const kind = (x: string) => t(`delivery.api.kinds.${x}`);
     return JSON.stringify(
       {
-        evento: 'ejecucion.completada',
-        fuente: sourceId,
-        ejecucion: r.at,
-        registros: rows.length,
-        calidad: r.quality,
-        cambios: r.changes.slice(0, 3).map((ch) => ({ tipo: ch.kind, clave: ch.key, titulo: ch.title, campos: ch.diffs.map((d) => ({ campo: d.label ?? d.field, antes: d.before, despues: d.after })) })),
-        ejemplo_registro: rows[0] ? pick(rows[0]) : null,
+        [k('event')]: t('delivery.api.eventName'),
+        [k('source')]: sourceId,
+        [k('runAt')]: r.at,
+        [k('records')]: rows.length,
+        [k('quality')]: r.quality,
+        [k('changes')]: r.changes.slice(0, 3).map((ch) => ({
+          [k('type')]: kind(ch.kind),
+          [k('key')]: ch.key,
+          [k('title')]: ch.title,
+          [k('fields')]: ch.diffs.map((d) => ({ [k('field')]: d.label ?? (d.labelKey ? t(`columns.${d.labelKey}`) : d.field), [k('before')]: d.before, [k('after')]: d.after })),
+        })),
+        [k('sampleRecord')]: rows[0] ? pick(rows[0]) : null,
       },
       null,
       2,
@@ -42,13 +50,13 @@ export default function Delivery({ sourceId }: { sourceId: SourceId }) {
   if (!r) return null;
 
   const csv = () => {
-    const name = csvName(sourceId, 'csv');
+    const name = csvName(sourceId, 'csv', clock.today);
     downloadText(name, buildCsv(columns, rows, t, loc), 'text/csv;charset=utf-8');
     markTour('download');
     notify.success(t('delivery.downloaded', { file: name }));
   };
   const json = () => {
-    const name = csvName(sourceId, 'json');
+    const name = csvName(sourceId, 'json', clock.today);
     downloadText(name, buildJson(columns, rows, t), 'application/json');
     notify.success(t('delivery.downloaded', { file: name }));
   };

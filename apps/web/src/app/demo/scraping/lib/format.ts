@@ -8,10 +8,57 @@
  */
 export type Loc = 'es' | 'en';
 
-/** Reloj fijo de la demo: jueves 8 de octubre de 2026, 8:15 a. m. (hora de Colombia). */
-export const DEMO_NOW = '2026-10-08T08:15';
-export const DEMO_TODAY = '2026-10-08';
-export const DEMO_YESTERDAY = '2026-10-07';
+/**
+ * Fecha con la que se escribieron los datos de ejemplo (`data.ts`). La demo los
+ * corre al día de hoy en Colombia: todas las fechas de ejemplo se desplazan los
+ * días que haya entre esta fecha y el día de los datos (`DemoClock.day`).
+ */
+export const BASE_DAY = '2026-10-08';
+
+/** Hora (Colombia) a la que ya terminaron las ejecuciones programadas del día (6:00–6:15 a. m.). */
+const SCHEDULED_DONE = '06:20';
+
+/**
+ * Reloj de la demo, calculado en el navegador después de montar (nunca en el
+ * render del servidor, para no causar errores de hidratación).
+ * - `now`: fecha y hora actuales en Colombia (UTC−5, sin horario de verano).
+ * - `today`: fecha de hoy en Colombia.
+ * - `day`: día de la última ejecución programada (hoy si ya pasaron las 6:20 a. m.; si no, ayer).
+ */
+export interface DemoClock {
+  now: string;
+  today: string;
+  day: string;
+}
+
+/** Reloj de referencia (antes de montar y en las pruebas): el día con el que se escribieron los datos. */
+export const BASE_CLOCK: DemoClock = { now: `${BASE_DAY}T08:15`, today: BASE_DAY, day: BASE_DAY };
+
+/** Reloj a partir de un instante: hora de Colombia sin `Intl` ni la zona del equipo. */
+export function clockAt(date: Date): DemoClock {
+  const co = new Date(date.getTime() - 5 * 3600000);
+  const now = toIso({ y: co.getUTCFullYear(), m: co.getUTCMonth() + 1, d: co.getUTCDate(), hh: co.getUTCHours(), mm: co.getUTCMinutes() });
+  const today = now.slice(0, 10);
+  const day = now.slice(11) >= SCHEDULED_DONE ? today : addDays(today, -1);
+  return { now, today, day };
+}
+
+/** Fecha y hora actuales en Colombia (`AAAA-MM-DDTHH:mm`). Solo en el navegador, en manejadores o efectos. */
+export function colombiaNow(): string {
+  return clockAt(new Date()).now;
+}
+
+/** Días que se corren los datos de ejemplo para el día `day`. */
+export function dayShift(day: string): number {
+  return daysBetween(BASE_DAY, day);
+}
+
+/** Corre una fecha de ejemplo (`AAAA-MM-DD` o con hora) `days` días, conservando la hora. */
+export function shiftIso(iso: string, days: number): string {
+  if (!days) return iso;
+  const moved = addDays(iso.slice(0, 10), days);
+  return iso.length > 10 ? `${moved}${iso.slice(10)}` : moved;
+}
 
 function group(intPart: string, sep: string) {
   return intPart.replace(/\B(?=(\d{3})+(?!\d))/g, sep);
