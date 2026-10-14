@@ -38,7 +38,6 @@ import {
 } from '@/components/admin/demos/shared';
 import { type AdminCatalogItem, apiRequest, demoName, formatDate, whatsappLink } from '@/lib/demo-system';
 import { cn } from '@/lib/utils';
-import { refreshPanelCounts } from '@/lib/portal';
 
 interface Detail {
   request: AdminDemoRequest;
@@ -80,7 +79,7 @@ export default function AdminDemoRequestDetailPage() {
   const [notify, setNotify] = useState(false);
   const [rejectMessage, setRejectMessage] = useState('');
   const [newNote, setNewNote] = useState('');
-  const [busy, setBusy] = useState<'' | 'approve' | 'reject' | 'review' | 'pending' | 'note' | 'resend'>('');
+  const [busy, setBusy] = useState<'' | 'approve' | 'reject' | 'review' | 'note' | 'resend'>('');
   const [actionError, setActionError] = useState('');
   const [result, setResult] = useState<GrantResult | null>(null);
 
@@ -141,10 +140,7 @@ export default function AdminDemoRequestDetailPage() {
   const r = detail.request;
   const open = r.estado === 'pendiente' || r.estado === 'en_revision';
   const privateBlocked = selected.some((s) => modeOf(s) === 'privado') && !isAdmin;
-  // Demos desactivadas en el catálogo: no se pueden conceder (el backend también lo rechaza).
-  const isInactive = (slug: string) => catalogBySlug.get(slug)?.activo === false || detail.demos.find((d) => d.slug === slug)?.activo === false;
-  const inactiveSelected = selected.filter(isInactive);
-  const addable = catalog.filter((c) => !selected.includes(c.slug) && c.activo !== false);
+  const addable = catalog.filter((c) => !selected.includes(c.slug));
   const greetingWa = whatsappLink(r.telefono, t('detail.whatsappGreeting', { name: r.nombre.split(' ')[0], code: r.codigo }));
 
   const run = async (kind: typeof busy, fn: () => Promise<void>) => {
@@ -167,7 +163,6 @@ export default function AdminDemoRequestDetailPage() {
       });
       setResult(data);
       toast.success(t('detail.approved'));
-      refreshPanelCounts();
       await load();
     });
 
@@ -179,23 +174,12 @@ export default function AdminDemoRequestDetailPage() {
         body: { motivo: reasonKey === 'spam' ? 'spam' : motivo, notificar: reasonKey !== 'spam' && notify, mensaje: rejectMessage.trim() || undefined },
       });
       toast.success(t('detail.rejected'));
-      refreshPanelCounts();
       await load();
     });
 
   const markReview = () =>
     run('review', async () => {
       await apiRequest(`/admin/demo-requests/${id}`, { method: 'PATCH', body: { estado: 'en_revision' } });
-      refreshPanelCounts();
-      await load();
-    });
-
-  // La API acepta volver de "en revisión" a "pendiente" (p. ej. si se marcó por error).
-  const markPending = () =>
-    run('pending', async () => {
-      await apiRequest(`/admin/demo-requests/${id}`, { method: 'PATCH', body: { estado: 'pendiente' } });
-      toast.success(t('detail.backToPendingDone'));
-      refreshPanelCounts();
       await load();
     });
 
@@ -233,11 +217,6 @@ export default function AdminDemoRequestDetailPage() {
             {canManage && r.estado === 'pendiente' && (
               <Button size="sm" variant="outline" onClick={markReview} isLoading={busy === 'review'}>
                 {t('detail.markReview')}
-              </Button>
-            )}
-            {canManage && r.estado === 'en_revision' && (
-              <Button size="sm" variant="outline" onClick={markPending} isLoading={busy === 'pending'} data-testid="back-to-pending">
-                {t('detail.backToPending')}
               </Button>
             )}
             <Button size="sm" variant="ghost" onClick={load} aria-label={t('refresh')}>
@@ -508,8 +487,7 @@ export default function AdminDemoRequestDetailPage() {
                           {selected.concat(r.demos.filter((s) => !selected.includes(s))).map((slug) => {
                             const mode = modeOf(slug);
                             const checked = selected.includes(slug);
-                            const inactive = isInactive(slug);
-                            const locked = (mode === 'privado' && !isAdmin) || inactive;
+                            const locked = mode === 'privado' && !isAdmin;
                             return (
                               <li key={slug}>
                                 <label
@@ -528,11 +506,7 @@ export default function AdminDemoRequestDetailPage() {
                                   <span className="flex-1 min-w-0">
                                     <span className="block text-sm font-medium text-secondary-900 dark:text-white">{nameOf(slug)}</span>
                                     <span className="block text-xs text-secondary-500">/demo/{slug}</span>
-                                    {inactive ? (
-                                      <span className="block text-xs text-red-700 dark:text-red-400">{t('detail.demoInactive')}</span>
-                                    ) : (
-                                      locked && <span className="block text-xs text-amber-700 dark:text-amber-400">{t('detail.privateAdminOnly')}</span>
-                                    )}
+                                    {locked && <span className="block text-xs text-amber-700 dark:text-amber-400">{t('detail.privateAdminOnly')}</span>}
                                   </span>
                                   {mode && <DemoAccessBadge mode={mode} activo={catalogBySlug.get(slug)?.activo !== false} />}
                                 </label>
@@ -540,13 +514,8 @@ export default function AdminDemoRequestDetailPage() {
                             );
                           })}
                         </ul>
-                        {inactiveSelected.length > 0 && (
-                          <p role="alert" className="mt-2 text-sm text-red-700 dark:text-red-400" data-testid="inactive-demos-warning">
-                            {t('detail.inactiveWarning', { demos: inactiveSelected.map(nameOf).join(', ') })}
-                          </p>
-                        )}
                         {addable.length > 0 && (
-                          <div className="mt-2 flex flex-col sm:flex-row gap-2">
+                          <div className="mt-2 flex gap-2">
                             <label htmlFor="extra-demo" className="sr-only">
                               {t('detail.addDemo')}
                             </label>
@@ -554,7 +523,7 @@ export default function AdminDemoRequestDetailPage() {
                               id="extra-demo"
                               value={extraDemo}
                               onChange={(e) => setExtraDemo(e.target.value)}
-                              className="flex-1 min-w-0 px-3 py-2 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-900 text-sm text-secondary-900 dark:text-white"
+                              className="flex-1 px-3 py-2 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-900 text-sm text-secondary-900 dark:text-white"
                             >
                               <option value="">{t('detail.addDemo')}</option>
                               {addable.map((c) => (
@@ -566,7 +535,6 @@ export default function AdminDemoRequestDetailPage() {
                             <Button
                               size="sm"
                               variant="outline"
-                              className="flex-shrink-0"
                               disabled={!extraDemo || selected.length >= 10}
                               onClick={() => {
                                 setSelected((cur) => [...cur, extraDemo]);
@@ -616,7 +584,7 @@ export default function AdminDemoRequestDetailPage() {
                         className="bg-green-600 hover:bg-green-700"
                         onClick={approve}
                         isLoading={busy === 'approve'}
-                        disabled={selected.length === 0 || privateBlocked || inactiveSelected.length > 0 || busy !== ''}
+                        disabled={selected.length === 0 || privateBlocked || busy !== ''}
                         data-testid="approve-button"
                       >
                         <CheckCircleIcon className="h-5 w-5 mr-2" />

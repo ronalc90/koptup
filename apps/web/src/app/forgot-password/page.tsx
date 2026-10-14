@@ -6,9 +6,7 @@ import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 import Button from '@/components/ui/Button';
 import Card, { CardContent } from '@/components/ui/Card';
-import { EnvelopeIcon, ArrowLeftIcon, CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { FaWhatsapp } from 'react-icons/fa';
-import { KOPTUP_WHATSAPP_NUMBER } from '@/lib/demo-system';
+import { EnvelopeIcon, ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 
 export default function ForgotPasswordPage() {
   const t = useTranslations('passwordRecovery.forgot');
@@ -16,9 +14,6 @@ export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  // Sin correo configurado en el servidor no sale ningún enlace: se dice tal cual
-  // y se ofrece pedirlo al equipo (que lo genera desde el panel).
-  const [noEmail, setNoEmail] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,21 +21,16 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
 
     try {
-      // El backend responde lo mismo exista o no la cuenta (anti-enumeración).
-      const res = await api.requestPasswordReset(email);
-      if (res?.data?.correo === 'no_configurado') setNoEmail(true);
-      else setSuccess(true);
+      // El backend responde el mismo mensaje exista o no la cuenta (anti-enumeración),
+      // por eso mostramos éxito siempre que la petición se complete sin error de red.
+      await api.requestPasswordReset(email);
+      setSuccess(true);
     } catch (err: any) {
-      const status = err?.response?.status;
-      if (status === 429) setError(t('errorRateLimited'));
-      else if (!err?.response) setError(t('errorNetwork'));
-      else setError(t('error'));
+      setError(t('error'));
     } finally {
       setIsLoading(false);
     }
   };
-
-  const whatsappHref = `https://wa.me/${KOPTUP_WHATSAPP_NUMBER}?text=${encodeURIComponent(t('whatsappMessage', { email }))}`;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:from-secondary-950 dark:via-black dark:to-primary-950 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -65,32 +55,7 @@ export default function ForgotPasswordPage() {
 
         <Card variant="elevated" className="shadow-xl">
           <CardContent className="p-8">
-            {noEmail ? (
-              <div className="text-center space-y-5" data-testid="forgot-no-email">
-                <div className="flex justify-center">
-                  <ExclamationTriangleIcon className="h-14 w-14 text-amber-500" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-2">{t('noEmailTitle')}</h2>
-                  <p className="text-sm text-secondary-600 dark:text-secondary-400">{t('noEmailBody')}</p>
-                </div>
-                <div className="flex flex-col gap-3">
-                  <Button fullWidth asChild>
-                    <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
-                      <FaWhatsapp className="h-5 w-5 mr-2" />
-                      {t('noEmailWhatsapp')}
-                    </a>
-                  </Button>
-                  <Button fullWidth variant="outline" asChild>
-                    <Link href="/contact">{t('noEmailContact')}</Link>
-                  </Button>
-                  <Link href="/login" className="inline-flex items-center justify-center text-sm font-medium text-primary-600 hover:text-primary-500">
-                    <ArrowLeftIcon className="h-4 w-4 mr-2" />
-                    {t('backToLogin')}
-                  </Link>
-                </div>
-              </div>
-            ) : success ? (
+            {success ? (
               <div className="text-center space-y-6">
                 <div className="flex justify-center">
                   <CheckCircleIcon className="h-16 w-16 text-green-500" />

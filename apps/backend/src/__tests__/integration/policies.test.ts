@@ -163,14 +163,10 @@ describeDb('políticas de autorización (integración)', () => {
       expect((await request(app).get('/api/messages/conversations/CONV-TEST-1').set(bearer(otherUser))).status).toBe(403);
     });
 
-    it('proyectos: el cliente solo consulta (403 al crear o borrar); el equipo: datos inválidos → 400 e inexistente → 404 (no 500)', async () => {
-      expect((await request(app).post('/api/projects').set(bearer(user)).send({ name: 'Mío' })).status).toBe(403);
+    it('proyectos: datos inválidos → 400 y proyecto ajeno o inexistente → 404 (no 500)', async () => {
+      expect((await request(app).post('/api/projects').set(bearer(user)).send({})).status).toBe(400);
       const missing = new mongoose.Types.ObjectId().toString();
-      expect((await request(app).delete(`/api/projects/${missing}`).set(bearer(user))).status).toBe(403);
-      expect((await request(app).put(`/api/projects/${missing}`).set(bearer(user)).send({ progress: 100 })).status).toBe(403);
-      expect((await request(app).post('/api/projects').set(bearer(manager)).send({})).status).toBe(400);
-      expect((await request(app).delete(`/api/projects/${missing}`).set(bearer(manager))).status).toBe(404);
-      expect((await request(app).get('/api/projects/no-es-un-id').set(bearer(user))).status).toBe(404);
+      expect((await request(app).delete(`/api/projects/${missing}`).set(bearer(user))).status).toBe(404);
     });
   });
 

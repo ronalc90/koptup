@@ -47,7 +47,6 @@ const startServer = async () => {
     const uploadDirs = [
       './uploads',
       './uploads/orders',
-      './uploads/deliverables',
       './uploads/cuentas-medicas',
       './uploads/ley100',
       './uploads/exports',

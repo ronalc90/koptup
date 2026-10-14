@@ -2,13 +2,18 @@ import { Response } from 'express';
 import { validationResult } from 'express-validator';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
-import { generateAccessToken } from '../middleware/auth';
-import { createSession, revokeAllSessions, revokeSession, validateRefreshToken } from '../services/session.service';
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  refreshTokenTtlSeconds,
+  verifyRefreshToken,
+} from '../middleware/auth';
 import { AuthRequest } from '../types';
 import { AppError, asyncHandler } from '../middleware/errorHandler';
 import { logger } from '../utils/logger';
+import { redis } from '../config/redis';
 import emailService from '../services/email.service';
-import User, { NOTIFICATION_EMAIL_CATEGORIES, resolveNotificationPreferences, type IUser } from '../models/User';
+import User, { type IUser } from '../models/User';
 import {
   MAGIC_LINK_ERRORS,
   consumeMagicLink,
@@ -26,19 +31,30 @@ const SESSION_EXPIRED_MESSAGE = 'Tu sesión expiró. Inicia sesión de nuevo.';
 
 /**
  * Emite la sesión (access + refresh) de un usuario: la misma respuesta que
- * POST /api/auth/login. La usan el login, la activación, Google y el cambio de
- * contraseña. Cada llamada es una sesión nueva (un dispositivo): las demás
- * siguen abiertas (services/session.service.ts).
+ * POST /api/auth/login. La usan el login y la activación de cuenta.
  */
-async function issueSession(user: IUser, opts: { remember?: boolean } = {}) {
-  const session = await createSession(user, opts);
+async function issueSession(user: IUser) {
+  const accessToken = generateAccessToken({
+    id: user._id.toString(),
+    email: user.email,
+    role: user.role,
+    name: user.name,
+  });
+  const refreshToken = generateRefreshToken({
+    id: user._id.toString(),
+    email: user.email,
+  });
+  // La copia en Redis vence igual que el JWT (JWT_REFRESH_EXPIRES_IN, 7 días por defecto).
+  await redis.setEx(`refresh_token:${user._id}`, refreshTokenTtlSeconds(), refreshToken);
   return {
-    accessToken: session.accessToken,
-    refreshToken: session.refreshToken,
-    // Vida de la sesión renovable y si la web debe guardarla en una cookie persistente.
-    expiresIn: session.expiresIn,
-    remember: session.remember,
-    user: session.user,
+    accessToken,
+    refreshToken,
+    user: {
+      id: user._id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+    },
   };
 }
 
@@ -90,9 +106,6 @@ export const login = asyncHandler(async (req: AuthRequest, res: Response) => {
   }
 
   const { email, password } = req.body;
-  // "Recordarme": sin marcar, la sesión dura 1 día y la web la guarda en una
-  // cookie de sesión (se borra al cerrar el navegador).
-  const remember = req.body?.remember !== false && req.body?.remember !== 'false';
 
   // Get user
   const user = await User.findOne({ email }).select('+password');
@@ -116,7 +129,7 @@ export const login = asyncHandler(async (req: AuthRequest, res: Response) => {
     throw new AppError('El correo o la contraseña no son correctos.', 401, 'invalid_credentials');
   }
 
-  const session = await issueSession(user, { remember });
+  const session = await issueSession(user);
 
   // Update last login
   user.last_login = new Date();
@@ -139,26 +152,34 @@ export const refreshToken = asyncHandler(
       throw new AppError('Falta la sesión para renovar. Inicia sesión de nuevo.', 400, 'refresh_token_required');
     }
 
-    // Firma, vencimiento y sesión abierta en Redis (inválido → 401, no 500).
-    const check = await validateRefreshToken(String(refreshToken));
-    if (!check.ok) {
+    // Verify refresh token (firma inválida o vencida → 401, no 500)
+    let decoded: { id: string };
+    try {
+      decoded = verifyRefreshToken(String(refreshToken));
+    } catch {
+      throw new AppError(SESSION_EXPIRED_MESSAGE, 401, 'invalid_refresh_token');
+    }
+
+    // Check if token exists in Redis
+    const storedToken = await redis.get(`refresh_token:${decoded.id}`);
+
+    if (!storedToken || storedToken !== refreshToken) {
       throw new AppError(SESSION_EXPIRED_MESSAGE, 401, 'invalid_refresh_token');
     }
 
     // Get user
-    const user = await User.findById(check.userId);
+    const user = await User.findById(decoded.id);
 
     if (!user) {
-      throw new AppError('No encontramos tu cuenta. Inicia sesión de nuevo.', 401, 'session_invalid');
+      throw new AppError('No encontramos tu cuenta. Inicia sesión de nuevo.', 404, 'not_found');
     }
 
-    // Nuevo token de acceso de la misma sesión (con el rol vigente).
+    // Generate new access token
     const accessToken = generateAccessToken({
       id: user._id.toString(),
       email: user.email,
       role: user.role,
       name: user.name,
-      ...(check.sid ? { sid: check.sid } : {}),
     });
 
     res.json({
@@ -176,8 +197,8 @@ export const logout = asyncHandler(async (req: AuthRequest, res: Response) => {
     throw new AppError('Inicia sesión para continuar.', 401, 'unauthorized');
   }
 
-  // Cierra solo la sesión de este dispositivo.
-  await revokeSession(req.user.id, req.user.sid);
+  // Remove refresh token from Redis
+  await redis.del(`refresh_token:${req.user.id}`);
 
   logger.info(`User logged out: ${req.user.email}`);
 
@@ -196,12 +217,9 @@ export const getProfile = asyncHandler(
     const user = await User.findById(req.user.id).select('-password');
 
     if (!user) {
-      // La cuenta ya no existe: la sesión no sirve (401, no 404, para que la
-      // web lo distinga de un servidor que no responde).
-      throw new AppError('No encontramos tu cuenta. Inicia sesión de nuevo.', 401, 'session_invalid');
+      throw new AppError('No encontramos tu cuenta. Inicia sesión de nuevo.', 404, 'not_found');
     }
 
-    res.setHeader('Cache-Control', 'no-store');
     res.json({ success: true, data: profileView(user) });
   }
 );
@@ -216,55 +234,10 @@ function profileView(user: IUser) {
     phone: user.phone ?? null,
     company: user.company ?? null,
     provider: user.provider,
-    avatar: user.avatar ?? null,
     accountStatus: user.accountStatus,
-    notificationPrefs: resolveNotificationPreferences(user.notificationPrefs),
     created_at: user.created_at,
     last_login: user.last_login,
   };
-}
-
-const PreferencesSchema = z
-  .object({
-    email: z.object(Object.fromEntries(NOTIFICATION_EMAIL_CATEGORIES.map((c) => [c, z.boolean().optional()])) as Record<string, z.ZodOptional<z.ZodBoolean>>).strict(),
-  })
-  .strict();
-
-/**
- * PATCH /api/auth/me/preferences { email: { pedidos?, facturacion?, proyectos?, mensajes? } }
- * — qué avisos del portal recibe la persona por correo. Los respeta
- * services/portal-notify.service.ts (la notificación del portal se crea siempre).
- */
-export const updatePreferences = asyncHandler(async (req: AuthRequest, res: Response) => {
-  if (!req.user) throw new AppError('Inicia sesión para continuar.', 401, 'unauthorized');
-  const parsed = PreferencesSchema.safeParse(req.body ?? {});
-  if (!parsed.success) throw new AppError('Preferencias no válidas.', 400, 'invalid_preferences');
-  const user = await User.findById(req.user.id);
-  if (!user) throw new AppError('No encontramos tu cuenta. Inicia sesión de nuevo.', 401, 'session_invalid');
-  const current = resolveNotificationPreferences(user.notificationPrefs);
-  const next = { email: { ...current.email } };
-  for (const [k, v] of Object.entries(parsed.data.email)) {
-    if (typeof v === 'boolean') next.email[k as keyof typeof next.email] = v;
-  }
-  user.notificationPrefs = next;
-  user.markModified('notificationPrefs');
-  await user.save();
-  res.json({ success: true, message: 'Preferencias guardadas.', data: { notificationPrefs: next } });
-});
-
-/**
- * GET /api/auth/providers — formas de iniciar sesión disponibles en este
- * servidor. La web muestra "Continuar con Google" solo si `google` es true.
- */
-export const getAuthProviders = (_req: AuthRequest, res: Response) => {
-  res.setHeader('Cache-Control', 'public, max-age=300');
-  res.json({ success: true, data: { google: isGoogleConfigured(), email: true } });
-};
-
-export function isGoogleConfigured(env: NodeJS.ProcessEnv = process.env): boolean {
-  const clientID = env.GOOGLE_CLIENT_ID;
-  const clientSecret = env.GOOGLE_CLIENT_SECRET;
-  return !!clientID && !!clientSecret && !clientID.includes('tu-google');
 }
 
 const PROFILE_PHONE = /^[+0-9 ().-]{7,40}$/;
@@ -342,9 +315,6 @@ export const changePassword = asyncHandler(async (req: AuthRequest, res: Respons
     entidad: { tipo: 'User', id: String(user._id) },
     req,
   });
-  // Todas las sesiones abiertas (otros navegadores y dispositivos) se cierran;
-  // esta recibe una sesión nueva.
-  await revokeAllSessions(String(user._id));
   const session = await issueSession(user);
   logger.info('Password changed by the account owner');
   res.json({ success: true, message: 'Tu contraseña quedó actualizada.', data: session });
@@ -366,26 +336,11 @@ export const forgotPassword = asyncHandler(
 
     const { email } = req.body;
 
-    // Sin correo configurado no se emite ningún enlace (no llegaría, y además
-    // anularía el que el equipo haya generado desde el panel). La respuesta es
-    // la misma exista o no la cuenta: no revela qué correos están registrados.
-    if (!emailService.isConfigured()) {
-      logger.info('Password reset requested but email is not configured');
-      return res.json({
-        success: true,
-        code: 'email_not_configured',
-        message:
-          'En este momento no podemos enviar correos. Escríbenos por WhatsApp o desde Contacto y el equipo de KopTup te dará un enlace para restablecer tu contraseña.',
-        data: { correo: 'no_configurado' },
-      });
-    }
-
     const genericResponse = () =>
       res.json({
         success: true,
         message:
           'Si existe una cuenta con ese correo, te enviamos un enlace para restablecer tu contraseña.',
-        data: { correo: 'enviado_si_existe' },
       });
 
     const user = await User.findOne({ email });
@@ -425,8 +380,7 @@ export const resetPassword = asyncHandler(
 
     const consumed = await consumeMagicLink(token, 'reset');
     if (!consumed.ok) {
-      // Mensaje distinto por motivo: usado, reemplazado por uno más reciente, vencido o inválido.
-      throw new AppError(RESET_LINK_ERRORS[consumed.reason], 400, consumed.reason);
+      throw new AppError('El enlace de recuperación es inválido o expiró', 400, consumed.reason);
     }
 
     const user = await User.findById(consumed.doc.user);
@@ -449,8 +403,8 @@ export const resetPassword = asyncHandler(
     // Ya tiene contraseña: el enlace de activación pendiente deja de servir.
     if (wasInvited) await invalidatePendingMagicLinks(user._id as any, 'activacion');
 
-    // Cierra todas las sesiones abiertas: hay que entrar con la contraseña nueva.
-    await revokeAllSessions(String(user._id));
+    // Invalida el refresh token para forzar un login nuevo.
+    await redis.del(`refresh_token:${user._id}`);
 
     logger.info('Password reset completed');
 
@@ -460,14 +414,6 @@ export const resetPassword = asyncHandler(
     });
   }
 );
-
-/** Mensajes de un enlace de restablecimiento que no sirve (POST /reset-password). */
-const RESET_LINK_ERRORS: Record<keyof typeof MAGIC_LINK_ERRORS, string> = {
-  token_invalid: 'El enlace de recuperación no es válido. Revisa que lo hayas copiado completo o pide uno nuevo.',
-  token_used: 'Este enlace de recuperación ya se usó. Si ya cambiaste tu contraseña, inicia sesión; si no, pide uno nuevo.',
-  token_replaced: 'Este enlace fue reemplazado por uno más reciente. Usa el último enlace que recibiste.',
-  token_expired: 'El enlace de recuperación venció (dura 1 hora). Pide uno nuevo.',
-};
 
 const ActivateSchema = z.object({
   token: z.string().trim().min(20).max(200),

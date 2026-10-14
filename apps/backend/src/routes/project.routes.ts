@@ -1,6 +1,5 @@
 import { Router, RequestHandler } from 'express';
 import { authenticate } from '../middleware/auth';
-import { requireRole } from '../middleware/access';
 import {
   getUserProjects,
   getProjectById,
@@ -22,14 +21,12 @@ router.use(authenticate);
 // Dashboard stats
 router.get('/dashboard/stats', getDashboardStats as RequestHandler);
 
-// Project routes. El cliente solo consulta sus proyectos; crearlos y
-// cambiarlos es del equipo (Admin › Proyectos usa /api/admin/projects, que
-// además avisa al cliente y deja la conversación del proyecto).
+// Project routes
 router.get('/', getUserProjects as RequestHandler);
-router.post('/', ...requireRole('admin', 'manager'), createProject as RequestHandler);
+router.post('/', createProject as RequestHandler);
 router.get('/:id', getProjectById as RequestHandler);
-router.put('/:id', ...requireRole('admin', 'manager'), updateProject as RequestHandler);
-router.delete('/:id', ...requireRole('admin', 'manager'), deleteProject as RequestHandler);
+router.put('/:id', updateProject as RequestHandler);
+router.delete('/:id', deleteProject as RequestHandler);
 
 // Project members
 router.get('/:id/members', getProjectMembers as RequestHandler);

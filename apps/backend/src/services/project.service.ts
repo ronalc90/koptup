@@ -57,20 +57,8 @@ export const getUserProjects = async (userId: string) => {
         as: 'members',
       },
     },
-    // Entregables, facturas y conversación del proyecto (portal del cliente).
-    { $lookup: { from: 'deliverables', localField: '_id', foreignField: 'projectId', as: 'deliverables_docs' } },
-    { $lookup: { from: 'invoices', localField: '_id', foreignField: 'projectId', as: 'invoices_docs' } },
-    { $lookup: { from: 'conversations', localField: '_id', foreignField: 'projectId', as: 'conversation_docs' } },
     {
       $addFields: {
-        deliverables_count: { $size: '$deliverables_docs' },
-        deliverables_pending: {
-          $size: { $filter: { input: '$deliverables_docs', cond: { $eq: ['$$this.status', 'in_review'] } } },
-        },
-        invoices_count: {
-          $size: { $filter: { input: '$invoices_docs', cond: { $ne: ['$$this.status', 'cancelled'] } } },
-        },
-        conversation_id: { $arrayElemAt: ['$conversation_docs.conversationId', 0] },
         manager_name: { $arrayElemAt: ['$manager.name', 0] },
         manager_email: { $arrayElemAt: ['$manager.email', 0] },
         client_name: { $arrayElemAt: ['$client.name', 0] },
@@ -93,9 +81,6 @@ export const getUserProjects = async (userId: string) => {
         client: 0,
         tasks: 0,
         members: 0,
-        deliverables_docs: 0,
-        invoices_docs: 0,
-        conversation_docs: 0,
       },
     },
     { $sort: { updated_at: -1 } },
@@ -108,7 +93,6 @@ export const getUserProjects = async (userId: string) => {
  * Get a single project by ID with full details
  */
 export const getProjectById = async (projectId: string, userId: string) => {
-  if (!mongoose.Types.ObjectId.isValid(projectId)) return null;
   const projectObjectId = new mongoose.Types.ObjectId(projectId);
   const userObjectId = new mongoose.Types.ObjectId(userId);
 

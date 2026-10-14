@@ -135,22 +135,18 @@ function networkError(err: unknown): ApiError {
   return new ApiError(err instanceof Error ? err.message : 'network_error', 0, 'network_error');
 }
 
-/**
- * Petición al backend con la sesión (renueva el token si venció). El cuerpo va
- * en JSON, o tal cual si es un `FormData` (archivos).
- */
+/** Petición JSON al backend con la sesión (renueva el token si venció). */
 export async function apiRequest<T>(
   path: string,
-  init: { method?: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE'; body?: unknown; auth?: boolean; signal?: AbortSignal } = {},
+  init: { method?: 'GET' | 'POST' | 'PATCH'; body?: unknown; auth?: boolean; signal?: AbortSignal } = {},
 ): Promise<T> {
   const { method = 'GET', body, auth = true, signal } = init;
   const headers: Record<string, string> = { Accept: 'application/json' };
-  const isForm = typeof FormData !== 'undefined' && body instanceof FormData;
-  if (body !== undefined && !isForm) headers['Content-Type'] = 'application/json';
+  if (body !== undefined) headers['Content-Type'] = 'application/json';
   const request: RequestInit = {
     method,
     headers,
-    body: body === undefined ? undefined : isForm ? (body as FormData) : JSON.stringify(body),
+    body: body !== undefined ? JSON.stringify(body) : undefined,
     signal,
     cache: 'no-store',
   };

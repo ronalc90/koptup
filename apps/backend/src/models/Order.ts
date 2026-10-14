@@ -1,5 +1,4 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { nextSequentialId } from '../utils/sequence';
 
 export interface IOrder extends Document {
   orderId: string;
@@ -156,13 +155,13 @@ const OrderSchema: Schema = new Schema(
   }
 );
 
-// Identificador legible (ORD-0001): se asigna antes de validar con un contador
-// atómico (utils/sequence.ts); contar documentos repetía números con dos
-// pedidos simultáneos.
-OrderSchema.pre('validate', async function () {
+// Generar orderId automáticamente
+OrderSchema.pre('save', async function (next) {
   if (!this.orderId) {
-    this.orderId = await nextSequentialId({ model: 'Order', field: 'orderId', key: 'order', prefix: 'ORD-', pad: 4 });
+    const count = await mongoose.model('Order').countDocuments();
+    this.orderId = `ORD-${String(count + 1).padStart(4, '0')}`;
   }
+  next();
 });
 
 export default mongoose.model<IOrder>('Order', OrderSchema);

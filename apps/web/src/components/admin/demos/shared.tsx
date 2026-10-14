@@ -74,7 +74,7 @@ export interface AdminGrant {
   motivoRevocacion: string | null;
   nota: string | null;
   createdAt: string;
-  user: { id: string; email?: string; name?: string; company?: string | null; phone?: string | null; role?: string; accountStatus?: string } | null;
+  user: { id: string; email?: string; name?: string; company?: string | null; role?: string; accountStatus?: string } | null;
 }
 
 export interface EmailOutcome {
@@ -84,7 +84,7 @@ export interface EmailOutcome {
 
 /** Respuesta de aprobar una solicitud o conceder acceso directo. */
 export interface GrantResult {
-  user: { id: string; email: string; name: string; role: string; accountStatus: string; cuentaNueva?: boolean; phone?: string | null };
+  user: { id: string; email: string; name: string; role: string; accountStatus: string; cuentaNueva?: boolean };
   grants?: AdminGrant[];
   activationUrl: string | null;
   activationExpiresAt: string | null;

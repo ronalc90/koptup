@@ -17,12 +17,9 @@ export const DEMO_ADMIN_ROLES: readonly string[] = ['admin', 'manager', 'sales']
 /** Rutas del panel que usan DEMO_ADMIN_ROLES en lugar de ADMIN_PANEL_ROLES. */
 export const DEMO_ADMIN_PATHS: readonly string[] = ['/admin/solicitudes', '/admin/accesos', '/admin/catalogo-demos'];
 
-/**
- * Secciones del panel solo para `admin`: Privacidad (datos personales de
- * terceros) y Bitácora (todas las acciones del equipo).
- */
+/** Secciones del panel solo para `admin` (Privacidad: datos personales de terceros). */
 export const ADMIN_ONLY_ROLES: readonly string[] = ['admin'];
-export const ADMIN_ONLY_PATHS: readonly string[] = ['/admin/privacidad', '/admin/bitacora'];
+export const ADMIN_ONLY_PATHS: readonly string[] = ['/admin/privacidad'];
 
 /** Equipo de KopTup (herramientas internas como /liquidacion). */
 export const STAFF_ROLES: readonly string[] = ['admin', 'manager', 'sales'];

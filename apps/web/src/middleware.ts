@@ -17,7 +17,7 @@ import { DEMO_DEFAULTS_BY_SLUG, type DemoAccessMode, isKnownDemoSlug, isPublicDe
  *     - Backend sin respuesta → 503 (falla cerrada: no se sirve la página).
  *
  * 2) /demo/<slug> (wiki 04, §10): el modo de acceso de la demo sale del
- *    catálogo del backend (`GET /api/demo-catalog`, caché de 10 s en memoria)
+ *    catálogo del backend (`GET /api/demo-catalog`, caché de 60 s en memoria)
  *    o, si el backend no responde, de la tabla de respaldo
  *    (lib/demo-access-defaults.ts).
  *     - `publico` y activa → pasa sin consultar nada más.
@@ -78,7 +78,7 @@ function forwardHeaders(req: NextRequest): Record<string, string> {
  * enlaces) y no hace falta consultar al backend en cada una. El backend vuelve
  * a autorizar cada endpoint con el rol vigente.
  */
-const ME_CACHE_TTL_MS = 10_000;
+const ME_CACHE_TTL_MS = 30_000;
 const ME_CACHE_MAX = 500;
 const meCache = new Map<string, { user: { id: string; email: string; role: string }; expires: number }>();
 
@@ -109,11 +109,7 @@ async function fetchMe(token: string, extra: Record<string, string>): Promise<Me
       cache: 'no-store',
       signal: AbortSignal.timeout(BACKEND_TIMEOUT_MS),
     });
-    // Solo un 401 del backend significa sesión inválida (vencida, falsificada o
-    // de una cuenta que ya no existe). Un 404 u otra respuesta es un backend que
-    // no responde bien (p. ej. "Application not found" de la plataforma): se
-    // muestra "servicio no disponible" en vez de mandar al login.
-    if (res.status === 401) return { status: 'unauthorized' };
+    if (res.status === 401 || res.status === 403 || res.status === 404) return { status: 'unauthorized' };
     if (!res.ok) return { status: 'error' };
     const json = (await res.json()) as { data?: { id?: string; email?: string; role?: string } };
     const user = json?.data;
@@ -184,12 +180,8 @@ function unavailable(): NextResponse {
 
 type CatalogModes = Map<string, { accessMode: DemoAccessMode; activo: boolean }>;
 
-/**
- * Caché del catálogo (10 s): un cambio de modo o la desactivación de una demo
- * en el panel se aplica en la web en máximo 10 s. Si el backend falla, se
- * reintenta tras 10 s y mientras tanto se usa la última versión conocida.
- */
-const CATALOG_TTL_MS = 10_000;
+/** Caché del catálogo (60 s). Si el backend falla, se reintenta tras 10 s. */
+const CATALOG_TTL_MS = 60_000;
 const CATALOG_RETRY_MS = 10_000;
 let catalogCache: { modes: CatalogModes; fetchedAt: number } | null = null;
 let catalogFailedAt = 0;
@@ -217,7 +209,7 @@ async function loadCatalog(): Promise<CatalogModes | null> {
 
 /**
  * Modo de acceso de la demo y si viene del backend (`fresh`) o de la tabla de
- * respaldo. Un catálogo viejo (más de 10 s) se sigue usando mientras el
+ * respaldo. Un catálogo viejo (más de 60 s) se sigue usando mientras el
  * backend no responda: es la última decisión conocida del administrador.
  */
 async function catalogEntry(slug: string): Promise<{ accessMode: DemoAccessMode; activo: boolean; fresh: boolean }> {

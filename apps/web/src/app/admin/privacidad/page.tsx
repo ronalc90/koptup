@@ -10,7 +10,7 @@
  * registros contractuales (el backend lo decide y lo explica).
  */
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import {
   ArrowDownTrayIcon,
@@ -84,13 +84,6 @@ function PrivacyInner() {
   const [erasing, setErasing] = useState(false);
   const [eraseError, setEraseError] = useState('');
   const [erased, setErased] = useState<EraseResult | null>(null);
-
-  // Desde Contactos («Buscar o suprimir sus datos») llega con ?email=: se
-  // prellena el campo (la búsqueda la lanza el admin).
-  useEffect(() => {
-    const fromQuery = new URLSearchParams(window.location.search).get('email');
-    if (fromQuery) setEmail(fromQuery.slice(0, 254));
-  }, []);
 
   const total = result ? Object.values(result.resumen).reduce((a, b) => a + b, 0) : 0;
   const blocked = (result?.bloqueos.length ?? 0) > 0;

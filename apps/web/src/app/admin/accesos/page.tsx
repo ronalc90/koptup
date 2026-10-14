@@ -222,24 +222,25 @@ function GrantsInner() {
           <table className="w-full text-sm" data-testid="grants-table">
             <thead className="bg-secondary-50 dark:bg-secondary-900 text-left text-xs uppercase tracking-wide text-secondary-500">
               <tr>
-                <th className="px-3 py-3">{t('grants.colPerson')}</th>
-                <th className="px-3 py-3">{t('grants.colDemo')}</th>
-                <th className="px-3 py-3">{t('grants.colStatus')}</th>
-                <th className="px-3 py-3">{t('grants.colExpires')}</th>
-                <th className="px-3 py-3">{t('grants.colLastAccess')}</th>
-                <th className="px-3 py-3 text-right">{t('actions')}</th>
+                <th className="px-4 py-3">{t('grants.colPerson')}</th>
+                <th className="px-4 py-3">{t('grants.colDemo')}</th>
+                <th className="px-4 py-3">{t('grants.colStatus')}</th>
+                <th className="px-4 py-3">{t('grants.colExpires')}</th>
+                <th className="px-4 py-3">{t('grants.colLastAccess')}</th>
+                <th className="px-4 py-3 text-right">{t('grants.colVisits')}</th>
+                <th className="px-4 py-3 text-right">{t('actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-secondary-200 dark:divide-secondary-800">
               {!data ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-10 text-center text-secondary-500">
+                  <td colSpan={7} className="px-4 py-10 text-center text-secondary-500">
                     {t('loading')}
                   </td>
                 </tr>
               ) : data.items.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-10 text-center text-secondary-500">
+                  <td colSpan={7} className="px-4 py-10 text-center text-secondary-500">
                     {t('grants.empty')}
                   </td>
                 </tr>
@@ -249,31 +250,31 @@ function GrantsInner() {
                   const locked = g.accessMode === 'privado' && !isAdmin;
                   return (
                     <tr key={g.id} className="align-top hover:bg-secondary-50 dark:hover:bg-secondary-900/50" data-grant-row={`${g.user?.email ?? ''}|${g.demoSlug}`}>
-                      <td className="px-3 py-3 min-w-[11rem] max-w-[15rem]">
-                        <p className="font-semibold text-secondary-900 dark:text-white break-words">{g.user?.name ?? t('grants.deletedAccount')}</p>
+                      <td className="px-4 py-3 min-w-[12rem]">
+                        <p className="font-semibold text-secondary-900 dark:text-white">{g.user?.name ?? t('grants.deletedAccount')}</p>
                         <p className="text-xs text-secondary-500 break-all">{g.user?.email ?? ''}</p>
                         {g.user?.company && <p className="text-xs text-secondary-500">{g.user.company}</p>}
                         {invited && <span className="mt-1 inline-flex rounded-full bg-amber-100 dark:bg-amber-900 px-2 py-0.5 text-[11px] font-semibold text-amber-800 dark:text-amber-100">{t('accountStatus.invitado')}</span>}
                       </td>
-                      <td className="px-3 py-3 min-w-[9rem]">
+                      <td className="px-4 py-3 min-w-[10rem]">
                         <p className="text-secondary-900 dark:text-white">{demoName({ slug: g.demoSlug, nombre: g.demoNombre, nombreEn: g.demoNombreEn }, locale)}</p>
                         {g.accessMode && <DemoAccessBadge mode={g.accessMode} activo={g.demoActiva} className="mt-1" />}
                       </td>
-                      <td className="px-3 py-3">
+                      <td className="px-4 py-3">
                         <GrantStatusBadge grant={g} />
                         {g.motivoRevocacion && <p className="mt-1 text-xs text-secondary-500 max-w-[12rem]">{g.motivoRevocacion}</p>}
                       </td>
-                      <td className="px-3 py-3 whitespace-nowrap">
+                      <td className="px-4 py-3 whitespace-nowrap">
                         <p className="text-secondary-900 dark:text-white">{formatDate(g.expiresAt, locale)}</p>
                         {g.estadoEfectivo === 'activo' && <p className="text-xs text-secondary-500">{t('daysLeftShort', { days: g.diasRestantes })}</p>}
                       </td>
-                      <td className="px-3 py-3 text-secondary-700 dark:text-secondary-300">
-                        <p className="whitespace-nowrap">{g.ultimoAcceso ? formatDate(g.ultimoAcceso, locale, true) : t('grants.never')}</p>
-                        <p className="text-xs text-secondary-500 tabular-nums">{t('grants.visits', { count: g.accesos })}</p>
+                      <td className="px-4 py-3 whitespace-nowrap text-secondary-700 dark:text-secondary-300">
+                        {g.ultimoAcceso ? formatDate(g.ultimoAcceso, locale, true) : t('grants.never')}
                       </td>
-                      <td className="px-3 py-3 w-[9.5rem]">
+                      <td className="px-4 py-3 text-right tabular-nums">{g.accesos}</td>
+                      <td className="px-4 py-3">
                         {canManage && !locked ? (
-                          <div className="flex flex-col items-stretch gap-1">
+                          <div className="flex flex-wrap justify-end gap-1">
                             {g.estadoEfectivo !== 'revocado' && (
                               <Button size="sm" variant="outline" onClick={() => setDialog({ kind: 'extend', grant: g })} data-action="extend">
                                 <CalendarDaysIcon className="h-4 w-4 mr-1" />
@@ -334,7 +335,7 @@ function GrantsInner() {
         <Modal title={t('grants.newLink')} onClose={() => setDialog(null)}>
           <ActivationLinkPanel
             result={dialog.result}
-            phone={dialog.result.user?.phone ?? dialog.grant.user?.phone ?? null}
+            phone={null}
             demoNames={[demoName({ slug: dialog.grant.demoSlug, nombre: dialog.grant.demoNombre, nombreEn: dialog.grant.demoNombreEn }, locale)]}
           />
         </Modal>
@@ -518,15 +519,10 @@ function InviteDialog({ catalog, isAdmin, onClose, onDone }: { catalog: AdminCat
             <p className="text-sm font-semibold mb-2">{t('grants.inviteDemos')} *</p>
             <div className="max-h-56 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-2 pr-1">
               {catalog.map((c) => {
-                // Una demo desactivada no se concede (el backend también lo rechaza).
-                const locked = (c.accessMode === 'privado' && !isAdmin) || !c.activo;
+                const locked = c.accessMode === 'privado' && !isAdmin;
                 const checked = demos.includes(c.slug);
                 return (
-                  <label
-                    key={c.slug}
-                    title={!c.activo ? t('grants.inactiveDemo') : undefined}
-                    className={cn('flex items-center gap-2 p-2 rounded-lg border text-sm', checked ? 'border-primary-400 bg-primary-50 dark:bg-primary-950/40' : 'border-secondary-200 dark:border-secondary-800', locked && 'opacity-50')}
-                  >
+                  <label key={c.slug} className={cn('flex items-center gap-2 p-2 rounded-lg border text-sm', checked ? 'border-primary-400 bg-primary-50 dark:bg-primary-950/40' : 'border-secondary-200 dark:border-secondary-800', locked && 'opacity-50')}>
                     <input
                       type="checkbox"
                       disabled={locked}
@@ -542,7 +538,6 @@ function InviteDialog({ catalog, isAdmin, onClose, onDone }: { catalog: AdminCat
               })}
             </div>
             {!isAdmin && <p className="text-xs text-secondary-500 mt-1">{t('detail.privateAdminOnly')}</p>}
-            {catalog.some((c) => !c.activo) && <p className="text-xs text-secondary-500 mt-1">{t('grants.inactiveDemosNote')}</p>}
           </div>
           <div>
             <p className="text-sm font-semibold mb-2">{t('detail.validity')}</p>

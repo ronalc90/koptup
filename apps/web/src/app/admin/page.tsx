@@ -54,7 +54,6 @@ const QUICK_LINKS = [
   { href: '/admin/contacts', key: 'contacts', icon: EnvelopeIcon, color: 'bg-green-100 dark:bg-green-950 text-green-600 dark:text-green-400' },
   { href: '/admin/users', key: 'users', icon: UserGroupIcon, color: 'bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400' },
   { href: '/admin/orders', key: 'orders', icon: ShoppingBagIcon, color: 'bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400' },
-  { href: '/admin/proyectos', key: 'projects', icon: ClipboardDocumentListIcon, color: 'bg-teal-100 dark:bg-teal-950 text-teal-600 dark:text-teal-400' },
   { href: '/admin/invoices', key: 'invoices', icon: BanknotesIcon, color: 'bg-orange-100 dark:bg-orange-950 text-orange-600 dark:text-orange-400' },
   { href: '/admin/deliverables', key: 'deliverables', icon: DocumentTextIcon, color: 'bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400' },
   { href: '/admin/conversations', key: 'conversations', icon: ChatBubbleLeftRightIcon, color: 'bg-pink-100 dark:bg-pink-950 text-pink-600 dark:text-pink-400' },
@@ -90,15 +89,7 @@ export default function AdminHomePage() {
     { key: 'pending', value: req ? num(req.conteos.pendiente + req.conteos.en_revision) : requests === 'error' ? '—' : '…', icon: InboxArrowDownIcon, href: '/admin/solicitudes', color: 'text-primary-600 dark:text-primary-400' },
     { key: 'activeGrants', value: gr ? num(gr.conteos.activo) : grants === 'error' ? '—' : '…', icon: KeyIcon, href: '/admin/accesos', color: 'text-green-600 dark:text-green-400' },
     { key: 'expiring', value: gr ? num(gr.conteos.por_vencer) : grants === 'error' ? '—' : '…', icon: ClockIcon, href: '/admin/accesos?estado=por_vencer', color: 'text-amber-600 dark:text-amber-400' },
-    // Contactos nuevos sin contar los de solicitudes de demo (esas se cuentan en
-    // «Solicitudes por revisar») ni los descartados como spam (el backend no los lista).
-    {
-      key: 'newContacts',
-      value: ct ? num(ct.filter((c) => c.status === 'new' && c.source !== 'demo-request').length) : contacts === 'error' ? '—' : '…',
-      icon: EnvelopeIcon,
-      href: '/admin/contacts',
-      color: 'text-blue-600 dark:text-blue-400',
-    },
+    { key: 'newContacts', value: ct ? num(ct.filter((c) => c.status === 'new').length) : contacts === 'error' ? '—' : '…', icon: EnvelopeIcon, href: '/admin/contacts', color: 'text-blue-600 dark:text-blue-400' },
   ];
 
   return (

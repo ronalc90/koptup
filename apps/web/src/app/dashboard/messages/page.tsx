@@ -1,406 +1,427 @@
 'use client';
 
-import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useLocale, useTranslations } from 'next-intl';
-import toast from 'react-hot-toast';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { api } from '@/lib/api';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
-import Card, { CardContent } from '@/components/ui/Card';
+import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import { Modal } from '@/components/admin/demos/shared';
-import { PortalError, PortalLoading } from '@/components/dashboard/PortalStates';
-import { useErrorText } from '@/hooks/useErrorText';
-import { apiRequest } from '@/lib/demo-system';
-import { formatDateTime, refreshPanelCounts } from '@/lib/portal';
-import { ArrowLeftIcon, ChatBubbleLeftRightIcon, CheckIcon, MagnifyingGlassIcon, PaperAirplaneIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { useTranslations } from 'next-intl';
+import {
+  MagnifyingGlassIcon,
+  PaperClipIcon,
+  PaperAirplaneIcon,
+  UserCircleIcon,
+  CheckIcon,
+} from '@heroicons/react/24/outline';
 
-interface ConversationRow {
+interface Message {
+  id: string;
+  senderId: string;
+  senderName: string;
+  content: string;
+  timestamp: string;
+  isOwnMessage: boolean;
+  status: 'sent' | 'delivered' | 'read';
+}
+
+interface Conversation {
   id: string;
   title: string;
-  projectName: string | null;
-  orderId: string | null;
+  projectId: string;
   lastMessage: string;
   lastMessageTime: string;
   unreadCount: number;
+  avatar?: string;
   participants: string[];
-  status: 'active' | 'archived' | 'closed';
+  status: 'active' | 'archived';
 }
 
-interface ChatMessage {
-  id: string;
-  senderName: string;
-  senderRole: 'admin' | 'client' | 'support';
-  content: string;
-  type: string;
-  timestamp: string;
-  isOwnMessage: boolean;
-  status: 'sent' | 'read';
-}
-
-interface ConversationDetail {
-  conversation: { id: string; title: string; status: string; projectName: string | null; orderId: string | null; participants: Array<{ name: string; role: string }> };
-  messages: ChatMessage[];
-}
-
-/** Revisa si hay respuestas nuevas mientras la conversación está abierta. */
-const POLL_MS = 30_000;
-
-function NewConversationModal({ onClose, onCreated }: { onClose: () => void; onCreated: (id: string) => void }) {
+export default function MessagesPage() {
   const t = useTranslations('messagesPage');
-  const errorText = useErrorText();
-  const [title, setTitle] = useState('');
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
-  const [busy, setBusy] = useState(false);
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!title.trim()) return setError(t('new.titleRequired'));
-    if (!message.trim()) return setError(t('new.messageRequired'));
-    setBusy(true);
-    setError('');
-    try {
-      const created = await apiRequest<{ id: string }>('/messages/conversations/support', { method: 'POST', body: { title: title.trim(), message: message.trim() } });
-      toast.success(t('new.sent'));
-      onCreated(created.id);
-    } catch (err) {
-      setError(errorText(err));
-      setBusy(false);
-    }
-  };
-
-  const inputCls = 'w-full px-3 py-2 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-950 text-secondary-900 dark:text-white';
-  return (
-    <Modal title={t('new.title')} onClose={busy ? () => undefined : onClose}>
-      <form onSubmit={submit} className="space-y-4">
-        <p className="text-sm text-secondary-600 dark:text-secondary-400">{t('new.help')}</p>
-        <div>
-          <label htmlFor="conv-title" className="block text-sm font-medium text-secondary-800 dark:text-secondary-200 mb-1">
-            {t('new.subject')}
-          </label>
-          <input id="conv-title" value={title} maxLength={200} onChange={(e) => setTitle(e.target.value)} className={inputCls} />
-        </div>
-        <div>
-          <label htmlFor="conv-message" className="block text-sm font-medium text-secondary-800 dark:text-secondary-200 mb-1">
-            {t('new.message')}
-          </label>
-          <textarea id="conv-message" rows={5} maxLength={5000} value={message} onChange={(e) => setMessage(e.target.value)} className={inputCls} />
-        </div>
-        {error && (
-          <p className="text-sm text-red-600 dark:text-red-400" role="alert">
-            {error}
-          </p>
-        )}
-        <div className="flex flex-col-reverse sm:flex-row justify-end gap-2">
-          <Button type="button" variant="outline" onClick={onClose} disabled={busy}>
-            {t('new.cancel')}
-          </Button>
-          <Button type="submit" isLoading={busy} disabled={busy}>
-            {t('new.submit')}
-          </Button>
-        </div>
-      </form>
-    </Modal>
-  );
-}
-
-function MessagesContent() {
-  const t = useTranslations('messagesPage');
-  const locale = useLocale();
-  const errorText = useErrorText();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const requested = searchParams.get('c');
-  const [conversations, setConversations] = useState<ConversationRow[] | null>(null);
-  const [loadError, setLoadError] = useState('');
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [detail, setDetail] = useState<ConversationDetail | null>(null);
-  const [detailError, setDetailError] = useState('');
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const [sending, setSending] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [creating, setCreating] = useState(false);
-  const endRef = useRef<HTMLDivElement>(null);
-  const seenCount = useRef<Record<string, number>>({});
+  const [loading, setLoading] = useState(true);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const loadConversations = useCallback(async () => {
-    setLoadError('');
-    try {
-      const data = await apiRequest<ConversationRow[]>('/messages/conversations');
-      setConversations(Array.isArray(data) ? data : []);
-    } catch (err) {
-      setLoadError(errorText(err));
+  useEffect(() => {
+    loadConversations();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (selectedConversation) {
+      loadMessages(selectedConversation.id);
+      markAsRead(selectedConversation.id);
     }
-  }, [errorText]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedConversation]);
 
-  useEffect(() => {
-    void loadConversations();
-  }, [loadConversations]);
+  const safeString = (value: any) =>
+    typeof value === 'string' ? value : value == null ? '' : JSON.stringify(value);
 
-  // Conversación pedida en la URL (?c=CONV-0001) o la primera de la lista (en pantallas grandes).
-  useEffect(() => {
-    if (!conversations) return;
-    if (requested && conversations.some((c) => c.id === requested)) setSelectedId(requested);
-    else if (!selectedId && conversations.length > 0 && typeof window !== 'undefined' && window.innerWidth >= 1024) setSelectedId(conversations[0].id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [conversations, requested]);
+  const loadConversations = async () => {
+    try {
+      setLoading(true);
+      const data = await api.getConversations();
 
-  const loadDetail = useCallback(
-    async (id: string, silent = false) => {
-      if (!silent) {
-        setDetail(null);
-        setDetailError('');
+      const normalized: Conversation[] =
+        Array.isArray(data) && data.length > 0
+          ? data.map((c: any): Conversation => ({
+              id: String(c.id || c._id || `conv-${Date.now()}`),
+              title: safeString(c.title || c.name || ''),
+              projectId: safeString(c.projectId || c.project?.id || c.project || ''),
+              lastMessage: safeString(c.lastMessage || c.preview || ''),
+              lastMessageTime: safeString(c.lastMessageTime || c.updatedAt || new Date().toISOString()),
+              unreadCount: Number(c.unreadCount || 0),
+              avatar: safeString(c.avatar || c.image || '') || undefined,
+              participants: Array.isArray(c.participants) ? c.participants.map(String) : [],
+              status: c.status === 'archived' ? 'archived' : 'active',
+            }))
+          : [];
+
+      setConversations(normalized);
+      if (normalized.length > 0) {
+        setSelectedConversation((prev) => prev ?? normalized[0]);
       }
-      try {
-        const data = await apiRequest<ConversationDetail>(`/messages/conversations/${encodeURIComponent(id)}`);
-        setDetail(data);
-        setDetailError('');
-        // Al abrirla (o si llegó algo nuevo mientras está abierta) queda leída.
-        const changed = seenCount.current[id] !== data.messages.length;
-        seenCount.current[id] = data.messages.length;
-        if (!silent || changed) {
-          await apiRequest(`/messages/conversations/${encodeURIComponent(id)}/read`, { method: 'POST' }).catch(() => undefined);
-          setConversations((prev) => (prev ? prev.map((c) => (c.id === id ? { ...c, unreadCount: 0 } : c)) : prev));
-          refreshPanelCounts();
-        }
-      } catch (err) {
-        if (!silent) setDetailError(errorText(err));
+    } catch (error) {
+      console.error('Failed to load conversations from API:', error);
+      setConversations([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const transformApiMessage = (apiMessage: any): Message => {
+    const id = String(apiMessage.id || apiMessage._id || `msg-${Date.now()}`);
+    const senderId = String(apiMessage.senderId || apiMessage.sender?._id || apiMessage.sender || 'unknown');
+    const senderName = safeString(
+      apiMessage.senderName ||
+      apiMessage.sender?.name ||
+      apiMessage.sender?.email ||
+      apiMessage.sender ||
+      t('unknown')
+    );
+    const content = safeString(apiMessage.content ?? apiMessage.text ?? apiMessage.body ?? '');
+    const timestamp = safeString(apiMessage.timestamp || apiMessage.createdAt || new Date().toISOString());
+    const isOwnMessage = Boolean(
+      apiMessage.isOwnMessage ||
+      apiMessage.fromSelf ||
+      apiMessage.isOwn ||
+      senderId === 'current-user'
+    );
+    const status = (apiMessage.status as Message['status']) || (apiMessage.read ? 'read' : 'sent');
+
+    return {
+      id,
+      senderId,
+      senderName,
+      content,
+      timestamp,
+      isOwnMessage,
+      status,
+    };
+  };
+
+  const loadMessages = async (conversationId: string) => {
+    try {
+      const conversationData = await api.getConversationById(conversationId);
+
+      // Extract messages from conversation data
+      const apiMessages = conversationData?.messages || [];
+
+      if (Array.isArray(apiMessages) && apiMessages.length > 0) {
+        const normalized = apiMessages.map(transformApiMessage);
+        setMessages(normalized);
+      } else {
+        setMessages([]);
       }
-    },
-    [errorText],
+    } catch (error) {
+      console.error('Failed to load messages from API:', error);
+      setMessages([]);
+    }
+  };
+
+  const markAsRead = async (conversationId: string) => {
+    try {
+      await api.markConversationAsRead(conversationId);
+      setConversations((prev) =>
+        prev.map((conv) => (conv.id === conversationId ? { ...conv, unreadCount: 0 } : conv))
+      );
+    } catch (error) {
+      console.error('Failed to mark conversation as read:', error);
+    }
+  };
+
+  const sendMessage = async () => {
+    if (!newMessage.trim() || !selectedConversation) return;
+
+    const messageContent = newMessage;
+    setNewMessage('');
+
+    // Optimistic UI update - add message immediately
+    const optimisticMessage: Message = {
+      id: `msg-temp-${Date.now()}`,
+      senderId: 'current-user',
+      senderName: t('you'),
+      content: messageContent,
+      timestamp: new Date().toISOString(),
+      isOwnMessage: true,
+      status: 'sent',
+    };
+
+    setMessages((prev) => [...prev, optimisticMessage]);
+
+    // Update conversation preview
+    setConversations((prev) =>
+      prev.map((conv) =>
+        conv.id === selectedConversation.id
+          ? { ...conv, lastMessage: messageContent, lastMessageTime: new Date().toISOString() }
+          : conv
+      )
+    );
+
+    try {
+      const response = await api.sendMessage({
+        conversationId: selectedConversation.id,
+        content: messageContent,
+      });
+
+      // Update the optimistic message with the real one from API
+      if (response) {
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === optimisticMessage.id ? transformApiMessage(response) : msg
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      // Remove optimistic message on error
+      setMessages((prev) => prev.filter((msg) => msg.id !== optimisticMessage.id));
+      // Restore the message in the input
+      setNewMessage(messageContent);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
+
+  const formatTime = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
+
+    if (diffInHours < 24) {
+      return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    } else {
+      return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+    }
+  };
+
+  const getMessageStatusIcon = (status: Message['status']) => {
+    switch (status) {
+      case 'sent':
+        return <CheckIcon className="h-4 w-4" />;
+      case 'delivered':
+      case 'read':
+        return (
+          <div className="flex">
+            <CheckIcon className="h-4 w-4 -mr-1" />
+            <CheckIcon className="h-4 w-4" />
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const filteredConversations = conversations.filter(
+    (conv) =>
+      (conv.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (conv.lastMessage || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  useEffect(() => {
-    if (!selectedId) return;
-    void loadDetail(selectedId);
-    const timer = window.setInterval(() => void loadDetail(selectedId, true), POLL_MS);
-    return () => window.clearInterval(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedId]);
-
-  useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }, [detail?.messages.length]);
-
-  const select = (id: string | null) => {
-    setSelectedId(id);
-    const params = new URLSearchParams(searchParams.toString());
-    if (id) params.set('c', id);
-    else params.delete('c');
-    router.replace(`/dashboard/messages${params.toString() ? `?${params}` : ''}`, { scroll: false });
-  };
-
-  const send = async () => {
-    const content = newMessage.trim();
-    if (!content || !selectedId || sending) return;
-    setSending(true);
-    try {
-      await apiRequest('/messages/send', { method: 'POST', body: { conversationId: selectedId, content } });
-      setNewMessage('');
-      await loadDetail(selectedId, true);
-      setConversations((prev) =>
-        prev ? prev.map((c) => (c.id === selectedId ? { ...c, lastMessage: content, lastMessageTime: new Date().toISOString() } : c)) : prev,
-      );
-    } catch (err) {
-      toast.error(errorText(err, t('sendError')));
-    } finally {
-      setSending(false);
-    }
-  };
-
-  const q = searchTerm.trim().toLowerCase();
-  const filtered = (conversations ?? []).filter((c) => !q || c.title.toLowerCase().includes(q) || c.lastMessage.toLowerCase().includes(q));
-
-  if (loadError) return <PortalError message={loadError} onRetry={() => void loadConversations()} />;
-  if (!conversations) return <PortalLoading />;
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-96">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <DashboardLayout>
+      <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">{t('title')}</h1>
-          <p className="text-secondary-600 dark:text-secondary-400">{t('subtitle')}</p>
+          <p className="text-secondary-600 dark:text-secondary-400">
+            {t('subtitle')}
+          </p>
         </div>
-        <Button onClick={() => setCreating(true)} data-testid="new-conversation">
-          <PlusIcon className="h-5 w-5 mr-2" />
-          {t('new.button')}
-        </Button>
-      </div>
 
-      {conversations.length === 0 ? (
-        <Card variant="bordered">
-          <CardContent className="p-10 text-center" data-testid="portal-empty">
-            <ChatBubbleLeftRightIcon className="h-12 w-12 mx-auto text-secondary-400 mb-4" />
-            <p className="font-semibold text-secondary-900 dark:text-white">{t('emptyTitle')}</p>
-            <p className="text-sm text-secondary-600 dark:text-secondary-400 mt-2 max-w-xl mx-auto">{t('emptyBody')}</p>
-            <Button className="mt-5" size="sm" onClick={() => setCreating(true)}>
-              {t('new.button')}
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:h-[calc(100vh-260px)] lg:min-h-[520px]">
-          {/* Lista */}
-          <Card variant="bordered" className={`lg:col-span-1 flex flex-col min-h-0 ${selectedId ? 'hidden lg:flex' : 'flex'}`}>
-            <CardContent className="p-4 flex-1 overflow-hidden flex flex-col min-h-0">
-              <div className="relative mb-4">
-                <label htmlFor="conv-search" className="sr-only">
-                  {t('searchPlaceholder')}
-                </label>
-                <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-secondary-400" />
-                <input
-                  id="conv-search"
-                  type="search"
-                  placeholder={t('searchPlaceholder')}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-              </div>
-              <ul className="flex-1 overflow-y-auto space-y-2" data-testid="conversation-list">
-                {filtered.length === 0 ? (
-                  <li className="text-center py-8 text-secondary-600 dark:text-secondary-400">{t('noConversations')}</li>
-                ) : (
-                  filtered.map((conv) => (
-                    <li key={conv.id}>
-                      <button
-                        type="button"
-                        onClick={() => select(conv.id)}
-                        aria-current={selectedId === conv.id}
-                        className={`w-full p-3 rounded-lg text-left transition-colors border-2 ${
-                          selectedId === conv.id ? 'bg-primary-50 dark:bg-primary-950 border-primary-500' : 'hover:bg-secondary-50 dark:hover:bg-secondary-800 border-transparent'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between gap-2 mb-1">
-                          <span className={`text-sm truncate ${conv.unreadCount > 0 ? 'font-bold text-secondary-900 dark:text-white' : 'font-semibold text-secondary-900 dark:text-white'}`}>{conv.title}</span>
-                          {conv.unreadCount > 0 && (
-                            <Badge variant="danger" size="sm" aria-label={t('unread', { count: conv.unreadCount })}>
-                              {conv.unreadCount}
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="text-xs text-secondary-600 dark:text-secondary-400 truncate mb-1">{conv.lastMessage || t('noMessages')}</p>
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-xs text-secondary-500 truncate">{conv.orderId ?? conv.projectName ?? ''}</span>
-                          <span className="text-xs text-secondary-500 flex-shrink-0">{formatDateTime(conv.lastMessageTime, locale)}</span>
-                        </div>
-                      </button>
-                    </li>
-                  ))
-                )}
-              </ul>
-            </CardContent>
-          </Card>
-
-          {/* Conversación */}
-          <Card variant="bordered" className={`lg:col-span-2 flex flex-col min-h-[480px] lg:min-h-0 ${selectedId ? 'flex' : 'hidden lg:flex'}`}>
-            {!selectedId ? (
-              <div className="flex-1 flex items-center justify-center p-8 text-center">
-                <p className="text-secondary-600 dark:text-secondary-400">{t('selectConversation')}</p>
-              </div>
-            ) : detailError ? (
-              <div className="p-6">
-                <PortalError compact message={detailError} onRetry={() => void loadDetail(selectedId)} />
-              </div>
-            ) : !detail ? (
-              <PortalLoading />
-            ) : (
-              <>
-                <div className="border-b border-secondary-200 dark:border-secondary-700 p-4 flex items-start gap-3">
-                  <button type="button" className="lg:hidden p-1 rounded hover:bg-secondary-100 dark:hover:bg-secondary-800" onClick={() => select(null)} aria-label={t('backToList')}>
-                    <ArrowLeftIcon className="h-5 w-5" />
-                  </button>
-                  <div className="min-w-0">
-                    <h2 className="text-lg font-semibold text-secondary-900 dark:text-white break-words">{detail.conversation.title}</h2>
-                    <p className="text-sm text-secondary-600 dark:text-secondary-400">
-                      {detail.conversation.participants.map((p) => p.name).join(', ') || t('noParticipants')}
-                    </p>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-280px)]">
+          <div className="lg:col-span-1">
+            <Card variant="bordered" className="h-full flex flex-col">
+              <CardContent className="p-4 flex-1 overflow-hidden flex flex-col">
+                <div className="mb-4">
+                  <div className="relative">
+                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-secondary-400" />
+                    <input
+                      type="text"
+                      placeholder={t('searchPlaceholder')}
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    />
                   </div>
                 </div>
-                <CardContent className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0" data-testid="message-thread">
-                  {detail.messages.length === 0 && <p className="text-center text-secondary-500">{t('noMessages')}</p>}
-                  {detail.messages.map((m) =>
-                    m.type === 'system' ? (
-                      <div key={m.id} className="text-center">
-                        <p className="inline-block text-xs text-secondary-700 dark:text-secondary-300 bg-amber-50 dark:bg-amber-950/40 rounded-lg px-3 py-2 whitespace-pre-wrap text-left max-w-[90%]">{m.content}</p>
-                        <p className="text-[11px] text-secondary-500 mt-1">{formatDateTime(m.timestamp, locale)}</p>
-                      </div>
-                    ) : (
-                      <div key={m.id} className={`flex ${m.isOwnMessage ? 'justify-end' : 'justify-start'}`} data-own={m.isOwnMessage ? 'true' : 'false'}>
-                        <div className="max-w-[85%] sm:max-w-[70%]">
-                          {!m.isOwnMessage && <p className="text-xs font-medium text-secondary-600 dark:text-secondary-400 mb-1">{m.senderName}</p>}
-                          <div className={`rounded-lg p-3 ${m.isOwnMessage ? 'bg-primary-600 text-white' : 'bg-secondary-100 dark:bg-secondary-800 text-secondary-900 dark:text-white'}`}>
-                            <p className="text-sm whitespace-pre-wrap break-words">{m.content}</p>
+
+                <div className="flex-1 overflow-y-auto space-y-2">
+                  {filteredConversations.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-secondary-600 dark:text-secondary-400">{t('noConversations')}</p>
+                    </div>
+                  ) : (
+                    filteredConversations.map((conv) => (
+                      <button
+                        key={conv.id}
+                        onClick={() => setSelectedConversation(conv)}
+                        className={`w-full p-3 rounded-lg text-left transition-colors ${
+                          selectedConversation?.id === conv.id
+                            ? 'bg-primary-50 dark:bg-primary-950 border-2 border-primary-500'
+                            : 'hover:bg-secondary-50 dark:hover:bg-secondary-800 border-2 border-transparent'
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-950 flex items-center justify-center flex-shrink-0">
+                            <UserCircleIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
                           </div>
-                          <div className={`flex items-center gap-1 mt-1 ${m.isOwnMessage ? 'justify-end' : 'justify-start'}`}>
-                            <span className="text-xs text-secondary-500">{formatDateTime(m.timestamp, locale)}</span>
-                            {m.isOwnMessage && (
-                              <span className="text-secondary-500 flex" title={m.status === 'read' ? t('read') : t('sent')} aria-label={m.status === 'read' ? t('read') : t('sent')}>
-                                <CheckIcon className="h-4 w-4" />
-                                {m.status === 'read' && <CheckIcon className="h-4 w-4 -ml-2" />}
-                              </span>
-                            )}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-1">
+                              <h4 className="font-semibold text-sm text-secondary-900 dark:text-white truncate">{conv.title}</h4>
+                              {conv.unreadCount > 0 && (
+                                <Badge variant="secondary" size="sm" className="ml-2 bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300">
+                                  {conv.unreadCount}
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-xs text-secondary-600 dark:text-secondary-400 truncate mb-1">
+                              {typeof conv.lastMessage === 'string' ? conv.lastMessage : safeString(conv.lastMessage)}
+                            </p>
+                            <div className="flex items-center justify-between">
+                              <Badge variant="secondary" size="sm">
+                                {conv.projectId}
+                              </Badge>
+                              <span className="text-xs text-secondary-500">{formatTime(conv.lastMessageTime)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="lg:col-span-2">
+            {selectedConversation ? (
+              <Card variant="bordered" className="h-full flex flex-col">
+                <div className="border-b border-secondary-200 dark:border-secondary-700 p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold text-secondary-900 dark:text-white">{selectedConversation.title}</h3>
+                      <p className="text-sm text-secondary-600 dark:text-secondary-400">
+                        {selectedConversation.participants?.join(', ') || t('noParticipants')}
+                      </p>
+                    </div>
+                    <Badge variant="primary" size="sm">
+                      {selectedConversation.projectId}
+                    </Badge>
+                  </div>
+                </div>
+
+                <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
+                  {messages.map((message) => {
+                    const messageId = String(message?.id || `msg-${Date.now()}`);
+                    const messageContent = typeof message?.content === 'string' ? message.content : safeString(message?.content);
+                    const messageSenderName = safeString(message?.senderName || t('unknown'));
+                    const messageTimestamp = safeString(message?.timestamp || new Date().toISOString());
+                    const messageIsOwnMessage = Boolean(message?.isOwnMessage);
+                    const messageStatus = message?.status || 'sent';
+
+                    return (
+                      <div key={messageId} className={`flex ${messageIsOwnMessage ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[70%] ${messageIsOwnMessage ? 'order-2' : 'order-1'}`}>
+                          {!messageIsOwnMessage && (
+                            <p className="text-xs font-medium text-secondary-600 dark:text-secondary-400 mb-1">
+                              {messageSenderName}
+                            </p>
+                          )}
+                          <div
+                            className={`rounded-lg p-3 ${
+                              messageIsOwnMessage ? 'bg-primary-600 text-white' : 'bg-secondary-100 dark:bg-secondary-800 text-secondary-900 dark:text-white'
+                            }`}
+                          >
+                            <p className="text-sm whitespace-pre-wrap">{messageContent}</p>
+                          </div>
+                          <div className={`flex items-center gap-1 mt-1 ${messageIsOwnMessage ? 'justify-end' : 'justify-start'}`}>
+                            <span className="text-xs text-secondary-500">{formatTime(messageTimestamp)}</span>
+                            {messageIsOwnMessage && <span className="text-secondary-500">{getMessageStatusIcon(messageStatus)}</span>}
                           </div>
                         </div>
                       </div>
-                    ),
-                  )}
-                  <div ref={endRef} />
+                    );
+                  })}
+                  <div ref={messagesEndRef} />
                 </CardContent>
+
                 <div className="border-t border-secondary-200 dark:border-secondary-700 p-4">
                   <div className="flex items-end gap-2">
-                    <label htmlFor="portal-reply" className="sr-only">
-                      {t('messagePlaceholder')}
-                    </label>
-                    <textarea
-                      id="portal-reply"
-                      value={newMessage}
-                      maxLength={5000}
-                      onChange={(e) => setNewMessage(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          void send();
-                        }
-                      }}
-                      placeholder={t('messagePlaceholder')}
-                      rows={2}
-                      disabled={sending}
-                      className="flex-1 px-4 py-2 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
-                    />
-                    <Button onClick={() => void send()} disabled={!newMessage.trim() || sending} isLoading={sending} className="flex-shrink-0" aria-label={t('send')}>
+                    <button
+                      className="p-2 rounded-lg text-secondary-600 dark:text-secondary-400 hover:bg-secondary-100 dark:hover:bg-secondary-800 transition-colors"
+                      title={t('title')}
+                    >
+                      <PaperClipIcon className="h-6 w-6" />
+                    </button>
+                    <div className="flex-1">
+                      <textarea
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        placeholder={t('messagePlaceholder')}
+                        rows={2}
+                        className="w-full px-4 py-2 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+                      />
+                    </div>
+                    <Button onClick={sendMessage} disabled={!newMessage.trim()} className="flex-shrink-0">
                       <PaperAirplaneIcon className="h-5 w-5" />
                     </Button>
                   </div>
                   <p className="text-xs text-secondary-500 mt-2">{t('enterToSend')}</p>
                 </div>
-              </>
+              </Card>
+            ) : (
+              <Card variant="bordered" className="h-full flex items-center justify-center">
+                <div className="text-center">
+                  <UserCircleIcon className="h-16 w-16 text-secondary-400 mx-auto mb-4" />
+                  <p className="text-secondary-600 dark:text-secondary-400">{t('selectConversation')}</p>
+                </div>
+              </Card>
             )}
-          </Card>
+          </div>
         </div>
-      )}
-
-      {creating && (
-        <NewConversationModal
-          onClose={() => setCreating(false)}
-          onCreated={(id) => {
-            setCreating(false);
-            void loadConversations().then(() => select(id));
-          }}
-        />
-      )}
-    </div>
-  );
-}
-
-/** Portal › Mensajes: conversaciones con el equipo (lectura, respuesta y nuevas). */
-export default function MessagesPage() {
-  return (
-    <DashboardLayout>
-      <Suspense fallback={<PortalLoading />}>
-        <MessagesContent />
-      </Suspense>
+      </div>
     </DashboardLayout>
   );
 }

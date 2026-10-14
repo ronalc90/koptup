@@ -52,7 +52,7 @@ import { AppError } from '../middleware/errorHandler';
 import { normalizeEmailLikeAuth } from '../utils/email-address';
 import { recordAudit, type AuditActor } from './audit.service';
 import { deleteFromS3 } from './storage.service';
-import { revokeAllSessions } from './session.service';
+import { redis } from '../config/redis';
 import { logger } from '../utils/logger';
 
 /** Estados de una propuesta que prueban una relación contractual. */
@@ -268,8 +268,7 @@ async function deleteDocumentFile(filePath: string | undefined): Promise<void> {
 
 /** Cierra las sesiones renovables de las cuentas suprimidas (sin Redis no hay sesiones que cerrar). */
 async function dropRefreshSessions(userIds: string[]): Promise<void> {
-  // Todas las sesiones de cada dispositivo (services/session.service.ts).
-  for (const id of userIds) await revokeAllSessions(id);
+  for (const id of userIds) await redis.del(`refresh_token:${id}`);
 }
 
 export interface ErasureResult {

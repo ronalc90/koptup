@@ -1,5 +1,4 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { nextSequentialId } from '../utils/sequence';
 
 export interface IConversation extends Document {
   conversationId: string;
@@ -91,12 +90,13 @@ const ConversationSchema: Schema = new Schema(
 // Índice compuesto para búsquedas por participante
 ConversationSchema.index({ 'participants.userId': 1, status: 1 });
 
-// Identificador legible (CONV-0001): se asigna ANTES de validar con un
-// contador atómico (utils/sequence.ts).
-ConversationSchema.pre('validate', async function () {
+// Generar conversationId automáticamente
+ConversationSchema.pre('save', async function (next) {
   if (!this.conversationId) {
-    this.conversationId = await nextSequentialId({ model: 'Conversation', field: 'conversationId', key: 'conversation', prefix: 'CONV-', pad: 4 });
+    const count = await mongoose.model('Conversation').countDocuments();
+    this.conversationId = `CONV-${String(count + 1).padStart(4, '0')}`;
   }
+  next();
 });
 
 export default mongoose.model<IConversation>('Conversation', ConversationSchema);

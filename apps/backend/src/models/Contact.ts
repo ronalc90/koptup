@@ -71,12 +71,6 @@ export interface IContact extends Document {
   consentimiento?: IContactConsent | null;
   /** Fecha en que el job de conservación quitó los datos personales (jobs/retention.job.ts). */
   anonimizadoEn?: Date | null;
-  /**
-   * Descartado como spam (p. ej. su solicitud de demo se rechazó con el
-   * motivo «spam»): no aparece en Contactos ni cuenta como nuevo, salvo con el
-   * filtro «Descartados».
-   */
-  descartado?: { motivo: string; fecha: Date } | null;
   created_at: Date;
 }
 
@@ -118,10 +112,6 @@ const ContactSchema = new Schema<IContact>({
     default: undefined,
   },
   anonimizadoEn: { type: Date, default: null },
-  descartado: {
-    type: new Schema({ motivo: { type: String, required: true, maxlength: 60 }, fecha: { type: Date, required: true } }, { _id: false }),
-    default: null,
-  },
   created_at: { type: Date, default: Date.now },
 });
 

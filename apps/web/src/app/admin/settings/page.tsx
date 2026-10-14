@@ -1,66 +1,151 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import AdminLayout from '@/components/admin/AdminLayout';
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
-import { BellIcon, GlobeAltIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
+import Button from '@/components/ui/Button';
+import {
+  BellIcon,
+  GlobeAltIcon,
+  ShieldCheckIcon,
+} from '@heroicons/react/24/outline';
 import { useTranslations } from 'next-intl';
-import { useSessionUser } from '@/hooks/useSessionUser';
 
-/**
- * Configuración del panel. El idioma y el tema se aplican al momento (no hay
- * nada que guardar). Los avisos al equipo (correo y WhatsApp) se configuran en
- * el servidor, no por persona: la página lo dice en vez de mostrar casillas
- * que no cambiaban ningún envío.
- */
 export default function AdminSettingsPage() {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const t = useTranslations('settingsPage');
-  const ta = useTranslations('adminSettings');
-  const { state } = useSessionUser();
-  const role = state.status === 'ok' ? state.user.role : null;
-  const [language, setLanguage] = useState('es');
-  const [mounted, setMounted] = useState(false);
+  const [settings, setSettings] = useState({
+    notifications: {
+      email: true,
+      push: true,
+      sms: false,
+    },
+    language: 'es',
+    theme: 'light',
+  });
 
+  const [saving, setSaving] = useState(false);
+
+  // Load language from cookie and theme on mount
   useEffect(() => {
-    setLanguage(document.cookie.match(/(?:^|; )locale=([^;]+)/)?.[1] === 'en' ? 'en' : 'es');
-    setMounted(true);
-  }, []);
+    const currentLocale = document.cookie.match(/(?:^|; )locale=([^;]+)/)?.[1] || 'es';
+    const currentTheme = theme === 'system' ? 'auto' : (theme || 'light');
+    setSettings(prev => ({ ...prev, language: currentLocale, theme: currentTheme }));
+  }, [theme]);
 
   const handleLanguageChange = (newLanguage: string) => {
-    setLanguage(newLanguage);
+    // Update state
+    setSettings({ ...settings, language: newLanguage });
+
+    // Set cookie
     document.cookie = `locale=${newLanguage}; path=/; max-age=${31536000}; SameSite=Lax`;
+
+    // Force reload to apply language change
     setTimeout(() => {
       router.refresh();
       window.location.reload();
     }, 100);
   };
 
-  const currentTheme = !mounted ? null : theme === 'system' ? 'system' : theme ?? 'light';
-  const themeButton = (value: 'light' | 'dark' | 'system', label: string) => (
-    <button
-      type="button"
-      onClick={() => setTheme(value)}
-      aria-pressed={currentTheme === value}
-      className={`p-4 rounded-lg border-2 transition-all ${
-        currentTheme === value ? 'border-primary-500 bg-primary-50 dark:bg-primary-950' : 'border-secondary-200 dark:border-secondary-700'
-      }`}
-    >
-      <p className="font-medium text-secondary-900 dark:text-white">{label}</p>
-    </button>
-  );
+  const handleSave = async () => {
+    setSaving(true);
+
+    // Save to localStorage
+    localStorage.setItem('adminSettings', JSON.stringify(settings));
+
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setSaving(false);
+
+    alert(t('toastSaved'));
+  };
 
   return (
     <AdminLayout>
       <div className="space-y-6 max-w-4xl">
         <div>
-          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">{t('title')}</h1>
-          <p className="text-secondary-600 dark:text-secondary-400">{ta('subtitle')}</p>
+          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">
+            {t('title')}
+          </h1>
+          <p className="text-secondary-600 dark:text-secondary-400">
+            {t('subtitle')}
+          </p>
         </div>
 
+        {/* Notifications */}
+        <Card variant="bordered">
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <BellIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
+              <CardTitle>{t('notifications')}</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <label className="flex items-center justify-between p-4 rounded-lg border border-secondary-200 dark:border-secondary-700 cursor-pointer hover:bg-secondary-50 dark:hover:bg-secondary-900">
+              <div>
+                <p className="font-medium text-secondary-900 dark:text-white">{t('emailNotifications')}</p>
+                <p className="text-sm text-secondary-600 dark:text-secondary-400">
+                  {t('emailDesc')}
+                </p>
+              </div>
+              <input
+                type="checkbox"
+                checked={settings.notifications.email}
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    notifications: { ...settings.notifications, email: e.target.checked },
+                  })
+                }
+                className="w-5 h-5 rounded border-secondary-300 text-primary-600 focus:ring-primary-500"
+              />
+            </label>
+
+            <label className="flex items-center justify-between p-4 rounded-lg border border-secondary-200 dark:border-secondary-700 cursor-pointer hover:bg-secondary-50 dark:hover:bg-secondary-900">
+              <div>
+                <p className="font-medium text-secondary-900 dark:text-white">{t('pushNotifications')}</p>
+                <p className="text-sm text-secondary-600 dark:text-secondary-400">
+                  {t('pushDesc')}
+                </p>
+              </div>
+              <input
+                type="checkbox"
+                checked={settings.notifications.push}
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    notifications: { ...settings.notifications, push: e.target.checked },
+                  })
+                }
+                className="w-5 h-5 rounded border-secondary-300 text-primary-600 focus:ring-primary-500"
+              />
+            </label>
+
+            <label className="flex items-center justify-between p-4 rounded-lg border border-secondary-200 dark:border-secondary-700 cursor-pointer hover:bg-secondary-50 dark:hover:bg-secondary-900">
+              <div>
+                <p className="font-medium text-secondary-900 dark:text-white">{t('smsNotifications')}</p>
+                <p className="text-sm text-secondary-600 dark:text-secondary-400">
+                  {t('smsDesc')}
+                </p>
+              </div>
+              <input
+                type="checkbox"
+                checked={settings.notifications.sms}
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    notifications: { ...settings.notifications, sms: e.target.checked },
+                  })
+                }
+                className="w-5 h-5 rounded border-secondary-300 text-primary-600 focus:ring-primary-500"
+              />
+            </label>
+          </CardContent>
+        </Card>
+
+        {/* Language & Theme */}
         <Card variant="bordered">
           <CardHeader>
             <div className="flex items-center gap-3">
@@ -70,12 +155,11 @@ export default function AdminSettingsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label htmlFor="admin-language" className="block text-sm font-medium text-secondary-900 dark:text-white mb-2">
+              <label className="block text-sm font-medium text-secondary-900 dark:text-white mb-2">
                 {t('language')}
               </label>
               <select
-                id="admin-language"
-                value={language}
+                value={settings.language}
                 onChange={(e) => handleLanguageChange(e.target.value)}
                 className="w-full px-4 py-2 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:ring-2 focus:ring-primary-500"
               >
@@ -83,44 +167,93 @@ export default function AdminSettingsPage() {
                 <option value="en">English</option>
               </select>
             </div>
+
             <div>
-              <p className="block text-sm font-medium text-secondary-900 dark:text-white mb-2">{t('theme')}</p>
+              <label className="block text-sm font-medium text-secondary-900 dark:text-white mb-2">
+                {t('theme')}
+              </label>
               <div className="grid grid-cols-3 gap-3">
-                {themeButton('light', t('light'))}
-                {themeButton('dark', t('dark'))}
-                {themeButton('system', t('auto'))}
+                <button
+                  onClick={() => {
+                    setTheme('light');
+                    setSettings({ ...settings, theme: 'light' });
+                  }}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    settings.theme === 'light'
+                      ? 'border-primary-500 bg-primary-50 dark:bg-primary-950'
+                      : 'border-secondary-200 dark:border-secondary-700'
+                  }`}
+                >
+                  <p className="font-medium text-secondary-900 dark:text-white">{t('light')}</p>
+                </button>
+                <button
+                  onClick={() => {
+                    setTheme('dark');
+                    setSettings({ ...settings, theme: 'dark' });
+                  }}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    settings.theme === 'dark'
+                      ? 'border-primary-500 bg-primary-50 dark:bg-primary-950'
+                      : 'border-secondary-200 dark:border-secondary-700'
+                  }`}
+                >
+                  <p className="font-medium text-secondary-900 dark:text-white">{t('dark')}</p>
+                </button>
+                <button
+                  onClick={() => {
+                    setTheme('system');
+                    setSettings({ ...settings, theme: 'auto' });
+                  }}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    settings.theme === 'auto' || settings.theme === 'system'
+                      ? 'border-primary-500 bg-primary-50 dark:bg-primary-950'
+                      : 'border-secondary-200 dark:border-secondary-700'
+                  }`}
+                >
+                  <p className="font-medium text-secondary-900 dark:text-white">{t('auto')}</p>
+                </button>
               </div>
             </div>
-            <p className="text-xs text-secondary-500">{ta('appliedNow')}</p>
           </CardContent>
         </Card>
 
-        <Card variant="bordered">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <BellIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
-              <CardTitle>{ta('teamNoticesTitle')}</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-secondary-700 dark:text-secondary-300">{ta('teamNoticesBody')}</p>
-          </CardContent>
-        </Card>
-
+        {/* Admin Info */}
         <Card variant="bordered">
           <CardHeader>
             <div className="flex items-center gap-3">
               <ShieldCheckIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
-              <CardTitle>{ta('accessTitle')}</CardTitle>
+              <CardTitle>Información del Administrador</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="p-4 rounded-lg bg-secondary-50 dark:bg-secondary-900">
-              <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">{role ? ta(`roleName.${role === 'admin' ? 'admin' : 'manager'}`) : '—'}</p>
-              <p className="font-medium text-secondary-900 dark:text-white">{role === 'admin' ? ta('accessAdmin') : ta('accessManager')}</p>
+            <div className="space-y-3">
+              <div className="p-4 rounded-lg bg-secondary-50 dark:bg-secondary-900">
+                <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">
+                  Panel de Administración
+                </p>
+                <p className="font-medium text-secondary-900 dark:text-white">
+                  Tienes acceso completo a todas las funcionalidades del sistema
+                </p>
+              </div>
+              <div className="p-4 rounded-lg bg-secondary-50 dark:bg-secondary-900">
+                <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-1">
+                  Módulos disponibles
+                </p>
+                <p className="font-medium text-secondary-900 dark:text-white">
+                  Pedidos, Entregables, Facturas, Conversaciones, Usuarios, Contactos
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
+
+        {/* Save Button */}
+        <div className="flex justify-end gap-3">
+          <Button variant="outline">{t('cancel')}</Button>
+          <Button onClick={handleSave} disabled={saving}>
+            {saving ? t('saving') : t('save')}
+          </Button>
+        </div>
       </div>
     </AdminLayout>
   );

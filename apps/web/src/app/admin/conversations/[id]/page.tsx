@@ -1,123 +1,101 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
-import Link from 'next/link';
-import { useLocale, useTranslations } from 'next-intl';
-import toast from 'react-hot-toast';
 import AdminLayout from '@/components/admin/AdminLayout';
-import Card, { CardContent } from '@/components/ui/Card';
+import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
-import { apiRequest } from '@/lib/demo-system';
-import { describeError, formatDateTime, refreshPanelCounts } from '@/lib/portal';
-import { ArrowLeftIcon, PaperAirplaneIcon, UserIcon } from '@heroicons/react/24/outline';
-
-interface DetailMessage {
-  id: string;
-  senderName: string;
-  senderRole: 'admin' | 'client' | 'support';
-  content: string;
-  type: string;
-  timestamp: string;
-  isOwnMessage: boolean;
-  readByOthers?: boolean;
-}
-
-interface Detail {
-  conversation: {
-    id: string;
-    title: string;
-    projectName: string | null;
-    orderId: string | null;
-    participants: Array<{ name: string; email: string; role: 'admin' | 'client' | 'support' }>;
-    status: 'active' | 'archived' | 'closed';
-  };
-  messages: DetailMessage[];
-}
-
-const ROLE_COLORS: Record<string, string> = {
-  admin: 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-400',
-  client: 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-400',
-  support: 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-400',
-};
+import { api } from '@/lib/api';
+import Link from 'next/link';
+import {
+  ArrowLeftIcon,
+  PaperAirplaneIcon,
+  UserIcon,
+} from '@heroicons/react/24/outline';
 
 export default function AdminConversationDetailPage() {
   const params = useParams();
-  const conversationId = String(params.id ?? '');
-  const t = useTranslations('adminConversations');
-  const tc = useTranslations('portalCommon');
-  const locale = useLocale();
-  const [detail, setDetail] = useState<Detail | null>(null);
+  const conversationId = params.id as string;
+  const [conversation, setConversation] = useState<any>(null);
+  const [messages, setMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState<{ status: number; message: string } | null>(null);
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const errorTexts = { network: tc('errors.network'), rateLimited: tc('errors.rateLimited'), server: tc('errors.server'), generic: tc('errors.generic') };
-
-  const load = useCallback(
-    async (silent = false) => {
-      if (!silent) setLoading(true);
-      try {
-        const data = await apiRequest<Detail>(`/admin/conversations/${encodeURIComponent(conversationId)}`);
-        setDetail(data);
-        setLoadError(null);
-        // Al abrirla, el equipo la leyó: el contador del menú baja.
-        refreshPanelCounts();
-      } catch (err) {
-        const status = (err as { status?: number }).status ?? 0;
-        setLoadError({ status, message: describeError(err, locale, errorTexts) });
-      } finally {
-        setLoading(false);
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [conversationId, locale],
-  );
+  useEffect(() => {
+    loadConversation();
+  }, [conversationId]);
 
   useEffect(() => {
-    void load();
-  }, [load]);
+    scrollToBottom();
+  }, [messages]);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [detail?.messages.length]);
-
-  const send = async () => {
-    const content = newMessage.trim();
-    if (!content || sending) return;
-    setSending(true);
+  const loadConversation = async () => {
     try {
-      await apiRequest(`/admin/conversations/${encodeURIComponent(conversationId)}/messages`, { method: 'POST', body: { content } });
+      setLoading(true);
+      const response = await api.get(`/api/admin/conversations/${conversationId}`);
+      setConversation(response.data?.data?.conversation);
+      setMessages(response.data?.data?.messages || []);
+    } catch (error) {
+      console.error('Error loading conversation:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || sending) return;
+
+    try {
+      setSending(true);
+      await api.post('/messages/send', {
+        conversationId,
+        content: newMessage.trim(),
+        type: 'text',
+      });
       setNewMessage('');
-      await load(true);
-    } catch (err) {
-      toast.error(describeError(err, locale, errorTexts));
+      await loadConversation();
+    } catch (error) {
+      console.error('Error sending message:', error);
+      alert('Error al enviar el mensaje');
     } finally {
       setSending(false);
     }
   };
 
-  const changeStatus = async (status: Detail['conversation']['status']) => {
-    try {
-      await apiRequest(`/admin/conversations/${encodeURIComponent(conversationId)}/status`, { method: 'PATCH', body: { status } });
-      toast.success(t('statusChanged'));
-      await load(true);
-    } catch (err) {
-      toast.error(describeError(err, locale, errorTexts));
+  const formatMessageTime = (timestamp: string) => {
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const formatMessageDate = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    if (date.toDateString() === today.toDateString()) {
+      return 'Hoy';
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return 'Ayer';
+    } else {
+      return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
     }
   };
 
-  const dayLabel = (iso: string) => {
-    const d = new Date(iso);
-    const key = (x: Date) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota' }).format(x);
-    const today = new Date();
-    const yesterday = new Date(Date.now() - 86400000);
-    if (key(d) === key(today)) return t('today');
-    if (key(d) === key(yesterday)) return t('yesterday');
-    return new Intl.DateTimeFormat(locale === 'en' ? 'en-US' : 'es-CO', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'America/Bogota' }).format(d);
+  const getRoleBadgeColor = (role: string) => {
+    const colors: Record<string, string> = {
+      admin: 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-400',
+      client: 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-400',
+      support: 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-400',
+    };
+    return colors[role] || 'bg-secondary-100 text-secondary-800';
   };
 
   if (loading) {
@@ -130,107 +108,128 @@ export default function AdminConversationDetailPage() {
     );
   }
 
-  if (!detail) {
+  if (!conversation) {
     return (
       <AdminLayout>
-        <div className="text-center py-12" role="alert">
-          <p className="text-secondary-600 dark:text-secondary-400">{loadError?.status === 404 ? t('conversationNotFound') : loadError?.message}</p>
-          <div className="mt-4 flex justify-center gap-2">
-            {loadError?.status !== 404 && (
-              <Button variant="outline" onClick={() => void load()}>
-                {tc('retry')}
-              </Button>
-            )}
-            <Button variant="outline" asChild>
-              <Link href="/admin/conversations">{t('backToList')}</Link>
+        <div className="text-center py-12">
+          <p className="text-secondary-600 dark:text-secondary-400">
+            Conversación no encontrada
+          </p>
+          <Link href="/admin/conversations">
+            <Button variant="outline" className="mt-4">
+              Volver a conversaciones
             </Button>
-          </div>
+          </Link>
         </div>
       </AdminLayout>
     );
   }
 
-  const groups: Array<{ label: string; items: DetailMessage[] }> = [];
-  for (const msg of detail.messages) {
-    const label = dayLabel(msg.timestamp);
-    const last = groups[groups.length - 1];
-    if (last && last.label === label) last.items.push(msg);
-    else groups.push({ label, items: [msg] });
-  }
-  const conv = detail.conversation;
+  // Group messages by date
+  const groupedMessages: Record<string, any[]> = {};
+  messages.forEach((msg) => {
+    const dateKey = formatMessageDate(msg.timestamp);
+    if (!groupedMessages[dateKey]) {
+      groupedMessages[dateKey] = [];
+    }
+    groupedMessages[dateKey].push(msg);
+  });
 
   return (
     <AdminLayout>
-      <div className="flex flex-col min-h-[calc(100vh-8rem)]">
+      <div className="flex flex-col h-[calc(100vh-8rem)]">
+        {/* Header */}
         <div className="mb-6">
-          <Button variant="ghost" size="sm" className="mb-4" asChild>
-            <Link href="/admin/conversations">
+          <Link href="/admin/conversations">
+            <Button variant="ghost" size="sm" className="mb-4">
               <ArrowLeftIcon className="h-4 w-4 mr-2" />
-              {t('backToList')}
-            </Link>
-          </Button>
-          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-            <div className="min-w-0">
-              <h1 className="text-2xl sm:text-3xl font-bold text-secondary-900 dark:text-white break-words">{conv.title}</h1>
-              <p className="text-secondary-600 dark:text-secondary-400 mt-1">
-                {[conv.orderId ? t('order', { id: conv.orderId }) : null, conv.projectName ? t('project', { name: conv.projectName }) : null].filter(Boolean).join(' · ')}
-              </p>
+              Volver a conversaciones
+            </Button>
+          </Link>
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">
+                {conversation.title}
+              </h1>
+              {conversation.projectName && (
+                <p className="text-secondary-600 dark:text-secondary-400 mt-1">
+                  Proyecto: {conversation.projectName}
+                </p>
+              )}
             </div>
-            <div className="flex items-center gap-2">
-              <Badge variant={conv.status === 'active' ? 'primary' : 'secondary'} size="sm">
-                {t(`status.${conv.status}`)}
-              </Badge>
-              <label htmlFor="conv-status" className="sr-only">
-                {t('changeStatus')}
-              </label>
-              <select
-                id="conv-status"
-                value={conv.status}
-                onChange={(e) => void changeStatus(e.target.value as Detail['conversation']['status'])}
-                className="text-sm px-2 py-1 rounded border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-950 text-secondary-900 dark:text-white"
-              >
-                {(['active', 'archived', 'closed'] as const).map((s) => (
-                  <option key={s} value={s}>
-                    {t(`status.${s}`)}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <Badge variant="primary" size="sm">
+              {conversation.status}
+            </Badge>
           </div>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {conv.participants.map((p, idx) => (
-              <div key={idx} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary-100 dark:bg-secondary-800">
+
+          {/* Participants */}
+          <div className="mt-4 flex gap-3">
+            {conversation.participants.map((participant: any, idx: number) => (
+              <div
+                key={idx}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary-100 dark:bg-secondary-800"
+              >
                 <UserIcon className="h-4 w-4 text-secondary-600 dark:text-secondary-400" />
-                <span className="text-sm font-medium text-secondary-900 dark:text-white">{p.name}</span>
-                <span className={`text-xs px-2 py-0.5 rounded ${ROLE_COLORS[p.role] ?? ''}`}>{t(`roles.${p.role}`)}</span>
+                <span className="text-sm font-medium text-secondary-900 dark:text-white">
+                  {participant.name}
+                </span>
+                <span
+                  className={`text-xs px-2 py-1 rounded ${getRoleBadgeColor(participant.role)}`}
+                >
+                  {participant.role}
+                </span>
               </div>
             ))}
           </div>
         </div>
 
+        {/* Messages */}
         <Card variant="bordered" className="flex-1 flex flex-col">
-          <CardContent className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 max-h-[60vh]">
-            {groups.length === 0 && <p className="text-center text-secondary-500">{t('noMessages')}</p>}
-            {groups.map((g) => (
-              <div key={g.label}>
+          <CardContent className="flex-1 overflow-y-auto p-6 space-y-6">
+            {Object.entries(groupedMessages).map(([date, msgs]) => (
+              <div key={date}>
                 <div className="flex items-center justify-center mb-4">
-                  <span className="text-xs text-secondary-500 bg-secondary-100 dark:bg-secondary-800 px-3 py-1 rounded-full">{g.label}</span>
+                  <span className="text-xs text-secondary-500 bg-secondary-100 dark:bg-secondary-800 px-3 py-1 rounded-full">
+                    {date}
+                  </span>
                 </div>
                 <div className="space-y-4">
-                  {g.items.map((m) => (
-                    <div key={m.id} className="flex gap-3" data-message-role={m.senderRole}>
+                  {msgs.map((message) => (
+                    <div key={message.id} className="flex gap-3">
                       <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-950 flex items-center justify-center">
-                        <span className="text-sm font-bold text-primary-600 dark:text-primary-400">{m.senderName?.[0]?.toUpperCase()}</span>
+                        {message.senderAvatar ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={message.senderAvatar}
+                            alt={message.senderName}
+                            className="w-full h-full rounded-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-sm font-bold text-primary-600 dark:text-primary-400">
+                            {message.senderName[0]?.toUpperCase()}
+                          </span>
+                        )}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-2 mb-1">
-                          <span className="font-semibold text-secondary-900 dark:text-white text-sm">{m.senderName}</span>
-                          <span className={`text-xs px-2 py-0.5 rounded ${ROLE_COLORS[m.senderRole] ?? ''}`}>{m.type === 'system' ? t('automatic') : t(`roles.${m.senderRole}`)}</span>
-                          <span className="text-xs text-secondary-500">{formatDateTime(m.timestamp, locale)}</span>
-                          {m.isOwnMessage && m.readByOthers && <span className="text-xs text-green-600">{t('read')}</span>}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-semibold text-secondary-900 dark:text-white text-sm">
+                            {message.senderName}
+                          </span>
+                          <span
+                            className={`text-xs px-2 py-0.5 rounded ${getRoleBadgeColor(
+                              message.senderRole
+                            )}`}
+                          >
+                            {message.senderRole}
+                          </span>
+                          <span className="text-xs text-secondary-500">
+                            {formatMessageTime(message.timestamp)}
+                          </span>
                         </div>
-                        <div className={`rounded-lg p-3 ${m.type === 'system' ? 'bg-amber-50 dark:bg-amber-950/40' : 'bg-secondary-50 dark:bg-secondary-900'}`}>
-                          <p className="text-secondary-900 dark:text-white whitespace-pre-wrap break-words">{m.content}</p>
+                        <div className="bg-secondary-50 dark:bg-secondary-900 rounded-lg p-3">
+                          <p className="text-secondary-900 dark:text-white whitespace-pre-wrap">
+                            {message.content}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -241,33 +240,38 @@ export default function AdminConversationDetailPage() {
             <div ref={messagesEndRef} />
           </CardContent>
 
+          {/* Input */}
           <div className="border-t border-secondary-200 dark:border-secondary-700 p-4">
-            <div className="flex flex-col sm:flex-row gap-3">
-              <label htmlFor="admin-reply" className="sr-only">
-                {t('typeMessage')}
-              </label>
-              <textarea
-                id="admin-reply"
-                rows={2}
+            <div className="flex gap-3">
+              <input
+                type="text"
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
-                onKeyDown={(e) => {
+                onKeyPress={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    void send();
+                    handleSendMessage();
                   }
                 }}
-                placeholder={t('typeMessage')}
-                maxLength={5000}
+                placeholder="Escribe tu mensaje..."
                 className="flex-1 px-4 py-2 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-950 text-secondary-900 dark:text-white focus:ring-2 focus:ring-primary-500"
                 disabled={sending}
               />
-              <Button onClick={() => void send()} disabled={!newMessage.trim() || sending} isLoading={sending} className="sm:self-end">
-                <PaperAirplaneIcon className="h-5 w-5 mr-2" />
-                {sending ? t('sending') : t('send')}
+              <Button
+                onClick={handleSendMessage}
+                disabled={!newMessage.trim() || sending}
+                className="px-6"
+              >
+                {sending ? (
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                ) : (
+                  <>
+                    <PaperAirplaneIcon className="h-5 w-5 mr-2" />
+                    Enviar
+                  </>
+                )}
               </Button>
             </div>
-            <p className="text-xs text-secondary-500 mt-2">{t('replyHelp')}</p>
           </div>
         </Card>
       </div>

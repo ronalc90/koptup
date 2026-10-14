@@ -875,14 +875,7 @@
       "successBody": "Si hay una cuenta con <strong>{email}</strong>, te enviamos un enlace para restablecer tu contraseña.",
       "successHint": "Revisa tu bandeja de entrada (y la de spam) y sigue las instrucciones. Si no te llega en unos minutos, escríbenos desde Contacto.",
       "backToLogin": "Volver al inicio de sesión",
-      "backHome": "Volver al inicio",
-      "errorRateLimited": "Pediste varios enlaces seguidos. Espera unos minutos e intenta de nuevo.",
-      "errorNetwork": "No pudimos conectarnos con el servidor. Revisa tu conexión e intenta de nuevo.",
-      "noEmailTitle": "Por ahora no podemos enviarte el enlace por correo",
-      "noEmailBody": "El envío de correos no está activo en este momento. Escríbenos por WhatsApp o desde Contacto y el equipo te comparte un enlace para crear tu contraseña nueva.",
-      "noEmailWhatsapp": "Escribir por WhatsApp",
-      "noEmailContact": "Ir a Contacto",
-      "whatsappMessage": "Hola, necesito restablecer la contraseña de mi cuenta de KopTup ({email})."
+      "backHome": "Volver al inicio"
     },
     "reset": {
       "title": "Nueva contraseña",
@@ -902,16 +895,7 @@
       "successTitle": "Contraseña actualizada",
       "successBody": "Tu contraseña se cambió correctamente. Ya puedes iniciar sesión con ella.",
       "goToLogin": "Ir a iniciar sesión",
-      "backToLogin": "Volver al inicio de sesión",
-      "errors": {
-        "token_used": "Este enlace ya se usó. Si ya cambiaste tu contraseña, inicia sesión; si no, pide uno nuevo.",
-        "token_replaced": "Este enlace fue reemplazado por uno más reciente. Usa el último enlace que recibiste.",
-        "token_expired": "Este enlace venció (dura 1 hora). Pide uno nuevo.",
-        "token_invalid": "Este enlace no es válido. Revisa que lo hayas copiado completo o pide uno nuevo."
-      },
-      "errorRateLimited": "Hiciste varios intentos seguidos. Espera unos minutos e intenta de nuevo.",
-      "errorNetwork": "No pudimos conectarnos con el servidor. Revisa tu conexión e intenta de nuevo.",
-      "requestNew": "Pedir un enlace nuevo"
+      "backToLogin": "Volver al inicio de sesión"
     }
   },
   "pageTitles": {
@@ -1486,578 +1470,73 @@
     "myDemos": "Mis demos",
     "backToSite": "Volver al sitio",
     "prospectTitle": "Cuenta de prospecto",
-    "prospectBody": "Aquí ves las demos que te aprobamos. Si contratas un proyecto, verás también pedidos, entregables y facturas.",
-    "notificationsLabel": "{count, plural, =0 {Notificaciones} one {Notificaciones: # sin leer} other {Notificaciones: # sin leer}}",
-    "openMenu": "Abrir menú",
-    "closeMenu": "Cerrar menú"
+    "prospectBody": "Aquí ves las demos que te aprobamos. Si contratas un proyecto, verás también pedidos, entregables y facturas."
   },
   "dashboardPage": {
-    "loading": "Cargando tu portal...",
-    "welcomeTitle": "¡Te damos la bienvenida a KopTup!",
-    "welcomeTitleName": "¡Te damos la bienvenida a KopTup, {name}!",
-    "welcomeBody": "Tu cuenta está lista. Desde aquí sigues tus demos, pedidos, proyectos, facturas y mensajes con el equipo.",
-    "welcomePlan": "Te interesó el plan {plan} del sistema RAG. Todavía no está activo: pide la cotización y el equipo te contacta.",
-    "welcomePlanCta": "Pedir cotización",
-    "greeting": "Hola",
-    "greetingName": "Hola, {name}",
-    "subtitle": "Este es el estado de tus pedidos, proyectos, facturas y mensajes.",
-    "writeTeam": "Escribir al equipo",
-    "newOrder": "Nuevo pedido",
-    "staffNote": "Tu cuenta es del equipo de KopTup: la operación (pedidos, facturas, clientes) está en el panel.",
-    "goToPanel": "Ir al panel",
+    "loading": "Cargando dashboard...",
+    "welcomeBack": "Bienvenido de nuevo! 👋",
+    "summaryActive": "Aquí está un resumen de tu actividad reciente",
+    "summaryEmpty": "Tu panel está listo. Comienza explorando nuestros servicios.",
+    "onboarding": {
+      "title": "Comienza tu primer proyecto",
+      "description": "Cuéntanos tu idea y te ayudamos a hacerla realidad. Explora nuestras demos para ver lo que podemos construir para ti.",
+      "requestQuote": "Solicitar Cotización",
+      "viewDemos": "Ver Demos",
+      "exploreServices": "Explorar Servicios"
+    },
     "kpis": {
-      "activeOrders": "Pedidos activos",
-      "waitingReview": "{count, plural, =0 {Ninguno esperando revisión} one {# esperando revisión} other {# esperando revisión}}",
-      "openProjects": "Proyectos en curso",
-      "toReview": "{count, plural, =0 {Sin entregables por revisar} one {# entregable por revisar} other {# entregables por revisar}}",
-      "pendingBalance": "Saldo por pagar",
-      "overdue": "{count, plural, one {# factura vencida} other {# facturas vencidas}}",
+      "activeOrders": "Pedidos Activos",
+      "pendingConfirmation": "{count} pendientes de confirmación",
+      "activeProjects": "Proyectos Activos",
+      "avgProgress": "Progreso promedio: {percent}%",
+      "pendingBalance": "Saldo Pendiente",
       "nextDue": "Próximo vencimiento: {date}",
-      "nothingDue": "No tienes facturas por pagar",
-      "unreadMessages": "Mensajes sin leer",
-      "conversations": "{count, plural, =0 {Sin conversaciones} one {# conversación} other {# conversaciones}}",
-      "unavailable": "No se pudo cargar"
+      "unreadMessages": "Mensajes No Leídos",
+      "totalMessages": "{count} mensajes totales"
     },
-    "sections": {
-      "orders": "Pedidos recientes",
-      "projects": "Proyectos",
-      "invoices": "Facturas por pagar",
-      "messages": "Mensajes",
-      "demos": "Mis demos"
-    },
+    "recentOrders": "Pedidos Recientes",
+    "activeProjectsSection": "Proyectos en Curso",
     "viewAll": "Ver todos",
-    "empty": {
-      "orders": "Aún no tienes pedidos. Cuéntanos qué necesitas y el equipo lo revisa.",
-      "projects": "Cuando el equipo cree tu proyecto, aquí verás su estado y su avance.",
-      "invoices": "Aún no tienes facturas.",
-      "invoicesPaid": "No tienes facturas pendientes.",
-      "messages": "Aún no tienes conversaciones con el equipo.",
-      "demos": "No tienes demos asignadas. Puedes probar las demos abiertas o pedir acceso a las demás.",
-      "demosExpired": "No tienes demos activas en este momento. En Mis demos puedes pedir más tiempo."
+    "nextMilestone": "Próximo hito: {milestone}",
+    "progress": "Progreso",
+    "deadline": "Fecha límite: {date}",
+    "upcomingDeadlines": "Próximos Vencimientos",
+    "quickActions": "Acciones Rápidas",
+    "newProject": "Nuevo Proyecto",
+    "contactSupport": "Contactar Soporte",
+    "payInvoice": "Pagar Factura",
+    "status": {
+      "active": "Activo",
+      "in_progress": "En Proceso",
+      "pending": "Pendiente",
+      "completed": "Completado",
+      "cancelled": "Cancelado"
     },
-    "progress": "{percent}% de avance",
-    "deliverablesToReview": "{count, plural, one {# entregable por revisar} other {# entregables por revisar}}",
-    "dueOn": "Vence el {date}",
-    "noMessagesYet": "Sin mensajes todavía",
-    "unread": "{count, plural, one {# sin leer} other {# sin leer}}",
-    "exploreDemos": "Ver demos",
-    "demoDays": "{days, plural, =0 {Vence hoy} one {Queda # día} other {Quedan # días}}",
-    "demoMaintenance": "En mantenimiento",
-    "openDemo": "Abrir demo"
+    "defaults": {
+      "inProcess": "En proceso",
+      "noDate": "Sin fecha"
+    }
   },
   "settingsPage": {
     "title": "Configuración",
-    "subtitle": "Elige qué avisos recibes por correo, el idioma y el tema.",
-    "notifications": "Avisos por correo",
-    "emailIntro": "Elige de qué temas quieres recibir un correo, además del aviso dentro del portal.",
-    "email": {
-      "pedidos": {
-        "title": "Pedidos",
-        "desc": "Cuando el equipo aprueba, rechaza o cambia el estado de un pedido."
-      },
-      "facturacion": {
-        "title": "Facturación",
-        "desc": "Cuando te emitimos una factura o registramos un pago."
-      },
-      "proyectos": {
-        "title": "Proyectos y entregables",
-        "desc": "Cuando se crea un proyecto, cambia de estado o hay un entregable para revisar."
-      },
-      "mensajes": {
-        "title": "Mensajes",
-        "desc": "Cuando el equipo te escribe en una conversación."
-      }
-    },
-    "inPortalNote": "Los avisos dentro del portal (la campana) siempre se muestran. Los correos salen solo cuando el servidor tiene el correo configurado.",
-    "languageAndAppearance": "Idioma y apariencia",
+    "subtitle": "Personaliza tu experiencia en KopTup",
+    "notifications": "Notificaciones",
+    "emailNotifications": "Notificaciones por correo",
+    "emailDesc": "Recibe actualizaciones importantes por correo electrónico",
+    "pushNotifications": "Notificaciones push",
+    "pushDesc": "Recibe notificaciones en tiempo real en tu navegador",
+    "smsNotifications": "Notificaciones SMS",
+    "smsDesc": "Recibe alertas importantes por mensaje de texto",
+    "languageAndAppearance": "Idioma y Apariencia",
     "language": "Idioma",
     "theme": "Tema",
     "light": "Claro",
     "dark": "Oscuro",
-    "auto": "Automático",
-    "appliedNow": "El idioma y el tema se aplican al instante en este navegador.",
+    "auto": "Auto",
     "cancel": "Cancelar",
     "save": "Guardar cambios",
     "saving": "Guardando...",
-    "toastSaved": "Preferencias guardadas"
-  },
-  "portalCommon": {
-    "errors": {
-      "network": "No pudimos conectarnos con el servidor. Revisa tu conexión e intenta de nuevo.",
-      "rateLimited": "Hiciste demasiados intentos seguidos. Espera un momento e intenta de nuevo.",
-      "server": "El servidor tuvo un problema. Intenta de nuevo en unos minutos.",
-      "generic": "Algo salió mal. Intenta de nuevo."
-    },
-    "retry": "Reintentar",
-    "search": "Buscar",
-    "cancel": "Cancelar",
-    "orderStatus": {
-      "pending": "Pendiente",
-      "in_progress": "En proceso",
-      "shipped": "Enviado",
-      "completed": "Completado",
-      "cancelled": "Cancelado"
-    },
-    "approvalStatus": {
-      "pending": "Por aprobar",
-      "approved": "Aprobado",
-      "rejected": "Rechazado"
-    },
-    "invoiceStatus": {
-      "draft": "Borrador",
-      "pending": "Pendiente",
-      "paid": "Pagada",
-      "overdue": "Vencida",
-      "cancelled": "Anulada"
-    },
-    "deliverableStatus": {
-      "pending": "Pendiente",
-      "in_review": "Por revisar",
-      "approved": "Aprobado",
-      "rejected": "Con cambios pedidos"
-    },
-    "deliverableType": {
-      "design": "Diseño",
-      "code": "Código",
-      "documentation": "Documentación",
-      "prototype": "Prototipo",
-      "other": "Otro"
-    },
-    "projectStatus": {
-      "planning": "Planeación",
-      "active": "Activo",
-      "on_hold": "En espera",
-      "completed": "Completado",
-      "cancelled": "Cancelado"
-    },
-    "roles": {
-      "admin": "Administrador",
-      "manager": "Gerente",
-      "sales": "Comercial",
-      "developer": "Desarrollador",
-      "client": "Cliente",
-      "prospect": "Prospecto",
-      "user": "Usuario"
-    }
-  },
-  "sessionState": {
-    "unavailableTitle": "El servicio no está disponible",
-    "unavailableBody": "No pudimos conectarnos con el servidor de KopTup. Tu sesión sigue abierta: intenta de nuevo en unos minutos.",
-    "retry": "Reintentar",
-    "backHome": "Volver al inicio"
-  },
-  "portalNotifications": {
-    "order_status": {
-      "title": "Pedido {id}: {status}",
-      "message": "Tu pedido \"{name}\" ahora está en estado {status}."
-    },
-    "order_approved": {
-      "title": "Pedido {id} aprobado",
-      "message": "Aprobamos tu pedido \"{name}\". El equipo te escribirá por Mensajes con los siguientes pasos."
-    },
-    "order_rejected": {
-      "title": "Pedido {id} no aprobado",
-      "message": "No pudimos aprobar tu pedido \"{name}\". Motivo: {reason}"
-    },
-    "deliverable_uploaded": {
-      "title": "Nuevo entregable: {title}",
-      "message": "El equipo compartió \"{title}\" del proyecto {project}. Revísalo y apruébalo o pide cambios."
-    },
-    "message_new": {
-      "title": "Nuevo mensaje del equipo",
-      "message": "Tienes un mensaje nuevo en \"{title}\"."
-    },
-    "project_created": {
-      "title": "Nuevo proyecto: {name}",
-      "message": "El equipo creó tu proyecto \"{name}\". Aquí verás su avance, entregables y facturas."
-    },
-    "project_status": {
-      "title": "Proyecto {name}: {status}",
-      "message": "Tu proyecto \"{name}\" ahora está en estado {status}."
-    },
-    "invoice_issued": {
-      "title": "Nueva factura {number}",
-      "message": "Te emitimos la factura {number} por {amount}. Puedes verla y descargarla en Facturación."
-    },
-    "invoice_paid": {
-      "title": "Pago registrado: {number}",
-      "message": "Registramos el pago de la factura {number}. ¡Gracias!"
-    }
-  },
-  "notificationsPage": {
-    "title": "Notificaciones",
-    "subtitle": "Avisos de tus pedidos, proyectos, entregables, facturas y mensajes.",
-    "markAll": "Marcar todas como leídas",
-    "preferences": "Preferencias",
-    "emptyTitle": "No tienes notificaciones",
-    "emptyBody": "Aquí verás los avisos cuando el equipo apruebe un pedido, comparta un entregable, te emita una factura o te escriba.",
-    "summary": "{unread, plural, =0 {Todo al día} one {# sin leer} other {# sin leer}} · {total, plural, one {# en total} other {# en total}}",
-    "filterLabel": "Filtrar notificaciones",
-    "filters": {
-      "all": "Todas",
-      "order": "Pedidos",
-      "project": "Proyectos",
-      "deliverable": "Entregables",
-      "billing": "Facturación",
-      "message": "Mensajes"
-    },
-    "noResults": "No hay notificaciones de este tipo.",
-    "new": "Nueva",
-    "open": "Ver",
-    "markRead": "Marcar como leída",
-    "delete": "Eliminar notificación"
-  },
-  "newOrderPage": {
-    "title": "Nuevo pedido",
-    "subtitle": "Describe lo que necesitas y adjunta los archivos de referencia. El equipo lo revisa y te responde por Mensajes.",
-    "back": "Volver a mis pedidos",
-    "name": "Nombre del pedido",
-    "namePlaceholder": "Ej.: Sitio web corporativo",
-    "description": "Descripción breve",
-    "descriptionPlaceholder": "Resumen en una o dos líneas",
-    "detail": "Describe tu proyecto en detalle",
-    "detailHelp": "Qué necesitas, objetivos, funciones esperadas, público y fechas importantes.",
-    "detailPlaceholder": "Ejemplo:\n- Necesito un sitio web para mi empresa de servicios\n- Con secciones de servicios, portafolio y contacto\n- Mis clientes son otras empresas",
-    "project": "Proyecto relacionado (opcional)",
-    "noProject": "Ninguno",
-    "attachments": "Archivos adjuntos",
-    "attachmentsHelp": "Hasta {files} archivos de máximo {size} MB cada uno.",
-    "chooseFiles": "Haz clic para elegir archivos",
-    "allowedTypes": "PDF, Word, TXT, CSV, imágenes, ZIP o RAR",
-    "removeFile": "Quitar {name}",
-    "fileTooBig": "{name} supera los {max} MB y no se agregó.",
-    "tooManyFiles": "Puedes adjuntar máximo {max} archivos.",
-    "items": "Ítems del pedido",
-    "currency": "Moneda",
-    "itemDescription": "Descripción",
-    "itemPlaceholder": "Ej.: Diseño de la página de inicio",
-    "quantity": "Cantidad",
-    "unitPrice": "Precio unitario estimado ({currency})",
-    "removeItem": "Quitar el ítem {index}",
-    "addItem": "Agregar ítem",
-    "estimatedTotal": "Total estimado",
-    "cancel": "Cancelar",
-    "create": "Crear pedido",
-    "creating": "Creando...",
-    "created": "Pedido {id} creado. El equipo lo revisará y te escribirá por Mensajes.",
-    "note": "El equipo recibe un aviso de tu pedido y lo revisa. Los precios son tu estimado: el valor final queda en la factura que te emitimos. Puedes cancelarlo mientras esté por aprobar.",
-    "errors": {
-      "nameRequired": "Escribe el nombre del pedido.",
-      "itemsRequired": "Agrega al menos un ítem con descripción.",
-      "itemsInvalid": "Revisa los ítems: la cantidad debe ser un número entero desde 1 y el precio, 0 o más.",
-      "generic": "No pudimos crear el pedido. Intenta de nuevo."
-    }
-  },
-  "orderDetailPage": {
-    "back": "Volver a mis pedidos",
-    "notFound": "No encontramos este pedido o no es de tu cuenta.",
-    "rejectedTitle": "El equipo no aprobó este pedido",
-    "date": "Fecha",
-    "amount": "Total estimado",
-    "tracking": "Seguimiento",
-    "description": "Descripción",
-    "detail": "Detalle del proyecto",
-    "items": "Ítems",
-    "attachments": "Archivos adjuntos",
-    "downloadFile": "Descargar {name}",
-    "downloadError": "No pudimos descargar el archivo. Intenta de nuevo.",
-    "history": "Historial",
-    "invoiceIssued": "Factura {number}",
-    "downloadInvoice": "Descargar PDF",
-    "viewBilling": "Ver facturación",
-    "notEditable": "Este pedido ya está aprobado o en curso: si necesitas cambiarlo o cancelarlo, escríbenos en la conversación del pedido.",
-    "openConversation": "Abrir conversación",
-    "cancel": "Cancelar pedido",
-    "cancelTitle": "Cancelar pedido",
-    "cancelConfirm": "¿Seguro que quieres cancelar el pedido \"{name}\"? El equipo recibirá el aviso y no se puede deshacer.",
-    "cancelYes": "Sí, cancelar pedido",
-    "cancelNo": "No, volver",
-    "cancelled": "Pedido cancelado"
-  },
-  "invoicePdf": {
-    "title": "Factura",
-    "issuer": "Emisor",
-    "client": "Cliente",
-    "number": "Número",
-    "issued": "Fecha de emisión",
-    "due": "Vencimiento",
-    "paid": "Pagada el",
-    "status": "Estado",
-    "project": "Proyecto",
-    "order": "Pedido",
-    "description": "Descripción",
-    "qty": "Cant.",
-    "unit": "Valor unitario",
-    "amount": "Valor",
-    "subtotal": "Subtotal",
-    "tax": "IVA",
-    "total": "Total",
-    "notes": "Notas",
-    "terms": "Términos",
-    "disclaimer": "Documento generado por el portal de KopTup para seguimiento. No reemplaza la factura electrónica de venta (DIAN) cuando esta aplique.",
-    "downloaded": "PDF de la factura descargado.",
-    "error": "No pudimos generar el PDF de la factura. Intenta de nuevo."
-  },
-  "adminClientPicker": {
-    "change": "Cambiar",
-    "placeholder": "Busca por nombre, correo o empresa",
-    "loading": "Buscando...",
-    "error": "No pudimos buscar las cuentas. Intenta de nuevo.",
-    "empty": "No encontramos cuentas de clientes con esa búsqueda.",
-    "roles": {
-      "prospect": "Prospecto",
-      "client": "Cliente"
-    }
-  },
-  "adminInvoicesPage": {
-    "title": "Facturas",
-    "subtitle": "Emite facturas a tus clientes, registra pagos y descarga el PDF.",
-    "newInvoice": "Nueva factura",
-    "searchPlaceholder": "Buscar por número, cliente o correo",
-    "filterAll": "Todas",
-    "noResults": "No hay facturas con estos filtros.",
-    "empty": "Aún no hay facturas",
-    "emptyHint": "Emite la primera desde aquí o desde un pedido aprobado (Pedidos › Emitir factura).",
-    "project": "Proyecto: {name}",
-    "order": "Pedido {id}",
-    "noProject": "Sin proyecto",
-    "dates": "Emitida el {issued} · vence el {due}",
-    "paidOn": "Pagada el {date}",
-    "downloadPdf": "Descargar PDF",
-    "registerPayment": "Registrar pago",
-    "cancelInvoice": "Anular",
-    "paymentRegistered": "Pago registrado. El cliente recibió el aviso.",
-    "cancelReasonRequired": "Escribe el motivo de la anulación.",
-    "cancelled": "Factura anulada",
-    "issued": "Factura {number} emitida. El cliente ya la ve en su portal.",
-    "registerPaymentTitle": "Registrar el pago de {number}",
-    "registerPaymentHelp": "Confirma que recibiste {amount}. El cliente verá la factura como pagada.",
-    "paymentMethod": "Medio de pago",
-    "methods": {
-      "transferencia": "Transferencia",
-      "consignacion": "Consignación",
-      "tarjeta": "Tarjeta",
-      "efectivo": "Efectivo",
-      "otro": "Otro"
-    },
-    "paymentReference": "Referencia del pago (opcional)",
-    "cancelTitle": "Anular la factura {number}",
-    "cancelHelp": "La factura queda anulada y deja de contar en el saldo del cliente. No se puede deshacer.",
-    "cancelReason": "Motivo",
-    "form": {
-      "client": "Cliente",
-      "clientRequired": "Elige el cliente.",
-      "itemsRequired": "Agrega al menos un ítem con descripción, cantidad (desde 1) y valor (0 o más).",
-      "project": "Proyecto (opcional)",
-      "noProject": "Sin proyecto",
-      "items": "Ítems",
-      "description": "Descripción",
-      "quantity": "Cantidad",
-      "unitPrice": "Valor unitario",
-      "removeItem": "Quitar ítem",
-      "addItem": "Agregar ítem",
-      "currency": "Moneda",
-      "tax": "IVA",
-      "dueDate": "Vence el",
-      "notes": "Notas para el cliente (opcional)",
-      "preview": "Subtotal {subtotal} · IVA {tax} · Total {total}",
-      "submit": "Emitir factura"
-    }
-  },
-  "adminDeliverablesPage": {
-    "title": "Entregables",
-    "subtitle": "Comparte archivos o enlaces con tus clientes y sigue su revisión.",
-    "newDeliverable": "Nuevo entregable",
-    "filterAll": "Todos",
-    "noResults": "No hay entregables con este filtro.",
-    "empty": "Aún no hay entregables",
-    "emptyHint": "Sube el primero para un proyecto: el cliente lo verá en su portal y podrá aprobarlo o pedir cambios.",
-    "fileGone": "El archivo ya no está en el servidor: vuelve a subirlo.",
-    "projectLabel": "Proyecto: {name}",
-    "clientComment": "Comentario del cliente",
-    "externalLink": "Enlace externo",
-    "openLink": "Abrir enlace",
-    "download": "Descargar",
-    "waitingClient": "Esperando la revisión del cliente",
-    "shared": "Entregable compartido. El cliente recibió el aviso.",
-    "form": {
-      "project": "Proyecto",
-      "loadingProjects": "Cargando proyectos...",
-      "noProjects": "No hay proyectos activos. Crea primero el proyecto del cliente en Proyectos.",
-      "chooseProject": "Elige un proyecto",
-      "ownerNote": "El entregable queda a nombre del cliente del proyecto.",
-      "title": "Título",
-      "type": "Tipo",
-      "description": "Descripción (opcional)",
-      "source": "Contenido",
-      "modeFile": "Subir archivo",
-      "modeLink": "Compartir enlace",
-      "fileHint": "Máximo 50 MB. PDF, documentos, imágenes, ZIP y archivos de diseño.",
-      "projectRequired": "Elige el proyecto.",
-      "titleRequired": "Escribe el título.",
-      "fileRequired": "Elige el archivo.",
-      "linkInvalid": "Escribe un enlace válido que empiece por https://.",
-      "submit": "Compartir con el cliente"
-    }
-  },
-  "adminProjects": {
-    "title": "Proyectos",
-    "subtitle": "Crea los proyectos de tus clientes y actualiza su estado y avance.",
-    "newProject": "Nuevo proyecto",
-    "searchPlaceholder": "Buscar por proyecto, cliente o correo",
-    "filterAll": "Todos",
-    "noResults": "No hay proyectos con estos filtros.",
-    "empty": "Aún no hay proyectos",
-    "emptyHint": "Crea el primero: el cliente lo verá en su portal con una conversación para hablar con el equipo.",
-    "noClient": "Sin cliente",
-    "progress": "Avance",
-    "budget": "Presupuesto",
-    "dates": "Fechas",
-    "counts": "{invoices, plural, one {# factura} other {# facturas}} · {deliverables, plural, one {# entregable} other {# entregables}} · {orders, plural, one {# pedido} other {# pedidos}}",
-    "edit": "Editar",
-    "conversation": "Conversación",
-    "created": "Proyecto \"{name}\" creado. El cliente recibió el aviso.",
-    "updated": "Proyecto actualizado",
-    "editTitle": "Editar {name}",
-    "form": {
-      "clientRequired": "Elige el cliente.",
-      "nameRequired": "Escribe el nombre del proyecto.",
-      "clientFixed": "Cliente: {name}",
-      "client": "Cliente",
-      "prospectNote": "Si la cuenta es de un prospecto, pasa a ser cliente al crear el proyecto.",
-      "name": "Nombre",
-      "description": "Descripción",
-      "budget": "Presupuesto (opcional)",
-      "currency": "Moneda",
-      "status": "Estado",
-      "startDate": "Inicio",
-      "endDate": "Entrega estimada",
-      "progress": "Avance (%)",
-      "welcome": "Mensaje de bienvenida (opcional)",
-      "welcomePlaceholder": "Hola, creamos tu proyecto. Estos son los siguientes pasos...",
-      "welcomeHelp": "Se publica como primer mensaje en la conversación del proyecto.",
-      "save": "Guardar cambios",
-      "create": "Crear proyecto"
-    }
-  },
-  "adminAudit": {
-    "title": "Bitácora",
-    "subtitle": "Lo que el equipo hizo en el panel: quién, qué y cuándo.",
-    "filters": {
-      "group": "Tema",
-      "allGroups": "Todos los temas",
-      "action": "Acción",
-      "allActions": "Todas las acciones",
-      "actor": "Persona",
-      "actorPlaceholder": "Correo de quien lo hizo",
-      "from": "Desde",
-      "to": "Hasta",
-      "apply": "Filtrar",
-      "clear": "Limpiar"
-    },
-    "groups": {
-      "demo_request": "Solicitudes de demo",
-      "demo_grant": "Accesos a demos",
-      "demo_catalog": "Catálogo de demos",
-      "user": "Usuarios",
-      "project": "Proyectos",
-      "invoice": "Facturas",
-      "deliverable": "Entregables",
-      "lead": "Leads",
-      "proposal": "Propuestas",
-      "proposal_request": "Solicitudes de propuesta",
-      "settings": "Configuración",
-      "privacy": "Privacidad"
-    },
-    "actions": {
-      "demo_request": {
-        "update": "Solicitud actualizada",
-        "approve": "Solicitud aprobada",
-        "reject": "Solicitud rechazada",
-        "merge": "Solicitud repetida unida a una abierta"
-      },
-      "demo_grant": {
-        "create": "Acceso concedido",
-        "extend": "Acceso extendido",
-        "revoke": "Acceso revocado",
-        "resend_activation": "Enlace de activación nuevo"
-      },
-      "demo_catalog": {
-        "update": "Catálogo actualizado"
-      },
-      "user": {
-        "activate": "Cuenta activada",
-        "role_change": "Rol cambiado",
-        "reset_link": "Enlace de contraseña generado",
-        "change_password": "Contraseña cambiada"
-      },
-      "project": {
-        "create": "Proyecto creado",
-        "update": "Proyecto actualizado"
-      },
-      "invoice": {
-        "issue": "Factura emitida",
-        "payment": "Pago registrado",
-        "cancel": "Factura anulada"
-      },
-      "deliverable": {
-        "create": "Entregable compartido"
-      },
-      "lead": {
-        "create": "Lead creado",
-        "assign": "Lead asignado",
-        "stage_change": "Etapa del lead cambiada",
-        "next_action": "Próxima acción del lead",
-        "migrate_contacts": "Contactos migrados a leads"
-      },
-      "proposal": {
-        "create": "Propuesta creada",
-        "update": "Propuesta actualizada",
-        "delete": "Propuesta eliminada",
-        "duplicate": "Propuesta duplicada",
-        "send": "Propuesta enviada",
-        "resend": "Propuesta reenviada",
-        "accept": "Propuesta aceptada",
-        "reject": "Propuesta rechazada",
-        "convert": "Propuesta convertida en proyecto",
-        "payment_options": "Opciones de pago de la propuesta",
-        "payment_received": "Pago de la propuesta recibido",
-        "wompi_checkout": "Pago en línea iniciado"
-      },
-      "proposal_request": {
-        "create": "Solicitud de propuesta recibida"
-      },
-      "settings": {
-        "commerce_update": "Datos comerciales actualizados"
-      },
-      "privacy": {
-        "search": "Búsqueda de datos personales",
-        "export": "Exportación de datos personales",
-        "erase": "Supresión de datos personales"
-      }
-    },
-    "empty": "No hay registros con estos filtros.",
-    "total": "{count, plural, one {# registro} other {# registros}}",
-    "by": "Por {email} ({role})",
-    "bySystem": "Automático (sistema)",
-    "showDetail": "Ver detalle",
-    "hideDetail": "Ocultar detalle",
-    "prev": "Anterior",
-    "next": "Siguiente",
-    "pageOf": "Página {page} de {pages}"
-  },
-  "adminSettings": {
-    "subtitle": "Idioma, tema y cómo recibe avisos el equipo.",
-    "appliedNow": "El idioma y el tema se aplican al instante en este navegador.",
-    "teamNoticesTitle": "Avisos al equipo",
-    "teamNoticesBody": "Los avisos de nuevas solicitudes, pedidos y mensajes llegan al correo y al WhatsApp del equipo configurados en el servidor (variables de entorno). No dependen de esta pantalla.",
-    "accessTitle": "Tu acceso",
-    "roleName": {
-      "admin": "Administrador",
-      "manager": "Gerente"
-    },
-    "accessAdmin": "Ves y gestionas todo el panel, incluidos usuarios, privacidad y bitácora.",
-    "accessManager": "Gestionas la operación (solicitudes, accesos, pedidos, proyectos, facturas y entregables) y ves los usuarios sin cambiar roles. Privacidad y bitácora son solo para administradores."
+    "toastSaved": "Configuración guardada exitosamente"
   },
   "adminConversations": {
     "title": "Conversaciones",
@@ -2069,8 +1548,7 @@
     "allConversations": "Todas las conversaciones",
     "noConversations": "No hay conversaciones para mostrar",
     "unread": "sin leer",
-    "project": "Proyecto: {name}",
-    "order": "Pedido {id}",
+    "project": "Proyecto",
     "loading": "Cargando conversaciones...",
     "backToList": "Volver a conversaciones",
     "conversationNotFound": "Conversación no encontrada",
@@ -2081,43 +1559,7 @@
     "sending": "Enviando...",
     "statusActive": "Activa",
     "statusArchived": "Archivada",
-    "statusClosed": "Cerrada",
-    "newConversation": "Nueva conversación",
-    "searchPlaceholder": "Buscar por asunto, cliente o correo",
-    "filters": {
-      "active": "Activas",
-      "archived": "Archivadas",
-      "closed": "Cerradas"
-    },
-    "status": {
-      "active": "Activa",
-      "archived": "Archivada",
-      "closed": "Cerrada"
-    },
-    "noResults": "No hay conversaciones con estos filtros.",
-    "emptyHint": "Las conversaciones se crean solas con cada pedido y cada proyecto. También puedes abrir una con un cliente.",
-    "unreadCount": "{count, plural, one {# sin leer} other {# sin leer}}",
-    "form": {
-      "client": "Cliente",
-      "clientRequired": "Elige el cliente.",
-      "title": "Asunto",
-      "titleRequired": "Escribe el asunto.",
-      "message": "Primer mensaje (opcional)",
-      "messageRequired": "Escribe el mensaje.",
-      "notifyHelp": "Si escribes un mensaje, el cliente recibe el aviso en su portal (y por correo si lo tiene activado).",
-      "submit": "Crear conversación"
-    },
-    "statusChanged": "Estado de la conversación actualizado",
-    "changeStatus": "Cambiar estado",
-    "roles": {
-      "admin": "Equipo",
-      "client": "Cliente",
-      "support": "Soporte"
-    },
-    "noMessages": "Aún no hay mensajes en esta conversación.",
-    "automatic": "Automático",
-    "read": "Leído",
-    "replyHelp": "El cliente recibe un aviso en su portal cuando le respondes. Enter envía; Shift + Enter hace un salto de línea."
+    "statusClosed": "Cerrada"
   },
   "adminUsers": {
     "title": "Usuarios",
@@ -2142,31 +1584,9 @@
     "roleDeveloper": "Developer",
     "roleManager": "Manager",
     "roleAdmin": "Admin",
-    "confirmRoleChange": "¿Cambiar el rol de {name} de {from} a {to}? El cambio se aplica en su próxima carga del panel o del portal, sin volver a iniciar sesión.",
+    "confirmRoleChange": "¿Estás seguro de cambiar el rol de este usuario a {role}?",
     "roleUpdated": "Rol actualizado exitosamente",
-    "roleUpdateError": "Error al actualizar el rol",
-    "subtitleReadOnly": "Consulta las cuentas y sus roles. Solo un administrador puede cambiarlos.",
-    "tableAccount": "Cuenta",
-    "notActivated": "Sin activar",
-    "providerGoogle": "Google",
-    "providerLocal": "Correo y contraseña",
-    "changeRoleFor": "Cambiar el rol de {name}",
-    "ownRole": "No puedes cambiar tu propio rol",
-    "resetLink": "Enlace para restablecer contraseña",
-    "resetLinkFor": "Generar enlace de contraseña para {name}",
-    "adminOnly": "Solo administradores",
-    "rolesHelp": "Administrador: todo el panel. Gerente: la operación; ve los usuarios sin cambiar roles y no entra a privacidad ni bitácora. Comercial: solicitudes, accesos y catálogo de demos. Desarrollador: abre todas las demos, sin panel. Cliente: portal completo. Prospecto: solo sus demos. Usuario: cuenta registrada sin proyectos.",
-    "confirmRoleTitle": "Cambiar rol",
-    "confirmRoleButton": "Cambiar rol",
-    "resetConfirm": "Se generará un enlace de un solo uso para que {name} ({email}) cree una contraseña nueva. Los enlaces anteriores dejan de servir. Compártelo por un canal de confianza.",
-    "resetGenerate": "Generar enlace",
-    "resetWhatsapp": "Hola {name}, este es tu enlace para crear una contraseña nueva en KopTup: {url} (vence el {date}).",
-    "resetHelp": "Cópialo o envíalo por WhatsApp. Sirve una sola vez y vence el {date}.",
-    "copied": "Enlace copiado",
-    "copyFailed": "No se pudo copiar: selecciónalo y cópialo a mano.",
-    "copy": "Copiar",
-    "whatsapp": "Enviar por WhatsApp",
-    "noPhone": "La cuenta no tiene teléfono: copia el enlace y envíalo por otro medio."
+    "roleUpdateError": "Error al actualizar el rol"
   },
   "adminContacts": {
     "title": "Contactos",
@@ -2195,37 +1615,7 @@
     "statusRead": "Leído",
     "statusResponded": "Respondido",
     "statusUpdated": "Estado actualizado exitosamente",
-    "statusUpdateError": "Error al actualizar estado",
-    "searchPlaceholder": "Buscar por nombre, correo, empresa o mensaje",
-    "filters": {
-      "all": "Todos",
-      "new": "Nuevos",
-      "read": "Leídos",
-      "responded": "Respondidos",
-      "discarded": "Descartados"
-    },
-    "sourceLabel": "Origen",
-    "sources": {
-      "contact-form": "Formulario de contacto",
-      "demo-request": "Solicitud de demo",
-      "demo-rag": "Demo RAG"
-    },
-    "discardedHelp": "Contactos de solicitudes rechazadas como spam: no cuentan en los nuevos ni en el inicio.",
-    "status": {
-      "new": "Nuevo",
-      "read": "Leído",
-      "responded": "Respondido"
-    },
-    "discardedAs": "Descartado: {reason}",
-    "openRequest": "Ver la solicitud {code}",
-    "markAs": {
-      "new": "Marcar como nuevo",
-      "read": "Marcar como leído",
-      "responded": "Marcar como respondido"
-    },
-    "statusNote": "El estado es solo para el equipo: la persona no recibe ningún aviso.",
-    "privacyLink": "Borrar o exportar sus datos (Privacidad)",
-    "privacyAdminOnly": "Para borrar sus datos, pídele a un administrador que use Admin › Privacidad."
+    "statusUpdateError": "Error al actualizar estado"
   },
   "loginPage": {
     "title": "Iniciar Sesión",
@@ -2253,11 +1643,7 @@
     "errorNotActivated": "Tu cuenta aún no está activada. Usa el enlace de activación que te enviamos o pide uno nuevo al equipo de KopTup.",
     "redirectNotice": "Inicia sesión para continuar a <strong>{target}</strong>",
     "emailPlaceholder": "tu@email.com",
-    "guestLink": "Continuar como invitado y ver demos",
-    "errorGoogleNotConfigured": "El inicio de sesión con Google no está disponible en este momento. Ingresa con tu correo y contraseña.",
-    "errorRateLimited": "Hiciste varios intentos seguidos. Espera unos minutos e intenta de nuevo.",
-    "errorServer": "El servidor tuvo un problema. Intenta de nuevo en unos minutos.",
-    "rememberHint": "Si no lo marcas, la sesión se cierra al cerrar el navegador o tras un día sin usarla."
+    "guestLink": "Continuar como invitado y ver demos"
   },
   "registerPage": {
     "title": "Crear Cuenta",
@@ -2299,11 +1685,7 @@
     "chosenPlanNote": "Crear la cuenta no contrata el plan. Para contratarlo, cotízalo y te enviamos una propuesta.",
     "quotePlan": "Cotizar este plan",
     "changePlan": "Cambiar de plan",
-    "createAndContinue": "Crear cuenta y continuar",
-    "errorRateLimited": "Hiciste varios intentos seguidos. Espera unos minutos e intenta de nuevo.",
-    "errorNetwork": "No pudimos conectarnos con el servidor. Revisa tu conexión e intenta de nuevo.",
-    "errorServer": "El servidor tuvo un problema y no pudimos crear la cuenta. Intenta de nuevo en unos minutos.",
-    "errorEmailTaken": "Ya existe una cuenta con este correo. Inicia sesión o recupera tu contraseña."
+    "createAndContinue": "Crear cuenta y continuar"
   },
   "aboutPage": {
     "badge": "Sobre KopTup",
@@ -3082,22 +2464,6 @@
     "statusUpdated": "Estado actualizado exitosamente",
     "statusUpdateError": "Error al actualizar el estado",
     "notSpecified": "No especificado",
-    "searchPlaceholder": "Buscar por pedido, nombre, cliente o correo",
-    "noResults": "No hay pedidos con estos filtros.",
-    "moveTo": {
-      "in_progress": "Pasar a En proceso",
-      "shipped": "Marcar como Enviado",
-      "completed": "Marcar como Completado"
-    },
-    "viewInvoice": "Ver factura {number}",
-    "issueInvoice": "Emitir factura",
-    "invoiceIssued": "Factura {number} emitida. El cliente ya la ve en su portal.",
-    "rejectReasonRequired": "Escribe el motivo del rechazo (mínimo 3 caracteres).",
-    "rejectNotice": "El cliente verá este motivo en su pedido y recibirá el aviso.",
-    "issueInvoiceHelp": "Se emite la factura del pedido {id} a nombre de {name}, con los ítems y valores del pedido.",
-    "invoiceDue": "Vence el",
-    "invoiceTax": "IVA",
-    "invoiceSubtotal": "Subtotal del pedido: {amount}",
     "approvalBadge": {
       "pending": "Pendiente de Aprobación",
       "approved": "Aprobado",
@@ -3162,63 +2528,75 @@
     }
   },
   "ordersPage": {
-    "title": "Mis pedidos",
-    "subtitle": "Sigue el estado de tus pedidos y de su revisión.",
-    "newOrder": "Nuevo pedido",
-    "searchPlaceholder": "Buscar por nombre o número...",
-    "statusFilter": "Filtrar por estado",
-    "noOrders": "No hay pedidos con estos filtros.",
-    "emptyTitle": "Aún no tienes pedidos",
-    "emptyBody": "Cuéntanos qué necesitas: el equipo revisa tu pedido, te responde por Mensajes y, si lo aprobamos, te emitimos la factura.",
-    "itemsCount": "{count, plural, one {# ítem} other {# ítems}}",
-    "viewDetail": "Ver detalle",
+    "title": "Mis Pedidos",
+    "subtitle": "Gestiona y rastrea todos tus pedidos",
+    "newOrder": "Nuevo Pedido",
+    "searchPlaceholder": "Buscar por nombre o ID...",
+    "noOrders": "No se encontraron pedidos",
+    "items": "artículos",
+    "viewDetail": "Ver Detalle",
+    "invoice": "Factura",
     "status": {
-      "all": "Todos los estados"
+      "all": "Todos",
+      "pending": "Pendiente",
+      "in_progress": "En Proceso",
+      "shipped": "Enviado",
+      "completed": "Completado",
+      "cancelled": "Cancelado"
     }
   },
   "projectsPage": {
-    "title": "Mis proyectos",
-    "subtitle": "El estado y el avance de tus proyectos, como los registra el equipo.",
-    "noProjects": "Aún no tienes proyectos",
-    "noProjectsDesc": "Cuando el equipo cree tu proyecto, aquí verás su estado, su avance, los entregables y las facturas. Si necesitas algo nuevo, crea un pedido.",
-    "requestNewProject": "Crear un pedido",
-    "progress": "Avance",
-    "progressNote": "El avance lo actualiza el equipo de KopTup.",
-    "budget": "Presupuesto",
-    "manager": "Responsable",
+    "title": "Mis Proyectos",
+    "subtitle": "Sigue el progreso de todos tus proyectos",
+    "newProject": "Nuevo Proyecto",
+    "noProjects": "No tienes proyectos activos",
+    "noProjectsDesc": "Comienza solicitando un nuevo proyecto para ver su progreso aquí",
+    "requestNewProject": "Solicitar Nuevo Proyecto",
+    "progress": "Progreso",
+    "members": "miembros",
+    "manager": "Manager",
+    "team": "Equipo",
     "startDate": "Inicio",
-    "deliveryDate": "Entrega estimada",
-    "contactTeam": "Conversación del proyecto",
+    "deliveryDate": "Entrega",
+    "budgetUsed": "Presupuesto utilizado",
+    "remaining": "Restante",
+    "projectPhases": "Fases del Proyecto",
+    "milestones": "Hitos",
+    "deliverables": "Entregables",
+    "viewDeliverables": "Ver Entregables",
+    "contactTeam": "Contactar Equipo",
     "noDescription": "Sin descripción",
     "noDate": "Sin fecha",
-    "unassigned": "Equipo KopTup",
-    "deliverablesCount": "{count, plural, one {# entregable} other {# entregables}}",
-    "toReview": "{count, plural, one {# por revisar} other {# por revisar}}",
-    "invoicesCount": "{count, plural, one {# factura} other {# facturas}}"
+    "unassigned": "Sin asignar",
+    "phases": {
+      "planning": "Planeación",
+      "development": "Desarrollo",
+      "qa": "QA",
+      "delivery": "Entrega"
+    },
+    "status": {
+      "planning": "Planeación",
+      "active": "Activo",
+      "on_hold": "En Espera",
+      "completed": "Completado",
+      "in_progress": "En Progreso",
+      "pending": "Pendiente",
+      "approved": "Aprobado",
+      "in_review": "En Revisión"
+    }
   },
   "billingPage": {
-    "title": "Facturación y pagos",
-    "subtitle": "Revisa tus facturas, descárgalas y mira cómo pagarlas.",
-    "invoiceCount": "{count, plural, one {# factura} other {# facturas}}",
-    "filterLabel": "Filtrar facturas",
-    "filters": {
-      "all": "Todas",
-      "unpaid": "Por pagar",
-      "paid": "Pagadas",
-      "cancelled": "Anuladas"
-    },
-    "noResults": "No hay facturas con este filtro.",
-    "emptyTitle": "Aún no tienes facturas",
-    "emptyBody": "Cuando el equipo te emita una factura (por ejemplo, al aprobar un pedido), aparecerá aquí y recibirás un aviso.",
-    "project": "Proyecto: {name}",
-    "order": "Pedido {id}",
-    "noReference": "Sin proyecto ni pedido asociado",
+    "title": "Facturación y Pagos",
+    "subtitle": "Revisa tus facturas y cómo pagarlas",
+    "pending": "Pendiente",
+    "overdue": "Vencido",
+    "paid": "Pagado",
+    "invoices": "facturas",
     "issued": "Emitida",
     "dueDate": "Vencimiento",
     "paidDate": "Pagada",
-    "details": "Detalle",
+    "details": "Detalles",
     "noDescription": "Sin descripción",
-    "tax": "IVA ({rate}%)",
     "downloadPdf": "Descargar PDF",
     "payNow": "Cómo pagar",
     "payHide": "Ocultar",
@@ -3231,63 +2609,33 @@
   },
   "messagesPage": {
     "title": "Mensajes",
-    "subtitle": "Habla con el equipo de KopTup sobre tus pedidos y proyectos.",
+    "subtitle": "Comunícate con el equipo de KopTup sobre tus proyectos",
     "searchPlaceholder": "Buscar conversaciones...",
-    "noConversations": "No hay conversaciones con esa búsqueda.",
+    "noConversations": "No se encontraron conversaciones",
     "noParticipants": "Sin participantes",
     "messagePlaceholder": "Escribe un mensaje...",
-    "enterToSend": "Enter envía; Shift + Enter hace un salto de línea.",
-    "selectConversation": "Elige una conversación para verla.",
-    "emptyTitle": "Aún no tienes conversaciones",
-    "emptyBody": "Cada pedido y cada proyecto tiene su conversación con el equipo. También puedes escribirnos sobre cualquier otro tema.",
-    "noMessages": "Aún no hay mensajes.",
-    "unread": "{count, plural, one {# sin leer} other {# sin leer}}",
-    "read": "Leído",
-    "sent": "Enviado",
-    "send": "Enviar",
-    "sendError": "No pudimos enviar tu mensaje. Intenta de nuevo.",
-    "backToList": "Volver a las conversaciones",
-    "new": {
-      "button": "Escribir al equipo",
-      "title": "Nueva conversación",
-      "help": "Cuéntanos qué necesitas. El equipo recibe el aviso y te responde aquí.",
-      "subject": "Asunto",
-      "message": "Mensaje",
-      "titleRequired": "Escribe el asunto.",
-      "messageRequired": "Escribe tu mensaje.",
-      "cancel": "Cancelar",
-      "submit": "Enviar",
-      "sent": "Mensaje enviado. El equipo te responderá aquí."
-    }
+    "enterToSend": "Presiona Enter para enviar, Shift + Enter para nueva línea",
+    "selectConversation": "Selecciona una conversación para comenzar",
+    "unknown": "Desconocido",
+    "you": "Tú"
   },
   "deliverablesPage": {
-    "title": "Entregables",
-    "subtitle": "Los archivos y enlaces que el equipo comparte contigo, por proyecto. Revísalos y apruébalos o pide cambios.",
+    "title": "Entregables y Documentos",
+    "subtitle": "Repositorio de archivos y entregables por proyecto",
     "total": "Total",
+    "approved": "Aprobados",
+    "inReview": "En Revisión",
+    "rejected": "Rechazados",
     "all": "Todos",
-    "filterLabel": "Filtrar entregables",
-    "noResults": "No hay entregables con este filtro.",
-    "emptyTitle": "Aún no tienes entregables",
-    "emptyBody": "Cuando el equipo comparta un archivo o enlace de tu proyecto, aparecerá aquí y recibirás un aviso.",
-    "noProject": "Sin proyecto",
-    "version": "v{version}",
-    "externalLink": "Enlace externo",
-    "openLink": "Abrir enlace",
-    "download": "Descargar",
-    "yourComment": "Tu comentario:",
+    "files": "archivos",
     "approve": "Aprobar",
-    "reject": "Pedir cambios",
-    "review": {
-      "approveTitle": "Aprobar \"{title}\"",
-      "rejectTitle": "Pedir cambios en \"{title}\"",
-      "approveHelp": "Al aprobarlo, el equipo sabe que el entregable está listo. Puedes dejar un comentario.",
-      "rejectHelp": "Cuéntale al equipo qué hay que cambiar. Recibirá tu comentario.",
-      "comments": "Comentarios",
-      "commentsOptional": "Comentario (opcional)",
-      "commentsRequired": "Escribe qué hay que cambiar (mínimo 3 caracteres).",
-      "cancel": "Cancelar",
-      "approved": "Entregable aprobado. El equipo recibió el aviso.",
-      "rejected": "Enviamos tus comentarios al equipo."
+    "reject": "Rechazar",
+    "rejectComments": "Comentarios de rechazo",
+    "rejectedByUser": "Rechazado por el usuario",
+    "status": {
+      "approved": "Aprobado",
+      "in_review": "En Revisión",
+      "rejected": "Rechazado"
     }
   },
   "chatbotBuilder": {
@@ -4483,10 +3831,7 @@
       "manager": "Gerente",
       "sales": "Comercial",
       "other": "Equipo"
-    },
-    "projects": "Proyectos",
-    "auditLog": "Bitácora",
-    "badgeLabel": "{count, plural, one {# pendiente} other {# pendientes}}"
+    }
   },
   "adminPrivacy": {
     "title": "Privacidad: derechos del titular",
@@ -4618,8 +3963,7 @@
       "demo_request": {
         "update": "Solicitud actualizada",
         "approve": "Solicitud aprobada",
-        "reject": "Solicitud rechazada",
-        "merge": "La persona volvió a enviar el formulario"
+        "reject": "Solicitud rechazada"
       },
       "demo_grant": {
         "create": "Acceso concedido",
@@ -4632,9 +3976,7 @@
       },
       "user": {
         "activate": "Cuenta activada",
-        "role_change": "Rol cambiado",
-        "reset_link": "Enlace de contraseña generado",
-        "change_password": "Contraseña cambiada"
+        "role_change": "Rol cambiado"
       }
     },
     "requests": {
@@ -4654,10 +3996,6 @@
       "received": "Recibida el {date}",
       "resubmitted": "{count, plural, one {la persona volvió a enviar el formulario # vez} other {la persona volvió a enviar el formulario # veces}}",
       "markReview": "Marcar en revisión",
-      "backToPending": "Volver a pendiente",
-      "backToPendingDone": "La solicitud volvió a pendiente.",
-      "demoInactive": "Desactivada: no se puede conceder",
-      "inactiveWarning": "Estas demos están desactivadas y no se pueden conceder: {demos}. Quítalas o actívalas en el catálogo antes de aprobar.",
       "email": "Email",
       "phone": "Teléfono",
       "whatsapp": "WhatsApp",
@@ -4779,10 +4117,7 @@
       "inviteSubmit": "Conceder acceso",
       "invited": "Acceso concedido.",
       "inviteEmailError": "Escribe un email válido.",
-      "inviteDemosError": "Elige al menos una demo.",
-      "visits": "{count, plural, =0 {Sin visitas} one {# visita} other {# visitas}}",
-      "inactiveDemo": "Demo desactivada: actívala en el catálogo para concederla",
-      "inactiveDemosNote": "Las demos desactivadas no se pueden conceder hasta que las actives en el catálogo."
+      "inviteDemosError": "Elige al menos una demo."
     },
     "catalog": {
       "title": "Catálogo de demos",

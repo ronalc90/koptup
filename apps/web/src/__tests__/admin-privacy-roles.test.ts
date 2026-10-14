@@ -10,11 +10,6 @@ describe('adminRolesFor', () => {
     expect(adminRolesFor('/admin/privacidad/')).toEqual(['admin']);
   });
 
-  it('Bitácora: solo admin', () => {
-    expect(adminRolesFor('/admin/bitacora')).toEqual(['admin']);
-    expect(adminRolesFor('/admin/proyectos')).toEqual(['admin', 'manager']);
-  });
-
   it('las demás secciones no cambian', () => {
     expect(adminRolesFor('/admin/contacts')).toEqual(['admin', 'manager']);
     expect(adminRolesFor('/admin/solicitudes')).toEqual(['admin', 'manager', 'sales']);

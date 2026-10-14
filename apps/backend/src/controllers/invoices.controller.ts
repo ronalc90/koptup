@@ -1,77 +1,157 @@
 import { Response } from 'express';
-import mongoose from 'mongoose';
 import { AuthRequest } from '../types';
 import { isStaffSession } from '../middleware/access';
-import { asyncHandler, AppError } from '../middleware/errorHandler';
 import Invoice from '../models/Invoice';
 // Registra los modelos que usa populate().
 import '../models/Project';
-import '../models/Order';
 import '../models/User';
+import mongoose from 'mongoose';
 import { getCommerceSettings } from '../services/commerce-settings.service';
-import {
-  IssueInvoiceSchema,
-  cancelInvoice as cancelInvoiceService,
-  invoiceStatusFilter,
-  invoiceView,
-  issueInvoice,
-  loadInvoiceView,
-  registerInvoicePayment,
-} from '../services/invoices.service';
-import { zodToAppError } from '../routes/demo-public.routes';
 
-function actorOf(req: AuthRequest) {
-  const u = req.user!;
-  return { id: u.id, email: u.email, role: u.role, name: u.name };
-}
+export const getInvoices = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const { status, startDate, endDate } = req.query;
 
-function queryText(value: unknown, max = 40): string | undefined {
-  return typeof value === 'string' && value.trim() ? value.trim().slice(0, max) : undefined;
-}
+    if (!userId) {
+      res.status(401).json({ success: false, message: 'Usuario no autenticado' });
+      return;
+    }
 
-/**
- * GET /api/invoices — facturas de la cuenta (el cliente ve las suyas). Las
- * fechas son días de Colombia; una factura pendiente con la fecha de pago
- * vencida aparece como `overdue`.
- */
-export const getInvoices = asyncHandler(async (req: AuthRequest, res: Response) => {
-  const userId = req.user!.id;
-  const status = queryText(req.query.status);
-  const filter: Record<string, unknown> = { userId, ...(status && status !== 'all' ? invoiceStatusFilter(status) : {}) };
-  const invoices = await Invoice.find(filter)
-    .populate('projectId', 'name')
-    .populate('orderId', 'orderId name')
-    .populate('userId', 'name email company')
-    .sort({ createdAt: -1 })
-    .limit(500)
-    .lean();
-  res.json({ success: true, data: invoices.map((inv) => invoiceView(inv)) });
-});
+    const query: any = { userId };
+    if (status && status !== 'all') query.status = status;
+    if (startDate) query.issueDate = { $gte: new Date(startDate as string) };
+    if (endDate) {
+      query.issueDate = query.issueDate || {};
+      query.issueDate.$lte = new Date(endDate as string);
+    }
 
-/** GET /api/invoices/:id — detalle: el cliente dueño o el equipo (rol leído de la BD). */
-export const getInvoiceById = asyncHandler(async (req: AuthRequest, res: Response) => {
-  const view = await loadInvoiceView(String(req.params.id));
-  if (!view) throw new AppError('Factura no encontrada', 404, 'not_found');
-  if (view.client.id !== String(req.user!.id) && !(await isStaffSession(req))) {
-    throw new AppError('No tienes permiso para ver esta factura', 403, 'forbidden');
+    const invoices = await Invoice.find(query)
+      .populate('projectId', 'name')
+      .populate('userId', 'name email')
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const formattedInvoices = invoices.map((inv: any) => ({
+      id: inv._id,
+      invoiceNumber: inv.invoiceNumber,
+      projectId: inv.projectId?._id,
+      projectName: inv.projectId?.name || 'Sin proyecto',
+      clientName: inv.clientInfo?.name || inv.userId?.name,
+      clientEmail: inv.clientInfo?.email || inv.userId?.email,
+      status: inv.status,
+      issueDate: inv.issueDate.toISOString().split('T')[0],
+      dueDate: inv.dueDate.toISOString().split('T')[0],
+      paidDate: inv.paidDate ? inv.paidDate.toISOString().split('T')[0] : null,
+      subtotal: inv.subtotal,
+      taxAmount: inv.taxAmount,
+      total: inv.total,
+      currency: inv.currency,
+      items: inv.items,
+    }));
+
+    res.json({ success: true, data: formattedInvoices });
+  } catch (error) {
+    console.error('Get invoices error:', error);
+    res.status(500).json({ success: false, message: 'Error al obtener facturas' });
   }
-  res.json({ success: true, data: view });
-});
+};
 
-/**
- * POST /api/invoices (admin o manager) — emite una factura a nombre del
- * cliente: `{ clientId | projectId | orderId, items[{ description, quantity,
- * unitPrice }], taxRate?, currency?, dueDate?, notes?, terms? }`.
- */
-export const createInvoice = asyncHandler(async (req: AuthRequest, res: Response) => {
-  const parsed = IssueInvoiceSchema.safeParse(req.body ?? {});
-  if (!parsed.success) throw zodToAppError(parsed.error);
-  if (!parsed.data.orderId && !parsed.data.items) {
-    throw new AppError('Agrega al menos un ítem.', 400, 'invalid_items', { fields: ['items'] });
+export const getInvoiceById = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      res.status(401).json({ success: false, message: 'Usuario no autenticado' });
+      return;
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(404).json({ success: false, message: 'Factura no encontrada' });
+      return;
+    }
+
+    const invoice = await Invoice.findById(id)
+      .populate('projectId', 'name description')
+      .populate('userId', 'name email')
+      .lean();
+
+    if (!invoice) {
+      res.status(404).json({ success: false, message: 'Factura no encontrada' });
+      return;
+    }
+
+    if (invoice.userId._id.toString() !== userId.toString()) {
+      res.status(403).json({ success: false, message: 'No tienes permiso para ver esta factura' });
+      return;
+    }
+
+    const formattedInvoice = {
+      ...invoice,
+      issueDate: invoice.issueDate.toISOString().split('T')[0],
+      dueDate: invoice.dueDate.toISOString().split('T')[0],
+      paidDate: invoice.paidDate ? invoice.paidDate.toISOString().split('T')[0] : null,
+    };
+
+    res.json({ success: true, data: formattedInvoice });
+  } catch (error) {
+    console.error('Get invoice by id error:', error);
+    res.status(500).json({ success: false, message: 'Error al obtener factura' });
   }
-  const view = await issueInvoice(parsed.data, actorOf(req), req);
-  res.status(201).json({ success: true, data: view, message: 'Factura emitida.' });
-});
+};
+
+export const createInvoice = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const { projectId, clientInfo, items, taxRate, dueDate, notes, terms } = req.body;
+
+    if (!userId) {
+      res.status(401).json({ success: false, message: 'Usuario no autenticado' });
+      return;
+    }
+
+    if (!projectId || !clientInfo || !items || !Array.isArray(items) || items.length === 0) {
+      res.status(400).json({ success: false, message: 'Datos requeridos faltantes' });
+      return;
+    }
+
+    const subtotal = items.reduce((sum: number, item: any) => sum + item.total, 0);
+    const taxAmount = subtotal * (taxRate || 0.19);
+    const total = subtotal + taxAmount;
+
+    const calculatedDueDate = dueDate ? new Date(dueDate) : new Date(Date.now() + 15 * 24 * 60 * 60 * 1000);
+
+    const newInvoice = new Invoice({
+      projectId,
+      userId,
+      clientInfo,
+      items,
+      subtotal,
+      taxRate: taxRate || 0.19,
+      taxAmount,
+      total,
+      currency: 'USD',
+      status: 'pending',
+      issueDate: new Date(),
+      dueDate: calculatedDueDate,
+      notes,
+      terms,
+      history: [{
+        date: new Date(),
+        action: 'created',
+        description: 'Factura creada',
+        updatedBy: userId,
+      }],
+    });
+
+    await newInvoice.save();
+    res.status(201).json({ success: true, data: { id: newInvoice._id, invoiceNumber: newInvoice.invoiceNumber }, message: 'Factura creada exitosamente' });
+  } catch (error) {
+    console.error('Create invoice error:', error);
+    res.status(500).json({ success: false, message: 'Error al crear factura' });
+  }
+};
 
 /**
  * POST /api/invoices/:id/pay — registra el pago de una factura. Solo el equipo
@@ -80,64 +160,121 @@ export const createInvoice = asyncHandler(async (req: AuthRequest, res: Response
  * marca sus facturas como pagadas: en el portal ve los métodos de pago
  * configurados (GET /api/invoices/payment-methods).
  */
-export const payInvoice = asyncHandler(async (req: AuthRequest, res: Response) => {
-  const { paymentMethod, transactionId } = (req.body ?? {}) as { paymentMethod?: unknown; transactionId?: unknown };
-  if (!paymentMethod || typeof paymentMethod !== 'string') {
-    throw new AppError('Método de pago requerido', 400, 'invalid_request', { fields: ['paymentMethod'] });
-  }
-  await registerInvoicePayment(
-    String(req.params.id),
-    { paymentMethod, transactionId: typeof transactionId === 'string' ? transactionId : undefined },
-    actorOf(req),
-    req,
-  );
-  res.json({ success: true, message: 'Pago registrado' });
-});
+export const payInvoice = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.id;
+    const { paymentMethod, transactionId } = req.body ?? {};
 
-/** POST /api/invoices/:id/cancel { motivo } (admin o manager) — anula una factura no pagada. */
-export const cancelInvoice = asyncHandler(async (req: AuthRequest, res: Response) => {
-  const motivo = typeof req.body?.motivo === 'string' ? req.body.motivo.trim().slice(0, 300) : '';
-  if (motivo.length < 3) throw new AppError('Escribe el motivo de la anulación.', 400, 'invalid_request', { fields: ['motivo'] });
-  await cancelInvoiceService(String(req.params.id), motivo, actorOf(req), req);
-  res.json({ success: true, message: 'Factura anulada.', data: await loadInvoiceView(String(req.params.id)) });
-});
+    if (!userId) {
+      res.status(401).json({ success: false, message: 'Usuario no autenticado' });
+      return;
+    }
+
+    if (!paymentMethod || typeof paymentMethod !== 'string') {
+      res.status(400).json({ success: false, message: 'Método de pago requerido' });
+      return;
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(404).json({ success: false, message: 'Factura no encontrada' });
+      return;
+    }
+
+    const invoice = await Invoice.findById(id);
+    if (!invoice) {
+      res.status(404).json({ success: false, message: 'Factura no encontrada' });
+      return;
+    }
+
+    if (invoice.status === 'paid') {
+      res.status(400).json({ success: false, message: 'La factura ya está pagada' });
+      return;
+    }
+
+    invoice.status = 'paid';
+    invoice.paidDate = new Date();
+    invoice.paymentMethod = paymentMethod.slice(0, 60);
+    invoice.transactionId = typeof transactionId === 'string' && transactionId.trim() ? transactionId.trim().slice(0, 120) : `TXN-${Date.now()}`;
+    invoice.history.push({
+      date: new Date(),
+      action: 'paid',
+      description: 'Pago registrado por el equipo',
+      amount: invoice.total,
+      updatedBy: new mongoose.Types.ObjectId(userId),
+    });
+
+    await invoice.save();
+    res.json({ success: true, message: 'Pago registrado' });
+  } catch (error) {
+    console.error('Pay invoice error:', error);
+    res.status(500).json({ success: false, message: 'Error al registrar el pago' });
+  }
+};
 
 /**
  * GET /api/invoices/payment-methods — métodos de pago reales que el equipo
  * configuró (Admin › Configuración). Hoy: las instrucciones de transferencia.
  * Si no hay ninguno, `metodos` viene vacío y el portal no ofrece "Pagar".
  */
-export const getInvoicePaymentMethods = asyncHandler(async (_req: AuthRequest, res: Response) => {
-  const settings = await getCommerceSettings();
-  const instrucciones = settings.instruccionesTransferencia.trim();
-  res.setHeader('Cache-Control', 'no-store');
-  res.json({
-    success: true,
-    data: {
-      metodos: instrucciones ? [{ tipo: 'transferencia' as const, instrucciones }] : [],
-    },
-  });
-});
-
-/**
- * GET /api/invoices/:id/download — los datos completos de la factura para
- * generar su PDF (la web lo arma con jsPDF y lo descarga). Solo el cliente
- * dueño o el equipo; sin caché.
- */
-export const downloadInvoice = asyncHandler(async (req: AuthRequest, res: Response) => {
-  if (!mongoose.Types.ObjectId.isValid(String(req.params.id))) throw new AppError('Factura no encontrada', 404, 'not_found');
-  const view = await loadInvoiceView(String(req.params.id));
-  if (!view) throw new AppError('Factura no encontrada', 404, 'not_found');
-  if (view.client.id !== String(req.user!.id) && !(await isStaffSession(req))) {
-    throw new AppError('No tienes permiso para descargar esta factura', 403, 'forbidden');
+export const getInvoicePaymentMethods = async (_req: AuthRequest, res: Response) => {
+  try {
+    const settings = await getCommerceSettings();
+    const instrucciones = settings.instruccionesTransferencia.trim();
+    res.setHeader('Cache-Control', 'no-store');
+    res.json({
+      success: true,
+      data: {
+        metodos: instrucciones ? [{ tipo: 'transferencia' as const, instrucciones }] : [],
+      },
+    });
+  } catch (error) {
+    console.error('Get invoice payment methods error:', error);
+    res.status(500).json({ success: false, message: 'Error al obtener los métodos de pago' });
   }
-  res.setHeader('Cache-Control', 'private, no-store');
-  res.json({
-    success: true,
-    data: {
-      ...view,
-      fileName: `factura-${view.invoiceNumber}.pdf`,
-      emisor: { nombre: 'KopTup' },
-    },
-  });
-});
+};
+
+export const downloadInvoice = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      res.status(401).json({ success: false, message: 'Usuario no autenticado' });
+      return;
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(404).json({ success: false, message: 'Factura no encontrada' });
+      return;
+    }
+
+    const invoice = await Invoice.findById(id);
+    if (!invoice) {
+      res.status(404).json({ success: false, message: 'Factura no encontrada' });
+      return;
+    }
+
+    // Dueño de la factura o staff (rol vigente en la BD).
+    if (invoice.userId.toString() !== userId.toString() && !(await isStaffSession(req))) {
+      res.status(403).json({ success: false, message: 'No tienes permiso para descargar esta factura' });
+      return;
+    }
+
+    const downloadUrl = `${process.env.API_URL || 'http://localhost:3001'}/api/invoices/${id}/download`;
+
+    res.json({
+      success: true,
+      data: {
+        id,
+        downloadUrl,
+        fileName: `invoice-${invoice.invoiceNumber}.pdf`,
+        expiresIn: 3600,
+      },
+      message: 'Link de descarga generado exitosamente',
+    });
+  } catch (error) {
+    console.error('Download invoice error:', error);
+    res.status(500).json({ success: false, message: 'Error al generar link de descarga' });
+  }
+};

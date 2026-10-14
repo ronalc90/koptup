@@ -26,8 +26,6 @@ function ResetPasswordInner() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  // El enlace no sirve (usado, reemplazado o vencido): se ofrece pedir otro.
-  const [linkProblem, setLinkProblem] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +33,6 @@ function ResetPasswordInner() {
 
     if (!token) {
       setError(t('errorInvalidLink'));
-      setLinkProblem(true);
       return;
     }
     if (password.length < 8) {
@@ -52,15 +49,7 @@ function ResetPasswordInner() {
       await api.resetPassword(token, password);
       setSuccess(true);
     } catch (err: any) {
-      // Un mensaje por motivo: enlace usado, reemplazado, vencido o inválido.
-      const code = err?.response?.data?.code;
-      const status = err?.response?.status;
-      if (code === 'token_used' || code === 'token_replaced' || code === 'token_expired' || code === 'token_invalid') {
-        setError(t(`errors.${code}`));
-        setLinkProblem(true);
-      } else if (status === 429) setError(t('errorRateLimited'));
-      else if (!err?.response) setError(t('errorNetwork'));
-      else setError(t('errorGeneric'));
+      setError(err?.response?.data?.message || t('errorGeneric'));
     } finally {
       setIsLoading(false);
     }
@@ -109,13 +98,8 @@ function ResetPasswordInner() {
             ) : (
               <>
                 {error && (
-                  <div role="alert" className="mb-6 p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg">
+                  <div className="mb-6 p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg">
                     <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-                    {linkProblem && (
-                      <Link href="/forgot-password" className="mt-2 inline-block text-sm font-semibold text-primary-600 hover:text-primary-500">
-                        {t('requestNew')}
-                      </Link>
-                    )}
                   </div>
                 )}
 
