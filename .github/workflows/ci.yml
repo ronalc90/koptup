@@ -6,11 +6,13 @@
 #                  integración) y de la web (matriz)
 #   3. build    -> compila el backend (tsc) y la web (next build)
 #   4. e2e      -> levanta MongoDB, Redis, el mock de OpenAI versionado
-#                  (apps/web/e2e/support/openai-mock.js), el backend y la web
-#                  compilados, y corre Playwright: humo de páginas y demos, y
-#                  la plataforma de punta a punta (solicitud → aprobación →
-#                  activación → acceso → revocación, permisos, modo de acceso
-#                  desde el panel, contacto y la demo RAG con un PDF)
+#                  (apps/web/e2e/support/openai-mock.js), el mock de Resend y
+#                  WhatsApp (apps/web/e2e/support/notify-mock.js), el backend
+#                  y la web compilados, y corre Playwright: humo de páginas y
+#                  demos, y la plataforma de punta a punta (solicitud →
+#                  aprobación → activación → acceso → revocación, permisos,
+#                  modo de acceso desde el panel, contacto con sus avisos al
+#                  dueño y la demo RAG con un PDF)
 #   5. seguridad -> npm audit de las dependencias de producción (falla con
 #                  una alerta alta o crítica que no esté revisada en
 #                  .github/audit-allowlist.json; ver scripts/audit-check.mjs)
@@ -250,6 +252,12 @@ jobs:
       # admin de pruebas (contraseña al azar de cada corrida) con el script
       # set-admin del backend. No es un secreto: la base vive solo en el job.
       E2E_MONGODB_URI: mongodb://localhost:27017/koptup_e2e
+      # Mock de Resend y WhatsApp (owner-notify.spec.ts lee ahí los avisos) y
+      # los destinos ficticios que tiene el backend (NOTIFY_EMAIL y
+      # ADMIN_WHATSAPP_NUMBER, más abajo).
+      E2E_NOTIFY_MOCK_URL: http://127.0.0.1:3998
+      E2E_NOTIFY_EMAIL: dueno@e2e.koptup.test
+      E2E_ADMIN_WHATSAPP_NUMBER: '573000000000'
     steps:
       - uses: actions/checkout@v4
 
@@ -281,6 +289,11 @@ jobs:
         env:
           OPENAI_MOCK_PORT: '3999'
 
+      - name: Arrancar mock de Resend y WhatsApp
+        run: nohup node apps/web/e2e/support/notify-mock.js > notify-mock.log 2>&1 &
+        env:
+          NOTIFY_MOCK_PORT: '3998'
+
       - name: Arrancar backend
         working-directory: apps/backend
         run: nohup node dist/index.js > ../../backend.log 2>&1 &
@@ -309,6 +322,20 @@ jobs:
           # que el backend lee porque confía en un salto de proxy (igual que
           # detrás de Railway). Ver apps/web/e2e/support/backend.ts.
           TRUST_PROXY_HOPS: '1'
+          # Avisos al dueño de cada contacto: correo por la API de Resend y
+          # WhatsApp con la plantilla de Meta, ambos contra el mock local (no
+          # sale nada real). Claves, token y destinos son ficticios.
+          RESEND_API_KEY: re_solo_ci_no_es_clave
+          RESEND_API_URL: http://127.0.0.1:3998
+          NOTIFY_EMAIL: dueno@e2e.koptup.test
+          WHATSAPP_PROVIDER: meta
+          WHATSAPP_API_TOKEN: solo-ci-e2e-no-es-token
+          WHATSAPP_PHONE_NUMBER_ID: '100000000000001'
+          WHATSAPP_GRAPH_URL: http://127.0.0.1:3998
+          ADMIN_WHATSAPP_NUMBER: '573000000000'
+          # Sin reintentos ni prueba mensual en segundo plano: así el mock solo
+          # recibe los avisos que provocan las pruebas.
+          NOTIFY_JOBS_ENABLED: 'false'
 
       - name: Arrancar web (next start)
         working-directory: apps/web
@@ -316,7 +343,7 @@ jobs:
 
       - name: Esperar a que respondan
         run: |
-          for url in http://127.0.0.1:3999/health "$E2E_API_URL/health" "$E2E_BASE_URL/"; do
+          for url in http://127.0.0.1:3999/health "$E2E_NOTIFY_MOCK_URL/health" "$E2E_API_URL/health" "$E2E_BASE_URL/"; do
             ok=""
             for _ in $(seq 1 60); do
               if curl -fs -o /dev/null "$url"; then ok=1; break; fi
@@ -335,7 +362,7 @@ jobs:
       - name: Logs de los servidores
         if: always()
         run: |
-          for f in openai-mock.log backend.log web.log; do
+          for f in openai-mock.log notify-mock.log backend.log web.log; do
             echo "::group::$f"
             tail -n 200 "$f" || true
             echo "::endgroup::"

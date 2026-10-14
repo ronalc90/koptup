@@ -106,6 +106,8 @@ export interface ContactLead {
   cotizacion?: { servicio: string; plan?: string; nivel?: string; modalidad?: string } | null;
   /** Prueba de la autorización de datos (Ley 1581), sin el hash de la IP. */
   consentimiento?: { aceptado: boolean; fecha: string | null; versionPolitica: string | null } | null;
+  /** Resultado del aviso al dueño por canal (Contact.notificaciones; null en contactos anteriores). */
+  notificaciones?: Partial<Record<'email' | 'whatsapp', { estado: string; intentos?: number; error?: string | null } | null>> | null;
 }
 
 class ApiError extends Error {}

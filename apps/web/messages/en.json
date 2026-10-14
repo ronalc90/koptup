@@ -352,7 +352,7 @@
       },
       "c3": {
         "subtitle": "2.3 Email and WhatsApp",
-        "text": "The email provider (SMTP) we use to send notices to the team and your request emails and, if enabled, the WhatsApp provider through which the team receives the notice of a new contact with your data."
+        "text": "Resend sends the platform's emails: the notice to the team when you write to us through a form (with the data you sent), your demo request emails and your account emails, such as a password change. Meta, through the WhatsApp Business Platform, delivers to the team on WhatsApp the notice of a new contact, which carries your name, your company, the service you're interested in, your email and an excerpt of your message, and the notices of the orders and proposal requests you make from the client portal (your name, your email and the order amount and items, or your request's message). Both act as processors: they handle that data on our behalf only to make the delivery."
       },
       "c4": {
         "subtitle": "2.4 Measurement and advertising, only if you accept them",
@@ -1545,6 +1545,109 @@
     "saving": "Saving...",
     "toastSaved": "Settings saved successfully"
   },
+  "adminNotify": {
+    "card": {
+      "title": "New contact notifications",
+      "subtitle": "When someone writes to you from the site (contact form, demo request or “Try it with your document”), the server notifies you by email and WhatsApp. Here you can see whether each channel is ready and how the last notification went.",
+      "loading": "Checking the notification status…",
+      "loadError": "We couldn't check the notification status: {error}",
+      "retry": "Try again",
+      "configured": "Configured",
+      "notConfigured": "Not configured",
+      "channels": {
+        "email": "Email",
+        "whatsapp": "WhatsApp"
+      },
+      "provider": "Provider",
+      "providers": {
+        "resend": "Resend (HTTPS API)",
+        "smtp": "SMTP",
+        "meta": "Meta · WhatsApp Cloud API (template)"
+      },
+      "destination": "Delivered to",
+      "sender": "Sender",
+      "template": "Template",
+      "webhook": "Delivery confirmation",
+      "webhookOnLast": "Set up: Meta sends the statuses (delivered, read or failed). Last event received: {date}.",
+      "webhookOnNoEvents": "Set up, no events yet: Meta hasn't sent any status. To receive them, the Meta app must be in Live mode with the “messages” field subscribed.",
+      "webhookOff": "Not set up: the panel only knows Meta accepted the message, not whether it reached you.",
+      "lastSuccess": "Last notification sent",
+      "lastFailure": "Last failure",
+      "lastError": "Last error",
+      "lastErrorRecovered": "{error} (recovered: a notification went out afterwards)",
+      "unsupportedProvider": "WHATSAPP_PROVIDER asks for a retired provider (Twilio or UltraMsg): change it to meta and set any missing Meta variables.",
+      "never": "None yet",
+      "missing": "Still missing on the server:",
+      "smtpWarning": "This server sends email over SMTP. On Railway, the Free, Trial and Hobby plans block outgoing SMTP: set RESEND_API_KEY so email goes out through the Resend API.",
+      "heartbeat": {
+        "title": "Automatic monthly test",
+        "on": "Every {days} days the server sends you a test notification on each configured channel (between 9 a.m. and 7 p.m., Colombia time), to confirm they still work even when no contacts arrive and so Meta doesn't archive the WhatsApp template for lack of use.",
+        "off": "Off on this server: nobody checks the channels while no contacts arrive. It turns on with at least one channel configured, NOTIFY_HEARTBEAT_DAYS greater than 0 and NOTIFY_JOBS_ENABLED other than false.",
+        "last": "Last test",
+        "next": "Next test"
+      },
+      "test": {
+        "hint": "Sends a test notification right now on each configured channel and shows you what each provider answered.",
+        "button": "Send test notification",
+        "sending": "Sending…",
+        "adminOnly": "Only an admin can send the test notification.",
+        "resultTitle": "Test result",
+        "sent": {
+          "email": "Sent. The provider accepted it (id {id}); check your inbox and your spam folder.",
+          "whatsapp": "Sent. Meta accepted it (id {id}); it should reach your WhatsApp in a few seconds."
+        },
+        "failed": "Failed: {error}",
+        "unknownError": "unknown error",
+        "noAnswer": "The server returned no result for this channel.",
+        "notConfigured": "Not attempted: the channel is not configured.",
+        "fallback": "Your template failed, so the fallback template “{name}” was sent so your phone would at least ring. Check the “{template}” template in Meta's WhatsApp Manager (name, language and that it is approved).",
+        "fallbackEmail": "Heads up: it went out from the fallback sender {name} because your sender's domain isn't verified in Resend. That sender only reaches the email that owns the Resend account: verify the domain in Resend.",
+        "error": "The test couldn't be sent: {error}",
+        "rateLimited": "You ran several tests in a row. Wait a few minutes and try again.",
+        "forbidden": "Your role can't send the test notification."
+      }
+    },
+    "status": {
+      "label": "New contact notification",
+      "channels": {
+        "email": "Email",
+        "whatsapp": "WhatsApp"
+      },
+      "states": {
+        "pendiente": "Pending",
+        "enviado": "Sent",
+        "entregado": "Delivered",
+        "leido": "Read",
+        "fallido": "Failed",
+        "no_configurado": "Not configured",
+        "none": "No record"
+      },
+      "noneHint": "This contact arrived before the panel started saving notification results.",
+      "reason": "Reason: {error}",
+      "notConfiguredHint": "The channel wasn't configured on the server when the contact arrived.",
+      "pendingHint": "It is being sent or waiting for its automatic retry.",
+      "sentHint": {
+        "email": "The email provider accepted it.",
+        "whatsapp": "Meta accepted it; delivery isn't confirmed yet."
+      },
+      "attempts": "{count, plural, one {# attempt} other {# attempts}}",
+      "lastAttempt": "last: {date}",
+      "nextAttempt": "Next automatic retry: {date}",
+      "fallbackUsed": {
+        "email": "It went out from the fallback sender {name} because your sender's domain isn't verified in Resend: verify the domain (that sender only reaches the email that owns the Resend account).",
+        "whatsapp": "The fallback template “{name}” was sent because your template failed: check it in Meta's WhatsApp Manager."
+      },
+      "resend": "Retry notification",
+      "resendAll": "Send the notification again",
+      "resending": "Sending again…",
+      "resendHint": "Retries the channels that didn't go out.",
+      "resendAllHint": "Both channels already went out: this sends it again on both.",
+      "resendAdminOnly": "Only an admin can resend notifications.",
+      "resendRateLimited": "You resent several times in a row. Wait a few minutes and try again.",
+      "resendDone": "Done: the result for each channel is shown above.",
+      "resendError": "The notification couldn't be resent: {error}"
+    }
+  },
   "adminConversations": {
     "title": "Conversations",
     "subtitle": "View and manage all system conversations",
@@ -1830,12 +1933,12 @@
             "note": "sessions and passwords"
           },
           {
-            "name": "Nodemailer",
-            "note": "emails"
+            "name": "Resend",
+            "note": "emails (HTTPS API; Nodemailer over SMTP as a fallback)"
           },
           {
-            "name": "Twilio",
-            "note": "WhatsApp notifications"
+            "name": "WhatsApp Cloud API (Meta)",
+            "note": "WhatsApp notifications with a template"
           },
           {
             "name": "AWS S3 SDK",
@@ -4055,7 +4158,7 @@
       "internalNote": "Internal note",
       "internalNoteHint": "(only the team sees it)",
       "messageToProspect": "Message to the person",
-      "messageHint": "(goes in the email, if SMTP is set up)",
+      "messageHint": "(goes in the email, if email is set up)",
       "approveSummaryNew": "The person's account will be created (not activated) with {count, plural, one {# access} other {# accesses}} of {days} days, plus a single-use activation link that expires in 72 hours.",
       "approveSummaryExisting": "The person already has an account: {count, plural, one {# access} other {# accesses}} of {days} days will be added.",
       "approveButton": "Approve and generate the link",
@@ -4063,7 +4166,7 @@
       "rejectReason": "Reason",
       "rejectDetail": "Reason details (internal)",
       "notify": "Notify the person by email",
-      "notifyHint": "Only if SMTP is set up. The reason is internal: the email carries the message below or a generic text. Spam is never notified.",
+      "notifyHint": "Only if email is set up (Admin › Settings). The reason is internal: the email carries the message below or a generic text. Spam is never notified.",
       "rejectMessage": "Message to the person (optional)",
       "rejectButton": "Reject request",
       "rejected": "Request rejected.",

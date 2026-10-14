@@ -7,22 +7,19 @@ import AdminLayout from '@/components/admin/AdminLayout';
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import {
-  BellIcon,
   GlobeAltIcon,
   ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
+import OwnerNotificationsCard from '@/components/admin/OwnerNotificationsCard';
+import { useStaffRole } from '@/components/admin/demos/shared';
 import { useTranslations } from 'next-intl';
 
 export default function AdminSettingsPage() {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const t = useTranslations('settingsPage');
+  const role = useStaffRole();
   const [settings, setSettings] = useState({
-    notifications: {
-      email: true,
-      push: true,
-      sms: false,
-    },
     language: 'es',
     theme: 'light',
   });
@@ -74,76 +71,8 @@ export default function AdminSettingsPage() {
           </p>
         </div>
 
-        {/* Notifications */}
-        <Card variant="bordered">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <BellIcon className="h-6 w-6 text-primary-600 dark:text-primary-400" />
-              <CardTitle>{t('notifications')}</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <label className="flex items-center justify-between p-4 rounded-lg border border-secondary-200 dark:border-secondary-700 cursor-pointer hover:bg-secondary-50 dark:hover:bg-secondary-900">
-              <div>
-                <p className="font-medium text-secondary-900 dark:text-white">{t('emailNotifications')}</p>
-                <p className="text-sm text-secondary-600 dark:text-secondary-400">
-                  {t('emailDesc')}
-                </p>
-              </div>
-              <input
-                type="checkbox"
-                checked={settings.notifications.email}
-                onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    notifications: { ...settings.notifications, email: e.target.checked },
-                  })
-                }
-                className="w-5 h-5 rounded border-secondary-300 text-primary-600 focus:ring-primary-500"
-              />
-            </label>
-
-            <label className="flex items-center justify-between p-4 rounded-lg border border-secondary-200 dark:border-secondary-700 cursor-pointer hover:bg-secondary-50 dark:hover:bg-secondary-900">
-              <div>
-                <p className="font-medium text-secondary-900 dark:text-white">{t('pushNotifications')}</p>
-                <p className="text-sm text-secondary-600 dark:text-secondary-400">
-                  {t('pushDesc')}
-                </p>
-              </div>
-              <input
-                type="checkbox"
-                checked={settings.notifications.push}
-                onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    notifications: { ...settings.notifications, push: e.target.checked },
-                  })
-                }
-                className="w-5 h-5 rounded border-secondary-300 text-primary-600 focus:ring-primary-500"
-              />
-            </label>
-
-            <label className="flex items-center justify-between p-4 rounded-lg border border-secondary-200 dark:border-secondary-700 cursor-pointer hover:bg-secondary-50 dark:hover:bg-secondary-900">
-              <div>
-                <p className="font-medium text-secondary-900 dark:text-white">{t('smsNotifications')}</p>
-                <p className="text-sm text-secondary-600 dark:text-secondary-400">
-                  {t('smsDesc')}
-                </p>
-              </div>
-              <input
-                type="checkbox"
-                checked={settings.notifications.sms}
-                onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    notifications: { ...settings.notifications, sms: e.target.checked },
-                  })
-                }
-                className="w-5 h-5 rounded border-secondary-300 text-primary-600 focus:ring-primary-500"
-              />
-            </label>
-          </CardContent>
-        </Card>
+        {/* Avisos de nuevos contactos: estado real del servidor y aviso de prueba. */}
+        <OwnerNotificationsCard role={role} />
 
         {/* Language & Theme */}
         <Card variant="bordered">
