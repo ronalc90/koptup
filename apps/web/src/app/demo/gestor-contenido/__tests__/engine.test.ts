@@ -7,7 +7,7 @@ import { classifyAiError } from '../lib/ai';
 import { entryJson, listJson } from '../lib/api';
 import { assistantDocs, publishedThisVisit, searchFaqs } from '../lib/assistant';
 import { hasUnpublishedChanges } from '../lib/models';
-import { blockingIssues, mediaUsage, notifiedTargets, reducer, wentThroughReview, type Action } from '../lib/reducer';
+import { blockingIssues, mediaUsage, reducer, wentThroughReview, type Action } from '../lib/reducer';
 import { seoChecks } from '../lib/seo';
 import { buildState, migrate, STATE_VERSION } from '../lib/seed';
 import { slugify, stripHtml, textToHtml, toCsv } from '../lib/text';
@@ -49,35 +49,15 @@ describe('CMS · datos de ejemplo', () => {
     }
   });
 
-  it('es coherente: lo publicado habla de cinco sedes en cuatro ciudades; la sexta (Bucaramanga) está en revisión', () => {
+  it('es coherente: seis sedes en cinco ciudades', () => {
     const s = buildState(NOW);
     const sedes = s.entries.filter((e) => e.type === 'location');
     expect(sedes).toHaveLength(6);
     expect(new Set(sedes.map((e) => e.content.fields.city)).size).toBe(5);
-    const publicadas = sedes.filter((e) => e.live);
-    expect(publicadas).toHaveLength(5);
-    expect(new Set(publicadas.map((e) => e.content.fields.city)).size).toBe(4);
-    expect(entry(s, 'loc-cabecera').status).toBe('review');
     const inicio = entry(s, 'page-inicio');
-    const nosotros = entry(s, 'page-nosotros');
-    expect((inicio.content.fields.title as { es: string; en: string }).es).toBe('Tu salud, cerca de ti en cuatro ciudades');
-    expect((inicio.content.fields.title as { es: string; en: string }).en).toBe('Your health, close to you in four cities');
-    // Lo publicado hace semanas no anuncia la sede nueva ni cuenta seis sedes.
-    for (const e of [inicio, nosotros]) expect(JSON.stringify(e.live)).not.toMatch(/Bucaramanga|seis sedes|six locations|cinco ciudades|five cities/);
-    expect(JSON.stringify(nosotros.live)).toMatch(/cinco sedes/);
+    expect(JSON.stringify(inicio)).not.toMatch(/seis ciudades|six cities/);
+    expect((inicio.content.fields.title as { es: string }).es).toBe('Tu salud, cerca de ti en cinco ciudades');
     expect(JSON.stringify(s)).not.toMatch(/TransMilenio/);
-  });
-
-  it('lo aprobado o programado tiene su aprobación de Edición en el historial', () => {
-    const s = buildState(NOW);
-    for (const id of ['faq-ecografia', 'art-fin-de-ano']) {
-      const e = entry(s, id);
-      expect(e.versions.map((v) => v.reason)).toEqual(['created', 'submitted', 'approved']);
-      expect(e.versions[2].by).toBe(EDITOR);
-      expect(e.updatedBy).toBe(EDITOR);
-      expect(Date.parse(e.updatedAt)).toBeLessThanOrEqual(NOW);
-    }
-    expect(entry(s, 'art-fin-de-ano').scheduledBy).toBe(EDITOR);
   });
 
   it('usa datos ficticios: teléfonos 555 y dominios .example', () => {
@@ -140,15 +120,6 @@ describe('CMS · flujo editorial, webhooks y programación', () => {
     expect(s.deliveries.map((d) => d.target).sort()).toEqual(['app', 'assistant', 'site']);
   });
 
-  it('el aviso de publicación nombra solo los canales que de verdad reciben el webhook', () => {
-    const s0 = buildState(NOW);
-    expect(notifiedTargets(s0, { type: 'location' })).toEqual(['site', 'app']);
-    expect(notifiedTargets(s0, { type: 'faq' })).toEqual(['site', 'app', 'assistant']);
-    const s1 = run(s0, who(ADMIN), { type: 'webhook.toggle', id: 'site', now }, { type: 'webhook.toggle', id: 'app', now });
-    expect(notifiedTargets(s1, { type: 'location' })).toEqual([]);
-    expect(notifiedTargets(s1, { type: 'faq' })).toEqual(['assistant']);
-  });
-
   it('un webhook desactivado no recibe entregas', () => {
     const s = run(buildState(NOW), who(ADMIN), { type: 'webhook.toggle', id: 'app', now }, { type: 'entry.publish', id: 'faq-ecografia', now });
     expect(s.deliveries.some((d) => d.target === 'app')).toBe(false);
@@ -165,39 +136,6 @@ describe('CMS · flujo editorial, webhooks y programación', () => {
     expect(e.status).toBe('published');
     expect(e.publishedAt).toBe(at);
     expect(s.deliveries.every((d) => d.auto)).toBe(true);
-  });
-
-  it('la publicación programada sale a nombre de quien la programó, aunque ahora mire Redacción', () => {
-    const at = iso(NOW + 60_000);
-    let s = run(buildState(NOW), who(EDITOR), { type: 'entry.schedule', id: 'faq-ecografia', at, now }, who(WRITER));
-    s = reducer(s, { type: 'scheduler.tick', now: iso(NOW + 65_000) });
-    const e = entry(s, 'faq-ecografia');
-    expect(e.versions[e.versions.length - 1]).toMatchObject({ reason: 'published', by: EDITOR });
-    expect(e.updatedBy).toBe(EDITOR);
-    expect(s.activity[0]).toMatchObject({ kind: 'autoPublished', by: EDITOR, at });
-    // La de ejemplo, programada por Edición, también sale a su nombre.
-    const s2 = run(buildState(NOW), who(WRITER), { type: 'scheduler.tick', now: iso(NOW + 4 * 86_400_000) });
-    expect(entry(s2, 'art-fin-de-ano').status).toBe('published');
-    expect(s2.activity[0]).toMatchObject({ kind: 'autoPublished', by: EDITOR });
-  });
-
-  it('si al llegar la hora le falta un campo obligatorio, no se publica: vuelve a «Aprobada» y lo registra', () => {
-    let s = run(
-      buildState(NOW),
-      who(ADMIN),
-      { type: 'model.addField', typeId: 'article', field: { id: 'autorDelTexto', kind: 'text', required: true, localized: true, custom: { label: { es: 'Autor del texto', en: '' } } }, now },
-      who(WRITER),
-    );
-    expect(blockingIssues(s, entry(s, 'art-fin-de-ano'))).toContain('autorDelTexto');
-    s = reducer(s, { type: 'scheduler.tick', now: iso(NOW + 4 * 86_400_000) });
-    const e = entry(s, 'art-fin-de-ano');
-    expect(e.status).toBe('approved');
-    expect(e.scheduledAt).toBeNull();
-    expect(e.live).toBeNull();
-    expect(s.deliveries).toHaveLength(0);
-    expect(s.activity[0]).toMatchObject({ kind: 'scheduleFailed', by: EDITOR, entryId: 'art-fin-de-ano' });
-    // y no se vuelve a intentar en cada revisión
-    expect(reducer(s, { type: 'scheduler.tick', now: iso(NOW + 5 * 86_400_000) })).toBe(s);
   });
 
   it('no deja programar en el pasado', () => {
@@ -220,12 +158,7 @@ describe('CMS · flujo editorial, webhooks y programación', () => {
   it('eliminar quita las referencias en otras entradas y avisa si estaba publicada', () => {
     const s = run(buildState(NOW), who(ADMIN), { type: 'entry.delete', id: 'svc-fisioterapia', now });
     expect(s.entries.some((e) => e.id === 'svc-fisioterapia')).toBe(false);
-    const usaquen = entry(s, 'loc-usaquen');
-    expect((usaquen.content.fields.services as string[]).includes('svc-fisioterapia')).toBe(false);
-    // También en la versión publicada: la sede no queda con «cambios sin publicar» por el borrado.
-    expect((usaquen.live?.fields.services as string[]).includes('svc-fisioterapia')).toBe(false);
-    expect(usaquen.status).toBe('published');
-    expect(hasUnpublishedChanges(usaquen)).toBe(false);
+    expect((entry(s, 'loc-usaquen').content.fields.services as string[]).includes('svc-fisioterapia')).toBe(false);
     expect(s.deliveries.every((d) => d.event === 'entry.deleted')).toBe(true);
   });
 
@@ -252,18 +185,6 @@ describe('CMS · API de entrega', () => {
     expect(entryJson(s, entry(s, 'faq-ecografia'), 'es', true)).not.toBeNull();
     const list = listJson(s, { type: 'location', locale: 'es', preview: false }) as { meta: { total: number } };
     expect(list.meta.total).toBe(5);
-  });
-
-  it('lo publicado no delata el borrador: su updatedAt es el de la publicación', () => {
-    let s = run(buildState(NOW), who(WRITER));
-    const e = entry(s, 'loc-chapinero');
-    s = reducer(s, { type: 'entry.edit', id: e.id, content: withField(e, 'address', 'Calle 63 # 9-47'), now: iso(NOW + 1000) });
-    const live = entryJson(s, entry(s, e.id), 'es', false) as { updatedAt: string; publishedAt: string; fields: { address: string } };
-    expect(live.updatedAt).toBe(live.publishedAt);
-    expect(live.fields.address).toBe('Calle 63 # 9-45, local 2');
-    const draft = entryJson(s, entry(s, e.id), 'es', true) as { updatedAt: string; fields: { address: string } };
-    expect(draft.updatedAt).toBe(iso(NOW + 1000));
-    expect(draft.fields.address).toBe('Calle 63 # 9-47');
   });
 
   it('marca el respaldo en español cuando falta la traducción', () => {
@@ -361,61 +282,21 @@ describe('CMS · recorrido: cada paso se marca solo con la acción completa', ()
 });
 
 describe('CMS · datos guardados por la versión anterior', () => {
-  // Así guardaban las versiones 3 y 4 las páginas de inicio y «Quiénes somos».
-  const V5_BACK: [string, string][] = [
-    ['cuatro ciudades', 'cinco ciudades'],
-    ['four cities', 'five cities'],
-    ['four Colombian cities', 'five Colombian cities'],
-    ['Cali y Barranquilla.', 'Cali, Barranquilla y Bucaramanga.'],
-    ['Cali and Barranquilla.', 'Cali, Barranquilla and Bucaramanga.'],
-    ['atendemos en cinco sedes', 'atendemos en seis sedes'],
-    ['at five locations', 'at six locations'],
-    ['con cinco sedes en Colombia', 'con seis sedes en Colombia'],
-    ['with five locations in Colombia', 'with six locations in Colombia'],
-  ];
-  const V4_BACK: [string, string][] = [
-    ['cinco ciudades', 'seis ciudades'],
-    ['five cities', 'six cities'],
-  ];
-  function storedBy(version: 3 | 4): AppState {
-    const s = buildState(NOW);
-    const back = (e: Entry, pairs: [string, string][]) => {
-      let json = JSON.stringify(e);
-      for (const [to, from] of pairs) json = json.split(to).join(from);
-      return JSON.parse(json) as Entry;
-    };
-    s.entries = s.entries.map((e) => (e.id === 'page-inicio' || e.id === 'page-nosotros' ? back(e, V5_BACK) : e));
-    if (version === 3) s.entries = s.entries.map((e) => (e.id === 'page-inicio' ? back(e, V4_BACK) : e));
-    s.version = version;
-    return s;
-  }
-
   it('migra la versión 3 sin perder cambios y corrige solo el texto de ejemplo', () => {
-    const v3 = storedBy(3);
+    // Así guardaba la versión 3 la página de inicio (decía «seis ciudades»).
+    const v3 = buildState(NOW);
+    v3.entries = v3.entries.map((e) => (e.id === 'page-inicio' ? (JSON.parse(JSON.stringify(e).split('cinco ciudades').join('seis ciudades').split('five cities').join('six cities')) as Entry) : e));
     expect(JSON.stringify(v3)).toMatch(/seis ciudades/);
+    v3.version = 3;
     v3.currentUserId = EDITOR;
     v3.tour.model = true;
     const m = migrate(v3);
     expect(m?.version).toBe(STATE_VERSION);
     expect(m?.currentUserId).toBe(EDITOR);
     expect(m?.tour.model).toBe(true);
-    expect(JSON.stringify(m)).not.toMatch(/seis ciudades|six cities|cinco ciudades|five cities/);
-    expect(m?.entries).toEqual(buildState(NOW).entries);
-  });
-
-  it('migra la versión 4: corrige lo publicado de ejemplo y conserva lo que la persona cambió', () => {
-    const v4 = storedBy(4);
-    expect(JSON.stringify(v4)).toMatch(/cinco ciudades/);
-    // La persona cambió el título de inicio: no se toca.
-    const inicio = v4.entries.find((e) => e.id === 'page-inicio') as Entry;
-    inicio.content = { ...inicio.content, fields: { ...inicio.content.fields, title: { es: 'Bienvenido a Montaña Azul', en: '' } } };
-    const m = migrate(v4);
-    expect(m?.version).toBe(STATE_VERSION);
-    const mi = m?.entries.find((e) => e.id === 'page-inicio') as Entry;
-    expect(mi.content.fields.title).toEqual({ es: 'Bienvenido a Montaña Azul', en: '' });
-    expect((mi.live?.fields.title as { es: string }).es).toBe('Tu salud, cerca de ti en cuatro ciudades');
-    expect(JSON.stringify(m?.entries.find((e) => e.id === 'page-nosotros'))).not.toMatch(/seis sedes|six locations|cinco ciudades/);
-    expect(m?.entries.find((e) => e.id === 'loc-chapinero')).toEqual(v4.entries.find((e) => e.id === 'loc-chapinero'));
+    expect(JSON.stringify(m)).not.toMatch(/seis ciudades|six cities/);
+    // lo que la persona cambió se conserva
+    expect(m?.entries.find((e) => e.id === 'page-nosotros')).toEqual(v3.entries.find((e) => e.id === 'page-nosotros'));
   });
 
   it('descarta lo irreconocible', () => {

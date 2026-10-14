@@ -4304,7 +4304,6 @@
       "intro": {
         "resumen": "Indicators for {period} against the target and the same period last year.",
         "finanzas": "Income statement for {period}, receivables aging and projected cash flow.",
-        "finanzasUpload": "Gross profit for {period} from your file. Receivables and cash flow need your accounting data.",
         "clientes": "Sales, margin, receivables and segment for each customer in {period}.",
         "preguntas": "Answers calculated with the figures for {period}, each with its formula.",
         "alertas": "Deviations detected by rules and a preview of the weekly summary.",
@@ -4542,8 +4541,8 @@
         "legendMin": "Lowest-cash week",
         "legendBelow": "Below minimum cash",
         "legendFloor": "Minimum cash ({floor})",
-        "legendMarkers": "VAT = bimonthly VAT (IVA) payment · P = service bonus (prima, June and December)",
-        "markerTax": "VAT",
+        "legendMarkers": "IVA = bimonthly VAT payment · P = service bonus (prima, June and December)",
+        "markerTax": "IVA",
         "markerBonus": "P",
         "weekRange": "Week {n}: {start} to {end}",
         "week": "Week",
@@ -4669,7 +4668,7 @@
     },
     "ask": {
       "title": "Pick or type your question",
-      "subtitle": "Answers are calculated with the figures for {period}, and each one shows how it was worked out.",
+      "subtitle": "Pick a question or type it. Answers are calculated with the figures for {period}.",
       "q": {
         "customersDown": "Which customers buy less than last year?",
         "margin": "Why did gross margin change?",
@@ -4752,7 +4751,7 @@
         },
         "customersRisk": {
           "title": "{count, plural, one {# customer at risk} other {# customers at risk}}",
-          "text": "Their purchases fell {drop}% or more against the same period last year: {names}{more, plural, =0 {} other { and # more}}. Together that is {lost} less."
+          "text": "Their purchases fell {drop}% or more against the same period last year: {names}{count, plural, one {} =2 {} =3 {} other { and others}}. Together that is {lost} less."
         },
         "forecastGoal": {
           "title": "Projection below target",
@@ -4798,7 +4797,7 @@
       "sampleName": "Sample data for {company} ({sector})",
       "uploadName": "Your file: {file}",
       "stats": "{rows} invoices · {customers} customers · {from} to {to} · as of {cutoff}",
-      "sampleHow": "Generated in your browser with a fixed seed: 24 months ending in the last closed month (they roll forward on their own every month), and every view comes from the same invoices. Company, customers, sales reps and tax ID are fictitious.",
+      "sampleHow": "Generated in your browser with a fixed seed: always the same, and every view comes from the same invoices. Company, customers, sales reps and tax ID are fictitious.",
       "uploadHow": "Only the views that depend on sales are recalculated (Overview, Customers, sales questions and alerts). Receivables and cash flow need your accounting data.",
       "downloadSample": "Download sample CSV",
       "downloadUpload": "Download normalized data",
@@ -4983,7 +4982,7 @@
       "methodGoal": "Target = sales of the same months last year + {goal}%.",
       "methodForecast": "Projection {range}: statistical method (same month last year × recent growth, or linear trend), 80% band with a deviation of {sigma}. No AI involved.",
       "noForecast": "Not enough months to project.",
-      "methodSample": "Sample data generated with a fixed seed up to the last closed month; every view comes from the same invoices.",
+      "methodSample": "Sample data generated with a fixed seed; every view comes from the same invoices.",
       "methodUpload": "Calculated with the rows of the file you uploaded.",
       "sales": "Sales",
       "goal": "Target",
@@ -5000,13 +4999,6 @@
       "page": "Page {n} of {total}",
       "done": "Report downloaded: {file}",
       "error": "The PDF could not be generated. Please try again."
-    },
-    "files": {
-      "report": "executive-report",
-      "receivables": "receivables",
-      "customers": "customers",
-      "invoices": "invoices",
-      "sales": "sales"
     },
     "intro": {
       "back": "Back to the demo catalog",
@@ -9326,7 +9318,6 @@
       "published": "published “{title}”",
       "autoPublished": "published “{title}” (scheduled publication)",
       "scheduled": "scheduled “{title}”",
-      "scheduleFailed": "scheduled “{title}”, but it was not published at the set time: required fields are missing (it went back to Approved)",
       "unscheduled": "cancelled the schedule of “{title}”",
       "unpublished": "unpublished “{title}”",
       "discarded": "discarded the unpublished changes of “{title}”",
@@ -9401,7 +9392,7 @@
       "deleteNotAllowed": "Your role cannot delete this entry",
       "deleteTitle": "Delete the entry?",
       "deleteBody": "“{title}” and its versions will be deleted. References from other entries are removed.",
-      "deleteLive": "The entry is published: the channels with an active webhook will be notified to remove it (simulated).",
+      "deleteLive": "The entry is published: the site will be notified to remove it (simulated webhook).",
       "deleteConfirm": "Delete",
       "deleted": "Entry deleted."
     },
@@ -9423,8 +9414,7 @@
       "approved": "Entry approved: it can now be published or scheduled.",
       "requestChanges": "Request changes",
       "publishNow": "Publish now",
-      "publishedTo": "Published. Notified: {targets} (simulated webhooks).",
-      "publishedNoHooks": "Published. No channel was notified: the webhooks that apply are turned off.",
+      "published": "Published: the site, the app and the assistant were notified (simulated webhooks).",
       "scheduleBtn": "Schedule…",
       "unschedule": "Cancel schedule",
       "unscheduled": "Schedule cancelled: the entry is still approved.",
@@ -9438,7 +9428,6 @@
       "reviewNote": "The editor requested changes: “{note}”",
       "changesNote": "There are unpublished changes: the site and the API show the published version until you publish again.",
       "issuesTitle": "Before sending or publishing, fix:",
-      "scheduledBlocked": "If you do not fix it before the scheduled time, it will not be published and will go back to Approved.",
       "issues": {
         "required": "The required field “{field}” is missing (in Spanish).",
         "slugInvalid": "The slug can only contain lowercase letters, numbers and hyphens.",
@@ -9489,7 +9478,7 @@
         "note": "While the demo is open, the scheduler checks every 5 seconds. If you close the tab, the entry is published the next time you open the demo, with the date you scheduled.",
         "confirm": "Schedule",
         "cancel": "Cancel",
-        "done": "Scheduled for {date} (Colombia time)."
+        "done": "Scheduled for {date}."
       },
       "noChangesSinceVersion": "No changes since the last version"
     },
@@ -9557,8 +9546,7 @@
       "remove": "Remove",
       "close": "Close",
       "meta": "{w} × {h} px · {kb} KB",
-      "focalHint": "Click the image (or focus it and use the arrow keys) to set the focal point ({x}%, {y}%): it drives the crop in every format.",
-      "focalKeys": "Image focal point: {x}%, {y}%. Use the arrow keys to move it.",
+      "focalHint": "Click the image to set the focal point ({x}%, {y}%): it drives the crop in every format.",
       "crops": {
         "web": "Web 16:9",
         "app": "App 4:5",
@@ -9809,6 +9797,7 @@
       "approve": "Approve",
       "approvedToast": "Entry approved.",
       "publishNow": "Publish now",
+      "publishedToast": "Entry published.",
       "scheduledAt": "{date} · {rel}",
       "by": "{name} · {date}",
       "blocked": "It has pending fields: open it to fix them.",
@@ -13998,8 +13987,8 @@
     "sampleHint": "{brand} (NIT {nit}), {club}, its stores, members, ID numbers, phone numbers, partners and all figures are made up.",
     "howItWorks": {
       "title": "What is real and what is simulated in this demo",
-      "real": "Calculated for real in your browser: the points for each purchase (base rule plus multipliers by category, day and channel), the balance as the sum of the points ledger, tiers, redemptions with coupons and checkout discounts, sweepstakes tickets, missions, referrals, fraud rules, allowed campaign hours (including Colombian public holidays), the cost simulator, the points liability and the CSV export.",
-      "simulated": "Simulated: sending WhatsApp, email or SMS (you see the preview, no message is sent), the Apple Wallet and Google Wallet pass (preview), the draw (the winner comes from your tickets and fictitious participants), and the figures for the 29,200-member base (KPIs, cohorts, mission results, A/B tests, partners and the sales mix behind the cost). Segments come from rules: there is no AI model in this demo. The WhatsApp and email buttons in “Invite friends” do open your app with the message ready.",
+      "real": "Calculated for real in your browser: the points for each purchase (base rule plus multipliers by category, day and channel), the balance as the sum of the points ledger, tiers, redemptions with coupons and checkout discounts, missions, referrals, fraud rules, allowed campaign hours (including Colombian public holidays), the cost simulator, the points liability and the CSV export.",
+      "simulated": "Simulated: sending WhatsApp, email or SMS (you see the preview, no message is sent), the Apple Wallet and Google Wallet pass (preview), sweepstakes, and the figures for the 29,200-member base (KPIs, cohorts, mission results, A/B tests and partners). Segments come from rules: there is no AI model in this demo. The WhatsApp and email buttons in “Invite friends” do open your app with the message ready.",
       "project": "In your project, the checkout connects to your POS or online store through an API, points live in a points ledger in your database, messages go out through WhatsApp Business with approved templates, the pass is issued for Apple Wallet and Google Wallet with your brand, and reports come from your real data.",
       "dates": "The demo works with today's date in Colombia: sample purchases, expirations and reports are built backwards from today, and what you record gets Colombia's date and time. Your changes are saved only in this browser."
     },
@@ -14206,8 +14195,7 @@
       "welcome": "Welcome bonus",
       "referral": "Referral: {name}",
       "mission": "Mission: {name}",
-      "reversal": "Reversal of sale {id}",
-      "ticket": "Ticket: {name}"
+      "reversal": "Reversal of sale {id}"
     },
     "export": {
       "button": "Export activity (CSV)",
@@ -14231,8 +14219,7 @@
         "referral": "Referral",
         "mission": "Mission",
         "reversal": "Reversal",
-        "summary": "Purchases (summary)",
-        "ticket": "Sweepstakes ticket"
+        "summary": "Purchases (summary)"
       }
     },
     "cashier": {
@@ -14497,21 +14484,6 @@
         "subtitle": "Purchase points in {month} (sample names)",
         "you": "You",
         "yourRank": "Your position: {rank} with {pts} points."
-      },
-      "draws": {
-        "title": "Club sweepstakes",
-        "subtitle": "Trade points for tickets to the open sweepstakes.",
-        "none": "No open sweepstakes. The business creates them in Settings › Sweepstakes.",
-        "line": "Prize: {prize} · drawn on {date} · {count, plural, one {# participant} other {{n} participants}}",
-        "mine": "{n, plural, =0 {No tickets yet} one {You have # ticket} other {You have # tickets}}",
-        "buy": "Buy ticket · {pts} pts",
-        "bought": "You bought a ticket for {pts} points (you have {n}). Balance: {balance}",
-        "errors": {
-          "insufficient": "You don’t have enough points for the ticket.",
-          "frozen": "Your points are frozen pending a review.",
-          "closed": "That sweepstake no longer takes tickets."
-        },
-        "note": "Tickets are paid with real points (they show in your activity). The draw is simulated: the business runs it in Settings › Sweepstakes and your tickets compete with the sample participants."
       }
     },
     "config": {
@@ -14560,20 +14532,19 @@
         "simDay": "Day",
         "simResult": "{base} × {mult}. Worth {value} in rewards ({pct}% of the purchase).",
         "costTitle": "How much does the program cost?",
-        "costSubtitle": "Monthly estimate with the current rules.",
+        "costSubtitle": "Monthly estimate with the base rule.",
         "costSales": "Monthly sales to members ($)",
         "costExpired": "% of points that expire unused",
         "costIssued": "Points issued per month",
         "costGross": "Value of those points",
         "costNet": "Estimated monthly cost",
-        "costNote": "Formula: sales ÷ base rule × average multiplier × point value × (1 − % expired). The average multiplier comes from your multipliers and the day rule (1 day in 7) with a sample sales mix ({care}% Personal care, {dermo}% Dermocosmetics, {rx}% prescription…; {store}% in store). Welcome, mission and referral bonuses add on top.",
+        "costNote": "Formula: sales ÷ base rule × point value × (1 − % expired). Multipliers and bonuses increase it depending on how much they are used.",
         "dayRuleHint": "In the demo it starts on today’s weekday so you can try it at checkout without changing the purchase date.",
         "simToday": "{day} (today)",
         "birthday": "Birthday gift",
         "birthdayHint": "Voucher in pesos that members claim in the app during their birthday month.",
         "birthdayNone": "No gift",
-        "birthdayOption": "{amount} voucher",
-        "costMult": "Average multiplier"
+        "birthdayOption": "{amount} voucher"
       },
       "tiers": {
         "title": "Tiers",
@@ -14641,15 +14612,15 @@
         "note": "It is a simulator to compare models: Checkout in this demo awards points."
       },
       "sweepstakes": {
-        "legal": "In Colombia, promotional sweepstakes need Coljuegos authorization before they are announced. In the demo the draw is simulated: the winner comes from the tickets bought by demo members and a list of fictitious participants.",
+        "legal": "In Colombia, promotional sweepstakes need authorization from Coljuegos before being announced. In the demo the draw is simulated and the winner comes from a list of fictitious names.",
         "title": "Sweepstakes",
-        "subtitle": "Members trade points for tickets in the app (Member app › Club sweepstakes).",
-        "line": "Prize: {prize} · {date} · {cost} points per ticket · {count, plural, one {# participant} other {{n} participants}}",
+        "subtitle": "Members exchange points for tickets.",
+        "line": "Prize: {prize} · {date} · {cost} points per ticket · {n} participants",
         "winner": "Winner: {name}",
         "done": "Drawn",
-        "run": "Draw now (simulated)",
+        "run": "Draw (simulated)",
         "drawn": "Simulated winner: {name}",
-        "note": "Sample participants are fictitious; “demo” tickets are the ones you buy in the app.",
+        "note": "Participants and tickets are sample data.",
         "newTitle": "New sweepstakes",
         "name": "Name",
         "namePh": "Year-end sweepstakes",
@@ -14669,10 +14640,7 @@
             "prize": "Dermocosmetic kit"
           }
         },
-        "noTickets": "No tickets yet: members buy them in Member app › Club sweepstakes.",
-        "lineDone": "Prize: {prize} · drawn on {date} · {cost} points per ticket · {count, plural, one {# participant} other {{n} participants}}",
-        "demoTickets": "{n, plural, one {# demo ticket} other {# demo tickets}} ({members, plural, one {# member} other {# members}})",
-        "drawnMember": "A demo member won: {name} (simulated)"
+        "noTickets": "No tickets yet: nobody enters new sweepstakes in the demo."
       },
       "campaigns": {
         "title": "Campaigns",
@@ -14756,10 +14724,7 @@
             "message": "Hi '{name}'. We have not seen you at {club} in a while: your next delivery order is free. Your balance: '{points}' points."
           }
         },
-        "nameHint": "Required to schedule it.",
-        "next": "Next send: {date}",
-        "skipped": "skips {date} (holiday)",
-        "recurringNote": "Recurring campaigns skip Sundays and Colombian holidays (Law 2300)."
+        "nameHint": "Required to schedule it."
       },
       "allies": {
         "title": "Partners (coalition)",
@@ -14821,7 +14786,7 @@
         },
         "samples": {
           "f1": {
-            "detail": "3 purchases in 9 minutes with the same phone at stores in two cities (Bogotá and Medellín). The purchases are in Jhon’s activity.",
+            "detail": "5 purchases in 10 minutes with the same phone at 2 stores in different cities.",
             "events": {
               "0": "{date} 10:02 · Chapinero · $96,000 · +96 pts",
               "1": "{date} 10:05 · Chapinero · $88,000 · +88 pts",
@@ -14868,13 +14833,7 @@
         "dismiss": "Dismiss alert",
         "dismissedToast": "Alert dismissed",
         "freeze": "Freeze points",
-        "frozenToast": "Points frozen: no redemptions until reviewed",
-        "release": "Release points",
-        "releasedToast": "Points released: the alert is dismissed",
-        "current": {
-          "frozen": "Status: points frozen (cannot redeem).",
-          "dismissed": "Status: alert dismissed."
-        }
+        "frozenToast": "Points frozen: no redemptions until reviewed"
       },
       "experiments": {
         "title": "A/B tests",
@@ -14934,7 +14893,7 @@
         "expiredSub": "Issued points that expire unused",
         "liability": "Points liability",
         "liabilitySub": "{pts} outstanding points × {value}",
-        "cost": "Estimated program cost: {cost} per month with member sales of {sales} and an average multiplier of ×{mult} (using the rules in Settings › Points)."
+        "cost": "Estimated program cost: {cost} per month with member sales of {sales} (base rule; adjust it in Settings › Points)."
       },
       "tiers": {
         "title": "Members by tier",
@@ -14948,7 +14907,7 @@
         "redemptions": "Redemptions",
         "points": "Points",
         "cost": "Cost",
-        "yours": "{n, plural, one {+# yours} other {+# yours}}"
+        "yours": "+{n} yours"
       },
       "segments": {
         "title": "Suggested segments",
@@ -14988,7 +14947,7 @@
     },
     "notice": {
       "newMonth": "The month changed since your last visit: the demo went back to the sample data with today's date (missions, streaks and expirations depend on the month).",
-      "updated": "We updated the demo: it went back to the sample data with today’s date."
+      "updated": "We updated the demo: it now works with today's date and went back to the sample data."
     },
     "guide": {
       "title": "Getting started",
@@ -15017,7 +14976,7 @@
         },
         "s4": {
           "title": "Adjust a rule",
-          "text": "In Settings › Points raise the day rule to ×3 and see in the simulator how many points it gives and how much the program cost goes up.",
+          "text": "In Settings › Points raise the day rule to ×3 and see in the simulator how many points it gives and what the program costs.",
           "go": "Go to the rules"
         },
         "s5": {

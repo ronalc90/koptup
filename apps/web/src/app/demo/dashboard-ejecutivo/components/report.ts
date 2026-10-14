@@ -57,7 +57,7 @@ export function useReportPdf() {
     });
 
     sections.push({
-      title: t('report.byCity', { dim: labels.cityDim.toLowerCase() }),
+      title: t('report.byCity', { dim: labels.cityDimPlural.toLowerCase() }),
       table: {
         headers: [labels.cityDim, t('report.sales'), t('report.goal'), t('report.compliance'), t('report.share')],
         rows: ctx.cities.map((c) => [c.key, fmt.moneyM(c.sales), c.budget !== null ? fmt.moneyM(c.budget) : '—', c.compliance !== null ? fmt.compliance(c.compliance) : '—', fmt.pct(c.share, 0)]),
@@ -89,7 +89,7 @@ export function useReportPdf() {
           fmt.moneyM(c.sales),
           c.yoy !== null ? fmt.signedPct(c.yoy) : '—',
           c.margin !== null ? fmt.pct(c.margin) : '—',
-          dataset.hasReceivables && c.overdue ? fmt.moneyM(c.overdue) : '—',
+          dataset.hasReceivables ? fmt.moneyM(c.overdue) : '—',
         ]),
         widths: [40, 16, 14, 12, 16],
         align: ['l', 'r', 'r', 'r', 'r'],
@@ -154,7 +154,7 @@ export function useReportPdf() {
       sections,
       footer: t('report.footer'),
       pageLabel: (n, total) => t('report.page', { n, total }),
-      fileName: `${t('files.report')}-${slugify(sample ? company.name : dataset.fileName ?? 'archivo')}-${period.key.replace(':', '-')}.pdf`,
+      fileName: `informe-ejecutivo-${slugify(sample ? company.name : dataset.fileName ?? 'archivo')}-${period.key.replace(':', '-')}.pdf`,
     };
   }, [ctx, period, company, dataset, alerts, findings, t, fmt, labels, alertTitle, alertText, findingText, range]);
 

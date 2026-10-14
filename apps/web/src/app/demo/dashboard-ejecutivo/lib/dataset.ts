@@ -129,7 +129,7 @@ export function buildSample(sector: SectorId, anchor: MonthKey): Dataset {
     }
   });
 
-  draft.sort((a, b) => (a.date === b.date ? a.customer.localeCompare(b.customer, 'es') : a.date < b.date ? -1 : 1));
+  draft.sort((a, b) => (a.date === b.date ? a.customer.localeCompare(b.customer) : a.date < b.date ? -1 : 1));
   const rows: SaleRow[] = draft.map((d, i) => ({ id: `${p.invoicePrefix}-${p.invoiceStart + i}`, ...d }));
 
   const salesByMonth = new Map<MonthKey, number>();

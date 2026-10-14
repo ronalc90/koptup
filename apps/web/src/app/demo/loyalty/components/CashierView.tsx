@@ -108,8 +108,6 @@ export default function CashierView({ onOpenMember }: { onOpenMember: () => void
     }
     setLastSale({ sale: res.sale, alerts: res.alerts.length });
     setRedeemSel('');
-    // Como en una caja real, la compra registrada sale del formulario (evita registrarla dos veces).
-    setLines([{ category: lines[0]?.category ?? 'personalCare', amount: 0 }]);
     notify(t('cashier.sale.toast', { id: res.sale.id, points: f.num(res.sale.points) }));
   };
 
@@ -495,21 +493,6 @@ function SaleResult({ sale, alerts, onOpenMember }: { sale: Sale; alerts: number
       <p className="text-xs text-emerald-800/80 dark:text-emerald-200/80 mt-0.5">
         {f.date(sale.date)} {sale.time} · {sedeName} · {t(`channels.${sale.channel}`)} · {t('cashier.result.paid', { amount: f.money(sale.paid) })}
       </p>
-      {sale.calc && sale.calc.length > 0 && (
-        <ul className="mt-2 space-y-0.5 text-xs text-emerald-900 dark:text-emerald-100" aria-label={t('cashier.sale.calc')}>
-          {sale.calc.map((l, i) => (
-            <li key={i} className="flex flex-wrap gap-x-2">
-              <span>
-                {t(`categories.${l.category}`)} · {f.money(l.net)}:
-              </span>
-              <span className="font-mono">
-                {l.mult === 0 ? t('cashier.sale.noPoints') : t('cashier.sale.lineCalc', { base: f.num(l.base), mult: f.dec(l.mult), points: f.num(l.points) })}
-                {l.dayApplied && ` (${t('cashier.sale.dayRuleApplied', { day: f.weekday(weekdayOf(sale.date)), days: f.weekdayPlural(weekdayOf(sale.date)) })})`}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
       {upgraded && (
         <p className="mt-2 text-sm font-medium text-amber-700 dark:text-amber-300">
           {t('cashier.result.upgraded', { name: first, tier: t(`tiers.${sale.tierAfter}`) })}

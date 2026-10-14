@@ -6,20 +6,14 @@
  */
 import {
   ANALYTICS,
-  CATEGORIES,
-  CHANNELS,
   CHANNEL_OPT_IN,
-  DRAW_PARTICIPANTS,
   INACTIVITY_HISTOGRAM,
   POINTS_HISTOGRAM,
   POINTS_HISTOGRAM_STEP,
-  SALES_MIX,
   TIERS,
-  type Campaign,
   type CampaignChannel,
   type CategoryKey,
   type ChannelKey,
-  type Draw,
   type LedgerTx,
   type Member,
   type Mission,
@@ -27,7 +21,7 @@ import {
   type Segment,
   type TierKey,
 } from './data';
-import { addDays, holidayOf, monthDay, monthKeyAgo, monthKeyOf, nextDays, partsOf, weekdayOf, type HolidayKey } from './dates';
+import { addDays, holidayOf, monthDay, monthKeyAgo, monthKeyOf, partsOf, weekdayOf, type HolidayKey } from './dates';
 
 export { weekdayOf };
 
@@ -140,30 +134,11 @@ export function returnPct(rules: Rules) {
   return (rules.pointValue / rules.baseAmount) * 100;
 }
 
-/**
- * Multiplicador promedio de las compras con las reglas actuales y la mezcla de
- * ventas de ejemplo: categoría × canal, y la regla del día pesa 1 de cada 7
- * días en su categoría.
- */
-export function averageMultiplier(rules: Rules) {
-  const byCategory = CATEGORIES.reduce((sum, c) => {
-    const cat = rules.categoryMult[c] ?? 1;
-    const day = rules.dayRule.enabled && rules.dayRule.category === c && cat > 0 ? 1 + (rules.dayRule.mult - 1) / 7 : 1;
-    return sum + SALES_MIX.category[c] * cat * day;
-  }, 0);
-  const byChannel = CHANNELS.reduce((sum, ch) => sum + SALES_MIX.channel[ch] * (rules.channelMult[ch] ?? 1), 0);
-  return byCategory * byChannel;
-}
-
-/**
- * Costo mensual estimado del programa: ventas ÷ regla base × multiplicador
- * promedio × valor del punto × (1 − % que vence sin usarse).
- */
+/** Costo mensual estimado del programa con la regla base. */
 export function programCost(monthlySales: number, rules: Rules, expiredPct: number) {
-  const mult = averageMultiplier(rules);
-  const issued = (monthlySales / rules.baseAmount) * mult;
+  const issued = monthlySales / rules.baseAmount;
   const gross = issued * rules.pointValue;
-  return { mult, issued, gross, net: gross * (1 - expiredPct / 100) };
+  return { issued, gross, net: gross * (1 - expiredPct / 100) };
 }
 
 /* --------------------------------- Niveles --------------------------------- */
@@ -294,10 +269,10 @@ export function referralPoints(ledger: LedgerTx[], memberId: string) {
     .reduce((s, tx) => s + tx.points, 0);
 }
 
-/** Puntos que vencen al final de este mes: los ganados hace un año que quedan después de los canjes y boletas de la demo (primero se usan los más viejos). */
+/** Puntos que vencen al final de este mes: los ganados hace un año que quedan después de los canjes de la demo (primero se usan los más viejos). */
 export function expiringPoints(member: Member, ledger: LedgerTx[]) {
   const sessionRedeemed = memberLedger(ledger, member.id)
-    .filter((tx) => tx.session && (tx.kind === 'redeem' || tx.kind === 'ticket'))
+    .filter((tx) => tx.session && tx.kind === 'redeem')
     .reduce((s, tx) => s - tx.points, 0);
   return Math.max(0, member.expiringBase - sessionRedeemed);
 }
@@ -362,51 +337,6 @@ export function ley2300Check(date: string, time: string): Ley2300Result {
 /** Primer día desde mañana en que se puede enviar a las 10:00 a. m. (no domingo ni festivo). */
 export function firstSendDate(dates: string[]) {
   return dates.find((d) => ley2300Check(d, '10:00').ok) ?? dates[0];
-}
-
-/**
- * Próximo envío de una campaña que se repite (desde mañana): el siguiente día
- * de su calendario en que la Ley 2300 lo permite. Si el día que le tocaba es
- * festivo, ese envío se salta y se devuelve también el festivo saltado.
- */
-export function nextRecurringSend(c: Pick<Campaign, 'day' | 'daily' | 'time'>, today: string): { date: string; skipped?: string } | null {
-  let skipped: string | undefined;
-  for (const d of nextDays(today, 60)) {
-    const wd = weekdayOf(d);
-    const due = c.daily ? wd !== 0 : wd === (c.day ?? 1);
-    if (!due) continue;
-    if (ley2300Check(d, c.time).ok) return { date: d, skipped };
-    if (!skipped && holidayOf(d)) skipped = d;
-  }
-  return null;
-}
-
-/* --------------------------------- Sorteos --------------------------------- */
-
-/** Boletas de la demo en un sorteo y cuántos miembros de la demo participan. */
-export function drawTickets(d: Draw) {
-  const entries = Object.entries(d.tickets ?? {}).filter(([, n]) => n > 0);
-  return { total: entries.reduce((s, [, n]) => s + n, 0), members: entries.length };
-}
-
-/**
- * Elige el ganador de un sorteo: cada participante de ejemplo tiene una boleta
- * y cada miembro de la demo, las que compró. `rand` va de 0 a 1.
- * Devuelve el id del miembro de la demo que ganó o el nombre ficticio.
- */
-export function pickDrawWinner(d: Draw, rand: number): { memberId: string } | { sample: string } | null {
-  const own = Object.entries(d.tickets ?? {}).filter(([, n]) => n > 0);
-  const ownTotal = own.reduce((s, [, n]) => s + n, 0);
-  const total = d.participants + ownTotal;
-  if (total <= 0) return null;
-  let r = Math.min(Math.floor(rand * total), total - 1);
-  if (r < d.participants) return { sample: DRAW_PARTICIPANTS[r % DRAW_PARTICIPANTS.length] };
-  r -= d.participants;
-  for (const [memberId, n] of own) {
-    if (r < n) return { memberId };
-    r -= n;
-  }
-  return { memberId: own[own.length - 1][0] };
 }
 
 /* --------------------------------- Segmentos --------------------------------- */

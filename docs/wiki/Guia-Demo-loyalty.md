@@ -26,7 +26,7 @@ El guion sigue los **Primeros pasos** de la propia demo. Empieza con los datos l
 
 ![Recorrido de la demo](images/doc/demos/loyalty/recorrido.gif)
 
-*Recorrido completo: dos compras de Laura en caja, subida a Oro, misiones y canje en la app, regla del día ×3 (y cuánto sube el costo del programa), resultados con CSV y una campaña desde un segmento.*
+*Recorrido completo: dos compras de Laura en caja, subida a Oro, misiones y canje en la app, regla del día ×3, resultados con CSV y una campaña desde un segmento.*
 
 ```mermaid
 flowchart LR
@@ -56,7 +56,7 @@ Pulsa **Ir a la caja** en el paso 1. Laura Martínez Ríos ya está en caja y la
 1. **Cliente en caja**: nombre, celular, cédula, nivel, saldo y su valor en premios ($10 por punto), y si autorizó mensajes por WhatsApp.
 2. **Día de la compra**: por defecto, hoy («Hoy · miércoles · 14 oct 2026»); se pueden registrar compras de los últimos 7 días.
 3. **Cálculo de puntos**: `185 × 2 = 370 pts (regla de los miércoles)`, el total a pagar, los puntos que gana y el saldo después de la compra (4.720). La regla del día de ejemplo arranca en el día de la semana de hoy para que se pueda probar sin cambiar la fecha.
-4. **Registrar compra de Laura**: aparece «Venta V-0001 registrada · +370 puntos» con la fecha y la hora de Colombia. Como en una caja real, la compra sale del formulario (el monto queda vacío y el botón se apaga), así no se registra dos veces por error.
+4. **Registrar compra de Laura**: aparece «Venta V-0001 registrada · +370 puntos» con la fecha y la hora de Colombia.
 
 Para buscar a otro cliente usa **Buscar cliente** (celular o cédula, al menos 3 dígitos; prueba `300 555 0142`). Si el número no existe, ofrece **Inscribir cliente nuevo**.
 
@@ -70,7 +70,7 @@ Pulsa **Dejar lista la compra** en el paso 2: la línea cambia a Dermocosmética
 
 *Resultado de la venta V-0002: 630 puntos, subida a Oro y la vista previa del mensaje al cliente.*
 
-1. **Cálculo**: Dermocosmética tiene multiplicador ×1,5, así que `420 × 1,5 = 630 pts`. El resultado de la venta guarda el cálculo de cada línea, porque el formulario de arriba ya quedó limpio.
+1. **Cálculo**: Dermocosmética tiene multiplicador ×1,5, así que `420 × 1,5 = 630 pts`.
 2. **Venta registrada** con fecha, hora, sede, canal y lo que pagó.
 3. **¡Laura subió a nivel Oro!**: sus puntos de compras de los últimos 12 meses pasan de 3.480 a 4.110 y el umbral de Oro es 4.000.
 4. **Mensaje al cliente (vista previa)**: el WhatsApp que recibiría («Hola, Laura. Ganaste 630 puntos…»). Es simulado: no sale ningún mensaje. Si el cliente no autorizó WhatsApp, la demo lo dice y no muestra mensaje.
@@ -100,8 +100,7 @@ Baja a **Misiones del mes**: «Compra 2 veces este mes» (se completa con las do
 1. **Filtros**: Todas (10), Bonos, Productos, Servicios y Donaciones.
 2. **Domicilio gratis** (600 puntos). Los productos muestran las unidades que quedan; si no te alcanza, el botón dice «Te faltan N pts».
 3. **Mis cupones**: los cupones de canjes y regalos, con su estado (Vigente, Usado o Donado).
-4. **Sorteos del club**: los sorteos abiertos con **Comprar boleta · 200 pts** (ver [Sorteos](#app-del-miembro)).
-5. **Invita amigos y gana puntos**: amigos inscritos, puntos ganados, enlace de ejemplo con **Copiar** y botones **WhatsApp** y **Correo**, que sí abren tu aplicación con el mensaje listo.
+4. **Invita amigos y gana puntos**: amigos inscritos, puntos ganados, enlace de ejemplo con **Copiar** y botones **WhatsApp** y **Correo**, que sí abren tu aplicación con el mensaje listo.
 
 Pulsa **Canjear** en Domicilio gratis y confirma con **Sí, canjear**:
 
@@ -120,14 +119,13 @@ Pulsa **Ir a las reglas** en el paso 4 (abre **Configuración › Puntos** con e
 
 ![Paso 4: reglas de acumulación](images/doc/demos/loyalty/06-paso4-reglas.jpg)
 
-*Reglas de acumulación con la regla del día en ×3 y su efecto en el simulador y en el costo del programa.*
+*Reglas de acumulación con la regla del día en ×3 y su efecto en el simulador.*
 
 1. **Regla del día**: categoría, día y multiplicador, con un interruptor para apagarla. Queda activa al instante: «Activa: puntos ×3 en Cuidado personal los miércoles».
 2. **Simulador de puntos**: la misma compra de $185.000 da ahora **555 puntos** (185 × 3), equivalentes a $5.550 en premios (3 % de la compra). El día del simulador se elige entre los últimos 7 días («miércoles (hoy)»).
-3. **Multiplicador promedio**: sale de los multiplicadores por categoría y canal y de la regla del día (que pesa 1 de cada 7 días en su categoría) con una mezcla de ventas de ejemplo (30 % Cuidado personal, 15 % Dermocosmética, 15 % con fórmula…; 70 % en tienda). Con las reglas de ejemplo es ×1,04; con la regla del día en ×3 sube a ×1,09.
-4. **Costo estimado al mes**: con ventas a miembros de $1.600.000.000 y 18 % de puntos vencidos pasa de $13.650.657 a **$14.255.114**. La fórmula está escrita debajo; los bonos de bienvenida, misiones y referidos se suman aparte.
-5. **Regalo de cumpleaños**: sin regalo, $10.000, $15.000 o $20.000; con «Sin regalo» la app deja de mostrar el banner.
-6. **Restablecer reglas**: vuelve a las reglas de ejemplo.
+3. **¿Cuánto cuesta el programa?**: con ventas a miembros de $1.600.000.000 al mes y 18 % de puntos vencidos, el costo estimado es $13.120.000 al mes. La fórmula está escrita debajo.
+4. **Regalo de cumpleaños**: sin regalo, $10.000, $15.000 o $20.000; con «Sin regalo» la app deja de mostrar el banner.
+5. **Restablecer reglas**: vuelve a las reglas de ejemplo.
 
 Qué decir: «Antes de lanzar una promoción ves cuánto da y cuánto te cuesta».
 
@@ -140,7 +138,7 @@ Pulsa **Ir a Resultados** en el paso 5.
 *Resultados: arriba lo que hiciste en la demo; abajo, los indicadores de la base de ejemplo.*
 
 1. **Lo que hiciste en esta demo**: 2 compras ($605.000), 1.350 puntos sumados, 600 descontados, miembros inscritos y alertas antifraude.
-2. **Pasivo por puntos**: $96 M, es decir 9.600.750 puntos vigentes × $10. Incluye los puntos que sumaste. Debajo, el costo estimado del programa usa las mismas reglas: «$14,3 M al mes… multiplicador promedio de ×1,09».
+2. **Pasivo por puntos**: $96 M, es decir 9.600.750 puntos vigentes × $10. Incluye los puntos que sumaste.
 3. **Exportar movimientos (CSV)**: descarga `club-ceiba-verde-movimientos-AAAA-MM-DD.csv` (con la fecha de hoy) con fecha, hora, miembro, cédula, tipo, detalle, puntos, saldo y origen (Ejemplo o Demo).
 
 Más abajo, en **Segmentos sugeridos**, pulsa **Crear campaña** en «En riesgo de irse». La demo abre **Configuración › Campañas** con el formulario listo:
@@ -205,15 +203,6 @@ Ver el [paso 3](#paso-3-app-del-miembro-misiones-y-canje). Además del saldo, el
 - **Racha**: meses seguidos comprando (Laura empieza con 8 y pasa a 9 con la primera compra del mes) y la barra de los últimos 12 meses.
 - **Insignias**: Primera compra, Cliente constante, Embajador, Corazón solidario y Nivel Oro, obtenidas o pendientes.
 - **Ranking del mes**: apagado por privacidad; se activa en Configuración › Misiones y muestra un top 10 con nombre corto.
-- **Sorteos del club**: los sorteos abiertos (el del mes y los que crees en Configuración › Sorteos) con **Comprar boleta · 200 pts**. La boleta se paga con puntos de verdad: baja el saldo, queda en los movimientos («Boleta: Sorteo de octubre») y en el CSV. Si los puntos están congelados o no alcanzan, el botón lo dice.
-
-![Sorteos del club en la app](images/doc/demos/loyalty/14-app-sorteos.jpg)
-
-*Laura con 2 boletas para el sorteo de octubre.*
-
-1. El sorteo, su premio, la fecha en que se sortea y los participantes (los de ejemplo más los miembros de la demo con boletas).
-2. **Comprar boleta · 200 pts**: descuenta los puntos y suma la boleta («Tienes 2 boletas»).
-3. Lo que es real (el pago con puntos) y lo simulado (el sorteo).
 - **Tus movimientos**: el libro de puntos; «El saldo es la suma de estos movimientos». Las líneas hechas en la demo llevan la marca «demo» y **Ver los N movimientos** despliega todo (Laura tiene 19 al empezar).
 - **Donaciones**: canjear «Donación a un banco de alimentos» o «Donación de útiles escolares» muestra «¡Gracias por tu donación!» (no se transfiere dinero).
 
@@ -223,47 +212,30 @@ Diez subpestañas (se recorren con las flechas, Inicio y Fin). Los cambios se ap
 
 | Subpestaña | Qué puedes hacer |
 |---|---|
-| **Puntos** | Regla base (por defecto 1 punto por cada $1.000), valor del punto al canjear ($10), multiplicadores por categoría y por canal, regla del día, bono de bienvenida, vigencia de los puntos, regalo de cumpleaños, simulador y costo del programa (con el multiplicador promedio de tus reglas). Ver el [paso 4](#paso-4-configuración-cambia-la-regla-del-día). |
+| **Puntos** | Regla base (por defecto 1 punto por cada $1.000), valor del punto al canjear ($10), multiplicadores por categoría y por canal, regla del día, bono de bienvenida, vigencia de los puntos, regalo de cumpleaños, simulador y costo del programa. Ver el [paso 4](#paso-4-configuración-cambia-la-regla-del-día). |
 | **Niveles** | Umbrales de puntos de los últimos 12 meses para Plata, Oro y Diamante, con el número de miembros en cada nivel; **Guardar niveles** valida que suban (Plata < Oro < Diamante). Regla para bajar de nivel tras N meses sin compras, con cuántos bajarían. |
 | **Misiones** | Activar o pausar cada misión y cambiar su premio; crear una misión nueva (tipo, meta y premio) que aparece de inmediato en la app; interruptor del ranking. |
 | **Referidos** | Puntos para quien invita y para el nuevo miembro, costo por referido y cifras de ejemplo. |
 | **Devolución en saldo** | Simulador de devolución en saldo por nivel (0,5 %, 1 %, 1,5 % y 2 % de ejemplo) para comparar con los puntos; la Caja sigue acumulando puntos. |
-| **Sorteos** | Aviso de que en Colombia los sorteos promocionales necesitan autorización de Coljuegos; el sorteo de este mes (1.284 participantes de ejemplo más las boletas que compres en la app) y el del mes pasado ya realizado; formulario para crear un sorteo con fecha al cierre de este mes o de los dos siguientes. Un sorteo nuevo dice «Sin boletas todavía» hasta que un miembro compre una en la app. **Sortear ahora (simulado)** elige al ganador entre los participantes de ejemplo y las boletas de la demo (cada boleta es una oportunidad) y deja la fecha en que se sorteó. |
-| **Campañas** | Lista de campañas de ejemplo (las que se repiten dicen «Los sábados · 10:00» y su **Próximo envío**, que salta domingos y festivos) con **Pausar** y **Programar**, y el formulario de nueva campaña con fecha, revisión de la Ley 2300 con festivos y vista previa. Ver el [paso 5](#paso-5-resultados-y-una-campaña-desde-un-segmento). |
+| **Sorteos** | Aviso de que en Colombia los sorteos promocionales necesitan autorización de Coljuegos; el sorteo de este mes (con **Sortear (simulado)**, que elige un ganador de una lista de nombres ficticios) y el del mes pasado ya realizado; formulario para crear un sorteo con fecha al cierre de este mes o de los dos siguientes. Los sorteos nuevos quedan «Sin boletas todavía» (en la demo nadie participa en ellos). |
+| **Campañas** | Lista de campañas de ejemplo (las que se repiten cada semana dicen «Los sábados · 10:00») con **Pausar** y **Programar**, y el formulario de nueva campaña con fecha, revisión de la Ley 2300 con festivos y vista previa. Ver el [paso 5](#paso-5-resultados-y-una-campaña-desde-un-segmento). |
 | **Aliados** | Comercios aliados (coalición) con los puntos que dan por cada $1.000 y los emitidos en el mes; **Agregar aliado** y quitar. Calcula cuánto paga cada aliado por sus puntos. |
-| **Antifraude** | Reglas activas en la demo y alertas para revisar (ver abajo). Una alerta con puntos congelados ofrece **Liberar puntos**. |
+| **Antifraude** | Reglas activas en la demo y alertas para revisar (ver abajo). |
 | **Pruebas A/B** | Tres pruebas con resultados de ejemplo; **Finalizar y aplicar la ganadora** deja la variante ganadora en las reglas: la regla del día en ×2, el bono de bienvenida en 300 puntos o el regalo de cumpleaños en $15.000. |
 
 ![Antifraude: revisar una alerta](images/doc/demos/loyalty/10-config-antifraude.jpg)
 
-*Revisión de la alerta de ejemplo «Acumulación anómala»: las tres compras de ayer de Jhon, acción sugerida y las dos decisiones.*
+*Revisión de la alerta de ejemplo «Acumulación anómala»: movimientos de ayer, acción sugerida y las dos decisiones.*
 
-1. **Movimientos**: en las alertas de ejemplo, con fechas de los días anteriores a hoy; en las de tu demo, las ventas que activaron la regla. Las tres compras de Jhon (dos en Chapinero y una en Laureles en 9 minutos) también aparecen en sus movimientos de la app.
+1. **Movimientos**: en las alertas de ejemplo, con fechas de los días anteriores a hoy; en las de tu demo, las ventas que activaron la regla.
 2. **Acción sugerida**.
-3. **Congelar puntos** impide que el miembro canjee o compre boletas en Caja y en la app; **Descartar alerta** la cierra. Si vuelves a abrir una alerta congelada, ofrece **Liberar puntos**.
+3. **Congelar puntos** impide que el miembro canjee en Caja y en la app; **Descartar alerta** la cierra.
 
 - **Reglas activas en la demo**: 3 o más compras del mismo miembro el mismo día, y compras de $2.000.000 o más. Si registras una compra así en Caja, aparece una alerta «de tu demo» y la Caja avisa «Esta compra activó una regla antifraude».
 
 ![Niveles](images/doc/demos/loyalty/11-config-niveles.jpg)
 
 *Umbrales de nivel (0, 1.500, 4.000 y 8.000 puntos en 12 meses), Guardar niveles y la regla para bajar de nivel.*
-
-![Sorteos en Configuración](images/doc/demos/loyalty/15-config-sorteos.jpg)
-
-*Sorteos con boletas de la demo: el sorteo nuevo ya se hizo y lo ganó Laura, que era la única con boletas.*
-
-1. Aviso de Coljuegos y de qué es simulado.
-2. Sorteo realizado: «sorteado el 14 oct 2026» y el ganador.
-3. Boletas compradas en la app («2 boletas de la demo (1 miembro)»).
-4. **Sortear ahora (simulado)**.
-
-![Campañas que se repiten](images/doc/demos/loyalty/16-config-campanas.jpg)
-
-*Campañas de ejemplo con su próximo envío.*
-
-1. **Próximo envío** de cada campaña que se repite (por ejemplo, «sábado · 17 oct 2026»). Si el día que le toca es festivo, se salta y lo dice («se salta el 2 nov 2026 (festivo)»).
-2. La regla: las campañas que se repiten se saltan los domingos y los festivos de Colombia.
-3. **Pausar** o **Programar** cada campaña.
 
 ### Resultados
 
@@ -291,17 +263,17 @@ En el teléfono las cuatro pestañas caben en una fila (ícono arriba y nombre a
 |---|---|---|
 | Marca, sedes, miembros, cédulas, celulares, aliados | **Datos de ejemplo** | Droguerías Ceiba Verde (NIT 901.555.214-1, con dígito de verificación válido) y todo su club son ficticios. |
 | Fechas | **Real (fecha de Colombia)** | La demo arma los datos de ejemplo hacia atrás desde hoy (compras de los últimos 12 meses, vencimientos al final del mes, cohortes y sorteos) y registra lo que haces con la fecha y la hora de Colombia. |
-| Puntos de cada compra, saldo, niveles, misiones, referidos, canjes, cupones y boletas de sorteo | **Real (en el navegador)** | Se calculan de verdad con las reglas de Configuración; el saldo es la suma del libro de puntos y el nivel usa los puntos de compras de los últimos 12 meses. |
+| Puntos de cada compra, saldo, niveles, misiones, referidos, canjes y cupones | **Real (en el navegador)** | Se calculan de verdad con las reglas de Configuración; el saldo es la suma del libro de puntos y el nivel usa los puntos de compras de los últimos 12 meses. |
 | Reglas antifraude de la demo y congelamiento | **Real (en el navegador)** | Reglas simples (3 compras el mismo día, compras de $2.000.000 o más). Las cuatro alertas iniciales son de ejemplo. |
-| Validación del horario de campañas (Ley 2300) | **Real (en el navegador)** | Revisa día, hora y festivos de Colombia (calculados para cada año), y el próximo envío de las campañas que se repiten. |
-| Simulador de puntos, costo del programa, pasivo y devolución en saldo | **Real (cálculo)** | Fórmulas a la vista; parten de supuestos de ejemplo (ventas mensuales, % vencido y la mezcla de ventas por categoría y canal del multiplicador promedio). |
+| Validación del horario de campañas (Ley 2300) | **Real (en el navegador)** | Revisa día, hora y festivos de Colombia (calculados para cada año). |
+| Simulador de puntos, costo del programa, pasivo y devolución en saldo | **Real (cálculo)** | Fórmulas a la vista; parten de supuestos de ejemplo. |
 | Pruebas A/B | **Resultados de ejemplo; la aplicación es real** | Las cifras de cada variante son de ejemplo; al finalizar, la ganadora sí cambia la regla correspondiente. |
 | Exportación CSV | **Real** | Se genera en el navegador con todos los movimientos. |
 | Cifras de la base de 29.200 miembros, cohortes, resultados de misiones, aliados y referidos | **Datos de ejemplo** | Marcadas «ejemplo» en pantalla. |
 | Segmentos sugeridos | **Reglas, no IA** | Recencia, frecuencia y nivel; tamaños de ejemplo. |
 | WhatsApp, correo y SMS de campañas y compras | **Simulado** | Solo vista previa; no sale ningún mensaje. |
 | Pase de Apple Wallet y Google Wallet | **Simulado** | Vista previa; no se genera el archivo del pase. |
-| Sorteos | **Boletas reales; sorteo simulado** | Las boletas se pagan con puntos del libro. El ganador sale al azar entre los participantes de ejemplo (nombres ficticios) y las boletas de la demo. |
+| Sorteos | **Simulado** | El ganador sale de una lista de nombres ficticios. |
 | Botones WhatsApp y Correo de «Invita amigos» | **Real** | Abren tu aplicación con el mensaje listo (el enlace es de un dominio de ejemplo). |
 | Dónde se guardan tus cambios | **Solo en este navegador** | `localStorage`; no llegan a un servidor ni los ven otras personas. |
 
@@ -331,6 +303,5 @@ En el teléfono las cuatro pestañas caben en una fila (ícono arriba y nombre a
 2. **Los cambios viven solo en el navegador.** Si el prospecto cambia de equipo o borra los datos del sitio, vuelve a los datos de ejemplo; no hay espacio compartido con el vendedor. Si vuelve en otro mes, la demo se rearma con la fecha de ese día (lo avisa).
 3. **Hora real.** Las compras quedan con la hora actual de Colombia; si la demo se muestra de madrugada, la venta dice, por ejemplo, «02:57».
 4. **La regla del día arranca en el día de hoy.** Es un dato de ejemplo para poder probarla en caja cualquier día (por eso las capturas dicen «miércoles»); en un programa real el comercio elige el día.
-5. **Campañas de un solo envío.** Las campañas que creas se programan para una fecha de los próximos 14 días (las cuatro de ejemplo se repiten cada semana y muestran su próximo envío, saltando domingos y festivos).
-6. **Mensajes, pases y el sorteo son simulados**; los indicadores de la base de 29.200 miembros, los 1.284 participantes del sorteo del mes y la mezcla de ventas del costo son de ejemplo, salvo lo que se recalcula con tus acciones y las reglas. Se puede sortear antes de la fecha programada para verlo en la demo.
-7. **El botón «Ver Planes y Precios» del bloque azul del final** es común a todas las demos y lleva a los planes RAG, no a los de este producto; para cotizar esta solución usa **Cotizar tu programa**.
+5. **Campañas de un solo envío.** Las campañas que creas se programan para una fecha de los próximos 14 días; las cuatro de ejemplo se repiten cada semana y no se recalculan contra festivos.
+6. **Mensajes, pases y sorteos simulados**; los indicadores de la base de 29.200 miembros son fijos salvo lo que se recalcula con tus acciones y los umbrales de nivel. Los sorteos que creas no reciben participantes.

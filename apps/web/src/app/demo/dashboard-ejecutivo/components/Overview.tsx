@@ -188,7 +188,7 @@ export default function Overview() {
                       <td className="py-1.5 px-3 text-right">{p.budget !== null ? fmt.moneyM(p.budget) : '—'}</td>
                       <td className="py-1.5 px-3 text-right">{p.forecast ? `${fmt.moneyM(p.forecast.value)} (${fmt.moneyM(p.forecast.low)}–${fmt.moneyM(p.forecast.high)})` : '—'}</td>
                       <td className="py-1.5 pl-3 text-right">
-                        {p.budget ? fmt.compliance((p.actual ?? p.forecast?.value ?? 0) / p.budget) : '—'}
+                        {p.budget ? fmt.pct((p.actual ?? p.forecast?.value ?? 0) / p.budget, 0) : '—'}
                       </td>
                     </tr>
                   ))}
@@ -200,7 +200,7 @@ export default function Overview() {
           )}
         </section>
         <section className={`${card} p-5 sm:p-6 xl:col-span-2 min-w-0`} aria-labelledby="ov-city">
-          <SectionTitle title={<span id="ov-city">{t('cityTitle', { dim: labels.cityDim.toLowerCase() })}</span>} subtitle={t('citySubtitle', { gap: fmt.param(ctx.params.thresholds.goalGap) })} />
+          <SectionTitle title={<span id="ov-city">{t('cityTitle', { dim: labels.cityDimPlural.toLowerCase() })}</span>} subtitle={t('citySubtitle', { gap: fmt.param(ctx.params.thresholds.goalGap) })} />
           <GoalBars items={cityItems} fmt={fmt} gap={ctx.params.thresholds.goalGap / 100} />
         </section>
       </div>

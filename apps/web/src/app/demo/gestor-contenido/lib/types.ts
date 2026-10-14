@@ -110,8 +110,6 @@ export interface Entry {
   updatedBy: string;
   publishedAt: string | null;
   scheduledAt: string | null;
-  /** Quién programó la publicación (la publicación automática sale a su nombre). */
-  scheduledBy?: string | null;
   reviewNote: string | null;
   versions: Version[];
 }
@@ -185,7 +183,6 @@ export type ActivityKind =
   | 'published'
   | 'autoPublished'
   | 'scheduled'
-  | 'scheduleFailed'
   | 'unscheduled'
   | 'unpublished'
   | 'discarded'

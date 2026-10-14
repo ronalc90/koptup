@@ -58,7 +58,7 @@ export function useNarrative() {
             today: fmt.moneyM(v.today),
           });
         case 'customersRisk':
-          return t('alerts.items.customersRisk.text', { more: Math.max(0, v.count - 3), names: a.labels.names, lost: fmt.moneyM(v.lost), drop: fmt.param(ctx.params.thresholds.riskDrop) });
+          return t('alerts.items.customersRisk.text', { count: v.count, names: a.labels.names, lost: fmt.moneyM(v.lost), drop: fmt.param(ctx.params.thresholds.riskDrop) });
         case 'forecastGoal':
           return t('alerts.items.forecastGoal.text', { range: range(a.labels.from, a.labels.to), value: fmt.moneyM(v.value), compliance: fmt.compliance(v.compliance) });
         default:

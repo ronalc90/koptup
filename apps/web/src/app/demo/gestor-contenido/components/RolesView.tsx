@@ -56,9 +56,7 @@ export default function RolesView() {
                 <td className="px-4 py-2 text-slate-700 dark:text-slate-200">{tPerm(perm.replace('.', '_'))}</td>
                 {ROLES.map((r) => (
                   <td key={r} className="px-3 py-2 text-center">
-                    {/* Los íconos de heroicons van con aria-hidden: el texto para lectores de pantalla va aparte. */}
-                    {can(r, perm) ? <CheckIcon className="w-5 h-5 text-emerald-600 inline" aria-hidden="true" /> : <MinusIcon className="w-5 h-5 text-slate-400 dark:text-slate-500 inline" aria-hidden="true" />}
-                    <span className="sr-only">{can(r, perm) ? t('yes') : t('no')}</span>
+                    {can(r, perm) ? <CheckIcon className="w-5 h-5 text-emerald-600 inline" aria-label={t('yes')} /> : <MinusIcon className="w-5 h-5 text-slate-300 inline" aria-label={t('no')} />}
                   </td>
                 ))}
               </tr>

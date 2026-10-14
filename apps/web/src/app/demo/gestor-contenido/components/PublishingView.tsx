@@ -8,7 +8,7 @@ import { blockingIssues } from '../lib/reducer';
 import { useCms } from '../lib/store';
 import { formatDateTime, formatTime } from '../lib/time';
 import type { Entry, Status } from '../lib/types';
-import { btn, card, Empty, Note, StatusBadge, Switch, TypeBadge, useEntryTitle, usePublishNotice, useUntil } from './ui';
+import { btn, card, Empty, Note, StatusBadge, Switch, TypeBadge, useUntil } from './ui';
 
 const COLUMNS: Status[] = ['review', 'approved', 'scheduled'];
 
@@ -19,8 +19,6 @@ export default function PublishingView() {
   const tTargets = useTranslations('demoCms.publishing.targets');
   const { state, me, act, toast, openEntry, newId, contentLocale: locale } = useCms();
   const until = useUntil();
-  const publishNotice = usePublishNotice();
-  const entryTitle = useEntryTitle();
   const person = (id: string) => state.people.find((p) => p.id === id)?.name ?? id;
   const admin = can(me.role, 'webhooks.manage');
 
@@ -48,7 +46,7 @@ export default function PublishingView() {
           disabled={blocked}
           onClick={() => {
             act({ type: 'entry.publish', id: e.id });
-            toast(publishNotice(e));
+            toast(t('publishedToast'));
           }}
         >
           {t('publishNow')}
@@ -157,7 +155,7 @@ export default function PublishingView() {
                       {d.resent && <span className="block text-[10px] text-slate-500">{t('resent')}</span>}
                     </td>
                     <td className="py-1.5 pr-3 whitespace-nowrap">{tTargets(`${d.target}.name`)}</td>
-                    <td className="py-1.5 pr-3">{entryTitle(d.entryId, d.entryTitle)}</td>
+                    <td className="py-1.5 pr-3">{d.entryTitle}</td>
                     <td className="py-1.5 pr-3 font-mono">{d.paths.join(', ')}</td>
                     <td className="py-1.5 pr-3 whitespace-nowrap text-emerald-700 dark:text-emerald-300">{t('simulatedOk')}</td>
                     <td className="py-1.5 text-right">

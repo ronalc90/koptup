@@ -82,7 +82,7 @@ export function buildIndex(ds: Dataset): Index {
       term: terms.length ? Math.round(terms.reduce((s, d) => s + d, 0) / terms.length) : null,
     });
   });
-  customers.sort((a, b) => a.name.localeCompare(b.name, 'es'));
+  customers.sort((a, b) => a.name.localeCompare(b.name));
   return {
     ds,
     byMonth,
@@ -795,25 +795,6 @@ export function customerStats(idx: Index, p: Period, riskDrop: number): Customer
     });
   }
   return out.sort((a, b) => b.sales - a.sales);
-}
-
-export type CustomerSortKey = 'sales' | 'yoy' | 'margin' | 'overdue' | 'name';
-
-/**
- * Ordena la lista de clientes. Los que no tienen el dato (cliente nuevo sin año
- * anterior, sin margen) van siempre al final, en cualquier sentido: así «Mayor
- * caída frente al año anterior» empieza por la mayor caída y no por los nuevos.
- */
-export function sortCustomers(list: CustomerStat[], key: CustomerSortKey, dir: 'asc' | 'desc'): CustomerStat[] {
-  const val = (c: CustomerStat): number | string | null =>
-    key === 'name' ? c.name : key === 'yoy' ? c.yoy : key === 'margin' ? c.margin : key === 'overdue' ? c.overdue : c.sales;
-  return [...list].sort((a, b) => {
-    const va = val(a);
-    const vb = val(b);
-    if (va === null || vb === null) return va === vb ? b.sales - a.sales : va === null ? 1 : -1;
-    const cmp = typeof va === 'string' ? va.localeCompare(vb as string, 'es') : (va as number) - (vb as number);
-    return dir === 'asc' ? cmp : -cmp;
-  });
 }
 
 /** Ventas de un cliente en los últimos 12 meses con datos hasta el período. */

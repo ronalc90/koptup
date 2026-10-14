@@ -80,7 +80,6 @@
       "intro": {
         "resumen": "Indicadores de {period} frente a la meta y al mismo período del año anterior.",
         "finanzas": "Estado de resultados de {period}, cartera por edades y flujo de caja proyectado.",
-        "finanzasUpload": "Utilidad bruta de {period} con tu archivo. La cartera y el flujo de caja necesitan tu contabilidad.",
         "clientes": "Ventas, margen, cartera y segmento de cada cliente en {period}.",
         "preguntas": "Respuestas calculadas con las cifras de {period}, con la fórmula de cada una.",
         "alertas": "Desvíos detectados con reglas y vista previa del resumen semanal.",
@@ -445,7 +444,7 @@
     },
     "ask": {
       "title": "Elige o escribe tu pregunta",
-      "subtitle": "Las respuestas se calculan con las cifras de {period} y cada una muestra cómo se hizo el cálculo.",
+      "subtitle": "Elige una pregunta o escríbela. Las respuestas se calculan con las cifras de {period}.",
       "q": {
         "customersDown": "¿Qué clientes compran menos que el año pasado?",
         "margin": "¿Por qué cambió el margen bruto?",
@@ -528,7 +527,7 @@
         },
         "customersRisk": {
           "title": "{count, plural, one {# cliente en riesgo} other {# clientes en riesgo}}",
-          "text": "Sus compras cayeron {drop} % o más frente al mismo período del año anterior: {names}{more, plural, =0 {} other { y # más}}. Entre todos son {lost} menos."
+          "text": "Sus compras cayeron {drop} % o más frente al mismo período del año anterior: {names}{count, plural, one {} =2 {} =3 {} other { y otros}}. Entre todos son {lost} menos."
         },
         "forecastGoal": {
           "title": "La proyección queda bajo la meta",
@@ -574,7 +573,7 @@
       "sampleName": "Datos de ejemplo de {company} ({sector})",
       "uploadName": "Tu archivo: {file}",
       "stats": "{rows} facturas · {customers} clientes · {from} a {to} · corte {cutoff}",
-      "sampleHow": "Generados en tu navegador con una semilla fija: 24 meses que terminan en el último mes cerrado (se corren solos cada mes) y todas las vistas salen de las mismas facturas. Empresa, clientes, vendedores y NIT son ficticios.",
+      "sampleHow": "Generados en tu navegador con una semilla fija: siempre son los mismos y todas las vistas salen de las mismas facturas. Empresa, clientes, vendedores y NIT son ficticios.",
       "uploadHow": "Solo se recalculan las vistas que dependen de las ventas (Resumen, Clientes, preguntas y alertas de ventas). La cartera y el flujo de caja necesitan tu contabilidad.",
       "downloadSample": "Descargar CSV de ejemplo",
       "downloadUpload": "Descargar datos normalizados",
@@ -759,7 +758,7 @@
       "methodGoal": "Meta = ventas de los mismos meses del año anterior + {goal} %.",
       "methodForecast": "Proyección {range}: método estadístico (mismo mes del año anterior × crecimiento reciente o tendencia lineal), banda del 80 % con desviación de {sigma}. No usa IA.",
       "noForecast": "No hay meses suficientes para proyectar.",
-      "methodSample": "Datos de ejemplo generados con una semilla fija hasta el último mes cerrado; todas las vistas salen de las mismas facturas.",
+      "methodSample": "Datos de ejemplo generados con una semilla fija; todas las vistas salen de las mismas facturas.",
       "methodUpload": "Calculado con las filas del archivo que cargaste.",
       "sales": "Ventas",
       "goal": "Meta",
@@ -776,13 +775,6 @@
       "page": "Página {n} de {total}",
       "done": "Informe descargado: {file}",
       "error": "No se pudo generar el PDF. Intenta de nuevo."
-    },
-    "files": {
-      "report": "informe-ejecutivo",
-      "receivables": "cartera",
-      "customers": "clientes",
-      "invoices": "facturas",
-      "sales": "ventas"
     },
     "intro": {
       "back": "Volver al catálogo de demos",

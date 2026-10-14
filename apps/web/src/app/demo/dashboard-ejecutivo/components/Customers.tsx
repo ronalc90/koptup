@@ -3,14 +3,14 @@
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { ArrowDownTrayIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
-import { customerMonths, openInvoices, periodEnd, rowsIn, sortCustomers, type CustomerSortKey, type Segment } from '../lib/engine';
-import { csvDecimal, toCsv } from '../lib/csv';
+import { customerMonths, openInvoices, periodEnd, rowsIn, type CustomerStat, type Segment } from '../lib/engine';
+import { toCsv } from '../lib/csv';
 import { slugify } from '../lib/format';
 import { useDashboard } from '../lib/store';
 import { MiniBars } from './charts';
 import { btn, card, downloadText, inputCls, Modal, Note, NS, selectCls, SectionTitle, useFmt, useLabels } from './ui';
 
-type SortKey = CustomerSortKey;
+type SortKey = 'sales' | 'yoy' | 'margin' | 'overdue' | 'name';
 
 const SEGMENT_STYLE: Record<Segment, string> = {
   nuevo: 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300',
@@ -25,7 +25,6 @@ export function SegmentBadge({ segment }: { segment: Segment }) {
 
 export default function Customers() {
   const t = useTranslations(`${NS}.customers`);
-  const tf = useTranslations(`${NS}.files`);
   const fmt = useFmt();
   const labels = useLabels();
   const { ctx, period, dataset, openCustomer, notify, company, segment, setSegment } = useDashboard();
@@ -42,7 +41,14 @@ export default function Customers() {
         (city === 'all' || c.city === city) &&
         (!needle || c.name.toLowerCase().includes(needle) || c.seller.toLowerCase().includes(needle) || c.city.toLowerCase().includes(needle)),
     );
-    return sortCustomers(out, sort, dir);
+    const val = (c: CustomerStat): number | string => (sort === 'name' ? c.name : sort === 'yoy' ? c.yoy ?? -Infinity : sort === 'margin' ? c.margin ?? -Infinity : sort === 'overdue' ? c.overdue : c.sales);
+    out.sort((a, b) => {
+      const va = val(a);
+      const vb = val(b);
+      const cmp = typeof va === 'string' ? va.localeCompare(vb as string) : (va as number) - (vb as number);
+      return dir === 'asc' ? cmp : -cmp;
+    });
+    return out;
   }, [ctx.customers, q, segment, city, sort, dir]);
 
   const counts = useMemo(() => {
@@ -68,15 +74,15 @@ export default function Customers() {
         c.seller,
         Math.round(c.sales),
         c.prevSales !== null ? Math.round(c.prevSales) : null,
-        csvDecimal(c.yoy !== null ? c.yoy * 100 : null, fmt.loc),
-        csvDecimal(c.margin !== null ? c.margin * 100 : null, fmt.loc),
+        c.yoy !== null ? (c.yoy * 100).toFixed(1) : null,
+        c.margin !== null ? (c.margin * 100).toFixed(1) : null,
         c.invoices,
         dataset.hasReceivables ? Math.round(c.overdue) : null,
         t(`segments.${c.segment}`),
       ]),
       fmt.loc,
     );
-    const file = `${tf('customers')}-${slugify(dataset.source === 'sample' ? company.name : dataset.fileName ?? 'archivo')}-${period.key.replace(':', '-')}.csv`;
+    const file = `clientes-${slugify(dataset.source === 'sample' ? company.name : dataset.fileName ?? 'archivo')}-${period.key.replace(':', '-')}.csv`;
     downloadText(csv, file, 'text/csv;charset=utf-8');
     notify(t('exported', { file, count: list.length }));
   };
@@ -253,7 +259,6 @@ export default function Customers() {
 export function CustomerModal() {
   const t = useTranslations(`${NS}.customers.detail`);
   const tc = useTranslations(`${NS}.customers`);
-  const tf = useTranslations(`${NS}.files`);
   const fmt = useFmt();
   const labels = useLabels();
   const { customer, openCustomer, ctx, period, dataset, openInvoice, notify } = useDashboard();
@@ -271,7 +276,7 @@ export function CustomerModal() {
       invoices.map((r) => [r.id, r.date, r.city, labels.line(r.line), Math.round(r.value), r.cost !== null ? Math.round(r.cost) : null, r.due, r.paid]),
       fmt.loc,
     );
-    const file = `${tf('invoices')}-${slugify(customer)}-${period.key.replace(':', '-')}.csv`;
+    const file = `facturas-${slugify(customer)}-${period.key.replace(':', '-')}.csv`;
     downloadText(csv, file, 'text/csv;charset=utf-8');
     notify(tc('exported', { file, count: invoices.length }));
   };

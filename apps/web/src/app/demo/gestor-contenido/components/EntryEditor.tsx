@@ -23,7 +23,7 @@ import BlocksEditor from './BlocksEditor';
 import { AiPanel, EntryApiPanel, HistoryPanel, SeoPanel } from './EditorPanels';
 import { FieldInput, useFieldLabel } from './Fields';
 import SitePreview from './SitePreview';
-import { btn, card, inputCls, labelCls, Modal, Note, StatusBadge, TypeBadge, usePublishNotice } from './ui';
+import { btn, card, inputCls, labelCls, Modal, Note, StatusBadge, TypeBadge } from './ui';
 
 type Tab = 'preview' | 'seo' | 'api' | 'history' | 'ai';
 
@@ -90,7 +90,6 @@ export default function EntryEditor({ id }: { id: string }) {
   const tIssues = useTranslations('demoCms.editor.issues');
   const { state, me, act, go, toast, contentLocale: locale, setContentLocale } = useCms();
   const fieldLabel = useFieldLabel();
-  const publishNotice = usePublishNotice();
   const [tab, setTab] = useState<Tab>('preview');
   const [previewMode, setPreviewMode] = useState<'draft' | 'live'>('draft');
   const tabRefs = useRef<Partial<Record<Tab, HTMLButtonElement | null>>>({});
@@ -211,7 +210,7 @@ export default function EntryEditor({ id }: { id: string }) {
     if (s === 'approved' || s === 'scheduled') {
       if (can(me.role, 'entry.publish')) {
         out.push(
-          <button key="publish" type="button" className={btn.primary} disabled={blocked} onClick={() => doAct('entry.publish', publishNotice(entry))}>
+          <button key="publish" type="button" className={btn.primary} disabled={blocked} onClick={() => doAct('entry.publish', t('published'))}>
             <CloudArrowUpIcon className="w-4 h-4" />
             {t('publishNow')}
           </button>,
@@ -302,7 +301,7 @@ export default function EntryEditor({ id }: { id: string }) {
         {waitingNote && <Note>{waitingNote}</Note>}
         {entry.reviewNote && entry.status === 'draft' && <Note tone="warn">{t('reviewNote', { note: entry.reviewNote })}</Note>}
         {changes && entry.status !== 'published' && <Note>{t('changesNote')}</Note>}
-        {issues.length > 0 && entry.status !== 'published' && (
+        {issues.length > 0 && (entry.status === 'draft' || entry.status === 'review' || entry.status === 'approved') && (
           <div className="rounded-lg border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/40 px-3 py-2 text-xs text-amber-900 dark:text-amber-100">
             <p className="font-semibold flex items-center gap-1">
               <ExclamationTriangleIcon className="w-4 h-4" />
@@ -313,7 +312,6 @@ export default function EntryEditor({ id }: { id: string }) {
                 <li key={c}>{issueText(c)}</li>
               ))}
             </ul>
-            {entry.status === 'scheduled' && <p className="mt-1">{t('scheduledBlocked')}</p>}
           </div>
         )}
         {locale === 'en' && pending.length > 0 && <Note>{t('translationPending', { n: pending.length })}</Note>}

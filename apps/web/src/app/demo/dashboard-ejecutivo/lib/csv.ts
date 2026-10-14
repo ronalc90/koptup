@@ -236,16 +236,6 @@ function cell(v: string | number | null, sep: string): string {
   return s.includes(sep) || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
-/**
- * Número con decimales para el CSV: coma decimal en español (el Excel en español
- * usa `;` como separador y `,` como decimal) y punto en inglés.
- */
-export function csvDecimal(n: number | null, loc: 'es' | 'en', digits = 1): string | null {
-  if (n === null || !Number.isFinite(n)) return null;
-  const s = n.toFixed(digits);
-  return loc === 'es' ? s.replace('.', ',') : s;
-}
-
 /** CSV con BOM (Excel lo abre con tildes) y `;` en español / `,` en inglés. */
 export function toCsv(headers: string[], rows: (string | number | null)[][], loc: 'es' | 'en'): string {
   const sep = loc === 'es' ? ';' : ',';

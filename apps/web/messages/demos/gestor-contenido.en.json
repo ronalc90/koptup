@@ -214,7 +214,6 @@
       "published": "published “{title}”",
       "autoPublished": "published “{title}” (scheduled publication)",
       "scheduled": "scheduled “{title}”",
-      "scheduleFailed": "scheduled “{title}”, but it was not published at the set time: required fields are missing (it went back to Approved)",
       "unscheduled": "cancelled the schedule of “{title}”",
       "unpublished": "unpublished “{title}”",
       "discarded": "discarded the unpublished changes of “{title}”",
@@ -289,7 +288,7 @@
       "deleteNotAllowed": "Your role cannot delete this entry",
       "deleteTitle": "Delete the entry?",
       "deleteBody": "“{title}” and its versions will be deleted. References from other entries are removed.",
-      "deleteLive": "The entry is published: the channels with an active webhook will be notified to remove it (simulated).",
+      "deleteLive": "The entry is published: the site will be notified to remove it (simulated webhook).",
       "deleteConfirm": "Delete",
       "deleted": "Entry deleted."
     },
@@ -311,8 +310,7 @@
       "approved": "Entry approved: it can now be published or scheduled.",
       "requestChanges": "Request changes",
       "publishNow": "Publish now",
-      "publishedTo": "Published. Notified: {targets} (simulated webhooks).",
-      "publishedNoHooks": "Published. No channel was notified: the webhooks that apply are turned off.",
+      "published": "Published: the site, the app and the assistant were notified (simulated webhooks).",
       "scheduleBtn": "Schedule…",
       "unschedule": "Cancel schedule",
       "unscheduled": "Schedule cancelled: the entry is still approved.",
@@ -326,7 +324,6 @@
       "reviewNote": "The editor requested changes: “{note}”",
       "changesNote": "There are unpublished changes: the site and the API show the published version until you publish again.",
       "issuesTitle": "Before sending or publishing, fix:",
-      "scheduledBlocked": "If you do not fix it before the scheduled time, it will not be published and will go back to Approved.",
       "issues": {
         "required": "The required field “{field}” is missing (in Spanish).",
         "slugInvalid": "The slug can only contain lowercase letters, numbers and hyphens.",
@@ -377,7 +374,7 @@
         "note": "While the demo is open, the scheduler checks every 5 seconds. If you close the tab, the entry is published the next time you open the demo, with the date you scheduled.",
         "confirm": "Schedule",
         "cancel": "Cancel",
-        "done": "Scheduled for {date} (Colombia time)."
+        "done": "Scheduled for {date}."
       },
       "noChangesSinceVersion": "No changes since the last version"
     },
@@ -445,8 +442,7 @@
       "remove": "Remove",
       "close": "Close",
       "meta": "{w} × {h} px · {kb} KB",
-      "focalHint": "Click the image (or focus it and use the arrow keys) to set the focal point ({x}%, {y}%): it drives the crop in every format.",
-      "focalKeys": "Image focal point: {x}%, {y}%. Use the arrow keys to move it.",
+      "focalHint": "Click the image to set the focal point ({x}%, {y}%): it drives the crop in every format.",
       "crops": {
         "web": "Web 16:9",
         "app": "App 4:5",
@@ -697,6 +693,7 @@
       "approve": "Approve",
       "approvedToast": "Entry approved.",
       "publishNow": "Publish now",
+      "publishedToast": "Entry published.",
       "scheduledAt": "{date} · {rel}",
       "by": "{name} · {date}",
       "blocked": "It has pending fields: open it to fix them.",

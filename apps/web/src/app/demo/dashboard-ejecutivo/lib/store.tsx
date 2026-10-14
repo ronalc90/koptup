@@ -20,23 +20,6 @@ const SETTINGS_KEY = 'demo:bi:settings:v1';
 /** Período elegido junto con el mes de corte en que se eligió (si el corte cambia, se vuelve al último mes). */
 const PERIOD_KEY = 'demo:bi:period:v2';
 const GUIDE_KEY = 'demo:bi:guide:v1';
-/** Bloque de primeros pasos abierto ('1') u oculto ('0'). */
-const GUIDE_OPEN_KEY = 'demo:bi:guide-open:v1';
-
-/**
- * Lleva la vista al comienzo de la sección del tablero (título de la sección
- * justo debajo de la barra fija del tablero), no al inicio de la página: el
- * encabezado de la demo queda arriba y la sección elegida a la vista.
- */
-export function scrollToContent() {
-  if (typeof window === 'undefined') return;
-  const content = document.getElementById('exec-content');
-  if (!content) return;
-  const bar = document.getElementById('exec-toolbar');
-  const siteNav = window.matchMedia('(min-width: 768px)').matches ? 80 : 64;
-  const top = content.getBoundingClientRect().top + window.scrollY - siteNav - (bar?.offsetHeight ?? 0);
-  window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
-}
 
 /** Pasos de "Primeros pasos": se marcan solos cuando el visitante hace cada cosa. */
 export type GuideStep = 'period' | 'finance' | 'customer' | 'ask' | 'pdf';
@@ -129,9 +112,6 @@ interface Store {
   setSegment: (s: 'all' | Segment) => void;
   guide: GuideProgress;
   markGuide: (step: GuideStep) => void;
-  /** Bloque de primeros pasos abierto (se recuerda en el navegador; «Restablecer demo» lo vuelve a abrir). */
-  guideOpen: boolean;
-  setGuideOpen: (open: boolean) => void;
   customer: string | null;
   openCustomer: (name: string | null) => void;
   invoice: string | null;
@@ -169,7 +149,6 @@ export function DashboardProvider({ anchor: anchorProp, children }: { anchor: Mo
   const [scrollTarget, setScrollTarget] = useState<string | null>(null);
   const [segment, setSegment] = useState<'all' | Segment>('all');
   const [guide, setGuide] = useState<GuideProgress>(emptyGuide);
-  const [guideOpen, setGuideOpenState] = useState(true);
   const [customer, setCustomer] = useState<string | null>(null);
   const [invoice, setInvoice] = useState<string | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -187,21 +166,7 @@ export function DashboardProvider({ anchor: anchorProp, children }: { anchor: Mo
       for (const k of GUIDE_STEPS) next[k] = g[k] === true;
       setGuide(next);
     }
-    try {
-      if (window.localStorage.getItem(GUIDE_OPEN_KEY) === '0') setGuideOpenState(false);
-    } catch {
-      /* sin almacenamiento: queda abierto */
-    }
   }, [anchor]);
-
-  const setGuideOpen = useCallback((open: boolean) => {
-    setGuideOpenState(open);
-    try {
-      window.localStorage.setItem(GUIDE_OPEN_KEY, open ? '1' : '0');
-    } catch {
-      /* sin almacenamiento */
-    }
-  }, []);
 
   const markGuide = useCallback((step: GuideStep) => {
     setGuide((g) => {
@@ -243,13 +208,9 @@ export function DashboardProvider({ anchor: anchorProp, children }: { anchor: Mo
     setPeriodKeyState(null);
     setSegment('all');
     setGuide(emptyGuide());
-    setGuideOpenState(true);
-    setCustomer(null);
-    setInvoice(null);
     writeJson(SETTINGS_KEY, null);
     writeJson(PERIOD_KEY, null);
     writeJson(GUIDE_KEY, null);
-    writeJson(GUIDE_OPEN_KEY, null);
   }, []);
 
   const setPeriodKey = useCallback(
@@ -270,8 +231,8 @@ export function DashboardProvider({ anchor: anchorProp, children }: { anchor: Mo
     (v: ViewId, target?: string) => {
       setViewState(v);
       if (v === 'finanzas') markGuide('finance');
-      // Con `target` baja hasta ese bloque cuando la sección se pinta; si no, al comienzo de la sección.
-      setScrollTarget(target ?? 'exec-content');
+      if (target) setScrollTarget(target);
+      else if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
     },
     [markGuide],
   );
@@ -308,8 +269,6 @@ export function DashboardProvider({ anchor: anchorProp, children }: { anchor: Mo
     setSegment,
     guide,
     markGuide,
-    guideOpen,
-    setGuideOpen,
     customer,
     openCustomer,
     invoice,

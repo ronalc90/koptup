@@ -214,7 +214,6 @@
       "published": "publicó «{title}»",
       "autoPublished": "publicó «{title}» (publicación programada)",
       "scheduled": "programó «{title}»",
-      "scheduleFailed": "programó «{title}», pero no se publicó a la hora prevista: le faltan campos obligatorios (volvió a «Aprobada»)",
       "unscheduled": "canceló la programación de «{title}»",
       "unpublished": "despublicó «{title}»",
       "discarded": "descartó los cambios sin publicar de «{title}»",
@@ -289,7 +288,7 @@
       "deleteNotAllowed": "Tu rol no puede eliminar esta entrada",
       "deleteTitle": "¿Eliminar la entrada?",
       "deleteBody": "Se elimina «{title}» y sus versiones. Las referencias desde otras entradas se quitan.",
-      "deleteLive": "La entrada está publicada: se avisará a los canales con el webhook activado para que la quiten (simulado).",
+      "deleteLive": "La entrada está publicada: se avisará al sitio para quitarla (webhook simulado).",
       "deleteConfirm": "Eliminar",
       "deleted": "Entrada eliminada."
     },
@@ -311,8 +310,7 @@
       "approved": "Entrada aprobada: ya se puede publicar o programar.",
       "requestChanges": "Pedir cambios",
       "publishNow": "Publicar ahora",
-      "publishedTo": "Publicada. Se avisó a: {targets} (webhooks simulados).",
-      "publishedNoHooks": "Publicada. No se avisó a ningún canal: los webhooks que aplican están desactivados.",
+      "published": "Publicada: se avisó al sitio, a la app y al asistente (webhooks simulados).",
       "scheduleBtn": "Programar…",
       "unschedule": "Cancelar programación",
       "unscheduled": "Programación cancelada: la entrada sigue aprobada.",
@@ -326,7 +324,6 @@
       "reviewNote": "Edición pidió cambios: «{note}»",
       "changesNote": "Hay cambios sin publicar: el sitio y la API muestran la versión publicada hasta que la vuelvas a publicar.",
       "issuesTitle": "Antes de enviar o publicar, corrige:",
-      "scheduledBlocked": "Si no lo corriges antes de la hora programada, no se publicará y volverá a «Aprobada».",
       "issues": {
         "required": "Falta el campo obligatorio «{field}» (en español).",
         "slugInvalid": "El slug solo puede tener minúsculas, números y guiones.",
@@ -377,7 +374,7 @@
         "note": "Mientras la demo está abierta, el programador revisa cada 5 segundos. Si cierras la pestaña, la entrada se publica la próxima vez que abras la demo, con la fecha que programaste.",
         "confirm": "Programar",
         "cancel": "Cancelar",
-        "done": "Programada para el {date} (hora de Colombia)."
+        "done": "Programada para el {date}."
       },
       "noChangesSinceVersion": "No hay cambios desde la última versión"
     },
@@ -445,8 +442,7 @@
       "remove": "Quitar",
       "close": "Cerrar",
       "meta": "{w} × {h} px · {kb} KB",
-      "focalHint": "Haz clic en la imagen (o enfócala y usa las flechas) para fijar el punto de interés ({x} %, {y} %): así se recorta en cada formato.",
-      "focalKeys": "Punto de interés de la imagen: {x} %, {y} %. Usa las flechas para moverlo.",
+      "focalHint": "Haz clic en la imagen para fijar el punto de interés ({x} %, {y} %): así se recorta en cada formato.",
       "crops": {
         "web": "Web 16:9",
         "app": "App 4:5",
@@ -697,6 +693,7 @@
       "approve": "Aprobar",
       "approvedToast": "Entrada aprobada.",
       "publishNow": "Publicar ahora",
+      "publishedToast": "Entrada publicada.",
       "scheduledAt": "{date} · {rel}",
       "by": "{name} · {date}",
       "blocked": "Tiene campos pendientes: ábrela para corregirlos.",

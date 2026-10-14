@@ -3,10 +3,10 @@ import { getTranslations } from 'next-intl/server';
 import { generateMetadata as metadataBase, getBreadcrumbSchema } from '@/lib/seo-config';
 
 /**
- * Metadata propia (título y descripción en el idioma de la visita): describe lo
- * que la demo hace de verdad (datos de ejemplo o tu CSV, proyección
- * estadística, alertas por reglas, informe PDF). De la entrada compartida de
- * seo-config se toman la URL canónica, la plantilla del título y las imágenes.
+ * Metadata propia: la entrada compartida de seo-config para esta ruta promete
+ * "datos en tiempo real" y "reportes automáticos". Aquí se describe lo que la
+ * demo hace de verdad (datos de ejemplo o tu CSV, proyección estadística,
+ * alertas por reglas, informe PDF).
  */
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('demoBiDashboard.meta');

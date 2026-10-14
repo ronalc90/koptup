@@ -47,7 +47,7 @@ export default function AnalyticsView({ onCreateCampaign }: { onCreateCampaign: 
         m?.name ?? '',
         m ? cedulaLabel(m.cedula) : '',
         t(`export.kinds.${tx.kind}`),
-        txLabel(t, tx, f.money, state.missions, state.draws),
+        txLabel(t, tx, f.money, state.missions),
         tx.points,
         running[tx.memberId],
         tx.session ? t('export.fromDemo') : t('export.sample'),
@@ -116,7 +116,7 @@ export default function AnalyticsView({ onCreateCampaign }: { onCreateCampaign: 
           <KpiBox label={t('analytics.kpis.liability')} value={f.moneyM(liability)} sub={t('analytics.kpis.liabilitySub', { pts: f.num(outstanding), value: f.money(state.rules.pointValue) })} />
         </div>
         <p className="mt-2 text-xs text-secondary-600 dark:text-secondary-400">
-          {t('analytics.kpis.cost', { cost: f.moneyM(cost.net), sales: f.moneyM(ANALYTICS.monthlyMemberSales), mult: f.dec(cost.mult) })}
+          {t('analytics.kpis.cost', { cost: f.moneyM(cost.net), sales: f.moneyM(ANALYTICS.monthlyMemberSales) })}
         </p>
       </div>
 

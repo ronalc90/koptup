@@ -31,10 +31,10 @@ import {
   type Segment,
 } from './data';
 import { addDays, nextDays, weekdayOf } from './dates';
-import { audienceFor, balanceOf, firstSendDate, ley2300Check, nextRecurringSend } from './engine';
+import { audienceFor, balanceOf, firstSendDate, ley2300Check } from './engine';
 import { useSessionYearPoints } from './ConfigProgram';
 import { useLoyalty } from './store';
-import { Field, Modal, SampleTag, SectionTitle, focusRing, inputCls, selectCls, useFmt, useToast } from './ui';
+import { Field, Modal, SampleTag, SectionTitle, inputCls, selectCls, useFmt, useToast } from './ui';
 
 const digits = (s: string) => s.replace(/\D/g, '');
 /** Días que ofrece el formulario para programar un envío (desde mañana). */
@@ -142,7 +142,6 @@ export function CampaignsConfig({ prefillSegment, onPrefillUsed }: { prefillSegm
                   </td>
                   <td className="py-3 pr-2 text-secondary-600 dark:text-secondary-300">
                     {schedule(c)}
-                    {!c.date && (c.status === 'active' || c.status === 'scheduled') && <NextSend c={c} />}
                   </td>
                   <td className="py-3 pr-2">
                     <span className="px-2 py-0.5 text-xs rounded-full bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200">{t(`config.campaigns.channels.${c.channel}`)}</span>
@@ -172,7 +171,6 @@ export function CampaignsConfig({ prefillSegment, onPrefillUsed }: { prefillSegm
           </table>
         </div>
         <p className="mt-3 text-[11px] text-secondary-500 dark:text-secondary-400">{t('config.campaigns.audienceNote')}</p>
-        <p className="mt-1 text-[11px] text-secondary-500 dark:text-secondary-400">{t('config.campaigns.recurringNote')}</p>
       </Card>
 
       <Card id="ly-new-campaign">
@@ -257,21 +255,6 @@ export function CampaignsConfig({ prefillSegment, onPrefillUsed }: { prefillSegm
   );
 }
 
-/** Próximo envío de una campaña que se repite: salta domingos y festivos (Ley 2300). */
-function NextSend({ c }: { c: Campaign }) {
-  const t = useTranslations('demoLoyalty');
-  const f = useFmt();
-  const { today } = useLoyalty();
-  const next = nextRecurringSend(c, today);
-  if (!next) return null;
-  return (
-    <span className="block text-[11px] text-secondary-500 dark:text-secondary-400">
-      {t('config.campaigns.next', { date: f.dayLabel(next.date, weekdayOf(next.date)) })}
-      {next.skipped && <> · {t('config.campaigns.skipped', { date: f.date(next.skipped) })}</>}
-    </span>
-  );
-}
-
 /* --------------------------------- Aliados --------------------------------- */
 
 export function AlliesConfig() {
@@ -319,7 +302,7 @@ export function AlliesConfig() {
                   }}
                   aria-label={t('config.allies.remove', { name: a.name })}
                   title={t('config.allies.remove', { name: a.name })}
-                  className={`p-1.5 rounded-lg text-secondary-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 ${focusRing}`}
+                  className="p-1.5 rounded-lg text-secondary-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
                 >
                   <TrashIcon className="h-4 w-4" />
                 </button>
@@ -479,45 +462,27 @@ export function FraudConfig() {
             <b>{t('config.fraud.suggested')}:</b> {t(`config.fraud.actions.${review.kind}`)}
           </p>
           <p className="mt-2 text-[11px] text-secondary-500">{t('config.fraud.note')}</p>
-          {review.status !== 'open' && <p className="mt-2 text-sm font-medium text-secondary-800 dark:text-secondary-200">{t(`config.fraud.current.${review.status}`)}</p>}
           <div className="mt-5 flex flex-wrap justify-end gap-2">
-            {review.status === 'frozen' ? (
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setAlertStatus(review.id, 'dismissed');
-                  notify(t('config.fraud.releasedToast'));
-                  setReview(null);
-                }}
-              >
-                {t('config.fraud.release')}
-              </Button>
-            ) : (
-              <>
-                {review.status === 'open' && (
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      setAlertStatus(review.id, 'dismissed');
-                      notify(t('config.fraud.dismissedToast'));
-                      setReview(null);
-                    }}
-                  >
-                    {t('config.fraud.dismiss')}
-                  </Button>
-                )}
-                <Button
-                  variant="danger"
-                  onClick={() => {
-                    setAlertStatus(review.id, 'frozen');
-                    notify(t('config.fraud.frozenToast'));
-                    setReview(null);
-                  }}
-                >
-                  {t('config.fraud.freeze')}
-                </Button>
-              </>
-            )}
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setAlertStatus(review.id, 'dismissed');
+                notify(t('config.fraud.dismissedToast'));
+                setReview(null);
+              }}
+            >
+              {t('config.fraud.dismiss')}
+            </Button>
+            <Button
+              variant="danger"
+              onClick={() => {
+                setAlertStatus(review.id, 'frozen');
+                notify(t('config.fraud.frozenToast'));
+                setReview(null);
+              }}
+            >
+              {t('config.fraud.freeze')}
+            </Button>
           </div>
         </Modal>
       )}

@@ -18,8 +18,8 @@ import {
   ANALYTICS,
   CATEGORIES,
   CHANNELS,
+  DRAW_PARTICIPANTS,
   SALE_DAYS_BACK,
-  SALES_MIX,
   MISSION_TYPES,
   TIERS,
   type CategoryKey,
@@ -29,8 +29,8 @@ import {
   type TierKey,
 } from './data';
 import { endOfMonth, lastDays } from './dates';
-import { drawTickets, programCost, quoteSale, returnPct, thresholdsValid, tierCounts, tierPoints, weekdayOf, wouldDowngrade } from './engine';
-import { drawName, drawPrize, missionTitle } from './MemberView';
+import { programCost, quoteSale, returnPct, thresholdsValid, tierCounts, tierPoints, weekdayOf, wouldDowngrade } from './engine';
+import { missionTitle } from './MemberView';
 import { useLoyalty } from './store';
 import { Field, KpiBox, SampleTag, SectionTitle, TIER_THEME, Toggle, inputCls, selectCls, useFmt, useToast } from './ui';
 
@@ -291,10 +291,6 @@ export function PointsConfig() {
             </Field>
           </div>
           <dl className="mt-4 grid grid-cols-2 gap-y-1 text-sm">
-            <dt className="text-secondary-500">{t('config.points.costMult')}</dt>
-            <dd className="text-right font-mono" data-testid="ly-cost-mult">
-              ×{f.dec(cost.mult)}
-            </dd>
             <dt className="text-secondary-500">{t('config.points.costIssued')}</dt>
             <dd className="text-right font-mono">{f.num(cost.issued)}</dd>
             <dt className="text-secondary-500">{t('config.points.costGross')}</dt>
@@ -304,15 +300,7 @@ export function PointsConfig() {
               {f.money(cost.net)}
             </dd>
           </dl>
-          <p className="mt-2 text-[11px] text-secondary-500 dark:text-secondary-400">
-            {t('config.points.costNote', {
-              care: Math.round(SALES_MIX.category.personalCare * 100),
-              dermo: Math.round(SALES_MIX.category.dermo * 100),
-              rx: Math.round(SALES_MIX.category.rx * 100),
-              store: Math.round(SALES_MIX.channel.store * 100),
-            })}{' '}
-            <SampleTag />
-          </p>
+          <p className="mt-2 text-[11px] text-secondary-500 dark:text-secondary-400">{t('config.points.costNote')}</p>
         </Card>
       </div>
     </div>
@@ -629,6 +617,8 @@ export function SweepstakesConfig() {
   const [date, setDate] = useState(dateOptions[0]);
   const [cost, setCost] = useState(200);
 
+  const drawName = (d: (typeof state.draws)[number]) => (d.key ? t(`config.sweepstakes.items.${d.key}.name`, { month: f.monthLong(d.date) }) : d.name ?? '');
+  const drawPrize = (d: (typeof state.draws)[number]) => (d.key ? t(`config.sweepstakes.items.${d.key}.prize`) : d.prize ?? '');
 
   return (
     <div className="space-y-6">
@@ -639,45 +629,36 @@ export function SweepstakesConfig() {
       <Card>
         <SectionTitle title={t('config.sweepstakes.title')} subtitle={t('config.sweepstakes.subtitle')} />
         <ul className="mt-4 space-y-3">
-          {state.draws.map((d) => {
-            const own = drawTickets(d);
-            return (
-              <li key={d.id} className="rounded-lg border border-secondary-200 dark:border-secondary-800 p-4 flex flex-col md:flex-row md:items-center gap-3">
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-secondary-900 dark:text-white">{drawName(t, d)}</p>
-                  <p className="text-xs text-secondary-500 mt-0.5">
-                    {t(d.status === 'done' ? 'config.sweepstakes.lineDone' : 'config.sweepstakes.line', {
-                      prize: drawPrize(t, d),
-                      date: f.date(d.date),
-                      cost: f.num(d.ticketCost),
-                      count: d.participants + own.members,
-                      n: f.num(d.participants + own.members),
-                    })}
-                  </p>
-                  {own.total > 0 && <p className="mt-0.5 text-xs text-primary-700 dark:text-primary-300">{t('config.sweepstakes.demoTickets', { n: own.total, members: own.members })}</p>}
-                  {d.winner && <p className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">{t('config.sweepstakes.winner', { name: d.winner })}</p>}
-                </div>
-                {d.status === 'done' ? (
-                  <Badge variant="success" size="sm" className="self-start md:self-auto">
-                    {t('config.sweepstakes.done')}
-                  </Badge>
-                ) : d.participants + own.total === 0 ? (
-                  <span className="text-xs text-secondary-500 dark:text-secondary-400 md:max-w-[15rem] md:text-right">{t('config.sweepstakes.noTickets')}</span>
-                ) : (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      const res = runDraw(d.id, Math.random());
-                      if (res) notify(t(res.memberId ? 'config.sweepstakes.drawnMember' : 'config.sweepstakes.drawn', { name: res.winner }));
-                    }}
-                  >
-                    {t('config.sweepstakes.run')}
-                  </Button>
-                )}
-              </li>
-            );
-          })}
+          {state.draws.map((d) => (
+            <li key={d.id} className="rounded-lg border border-secondary-200 dark:border-secondary-800 p-4 flex flex-col md:flex-row md:items-center gap-3">
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-secondary-900 dark:text-white">{drawName(d)}</p>
+                <p className="text-xs text-secondary-500 mt-0.5">
+                  {t('config.sweepstakes.line', { prize: drawPrize(d), date: f.date(d.date), cost: f.num(d.ticketCost), n: f.num(d.participants) })}
+                </p>
+                {d.winner && <p className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">{t('config.sweepstakes.winner', { name: d.winner })}</p>}
+              </div>
+              {d.status === 'done' ? (
+                <Badge variant="success" size="sm">
+                  {t('config.sweepstakes.done')}
+                </Badge>
+              ) : d.participants === 0 ? (
+                <span className="text-xs text-secondary-500 dark:text-secondary-400 md:max-w-[14rem] md:text-right">{t('config.sweepstakes.noTickets')}</span>
+              ) : (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    const winner = DRAW_PARTICIPANTS[Math.floor(Math.random() * DRAW_PARTICIPANTS.length)];
+                    runDraw(d.id, winner);
+                    notify(t('config.sweepstakes.drawn', { name: winner }));
+                  }}
+                >
+                  {t('config.sweepstakes.run')}
+                </Button>
+              )}
+            </li>
+          ))}
         </ul>
         <p className="mt-3 text-[11px] text-secondary-500 dark:text-secondary-400">{t('config.sweepstakes.note')}</p>
       </Card>

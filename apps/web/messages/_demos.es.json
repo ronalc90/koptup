@@ -4304,7 +4304,6 @@
       "intro": {
         "resumen": "Indicadores de {period} frente a la meta y al mismo período del año anterior.",
         "finanzas": "Estado de resultados de {period}, cartera por edades y flujo de caja proyectado.",
-        "finanzasUpload": "Utilidad bruta de {period} con tu archivo. La cartera y el flujo de caja necesitan tu contabilidad.",
         "clientes": "Ventas, margen, cartera y segmento de cada cliente en {period}.",
         "preguntas": "Respuestas calculadas con las cifras de {period}, con la fórmula de cada una.",
         "alertas": "Desvíos detectados con reglas y vista previa del resumen semanal.",
@@ -4669,7 +4668,7 @@
     },
     "ask": {
       "title": "Elige o escribe tu pregunta",
-      "subtitle": "Las respuestas se calculan con las cifras de {period} y cada una muestra cómo se hizo el cálculo.",
+      "subtitle": "Elige una pregunta o escríbela. Las respuestas se calculan con las cifras de {period}.",
       "q": {
         "customersDown": "¿Qué clientes compran menos que el año pasado?",
         "margin": "¿Por qué cambió el margen bruto?",
@@ -4752,7 +4751,7 @@
         },
         "customersRisk": {
           "title": "{count, plural, one {# cliente en riesgo} other {# clientes en riesgo}}",
-          "text": "Sus compras cayeron {drop} % o más frente al mismo período del año anterior: {names}{more, plural, =0 {} other { y # más}}. Entre todos son {lost} menos."
+          "text": "Sus compras cayeron {drop} % o más frente al mismo período del año anterior: {names}{count, plural, one {} =2 {} =3 {} other { y otros}}. Entre todos son {lost} menos."
         },
         "forecastGoal": {
           "title": "La proyección queda bajo la meta",
@@ -4798,7 +4797,7 @@
       "sampleName": "Datos de ejemplo de {company} ({sector})",
       "uploadName": "Tu archivo: {file}",
       "stats": "{rows} facturas · {customers} clientes · {from} a {to} · corte {cutoff}",
-      "sampleHow": "Generados en tu navegador con una semilla fija: 24 meses que terminan en el último mes cerrado (se corren solos cada mes) y todas las vistas salen de las mismas facturas. Empresa, clientes, vendedores y NIT son ficticios.",
+      "sampleHow": "Generados en tu navegador con una semilla fija: siempre son los mismos y todas las vistas salen de las mismas facturas. Empresa, clientes, vendedores y NIT son ficticios.",
       "uploadHow": "Solo se recalculan las vistas que dependen de las ventas (Resumen, Clientes, preguntas y alertas de ventas). La cartera y el flujo de caja necesitan tu contabilidad.",
       "downloadSample": "Descargar CSV de ejemplo",
       "downloadUpload": "Descargar datos normalizados",
@@ -4983,7 +4982,7 @@
       "methodGoal": "Meta = ventas de los mismos meses del año anterior + {goal} %.",
       "methodForecast": "Proyección {range}: método estadístico (mismo mes del año anterior × crecimiento reciente o tendencia lineal), banda del 80 % con desviación de {sigma}. No usa IA.",
       "noForecast": "No hay meses suficientes para proyectar.",
-      "methodSample": "Datos de ejemplo generados con una semilla fija hasta el último mes cerrado; todas las vistas salen de las mismas facturas.",
+      "methodSample": "Datos de ejemplo generados con una semilla fija; todas las vistas salen de las mismas facturas.",
       "methodUpload": "Calculado con las filas del archivo que cargaste.",
       "sales": "Ventas",
       "goal": "Meta",
@@ -5000,13 +4999,6 @@
       "page": "Página {n} de {total}",
       "done": "Informe descargado: {file}",
       "error": "No se pudo generar el PDF. Intenta de nuevo."
-    },
-    "files": {
-      "report": "informe-ejecutivo",
-      "receivables": "cartera",
-      "customers": "clientes",
-      "invoices": "facturas",
-      "sales": "ventas"
     },
     "intro": {
       "back": "Volver al catálogo de demos",
@@ -9326,7 +9318,6 @@
       "published": "publicó «{title}»",
       "autoPublished": "publicó «{title}» (publicación programada)",
       "scheduled": "programó «{title}»",
-      "scheduleFailed": "programó «{title}», pero no se publicó a la hora prevista: le faltan campos obligatorios (volvió a «Aprobada»)",
       "unscheduled": "canceló la programación de «{title}»",
       "unpublished": "despublicó «{title}»",
       "discarded": "descartó los cambios sin publicar de «{title}»",
@@ -9401,7 +9392,7 @@
       "deleteNotAllowed": "Tu rol no puede eliminar esta entrada",
       "deleteTitle": "¿Eliminar la entrada?",
       "deleteBody": "Se elimina «{title}» y sus versiones. Las referencias desde otras entradas se quitan.",
-      "deleteLive": "La entrada está publicada: se avisará a los canales con el webhook activado para que la quiten (simulado).",
+      "deleteLive": "La entrada está publicada: se avisará al sitio para quitarla (webhook simulado).",
       "deleteConfirm": "Eliminar",
       "deleted": "Entrada eliminada."
     },
@@ -9423,8 +9414,7 @@
       "approved": "Entrada aprobada: ya se puede publicar o programar.",
       "requestChanges": "Pedir cambios",
       "publishNow": "Publicar ahora",
-      "publishedTo": "Publicada. Se avisó a: {targets} (webhooks simulados).",
-      "publishedNoHooks": "Publicada. No se avisó a ningún canal: los webhooks que aplican están desactivados.",
+      "published": "Publicada: se avisó al sitio, a la app y al asistente (webhooks simulados).",
       "scheduleBtn": "Programar…",
       "unschedule": "Cancelar programación",
       "unscheduled": "Programación cancelada: la entrada sigue aprobada.",
@@ -9438,7 +9428,6 @@
       "reviewNote": "Edición pidió cambios: «{note}»",
       "changesNote": "Hay cambios sin publicar: el sitio y la API muestran la versión publicada hasta que la vuelvas a publicar.",
       "issuesTitle": "Antes de enviar o publicar, corrige:",
-      "scheduledBlocked": "Si no lo corriges antes de la hora programada, no se publicará y volverá a «Aprobada».",
       "issues": {
         "required": "Falta el campo obligatorio «{field}» (en español).",
         "slugInvalid": "El slug solo puede tener minúsculas, números y guiones.",
@@ -9489,7 +9478,7 @@
         "note": "Mientras la demo está abierta, el programador revisa cada 5 segundos. Si cierras la pestaña, la entrada se publica la próxima vez que abras la demo, con la fecha que programaste.",
         "confirm": "Programar",
         "cancel": "Cancelar",
-        "done": "Programada para el {date} (hora de Colombia)."
+        "done": "Programada para el {date}."
       },
       "noChangesSinceVersion": "No hay cambios desde la última versión"
     },
@@ -9557,8 +9546,7 @@
       "remove": "Quitar",
       "close": "Cerrar",
       "meta": "{w} × {h} px · {kb} KB",
-      "focalHint": "Haz clic en la imagen (o enfócala y usa las flechas) para fijar el punto de interés ({x} %, {y} %): así se recorta en cada formato.",
-      "focalKeys": "Punto de interés de la imagen: {x} %, {y} %. Usa las flechas para moverlo.",
+      "focalHint": "Haz clic en la imagen para fijar el punto de interés ({x} %, {y} %): así se recorta en cada formato.",
       "crops": {
         "web": "Web 16:9",
         "app": "App 4:5",
@@ -9809,6 +9797,7 @@
       "approve": "Aprobar",
       "approvedToast": "Entrada aprobada.",
       "publishNow": "Publicar ahora",
+      "publishedToast": "Entrada publicada.",
       "scheduledAt": "{date} · {rel}",
       "by": "{name} · {date}",
       "blocked": "Tiene campos pendientes: ábrela para corregirlos.",
@@ -13998,8 +13987,8 @@
     "sampleHint": "{brand} (NIT {nit}), {club}, sus sedes, miembros, cédulas, celulares, aliados y todas las cifras son inventados.",
     "howItWorks": {
       "title": "Qué es real y qué es simulado en esta demo",
-      "real": "Se calcula de verdad en tu navegador: los puntos de cada compra (regla base y multiplicadores por categoría, día y canal), el saldo como suma del libro de puntos, los niveles, los canjes con cupón y descuento en caja, las boletas de los sorteos, las misiones, los referidos, las reglas antifraude, el horario permitido de las campañas (con los festivos de Colombia), el simulador de costo, el pasivo por puntos y la exportación CSV.",
-      "simulated": "Son simulados: el envío de WhatsApp, correo o SMS (ves la vista previa, no sale ningún mensaje), el pase de Apple Wallet y Google Wallet (vista previa), el sorteo (el ganador sale de tus boletas y de participantes ficticios) y las cifras de la base de 29.200 miembros (indicadores, cohortes, resultados de misiones, pruebas A/B, aliados y la mezcla de ventas del costo). Los segmentos salen de reglas: en esta demo no hay un modelo de IA. Los botones de WhatsApp y correo en «Invita amigos» sí abren tu aplicación con el mensaje listo.",
+      "real": "Se calcula de verdad en tu navegador: los puntos de cada compra (regla base y multiplicadores por categoría, día y canal), el saldo como suma del libro de puntos, los niveles, los canjes con cupón y descuento en caja, las misiones, los referidos, las reglas antifraude, el horario permitido de las campañas (con los festivos de Colombia), el simulador de costo, el pasivo por puntos y la exportación CSV.",
+      "simulated": "Son simulados: el envío de WhatsApp, correo o SMS (ves la vista previa, no sale ningún mensaje), el pase de Apple Wallet y Google Wallet (vista previa), los sorteos y las cifras de la base de 29.200 miembros (indicadores, cohortes, resultados de misiones, pruebas A/B y aliados). Los segmentos salen de reglas: en esta demo no hay un modelo de IA. Los botones de WhatsApp y correo en «Invita amigos» sí abren tu aplicación con el mensaje listo.",
       "project": "En tu proyecto, la caja se conecta a tu POS o tienda en línea por API, los puntos quedan en un libro de puntos en tu base de datos, los mensajes salen por WhatsApp Business con plantillas aprobadas, el pase se emite para Apple Wallet y Google Wallet con tu marca y los reportes salen de tus datos reales.",
       "dates": "La demo trabaja con la fecha de hoy en Colombia: las compras de ejemplo, los vencimientos y los reportes se arman hacia atrás desde hoy, y lo que registras queda con la fecha y la hora de Colombia. Tus cambios se guardan solo en este navegador."
     },
@@ -14206,8 +14195,7 @@
       "welcome": "Bono de bienvenida",
       "referral": "Referido: {name}",
       "mission": "Misión: {name}",
-      "reversal": "Reverso de la venta {id}",
-      "ticket": "Boleta: {name}"
+      "reversal": "Reverso de la venta {id}"
     },
     "export": {
       "button": "Exportar movimientos (CSV)",
@@ -14231,8 +14219,7 @@
         "referral": "Referido",
         "mission": "Misión",
         "reversal": "Reverso",
-        "summary": "Compras (resumen)",
-        "ticket": "Boleta de sorteo"
+        "summary": "Compras (resumen)"
       }
     },
     "cashier": {
@@ -14497,21 +14484,6 @@
         "subtitle": "Puntos de compras en {month} (nombres de ejemplo)",
         "you": "Tú",
         "yourRank": "Tu posición: {rank} con {pts} puntos."
-      },
-      "draws": {
-        "title": "Sorteos del club",
-        "subtitle": "Cambia puntos por boletas para los sorteos abiertos.",
-        "none": "No hay sorteos abiertos. El comercio los crea en Configuración › Sorteos.",
-        "line": "Premio: {prize} · se sortea el {date} · {count, plural, one {# participante} other {{n} participantes}}",
-        "mine": "{n, plural, =0 {Aún no tienes boletas} one {Tienes # boleta} other {Tienes # boletas}}",
-        "buy": "Comprar boleta · {pts} pts",
-        "bought": "Compraste una boleta por {pts} puntos (tienes {n}). Saldo: {balance}",
-        "errors": {
-          "insufficient": "No te alcanzan los puntos para la boleta.",
-          "frozen": "Tus puntos están congelados por una revisión.",
-          "closed": "Ese sorteo ya no recibe boletas."
-        },
-        "note": "Las boletas se pagan con puntos de verdad (quedan en tus movimientos). El sorteo es simulado: lo hace el comercio en Configuración › Sorteos y tus boletas compiten con los participantes de ejemplo."
       }
     },
     "config": {
@@ -14560,20 +14532,19 @@
         "simDay": "Día",
         "simResult": "{base} × {mult}. Equivale a {value} en premios ({pct} % de la compra).",
         "costTitle": "¿Cuánto cuesta el programa?",
-        "costSubtitle": "Estimación mensual con las reglas actuales.",
+        "costSubtitle": "Estimación mensual con la regla base.",
         "costSales": "Ventas mensuales a miembros ($)",
         "costExpired": "% de puntos que vencen sin usarse",
         "costIssued": "Puntos emitidos al mes",
         "costGross": "Valor de esos puntos",
         "costNet": "Costo estimado al mes",
-        "costNote": "Fórmula: ventas ÷ regla base × multiplicador promedio × valor del punto × (1 − % vencido). El multiplicador promedio sale de tus multiplicadores y de la regla del día (1 de cada 7 días) con una mezcla de ventas de ejemplo ({care} % Cuidado personal, {dermo} % Dermocosmética, {rx} % con fórmula…; {store} % en tienda). Los bonos de bienvenida, misiones y referidos se suman aparte.",
+        "costNote": "Fórmula: ventas ÷ regla base × valor del punto × (1 − % vencido). Los multiplicadores y bonos lo suben según cuánto se usen.",
         "dayRuleHint": "En la demo arranca en el día de hoy para que la pruebes en la Caja sin cambiar la fecha de la compra.",
         "simToday": "{day} (hoy)",
         "birthday": "Regalo de cumpleaños",
         "birthdayHint": "Bono en pesos que el miembro reclama en la app en su mes de cumpleaños.",
         "birthdayNone": "Sin regalo",
-        "birthdayOption": "Bono de {amount}",
-        "costMult": "Multiplicador promedio"
+        "birthdayOption": "Bono de {amount}"
       },
       "tiers": {
         "title": "Niveles",
@@ -14641,15 +14612,15 @@
         "note": "Es un simulador para comparar modalidades: la Caja de esta demo acumula puntos."
       },
       "sweepstakes": {
-        "legal": "En Colombia, los sorteos promocionales necesitan autorización de Coljuegos antes de anunciarse. En la demo el sorteo es simulado: el ganador sale de las boletas que compren los miembros de la demo y de una lista de participantes ficticios.",
+        "legal": "En Colombia, los sorteos promocionales necesitan autorización de Coljuegos antes de anunciarse. En la demo el sorteo es simulado y el ganador sale de una lista de nombres ficticios.",
         "title": "Sorteos",
-        "subtitle": "Los miembros cambian puntos por boletas en la app (App del miembro › Sorteos del club).",
-        "line": "Premio: {prize} · {date} · {cost} puntos por boleta · {count, plural, one {# participante} other {{n} participantes}}",
+        "subtitle": "Los miembros cambian puntos por boletas.",
+        "line": "Premio: {prize} · {date} · {cost} puntos por boleta · {n} participantes",
         "winner": "Ganador: {name}",
         "done": "Realizado",
-        "run": "Sortear ahora (simulado)",
+        "run": "Sortear (simulado)",
         "drawn": "Ganador simulado: {name}",
-        "note": "Los participantes de ejemplo son ficticios; las boletas «de la demo» son las que compras en la app.",
+        "note": "Los participantes y las boletas son datos de ejemplo.",
         "newTitle": "Nuevo sorteo",
         "name": "Nombre",
         "namePh": "Sorteo de fin de año",
@@ -14669,10 +14640,7 @@
             "prize": "Kit dermocosmético"
           }
         },
-        "noTickets": "Sin boletas todavía: los miembros las compran en App del miembro › Sorteos del club.",
-        "lineDone": "Premio: {prize} · sorteado el {date} · {cost} puntos por boleta · {count, plural, one {# participante} other {{n} participantes}}",
-        "demoTickets": "{n, plural, one {# boleta} other {# boletas}} de la demo ({members, plural, one {# miembro} other {# miembros}})",
-        "drawnMember": "Ganó un miembro de la demo: {name} (simulado)"
+        "noTickets": "Sin boletas todavía: en la demo nadie participa en los sorteos nuevos."
       },
       "campaigns": {
         "title": "Campañas",
@@ -14756,10 +14724,7 @@
             "message": "Hola, '{nombre}'. Hace tiempo no te vemos en {club}: tu próximo pedido a domicilio va gratis. Tu saldo: '{puntos}' puntos."
           }
         },
-        "nameHint": "Obligatorio para programarla.",
-        "next": "Próximo envío: {date}",
-        "skipped": "se salta el {date} (festivo)",
-        "recurringNote": "Las campañas que se repiten se saltan los domingos y los festivos de Colombia (Ley 2300)."
+        "nameHint": "Obligatorio para programarla."
       },
       "allies": {
         "title": "Aliados (coalición)",
@@ -14821,7 +14786,7 @@
         },
         "samples": {
           "f1": {
-            "detail": "3 compras en 9 minutos con el mismo celular en sedes de dos ciudades (Bogotá y Medellín). Las compras están en los movimientos de Jhon.",
+            "detail": "5 compras en 10 minutos con el mismo celular en 2 sedes de ciudades distintas.",
             "events": {
               "0": "{date} 10:02 · Chapinero · $96.000 · +96 pts",
               "1": "{date} 10:05 · Chapinero · $88.000 · +88 pts",
@@ -14868,13 +14833,7 @@
         "dismiss": "Descartar alerta",
         "dismissedToast": "Alerta descartada",
         "freeze": "Congelar puntos",
-        "frozenToast": "Puntos congelados: no podrá canjear hasta que se revise",
-        "release": "Liberar puntos",
-        "releasedToast": "Puntos liberados: la alerta queda descartada",
-        "current": {
-          "frozen": "Estado: puntos congelados (no puede canjear).",
-          "dismissed": "Estado: alerta descartada."
-        }
+        "frozenToast": "Puntos congelados: no podrá canjear hasta que se revise"
       },
       "experiments": {
         "title": "Pruebas A/B",
@@ -14934,7 +14893,7 @@
         "expiredSub": "Emitidos que vencen sin usarse",
         "liability": "Pasivo por puntos",
         "liabilitySub": "{pts} puntos vigentes × {value}",
-        "cost": "Costo estimado del programa: {cost} al mes con ventas a miembros de {sales} y un multiplicador promedio de ×{mult} (con las reglas de Configuración › Puntos)."
+        "cost": "Costo estimado del programa: {cost} al mes con ventas a miembros de {sales} (regla base; ajústalo en Configuración › Puntos)."
       },
       "tiers": {
         "title": "Miembros por nivel",
@@ -14948,7 +14907,7 @@
         "redemptions": "Canjes",
         "points": "Puntos",
         "cost": "Costo",
-        "yours": "{n, plural, one {+# tuyo} other {+# tuyos}}"
+        "yours": "+{n} tuyos"
       },
       "segments": {
         "title": "Segmentos sugeridos",
@@ -14988,7 +14947,7 @@
     },
     "notice": {
       "newMonth": "Cambió el mes desde tu última visita: la demo volvió a los datos de ejemplo con la fecha de hoy (las misiones, la racha y los vencimientos dependen del mes).",
-      "updated": "Actualizamos la demo: volvió a los datos de ejemplo con la fecha de hoy."
+      "updated": "Actualizamos la demo: ahora trabaja con la fecha de hoy y volvió a los datos de ejemplo."
     },
     "guide": {
       "title": "Primeros pasos",
@@ -15017,7 +14976,7 @@
         },
         "s4": {
           "title": "Ajusta una regla",
-          "text": "En Configuración › Puntos sube la regla del día a ×3 y mira en el simulador cuántos puntos da y cuánto sube el costo del programa.",
+          "text": "En Configuración › Puntos sube la regla del día a ×3 y mira en el simulador cuántos puntos da y cuánto cuesta el programa.",
           "go": "Ir a las reglas"
         },
         "s5": {

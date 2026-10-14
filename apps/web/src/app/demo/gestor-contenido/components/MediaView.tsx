@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, type KeyboardEvent, type MouseEvent } from 'react';
+import { useRef, useState, type MouseEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import { ArrowUpTrayIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { mediaSrc } from '../lib/art';
@@ -13,8 +13,6 @@ import { iso } from '../lib/time';
 import { imageFileToMedia, MAX_UPLOAD_MB } from '../lib/upload';
 import type { Media } from '../lib/types';
 import { btn, card, Empty, inputCls, labelCls, Modal, Note } from './ui';
-
-const FOCAL_MOVES: Record<string, [number, number] | undefined> = { ArrowLeft: [-5, 0], ArrowRight: [5, 0], ArrowUp: [0, -5], ArrowDown: [0, 5] };
 
 const CROPS = [
   { id: 'web', ratio: 'aspect-video' },
@@ -34,14 +32,6 @@ function MediaDetail({ media, onClose }: { media: Media; onClose: () => void }) 
     const x = Math.round(((e.clientX - r.left) / r.width) * 100);
     const y = Math.round(((e.clientY - r.top) / r.height) * 100);
     act({ type: 'media.update', id: media.id, patch: { focal: { x: Math.min(100, Math.max(0, x)), y: Math.min(100, Math.max(0, y)) } } });
-  };
-  // Con el teclado: las flechas mueven el punto de interés de 5 en 5 %.
-  const moveFocal = (e: KeyboardEvent<HTMLDivElement>) => {
-    const d = FOCAL_MOVES[e.key];
-    if (!d || !canEditMeta) return;
-    e.preventDefault();
-    const clamp = (n: number) => Math.min(100, Math.max(0, n));
-    act({ type: 'media.update', id: media.id, patch: { focal: { x: clamp(media.focal.x + d[0]), y: clamp(media.focal.y + d[1]) } } });
   };
   const src = mediaSrc(media);
   return (
@@ -74,14 +64,7 @@ function MediaDetail({ media, onClose }: { media: Media; onClose: () => void }) 
     >
       <div className="grid md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <div
-            className={`relative rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 ${canEditMeta ? 'cursor-crosshair' : ''}`}
-            onClick={setFocal}
-            onKeyDown={moveFocal}
-            tabIndex={canEditMeta ? 0 : undefined}
-            role="group"
-            aria-label={t('focalKeys', { x: media.focal.x, y: media.focal.y })}
-          >
+          <div className="relative rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 cursor-crosshair" onClick={setFocal} role="presentation">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={src} alt={media.alt[contentLocale]} className="w-full aspect-video object-cover" />
             <span className="absolute w-5 h-5 -ml-2.5 -mt-2.5 rounded-full border-2 border-white bg-pink-600/80 shadow" style={{ left: `${media.focal.x}%`, top: `${media.focal.y}%` }} aria-hidden="true" />

@@ -80,7 +80,6 @@
       "intro": {
         "resumen": "Indicators for {period} against the target and the same period last year.",
         "finanzas": "Income statement for {period}, receivables aging and projected cash flow.",
-        "finanzasUpload": "Gross profit for {period} from your file. Receivables and cash flow need your accounting data.",
         "clientes": "Sales, margin, receivables and segment for each customer in {period}.",
         "preguntas": "Answers calculated with the figures for {period}, each with its formula.",
         "alertas": "Deviations detected by rules and a preview of the weekly summary.",
@@ -318,8 +317,8 @@
         "legendMin": "Lowest-cash week",
         "legendBelow": "Below minimum cash",
         "legendFloor": "Minimum cash ({floor})",
-        "legendMarkers": "VAT = bimonthly VAT (IVA) payment · P = service bonus (prima, June and December)",
-        "markerTax": "VAT",
+        "legendMarkers": "IVA = bimonthly VAT payment · P = service bonus (prima, June and December)",
+        "markerTax": "IVA",
         "markerBonus": "P",
         "weekRange": "Week {n}: {start} to {end}",
         "week": "Week",
@@ -445,7 +444,7 @@
     },
     "ask": {
       "title": "Pick or type your question",
-      "subtitle": "Answers are calculated with the figures for {period}, and each one shows how it was worked out.",
+      "subtitle": "Pick a question or type it. Answers are calculated with the figures for {period}.",
       "q": {
         "customersDown": "Which customers buy less than last year?",
         "margin": "Why did gross margin change?",
@@ -528,7 +527,7 @@
         },
         "customersRisk": {
           "title": "{count, plural, one {# customer at risk} other {# customers at risk}}",
-          "text": "Their purchases fell {drop}% or more against the same period last year: {names}{more, plural, =0 {} other { and # more}}. Together that is {lost} less."
+          "text": "Their purchases fell {drop}% or more against the same period last year: {names}{count, plural, one {} =2 {} =3 {} other { and others}}. Together that is {lost} less."
         },
         "forecastGoal": {
           "title": "Projection below target",
@@ -574,7 +573,7 @@
       "sampleName": "Sample data for {company} ({sector})",
       "uploadName": "Your file: {file}",
       "stats": "{rows} invoices · {customers} customers · {from} to {to} · as of {cutoff}",
-      "sampleHow": "Generated in your browser with a fixed seed: 24 months ending in the last closed month (they roll forward on their own every month), and every view comes from the same invoices. Company, customers, sales reps and tax ID are fictitious.",
+      "sampleHow": "Generated in your browser with a fixed seed: always the same, and every view comes from the same invoices. Company, customers, sales reps and tax ID are fictitious.",
       "uploadHow": "Only the views that depend on sales are recalculated (Overview, Customers, sales questions and alerts). Receivables and cash flow need your accounting data.",
       "downloadSample": "Download sample CSV",
       "downloadUpload": "Download normalized data",
@@ -759,7 +758,7 @@
       "methodGoal": "Target = sales of the same months last year + {goal}%.",
       "methodForecast": "Projection {range}: statistical method (same month last year × recent growth, or linear trend), 80% band with a deviation of {sigma}. No AI involved.",
       "noForecast": "Not enough months to project.",
-      "methodSample": "Sample data generated with a fixed seed up to the last closed month; every view comes from the same invoices.",
+      "methodSample": "Sample data generated with a fixed seed; every view comes from the same invoices.",
       "methodUpload": "Calculated with the rows of the file you uploaded.",
       "sales": "Sales",
       "goal": "Target",
@@ -776,13 +775,6 @@
       "page": "Page {n} of {total}",
       "done": "Report downloaded: {file}",
       "error": "The PDF could not be generated. Please try again."
-    },
-    "files": {
-      "report": "executive-report",
-      "receivables": "receivables",
-      "customers": "customers",
-      "invoices": "invoices",
-      "sales": "sales"
     },
     "intro": {
       "back": "Back to the demo catalog",
