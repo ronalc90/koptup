@@ -4,11 +4,12 @@
  * las 4 apps.
  */
 import {
-  ACCEPT_WINDOW_S, CLUB_FREE_FROM, FEE_BASE, RAIN_FEE, computeKpis, deliveryCode, deliveryFee, fmtMoney, fmtNum, fmtTime, km,
-  navSteps, nearestSede, opsAlerts, placeFromAddress, planRoute, priceOrder, stageTimes, docStatus, daysUntil,
+  ACCEPT_WINDOW_S, CLUB_FREE_FROM, DEMO_DATE, FEE_BASE, RAIN_FEE, computeKpis, deliveryCode, deliveryFee, fmtMoney, fmtNum, fmtTime, km,
+  navSteps, nearestSede, opsAlerts, orderEta, placeFromAddress, planRoute, priceOrder, stageTimes, docStatus, daysUntil, shiftDate,
+  todayInBogota, travelMin,
 } from '../components/engine';
 import { DRIVER_DOCS, SAVED_ADDRESSES, SEDES, SEDE_BY_ID, START_SOD, generateSampleDay } from '../components/data';
-import { __test, initialState, type DemoState } from '../components/store';
+import { __test, clockJumpMinutes, initialState, migrateSaved, withDate, type DemoState } from '../components/store';
 
 const { reducer } = __test;
 const casa = SAVED_ADDRESSES[0].place;
@@ -114,9 +115,9 @@ describe('jornada de ejemplo', () => {
 
   it('marca el SOAT que vence en 12 días', () => {
     const soat = DRIVER_DOCS.d1.find((d) => d.id === 'soat')!;
-    expect(daysUntil(soat.expires!)).toBe(12);
-    expect(docStatus(soat.expires)).toBe('expiring');
-    expect(docStatus('2026-10-01')).toBe('expired');
+    expect(daysUntil(soat.expires!, DEMO_DATE)).toBe(12);
+    expect(docStatus(soat.expires, DEMO_DATE)).toBe('expiring');
+    expect(docStatus('2026-10-01', DEMO_DATE)).toBe('expired');
   });
 });
 
@@ -162,13 +163,18 @@ describe('un pedido recorre las 4 apps', () => {
     expect(s.customer.points).toBe(1240);
   });
 
-  it('el avance automático completa el pedido con el reloj', () => {
+  it('el avance automático completa el pedido con tiempos realistas', () => {
     let s = initialState();
     s = run(s, { type: 'addToCart', itemId: 'arepa', options: [], qty: 1 }, { type: 'placeOrder' }, { type: 'auto' });
     const id = s.customer.activeOrderId!;
     for (let i = 0; i < 60; i++) s = reducer(s, { type: 'tick' });
-    expect(s.orders.find((o) => o.id === id)!.stage).toBe('delivered');
-    expect(s.now).toBe(START_SOD + 60);
+    const o = s.orders.find((x) => x.id === id)!;
+    expect(o.stage).toBe('delivered');
+    // La preparación (15 min) y el trayecto se reflejan en el reloj: nada de "entregado en 1 minuto".
+    const minutes = (o.t.delivered! - o.t.created) / 60;
+    expect(minutes).toBeGreaterThanOrEqual(15 + travelMin(km(SEDE_BY_ID[o.sedeId].place, o.customer.place)));
+    expect(o.t.ready! - o.t.accepted!).toBe(15 * 60);
+    expect(s.log.some((l) => l.key === 'clockJump')).toBe(true);
   });
 });
 
@@ -180,5 +186,132 @@ describe('formatos', () => {
     expect(fmtTime(9 * 3600, 'en')).toBe('9:00 AM');
     expect(fmtNum(4.75, 'es', 1)).toBe('4,8');
     expect(fmtNum(1240, 'es')).toBe('1.240');
+  });
+});
+
+describe('reloj de la demo', () => {
+  const run = (s: DemoState, ...actions: Parameters<typeof reducer>[1][]) => actions.reduce(reducer, s);
+  const ordered = () => {
+    let s = initialState();
+    s = run(s, { type: 'addToCart', itemId: 'ajiaco', options: [], qty: 1 }, { type: 'placeOrder' });
+    return { s, id: s.customer.activeOrderId! };
+  };
+
+  it('«listo» adelanta el reloj hasta el fin de la preparación', () => {
+    let { s, id } = ordered();
+    s = run(s, { type: 'accept', id, prepMin: 20 });
+    expect(clockJumpMinutes(s, 'ready', id)).toBe(20);
+    s = run(s, { type: 'ready', id });
+    const o = s.orders.find((x) => x.id === id)!;
+    expect(o.t.ready! - o.t.accepted!).toBe(20 * 60);
+    expect(s.now).toBe(o.t.ready);
+    expect(s.log[0]).toMatchObject({ key: 'ready' });
+    expect(s.log.find((l) => l.key === 'clockJump')).toMatchObject({ app: 'system', params: { id, min: 20, why: 'prep' } });
+  });
+
+  it('recoger espera a que el repartidor llegue y entregar suma el trayecto', () => {
+    let { s, id } = ordered();
+    s = run(s, { type: 'accept', id, prepMin: 15 }, { type: 'assign', id, driverId: 'd1' }, { type: 'driverAccept', id }, { type: 'ready', id });
+    s = run(s, { type: 'pickup', id });
+    let o = s.orders.find((x) => x.id === id)!;
+    expect(o.stage).toBe('pickedUp');
+    const sede = SEDE_BY_ID[o.sedeId];
+    const ride = travelMin(km(sede.place, o.customer.place), 'moto');
+    // La llegada estimada (y la del WhatsApp) es la salida + el trayecto.
+    expect(orderEta(o, s.drivers.find((d) => d.id === 'd1'), sede)).toBe(o.t.pickedUp! + ride * 60);
+    expect(clockJumpMinutes(s, 'deliver', id)).toBe(ride);
+    s = run(s, { type: 'deliver', id, method: 'code' });
+    o = s.orders.find((x) => x.id === id)!;
+    expect(o.t.delivered! - o.t.pickedUp!).toBe(ride * 60);
+    expect(s.now).toBe(o.t.delivered);
+  });
+
+  it('el resto de la operación termina los pedidos de ejemplo que ya estaban en curso', () => {
+    let s = initialState();
+    const before = s.orders.filter((o) => o.plan);
+    expect(before.length).toBeGreaterThan(0);
+    for (let i = 0; i < 25 * 60; i++) s = reducer(s, { type: 'tick' });
+    const andrea = s.orders.find((o) => o.customer.name === 'Andrea F.')!;
+    const martin = s.orders.find((o) => o.customer.name === 'Martín E.')!;
+    expect(andrea.stage).toBe('delivered');
+    expect(martin.stage).toBe('delivered');
+    expect(andrea.t.ready! < andrea.t.pickedUp! && andrea.t.pickedUp! < andrea.t.delivered!).toBe(true);
+    // Los que esperan una acción (aceptar, asignar) no avanzan solos.
+    expect(s.orders.find((o) => o.customer.name === 'Lina K.')!.stage).toBe('pending');
+    expect(s.orders.find((o) => o.customer.name === 'Gloria P.')!.stage).toBe('ready');
+    // La actividad queda en orden (lo más reciente primero).
+    const at = s.log.map((l) => l.at);
+    expect([...at].sort((a, b) => b - a)).toEqual(at);
+  });
+});
+
+describe('el resto de la operación al adelantar el reloj', () => {
+  it('los pedidos de ejemplo en curso avanzan hasta la nueva hora y quedan en la actividad', () => {
+    let s = initialState();
+    s = [
+      { type: 'addToCart', itemId: 'ajiaco', options: [], qty: 1 },
+      { type: 'placeOrder' },
+    ].reduce((acc, a) => reducer(acc, a as Parameters<typeof reducer>[1]), s);
+    const id = s.customer.activeOrderId!;
+    s = reducer(s, { type: 'accept', id, prepMin: 20 });
+    s = reducer(s, { type: 'ready', id });
+    const andrea = s.orders.find((o) => o.customer.name === 'Andrea F.')!;
+    expect(andrea.stage).toBe('delivered');
+    expect(s.log.some((l) => l.key === 'delivered' && l.params?.id === andrea.id)).toBe(true);
+    const at = s.log.map((l) => l.at);
+    expect([...at].sort((a, b) => b - a)).toEqual(at);
+  });
+});
+
+describe('pago rechazado (simulado)', () => {
+  it('no crea el pedido y el siguiente intento se aprueba', () => {
+    let s = initialState();
+    s = [
+      { type: 'addToCart', itemId: 'arepa', options: [], qty: 1 },
+      { type: 'customer', patch: { payment: 'card', declineNext: true } },
+      { type: 'placeOrder' },
+    ].reduce((acc, a) => reducer(acc, a as Parameters<typeof reducer>[1]), s);
+    expect(s.orders.some((o) => o.own)).toBe(false);
+    expect(s.customer.cart).toHaveLength(1);
+    expect(s.customer.declineNext).toBe(false);
+    expect(s.log[0]).toMatchObject({ key: 'paymentDeclined', params: { method: 'card' } });
+    s = reducer(s, { type: 'placeOrder' });
+    expect(s.orders.some((o) => o.own)).toBe(true);
+  });
+
+  it('en efectivo no aplica el rechazo de prueba', () => {
+    let s = initialState();
+    s = [
+      { type: 'addToCart', itemId: 'arepa', options: [], qty: 1 },
+      { type: 'customer', patch: { payment: 'cash', declineNext: true } },
+      { type: 'placeOrder' },
+    ].reduce((acc, a) => reducer(acc, a as Parameters<typeof reducer>[1]), s);
+    expect(s.orders.some((o) => o.own)).toBe(true);
+  });
+});
+
+describe('fecha de la jornada', () => {
+  it('usa la fecha de hoy en Colombia y corre los vencimientos', () => {
+    expect(todayInBogota(new Date('2026-10-15T03:00:00Z'))).toBe('2026-10-14');
+    expect(shiftDate('2026-10-31', 1)).toBe('2026-11-01');
+    const s = withDate(initialState(), '2026-10-14');
+    expect(s.date).toBe('2026-10-14');
+    const soat = s.docs.d1.find((d) => d.id === 'soat')!;
+    expect(daysUntil(soat.expires!, s.date)).toBe(12);
+    expect(soat.expires).toBe('2026-10-26');
+  });
+
+  it('migra lo guardado por la versión 1 sin perder pedidos', () => {
+    const old = { ...initialState(), v: 1 } as Partial<DemoState>;
+    delete old.date;
+    const m = migrateSaved(JSON.parse(JSON.stringify(old)))!;
+    expect(m.v).toBe(2);
+    expect(m.date).toBe(DEMO_DATE);
+    expect(m.customer.declineNext).toBe(false);
+    expect(m.orders).toHaveLength(old.orders!.length);
+    // Los pedidos de ejemplo en curso recuperan su plan (si no, quedarían quietos al adelantar el reloj).
+    const noPlan = { ...initialState(), v: 1, orders: initialState().orders.map((o) => ({ ...o, plan: undefined })) };
+    expect(migrateSaved(JSON.parse(JSON.stringify(noPlan)))!.orders.filter((o) => o.plan)).toHaveLength(3);
+    expect(migrateSaved({ v: 99 })).toBeNull();
   });
 });

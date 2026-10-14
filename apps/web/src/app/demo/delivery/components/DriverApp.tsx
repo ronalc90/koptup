@@ -10,7 +10,7 @@ import { SEDES, SEDE_BY_ID } from './data';
 import { DRIVER_BASE_PAY, DRIVER_PAY_PER_KM, driverPay, fmtKm, fmtNum, isActive, km, navSteps, planRoute, streetName, travelMin, type NavStep } from './engine';
 import type { Order } from './types';
 import { Modal, PhoneFrame, Stars, useMoney } from './ui';
-import { useDelivery } from './store';
+import { useDelivery, clockJumpMinutes } from './store';
 import { ChatComposer, ChatThread, MaskedCall } from './CustomerTracking';
 import ProofOfDelivery from './ProofOfDelivery';
 import DriverDocs from './DriverDocs';
@@ -118,7 +118,7 @@ export default function DriverApp() {
           <select
             value={driver.id}
             onChange={(e) => { dispatch({ type: 'set', patch: { driverView: e.target.value } }); setNavIdx(0); setChatOpen(false); }}
-            className="block w-full rounded-lg border border-secondary-300 bg-white px-2 py-1.5 dark:border-secondary-600 dark:bg-secondary-800"
+            className="block w-full rounded-lg border border-secondary-300 bg-white py-1.5 pl-2 pr-8 dark:border-secondary-600 dark:bg-secondary-800"
           >
             {state.drivers.map((d) => {
               const offersN = state.orders.filter((o) => o.driverId === d.id && o.driverStatus === 'offered' && isActive(o)).length;
@@ -185,7 +185,23 @@ export default function DriverApp() {
               <>
                 <p className="flex items-start gap-1"><MapPinIcon className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />{t('driver.goToSede', { sede: t(`sedes.${current.sedeId}`), address: SEDE_BY_ID[current.sedeId].address })}</p>
                 {current.stage === 'ready' ? (
-                  <Button size="sm" fullWidth onClick={() => { dispatch({ type: 'pickup', id: current.id }); setNavIdx(0); notify(t('driver.pickedToast', { id: current.id })); }}>{t('driver.pickup')}</Button>
+                  <>
+                    <Button
+                      size="sm"
+                      fullWidth
+                      onClick={() => {
+                        const jump = clockJumpMinutes(state, 'pickup', current.id);
+                        dispatch({ type: 'pickup', id: current.id });
+                        setNavIdx(0);
+                        notify(jump > 0 ? t('driver.pickedToastJump', { id: current.id, min: jump }) : t('driver.pickedToast', { id: current.id }));
+                      }}
+                    >
+                      {t('driver.pickup')}
+                    </Button>
+                    {clockJumpMinutes(state, 'pickup', current.id) > 0 && (
+                      <p className="text-[10px] text-secondary-600 dark:text-secondary-400">{t('driver.pickupJumpHint', { min: clockJumpMinutes(state, 'pickup', current.id) })}</p>
+                    )}
+                  </>
                 ) : (
                   <p className="rounded-lg bg-secondary-100 px-2 py-1.5 dark:bg-secondary-900">
                     {t('driver.waitingSede', { min: Math.max(0, (current.prepMin ?? 15) - Math.floor((state.now - (current.t.accepted ?? current.t.created)) / 60)) })}
@@ -217,6 +233,9 @@ export default function DriverApp() {
                 <Button size="sm" fullWidth onClick={() => setPod(current)}>
                   <CheckBadgeIcon className="mr-1 h-4 w-4" />{t('driver.confirmDelivery')}
                 </Button>
+                {clockJumpMinutes(state, 'deliver', current.id) > 0 && (
+                  <p className="text-[10px] text-secondary-600 dark:text-secondary-400">{t('driver.deliverJumpHint', { min: clockJumpMinutes(state, 'deliver', current.id) })}</p>
+                )}
               </>
             )}
 

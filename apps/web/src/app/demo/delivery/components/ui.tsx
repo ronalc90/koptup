@@ -13,20 +13,34 @@ export function useMoney() {
   return (n: number) => fmtMoney(n, locale);
 }
 
+/**
+ * Marco de celular. En pantallas pequeñas (el visitante ya está en un celular)
+ * la app ocupa el ancho y crece con su contenido, sin un "celular dentro del
+ * celular" con desplazamiento propio; desde 640 px se ve el marco de 680 px.
+ */
 export function PhoneFrame({ children, label, overlay }: { children: ReactNode; label: string; overlay?: ReactNode }) {
   return (
     <div className="mx-auto w-full max-w-[400px]">
-      <div className="mb-2 text-center text-xs font-semibold uppercase tracking-wider text-secondary-500 dark:text-secondary-400">{label}</div>
-      <div className="relative overflow-hidden rounded-[2.2rem] border-[10px] border-secondary-900 bg-secondary-900 shadow-2xl dark:border-secondary-700 dark:bg-secondary-950">
-        <div className="absolute left-1/2 top-0 z-20 h-5 w-28 -translate-x-1/2 rounded-b-2xl bg-secondary-900 dark:bg-secondary-950" />
-        <div className="h-[680px] overflow-y-auto overflow-x-hidden bg-secondary-50 text-secondary-900 dark:bg-secondary-900 dark:text-white">{children}</div>
+      <div className="mb-2 text-center text-xs font-semibold uppercase tracking-wider text-secondary-600 dark:text-secondary-400">{label}</div>
+      <div className="relative rounded-2xl border border-secondary-200 bg-secondary-50 shadow-sm dark:border-secondary-700 dark:bg-secondary-900 sm:overflow-hidden sm:rounded-[2.2rem] sm:border-[10px] sm:border-secondary-900 sm:bg-secondary-900 sm:shadow-2xl sm:dark:border-secondary-700 sm:dark:bg-secondary-950">
+        <div className="absolute left-1/2 top-0 z-20 hidden h-5 w-28 -translate-x-1/2 rounded-b-2xl bg-secondary-900 dark:bg-secondary-950 sm:block" aria-hidden="true" />
+        <div className="rounded-2xl bg-secondary-50 text-secondary-900 dark:bg-secondary-900 dark:text-white sm:h-[680px] sm:overflow-y-auto sm:overflow-x-hidden sm:rounded-none">{children}</div>
         {overlay}
       </div>
     </div>
   );
 }
 
-/** Ventana modal. Dentro del teléfono usa scope="phone" (cubre solo la pantalla del teléfono). */
+// Ventanas abiertas, de la más vieja a la más nueva: Escape cierra solo la de arriba.
+const modalStack: symbol[] = [];
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+/**
+ * Ventana modal. Dentro del teléfono usa scope="phone": desde 640 px cubre solo
+ * la pantalla del marco; en un celular real ocupa la pantalla como una hoja
+ * que sube desde abajo. El foco entra a la ventana, Tab no sale de ella,
+ * Escape la cierra y el foco vuelve al control que la abrió.
+ */
 export function Modal({
   title, onClose, children, footer, scope = 'page',
 }: { title: string; onClose: () => void; children: ReactNode; footer?: ReactNode; scope?: 'page' | 'phone' }) {
@@ -37,13 +51,41 @@ export function Modal({
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeRef.current(); };
+    const id = Symbol('modal');
+    modalStack.push(id);
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const onKey = (e: KeyboardEvent) => {
+      if (modalStack[modalStack.length - 1] !== id) return;
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeRef.current();
+        return;
+      }
+      if (e.key !== 'Tab' || !ref.current) return;
+      const items = Array.from(ref.current.querySelectorAll<HTMLElement>(FOCUSABLE)).filter((el) => el.offsetParent !== null);
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      const inside = ref.current.contains(document.activeElement);
+      if (e.shiftKey && (document.activeElement === first || !inside)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (document.activeElement === last || !inside)) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
     window.addEventListener('keydown', onKey);
     ref.current?.focus();
-    return () => window.removeEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      const i = modalStack.indexOf(id);
+      if (i >= 0) modalStack.splice(i, 1);
+      if (opener && opener.isConnected) opener.focus();
+    };
   }, []);
-  const wrap = scope === 'page' ? 'fixed inset-0 z-[70] items-center p-4' : 'absolute inset-0 z-30 items-end';
-  const box = scope === 'page' ? 'max-h-[85vh] w-full max-w-lg rounded-2xl' : 'max-h-[88%] w-full rounded-t-2xl';
+  const wrap = scope === 'page' ? 'fixed inset-0 z-[70] items-center p-4' : 'fixed inset-0 z-[70] items-end sm:absolute sm:z-30';
+  const box = scope === 'page' ? 'max-h-[85vh] w-full max-w-lg rounded-2xl' : 'max-h-[88vh] w-full rounded-t-2xl sm:max-h-[88%]';
   return (
     <div className={`flex justify-center bg-black/50 ${wrap}`} onClick={onClose}>
       <div
@@ -56,7 +98,7 @@ export function Modal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between gap-2 border-b border-secondary-200 px-4 py-3 dark:border-secondary-700">
-          <h3 className="text-sm font-bold">{title}</h3>
+          <h2 className="text-sm font-bold">{title}</h2>
           <button type="button" onClick={onClose} aria-label={t('close')} className="rounded-full p-1 hover:bg-secondary-100 dark:hover:bg-secondary-800">
             <XMarkIcon className="h-5 w-5" />
           </button>
@@ -69,6 +111,7 @@ export function Modal({
 }
 
 export function Toasts() {
+  const t = useTranslations('demoDelivery.common');
   const { toasts, dismissToast } = useDelivery();
   if (!toasts.length) return null;
   return (
@@ -82,7 +125,7 @@ export function Toasts() {
           }`}
         >
           <span className="flex-1">{x.text}</span>
-          <button type="button" onClick={() => dismissToast(x.id)} className="opacity-80 hover:opacity-100" aria-label="×">
+          <button type="button" onClick={() => dismissToast(x.id)} className="opacity-80 hover:opacity-100" aria-label={t('closeToast')}>
             <XMarkIcon className="h-4 w-4" />
           </button>
         </div>
@@ -129,11 +172,16 @@ export function StageBadge({ stage }: { stage: Stage }) {
 }
 
 export function Stars({ value, onChange, size = 'h-4 w-4', label }: { value: number; onChange?: (n: number) => void; size?: string; label?: string }) {
+  const t = useTranslations('demoDelivery.common');
   return (
-    <span className="inline-flex items-center gap-0.5" role={onChange ? 'radiogroup' : undefined} aria-label={label}>
+    <span
+      className="inline-flex items-center gap-0.5"
+      role={onChange ? 'radiogroup' : 'img'}
+      aria-label={onChange ? label : t('stars', { n: value })}
+    >
       {[1, 2, 3, 4, 5].map((n) =>
         onChange ? (
-          <button key={n} type="button" role="radio" aria-checked={value === n} aria-label={`${n}`} onClick={() => onChange(n)}>
+          <button key={n} type="button" role="radio" aria-checked={value === n} aria-label={t('stars', { n })} onClick={() => onChange(n)}>
             <StarSolid className={`${size} ${n <= value ? 'text-amber-400' : 'text-secondary-300 dark:text-secondary-600'}`} />
           </button>
         ) : (

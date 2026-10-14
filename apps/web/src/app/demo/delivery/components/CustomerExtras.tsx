@@ -119,14 +119,14 @@ export function CustomerAddress() {
         <p className="font-semibold">{t('customer.address.newTitle')}</p>
         <label className="block">
           <span className="mb-0.5 block text-secondary-600 dark:text-secondary-300">{t('customer.address.streetType')}</span>
-          <select value={type} onChange={(e) => setType(e.target.value as StreetType)} className={field}>
+          <select value={type} onChange={(e) => setType(e.target.value as StreetType)} className={`${field} pr-8`}>
             {STREET_TYPES.map((s) => <option key={s} value={s}>{STREET_LABEL[s]}</option>)}
           </select>
         </label>
         <div className="grid grid-cols-[1fr_auto_1fr_auto_1fr] items-end gap-1">
           <label className="block min-w-0">
             <span className="mb-0.5 block text-secondary-600 dark:text-secondary-300">{t('customer.address.main')}</span>
-            <input value={main} onChange={(e) => setMain(e.target.value)} placeholder="85" className={field} />
+            <input value={main} onChange={(e) => setMain(e.target.value)} placeholder="85" inputMode="text" autoComplete="off" className={field} />
           </label>
           <span className="pb-1.5 font-bold">#</span>
           <label className="block min-w-0">

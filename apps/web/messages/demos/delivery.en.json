@@ -12,6 +12,22 @@
       "breadcrumbHome": "Home",
       "breadcrumbDemos": "Demos"
     },
+    "header": {
+      "back": "Back to the demo catalog",
+      "audience": "For restaurants, chains and stores with their own delivery that depend on aggregator apps today. Start with the suggested walkthrough: place an order as a customer and follow it to delivery.",
+      "requestDemo": "Request a guided demo",
+      "quote": "Get a quote for your delivery app",
+      "howTitle": "What is real and what is simulated",
+      "show": "Show",
+      "hide": "Hide",
+      "how": {
+        "real": "Real in your browser: the order goes through the 4 apps with a single shared state; prices, distance-based delivery fee, tip, points, KPIs, stage times, avoided commission and the CSV are calculated from the orders.",
+        "rules": "Rules, not AI: the courier suggestion (closest and free), the stop order and the review of suspicious orders.",
+        "clock": "Demo clock: the sample day is today and starts at 7:05 PM; it runs in real time and jumps ahead when the kitchen finishes, the courier reaches the store or delivers, so the times are realistic.",
+        "simulated": "Simulated: payments (always approved unless you turn on the test decline), WhatsApp, masked call, GPS, map and courier position. In your project they connect to the payment gateway, WhatsApp Business, a telephony provider and a maps service.",
+        "storage": "What you do is saved only in this browser; “Reset demo” goes back to the sample data."
+      }
+    },
     "tabs": {
       "label": "Demo apps",
       "customer": "Customer",
@@ -51,9 +67,9 @@
       },
       "next": {
         "order": "Start in Customer: add dishes to the cart and place the order.",
-        "accept": "Next: in Store, accept order {id} before the 45 s run out.",
+        "accept": "Next: in Store, accept order {id}. The store has 45 s; if they run out you can still accept it and Operations gets an alert.",
         "assign": "Next: in Operations, assign a courier to order {id} (Dispatch or Alerts).",
-        "deliver": "Next: in Store, mark order {id} “Ready for pickup”; then, in Courier, accept the offer, pick it up and confirm the delivery with the code the customer sees.",
+        "deliver": "Next: in Store, mark order {id} “Ready for pickup” (the clock jumps to the end of preparation); then, in Courier, accept the offer, pick it up and confirm delivery with the code the customer sees.",
         "rate": "Next: in Customer, rate the delivery of order {id}."
       },
       "done": "Done! You followed the order through the 4 apps. In Operations, check the time per stage and the commission you did not pay.",
@@ -63,7 +79,7 @@
     },
     "activity": {
       "title": "Activity across apps",
-      "hint": "Every action in one app shows up in the others. The demo clock started at 7:05 PM and runs in real time.",
+      "hint": "Every action in one app shows up in the others. The demo clock starts at 7:05 PM, runs in real time and jumps ahead when the kitchen finishes, the courier reaches the store or delivers.",
       "clockHint": "Demo clock",
       "empty": "Here you will see your order move from one app to another.",
       "app": {
@@ -104,7 +120,9 @@
       "driverOffline": "{driver} went offline",
       "docUpdated": "Document updated: {doc}",
       "autoOn": "Auto-advance on",
-      "autoOff": "Auto-advance off"
+      "autoOff": "Auto-advance off",
+      "clockJump": "Demo clock moved ahead {min} min: {why, select, prep {{id} finished cooking} toSede {the courier reached the store for {id}} other {the courier reached the address of {id}}}",
+      "paymentDeclined": "{method} payment declined (simulated): no order was created"
     },
     "common": {
       "back": "Back",
@@ -121,8 +139,10 @@
       "yours": "Yours",
       "yes": "yes",
       "no": "no",
-      "mapHint": "Illustrative map, not to scale · simulated position",
-      "mapHintOps": "Illustrative map of Bogotá, not to scale · simulated positions"
+      "mapHint": "Illustrative map, not to scale · simulated, sped-up position",
+      "mapHintOps": "Illustrative map of Bogotá, not to scale · simulated positions",
+      "closeToast": "Close notice",
+      "stars": "{n, plural, one {# star} other {# stars}}"
     },
     "stage": {
       "pending": "Awaiting confirmation",
@@ -362,7 +382,9 @@
       "needBoth": "To deliver without a code you need the photo and the signature.",
       "privacy": "In the demo the photo and signature never leave your browser; in your project they are stored as proof of delivery.",
       "confirm": "Confirm delivery",
-      "done": "Order {id} delivered"
+      "done": "Order {id} delivered",
+      "doneJump": "Order {id} delivered · the demo clock moved ahead {min} min (ride)",
+      "modeLabel": "How you confirm delivery"
     },
     "docs": {
       "title": "Courier documents",
@@ -481,8 +503,11 @@
           "noSede": "No open store covers your address.",
           "soldOut": "Some items are sold out at the store: remove them from the cart.",
           "cash": "The cash you will pay with does not cover the total.",
-          "blocked": "Your account is blocked in the demo: unblock it in Operations."
-        }
+          "blocked": "Your account is blocked in the demo: unblock it in Operations.",
+          "declined": "The bank declined the {method} payment (simulated): insufficient funds. No order was created and nothing was charged; try again or choose another payment method."
+        },
+        "simulateDecline": "Try a declined payment: the bank declines the next payment (simulated).",
+        "declinedToast": "Payment declined by the bank (simulated). No order was created: try again or choose another method."
       },
       "tracking": {
         "title": "Order {id}",
@@ -609,7 +634,9 @@
       "analytics": "Today's sales",
       "topItems": "Best sellers (units)",
       "salesByHour": "Sales by hour",
-      "rating": "Average rating ({n} reviews)"
+      "rating": "Average rating ({n} reviews)",
+      "readyToastJump": "{id} ready for pickup · the demo clock moved ahead {min} min (end of preparation)",
+      "readyJumpHint": "In the demo, marking it ready moves the clock ahead {min} min to the end of the chosen preparation time."
     },
     "driver": {
       "hello": "Hi, {name}",
@@ -663,11 +690,14 @@
       "stopDropoff": "Deliver {id} · {place}",
       "recentRatings": "Recent ratings",
       "noRatings": "No ratings yet.",
-      "footer": "Earnings, ratings and documents are calculated from this demo's sample data."
+      "footer": "Earnings, ratings and documents are calculated from this demo's sample data.",
+      "pickedToastJump": "{id} picked up · the demo clock moved ahead {min} min (arrival at the store)",
+      "pickupJumpHint": "You reach the store in ~{min} min: when you pick it up, the demo clock moves ahead.",
+      "deliverJumpHint": "The ride takes ~{min} min: when you confirm delivery, the demo clock moves ahead."
     },
     "ops": {
       "title": "Operations center · {brand}",
-      "subtitle": "Sample day, {date} · demo clock {time}",
+      "subtitle": "Sample day for today ({date}) · demo clock {time}",
       "exportCsv": "Export orders (CSV)",
       "csvToast": "CSV downloaded with {n} orders",
       "kpis": {

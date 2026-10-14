@@ -2,25 +2,36 @@
 
 > Ruta `/demo/delivery` · Modo de acceso: **Con solicitud** · Tipo: **datos de ejemplo** (todo corre en el navegador; no llama al servidor ni a un modelo de IA) · Plan del producto: [App de delivery](Producto-app-delivery.md)
 
-**Resumen.** Es el canal propio de domicilios de un restaurante ficticio (Fogón Demo, con 3 sedes en Bogotá) contado en **4 apps conectadas**: el **Cliente** pide y paga, el **Comercio** (la sede) acepta y prepara, **Operaciones** asigna repartidores y vigila tiempos, y el **Repartidor** recoge y entrega con un código. Un pedido que haces en una app aparece al instante en las otras, y un panel de actividad lo va contando. Está pensada para dueños de restaurantes y cadenas que hoy dependen de los agregadores; se abre solo con un acceso aprobado y lo que haces se guarda solo en tu navegador.
+**Resumen.** Es el canal propio de domicilios de un restaurante ficticio (Fogón Demo, con 3 sedes en Bogotá) contado en **4 apps conectadas**: el **Cliente** pide y paga, el **Comercio** (la sede) acepta y prepara, **Operaciones** asigna repartidores y vigila tiempos, y el **Repartidor** recoge y entrega con un código. Un pedido que haces en una app aparece al instante en las otras, y un panel de actividad lo va contando. Está pensada para dueños de restaurantes, cadenas y comercios con domicilio propio que hoy dependen de los agregadores; el encabezado lo dice, explica qué es real y qué es simulado, y ofrece **Solicitar demo guiada** y **Cotizar tu app de domicilios**. Un **recorrido sugerido de 5 pasos** dice por dónde empezar y se marca solo. La jornada de ejemplo es la de **hoy** (fecha de Colombia) y su reloj se adelanta cuando la cocina termina, el repartidor llega o entrega, así que los tiempos son realistas. Se abre solo con un acceso aprobado y lo que haces se guarda solo en tu navegador.
 
 **En esta página:** [Recorrido sugerido](#recorrido-sugerido-demo-comercial-de-5-minutos) · [Pantallas y funciones](#pantallas-y-funciones) · [Qué es real y qué es simulado](#qué-es-real-y-qué-es-simulado) · [Acceso](#acceso) · [Limitaciones conocidas](#limitaciones-conocidas)
 
 ![Vista general](images/doc/demos/delivery/00-general.jpg)
 
-*Vista inicial: las cuatro apps (con contadores en rojo), «Avance automático», «Reiniciar demo», el recorrido sugerido (0/5), la app del Cliente dentro de un marco de celular y el panel «Actividad entre apps».*
+*Lo primero que ve quien entra: qué es, para quién, las salidas comerciales, las cuatro apps y el recorrido sugerido.*
+
+1. **Volver al catálogo de demos** (`/demo`).
+2. **Solicitar demo guiada** (`/solicitar-demo?demos=delivery`, con esta demo ya elegida) y **Cotizar tu app de domicilios** (`/contact?service=app-delivery`, con «App de delivery» prellenado). Arriba, las insignias «Demo interactiva» y «Datos de ejemplo»; debajo del título, para quién es y por dónde empezar.
+3. **Pestañas** de las cuatro apps (con flechas, Inicio y Fin del teclado también se cambia de app). El número en rojo es lo pendiente en cada una.
+4. **Avance automático** y **Reiniciar demo**.
+5. **Recorrido sugerido (0/5)**.
+6. **Actividad entre apps**, con el reloj de la demo.
+
+Entre el encabezado y las pestañas está el desplegable **Qué es real y qué es simulado**. Al final de la página está el cierre común de las demos (demo guiada, cotización y planes).
+
+> **Sobre las fechas y las horas de las capturas.** La jornada de ejemplo es la de **hoy en Colombia** y empieza a las 7:05 p. m. (es el reloj de la demo, no la hora real). Las capturas son del 14 de octubre de 2026; otro día cambian la fecha de Operaciones, el nombre del CSV y las fechas de vencimiento de los documentos (los días que faltan son los mismos).
 
 ---
 
 ## Recorrido sugerido (demo comercial de 5 minutos)
 
-El guion sigue la barra **Recorrido sugerido: un pedido de punta a punta** que trae la propia demo: cada paso se marca en verde solo cuando lo haces de verdad, y al pulsar un paso la demo te lleva a la app que corresponde. Empieza con los datos limpios: si alguien ya usó la demo en ese navegador, pulsa **Reiniciar demo** y confirma.
+El guion sigue la barra **Recorrido sugerido: un pedido de punta a punta** de la propia demo: cada paso se marca en verde solo cuando lo haces de verdad, y al pulsar un paso la demo te lleva a la app que corresponde. Empieza con los datos limpios: si alguien ya usó la demo en ese navegador, pulsa **Reiniciar demo** y confirma.
 
-> **Ojo con el tiempo:** la sede tiene **45 segundos** para aceptar tu pedido. Si te demoras, el pedido no se pierde: queda «Sin respuesta · escalado a Operaciones» y desde Operaciones lo puedes aceptar en nombre de la sede. Si prefieres no correr, activa **Avance automático**: tu pedido avanza solo un paso cada 4 segundos.
+> **Cómo corre el tiempo.** El reloj de la demo avanza en tiempo real y **se adelanta** cuando algo tomaría minutos: al marcar «Listo para recoger» salta al final de la preparación elegida, al recoger salta hasta que el repartidor llega a la sede (si aún no ha llegado) y al confirmar la entrega salta lo que dura el trayecto. Cada salto queda escrito en la actividad («Reloj de la demo adelantado 20 min: terminó la preparación de P-1036») y el botón avisa antes cuántos minutos se adelantará. Mientras tanto, los pedidos de ejemplo que ya estaban en curso siguen su camino solos. La sede tiene **45 segundos reales** para aceptar; si se pasan, el pedido queda «Sin respuesta · escalado a Operaciones», pero la sede todavía puede aceptarlo (y Operaciones también, en su nombre). Si prefieres no correr, activa **Avance automático**: tu pedido avanza un paso cada 4 segundos.
 
 ![Recorrido de la demo](images/doc/demos/delivery/recorrido.gif)
 
-*Recorrido completo: pedido y pago simulado, aceptación en la sede, asignación del repartidor, seguimiento con código, entrega y calificación.*
+*Recorrido completo: pedido con un pago rechazado de prueba y luego aprobado, aceptación en la sede, asignación del repartidor, seguimiento con código, entrega y calificación.*
 
 ```mermaid
 sequenceDiagram
@@ -29,13 +40,13 @@ sequenceDiagram
     participant O as Operaciones
     participant R as Repartidor
     C->>S: Pedido y pago simulado
-    S->>S: Acepta antes de 45 s y fija el tiempo de preparación
+    S->>S: Acepta (45 s) y fija el tiempo de preparación
     O->>R: Asigna al repartidor sugerido (oferta)
     R->>O: Acepta la oferta
-    S->>R: Listo para recoger
+    S->>R: Listo para recoger (el reloj salta al fin de la preparación)
     R->>C: Recogido: va en camino
     C->>R: Código de entrega de 4 dígitos
-    R->>C: Entrega confirmada
+    R->>C: Entrega confirmada (el reloj suma el trayecto)
     C->>S: Calificación (llega a la sede y al repartidor)
 ```
 
@@ -47,19 +58,26 @@ En **Cliente**, busca «ajiaco» y pulsa **+** en Ajiaco santafereño: se abre u
 
 ![Paso 1: carrito](images/doc/demos/delivery/02-paso1-carrito.jpg)
 
-*Carrito con Ajiaco (con arroz blanco) y dos limonadas, propina de $2.000 y pago con Nequi.*
+*Carrito con Ajiaco (con arroz blanco) y dos limonadas: medios de pago y la casilla para probar un pago rechazado.*
 
 1. **Medio de pago**: Nequi, Daviplata, PSE, tarjeta guardada, efectivo contraentrega (con «¿Con cuánto vas a pagar?» y el cambio que llevará el repartidor) o datáfono contraentrega. Todos los pagos son simulados.
-2. **Usar 500 puntos (−$5.000)**: el cliente de ejemplo, Mariana, tiene 1.240 puntos.
-3. **Dividir la cuenta**: entre 2, 3 o 4 personas muestra cuánto paga cada una.
-4. **Totales**: subtotal $56.200, domicilio $4.700 (según la distancia a la sede), propina $2.000 y total $62.900.
-5. **Pagar $62.900 (simulado)**: aparece «Pago aprobado con Nequi (simulado) · pedido P-1036 enviado a la sede». Con pago contraentrega el botón dice «Hacer pedido · pagas $… al recibir».
+2. **Probar un pago rechazado**: con un medio en línea, el banco «rechaza» el próximo pago (simulado).
 
-Más arriba en el carrito quedan la **Nota para la sede** y la **Propina** (sin propina, $2.000, $3.000 o $5.000; «el 100 % es para quien te lleva el pedido»). El seguimiento queda en «Esperando que la sede confirme» con la cuenta regresiva y el botón **Cancelar pedido**.
+Más abajo están **Usar 500 puntos (−$5.000)** (Mariana, la clienta de ejemplo, tiene 1.240), **Dividir la cuenta** entre 2, 3 o 4 personas y los totales: subtotal $56.200, domicilio $4.700 (según la distancia a la sede), propina $2.000 y total $62.900. Más arriba quedan la **Nota para la sede** y la **Propina** (sin propina, $2.000, $3.000 o $5.000; «el 100 % es para quien te lleva el pedido»).
 
-Qué decir: «El cliente pide en tu propio canal, con tus medios de pago, y la venta es tuya».
+Con la casilla marcada, **Pagar $62.900 (simulado)** muestra el rechazo y no crea el pedido:
 
-### Paso 2. Comercio: acepta antes de 45 segundos
+![Paso 1: pago rechazado de prueba](images/doc/demos/delivery/02b-pago-rechazado.jpg)
+
+*«El banco rechazó el pago con Nequi (simulado): fondos insuficientes. No se creó el pedido ni se cobró nada; vuelve a intentarlo o elige otro medio de pago.»*
+
+1. El mensaje del rechazo. La casilla se desmarca sola: al pulsar **Pagar** otra vez, el pago se aprueba («Pago aprobado con Nequi (simulado) · pedido P-1036 enviado a la sede»). Con pago contraentrega el botón dice «Hacer pedido · pagas $… al recibir» y la casilla no aparece.
+
+El seguimiento queda en «Esperando que la sede confirme», con la cuenta regresiva de la sede, **Ir a Comercio** y **Cancelar pedido**.
+
+Qué decir: «El cliente pide en tu propio canal, con tus medios de pago, y la venta es tuya. Si el banco rechaza el pago, no hay pedido ni cobro».
+
+### Paso 2. Comercio: acepta el pedido
 
 Pulsa **Comercio** (o el paso 2 de la barra). La sede que atiende el pedido ya queda seleccionada.
 
@@ -67,10 +85,9 @@ Pulsa **Comercio** (o el paso 2 de la barra). La sede que atiende el pedido ya q
 
 *App de la Sede Chapinero con el pedido P-1036 por aceptar.*
 
-1. **El pedido**: número, la marca «Tuyo», productos con sus opciones, cliente, total y medio de pago, con **Responde en N s**.
-2. **Tiempo de preparación**: 15, 20 o 30 minutos.
-3. **Rechazar**: pide el motivo (se agotó un producto, la cocina está llena, dirección fuera de cobertura o la sede está por cerrar). El cliente ve el motivo y «No se hizo ningún cobro (simulado)».
-4. **Aceptar**: el pedido pasa a **En preparación** con su barra de avance («8 de 20 min»).
+1. **Tiempo de preparación**: 15, 20 o 30 minutos.
+
+En la tarjeta están el número del pedido, la marca «Tuyo», los productos con sus opciones, la clienta, el total y el medio de pago, con **Responde en N s**. **Rechazar** pide el motivo (se agotó un producto, la cocina está llena, dirección fuera de cobertura o la sede está por cerrar); el cliente ve el motivo y «No se hizo ningún cobro (simulado)». **Aceptar** pasa el pedido a **En preparación** con su avance («0 de 20 min»).
 
 Qué decir: «La sede tiene un tiempo límite; si no responde, Operaciones se entera de inmediato».
 
@@ -82,35 +99,31 @@ En **Operaciones**, busca tu pedido en la tabla **Despacho** (o en **Alertas**, 
 
 *Ventana «Asignar P-1036 · Sede Chapinero» con los repartidores conectados ordenados por carga y distancia.*
 
-1. **Sugerido**: Camilo Rojas, en moto, a 1,1 km y ~6 minutos de la sede, libre. «El sistema sugiere al más cercano a la sede que esté libre (regla simple, no IA)».
-2. **Asignar**: envía la oferta; el aviso dice «Oferta de P-1036 enviada a Camilo Rojas. Mírala en la pestaña Repartidor». En Despacho el pedido queda «Oferta enviada».
-3. **Desconectados o suspendidos (no aparecen)**: cuántos repartidores no están disponibles.
+- **Sugerido**: Camilo Rojas, en moto, a 1,1 km y ~6 minutos de la sede, libre («regla simple, no IA»). Primero van los libres y, entre ellos, el más cercano.
+- **Asignar** envía la oferta: «Oferta de P-1036 enviada a Camilo Rojas. Mírala en la pestaña Repartidor». En Despacho el pedido queda «Oferta enviada».
+- **Desconectados o suspendidos (no aparecen)**: cuántos repartidores no están disponibles.
+- **Escape** o la **X** cierran la ventana; el foco vuelve al botón que la abrió.
 
 ### Paso 4. Repartidor: recoge y entrega con el código
 
-En **Repartidor** aparece la oferta (sede de recogida, zona de entrega y lo que gana con el pedido). Pulsa **Aceptar**. Mientras la sede prepara, la tarea dice «La sede aún lo prepara»: vuelve a **Comercio**, pulsa **Listo para recoger**, regresa a **Repartidor** y pulsa **Recogí el pedido**.
+En **Repartidor** aparece la oferta (sede de recogida, zona de entrega y lo que gana con el pedido). Pulsa **Aceptar**. Mientras la sede prepara, la tarea dice «La sede aún lo prepara»: vuelve a **Comercio** y pulsa **Listo para recoger**. Debajo del botón la demo avisa «al marcarlo listo el reloj se adelanta 20 min hasta el fin de la preparación elegida», y el aviso lo confirma («P-1036 listo para recoger · el reloj de la demo se adelantó 20 min»). Regresa a **Repartidor** y pulsa **Recogí el pedido** (si el repartidor aún no hubiera llegado a la sede, el reloj saltaría también esos minutos).
 
 ![Paso 4: tarea del repartidor](images/doc/demos/delivery/05-paso4-repartidor.jpg)
 
-*Tarea actual de Camilo con el pedido en camino, las indicaciones y la ruta.*
+*Tarea actual de Camilo con el pedido en camino; a la derecha, la actividad con el salto del reloj y los pedidos de ejemplo que avanzaron solos en esos minutos.*
 
-1. **Entrega a**: nombre y dirección del cliente.
-2. **Cobro**: «Ya pagado con Nequi: no cobres nada» (en contraentrega diría cuánto cobrar en efectivo, con cuánto paga y cuánto cambio llevar, o que se cobra con datáfono).
-3. **Chat** con el cliente y **Llamar** (llamada enmascarada simulada: explica el número puente y no llama).
-4. **Confirmar entrega**: abre la confirmación con código.
-
-Debajo están las **Indicaciones** por cuadras («Sigue por la Calle 63 hacia el occidente 0,6 km…», con **Siguiente indicación**) y la **Ruta con varias paradas**.
+En la tarea están **Entrega a** (nombre y dirección), el **cobro** («Ya pagado con Nequi: no cobres nada»; en contraentrega dice cuánto cobrar, con cuánto paga y cuánto cambio llevar, o que se cobra con datáfono), **Chat** con el cliente, **Llamar** (llamada enmascarada simulada: explica el número puente y no llama) y **Confirmar entrega**, con el aviso «El trayecto toma ~11 min: al confirmar la entrega, el reloj de la demo se adelanta». Debajo están las **Indicaciones** por cuadras (con **Siguiente indicación**) y la **Ruta con varias paradas**.
 
 Mientras tanto, el cliente ve su pedido en camino. Ábrelo en **Cliente** para mostrar el código:
 
 ![Paso 4: el cliente ve el pedido en camino](images/doc/demos/delivery/06-paso4-cliente-en-camino.jpg)
 
-*Seguimiento del cliente: llegada estimada, código de entrega, mapa ilustrativo y la vista previa del WhatsApp.*
+*Seguimiento del cliente: llegada estimada, código de entrega, mapa ilustrativo y la vista previa del WhatsApp con la misma hora.*
 
-1. **Llegada estimada** (7:16 p. m. en la prueba) y la hora prometida.
-2. **Código de entrega** (`1905` en la prueba): el cliente se lo da al repartidor.
-3. **Chatear con el repartidor** (y el botón verde para llamarlo). El chat se habilita cuando un repartidor acepta y se cierra al entregar.
-4. **Vista previa del WhatsApp que recibes**, con el enlace de seguimiento de ejemplo y el código. Es simulado; **Copiar** copia el texto.
+- **Llegada estimada** 7:36 p. m. (la salida de la sede más el trayecto) y «Prometido: antes de las 7:42 p. m.». La vista previa del WhatsApp dice la misma hora («llega aprox. a las 7:36 p. m.»).
+- **Código de entrega** (`1905` en la prueba): el cliente se lo da al repartidor.
+- **Chatear con el repartidor** y el botón verde para llamarlo. El chat se habilita cuando un repartidor acepta y se cierra al entregar.
+- **Vista previa del WhatsApp que recibes**, con un enlace de seguimiento de ejemplo y el código. Es simulado; **Copiar** copia el texto.
 
 Vuelve a **Repartidor**, pulsa **Confirmar entrega** y escribe el código:
 
@@ -118,24 +131,23 @@ Vuelve a **Repartidor**, pulsa **Confirmar entrega** y escribe el código:
 
 *Ventana «Confirmar entrega de P-1036» con el código que dio el cliente.*
 
-1. **Código del cliente** o **Foto y firma** (la alternativa pide una foto y una firma con el dedo o el mouse; las dos quedan solo en el navegador).
-2. **Código de 4 dígitos**: si no coincide, dice «El código no coincide. Pídeselo de nuevo al cliente».
-3. **Pista de la demo**: dónde encontrar el código (en los pedidos de ejemplo la pista muestra el código directamente).
-4. **Confirmar entrega**: «Pedido P-1036 entregado».
+- **Código del cliente** o **Foto y firma** (la alternativa pide una foto y una firma con el dedo o el mouse; las dos quedan solo en el navegador).
+- Si el código no coincide: «El código no coincide. Pídeselo de nuevo al cliente».
+- La pista de la demo dice dónde encontrar el código (en los pedidos de ejemplo lo muestra directamente).
+- **Confirmar entrega**: «Pedido P-1036 entregado · el reloj de la demo se adelantó 11 min (trayecto)».
 
 Qué decir: «Sin código no hay entrega: se acaban los "yo no recibí nada"».
 
 ### Paso 5. Cliente: califica la entrega
 
-En **Cliente** el pedido dice «¡Pedido entregado!». Elige las estrellas, escribe un comentario opcional y pulsa **Enviar calificación**.
+En **Cliente** el pedido dice «¡Pedido entregado!» y «Entregado a las 7:36 p. m. · 31 min desde que lo pediste». Elige las estrellas, escribe un comentario opcional y pulsa **Enviar calificación**.
 
 ![Paso 5: recorrido completo](images/doc/demos/delivery/08-paso5-calificar.jpg)
 
-*Recorrido completo (5/5), la calificación enviada y todo lo que pasó, contado en el panel de actividad.*
+*Recorrido completo (5/5) con la salida comercial y el pedido entregado.*
 
-1. **Recorrido sugerido (5/5)**: «¡Listo! Recorriste el pedido en las 4 apps. En Operaciones mira los tiempos por etapa y la comisión que no pagaste».
-2. **Gracias por calificar**: las estrellas y los puntos ganados («Ganaste 56 puntos con este pedido · ahora tienes 1.296»: 1 punto por cada $1.000 del subtotal).
-3. **Actividad entre apps**: cada evento con la hora del reloj de la demo y la app que lo hizo (Cliente, Comercio, Operaciones, Repartidor).
+- **Recorrido sugerido (5/5)**: «¡Listo! Recorriste el pedido en las 4 apps. En Operaciones mira los tiempos por etapa y la comisión que no pagaste», con **Solicitar demo guiada** y **Cotizar tu app de domicilios**.
+- **Gracias por calificar**: las estrellas y los puntos ganados («Ganaste 56 puntos con este pedido · ahora tienes 1.296»: 1 punto por cada $1.000 del subtotal).
 
 Cierra en **Operaciones** con [Tiempos y zonas y la comisión que no pagaste](#operaciones).
 
@@ -147,12 +159,17 @@ Cierra en **Operaciones** con [Tiempos y zonas y la comisión que no pagaste](#o
 
 | Elemento | Qué hace |
 |---|---|
-| **Pestañas** Cliente, Comercio, Operaciones y Repartidor | Cambian de app. El número en rojo es lo pendiente en cada una: productos en el carrito, pedidos por aceptar, alertas y ofertas de pedido. |
-| **Avance automático** | Simula a la sede, a operaciones y al repartidor: tu pedido más reciente avanza un paso cada 4 segundos (acepta con 15 min, asigna al sugerido, el repartidor acepta, queda listo, se recoge y se entrega con el código). |
+| **Volver al catálogo de demos** | Vuelve a `/demo`. |
+| **Solicitar demo guiada** / **Cotizar tu app de domicilios** | Abren `/solicitar-demo?demos=delivery` y `/contact?service=app-delivery`. También aparecen al terminar el recorrido. |
+| **Qué es real y qué es simulado** | Desplegable: lo que se calcula de verdad, lo que sale de reglas (no IA), cómo corre el reloj, lo simulado y dónde se guarda lo que haces. |
+| **Pestañas** Cliente, Comercio, Operaciones y Repartidor | Cambian de app (también con las flechas, Inicio y Fin). El número en rojo es lo pendiente en cada una: productos en el carrito, pedidos por aceptar, alertas y ofertas de pedido. Pulsar la pestaña activa lleva a la app (útil en el celular). |
+| **Avance automático** | Simula a la sede, a operaciones y al repartidor: tu pedido más reciente avanza un paso cada 4 segundos (acepta con 15 min, asigna al sugerido, el repartidor acepta, queda listo, se recoge y se entrega con el código), con los mismos saltos del reloj. |
 | **Reiniciar demo** | Pide confirmación y borra tus pedidos y cambios; vuelve la jornada de ejemplo de las 7:05 p. m. |
 | **Recorrido sugerido** | Los 5 pasos, marcados según lo que hiciste; se oculta con **Ocultar** y se vuelve a abrir con **Ver recorrido sugerido (N/5)**. Si tu pedido se rechaza o se cancela, lo dice y te pide hacer otro. |
-| **Actividad entre apps** | Lo que va pasando, con el reloj de la demo (empieza a las 7:05 p. m. del jueves 8 de octubre de 2026 y avanza en tiempo real). |
+| **Actividad entre apps** | Lo que va pasando, en orden y con la hora del reloj de la demo, incluidos los saltos del reloj y lo que hacen solos los pedidos de ejemplo. |
 | **Datos de ejemplo** | Insignia; al pasar el mouse dice que la marca, las sedes, los clientes, los repartidores y las cifras son ficticios, y que pagos, WhatsApp, llamadas, GPS y mapa son simulados. |
+
+Las ventanas se cierran con **Escape**, mantienen el foco adentro mientras están abiertas y lo devuelven al control que las abrió.
 
 ### Cliente
 
@@ -174,7 +191,7 @@ Ver los pasos [1](#paso-1-cliente-pide-y-paga-simulado), [4](#paso-4-repartidor-
 
 - **Sede**: Chapinero, Usaquén o Cedritos (con el número de pedidos por aceptar), e interruptor **Abierta/Cerrada**. Una sede cerrada no recibe pedidos y al cliente se le ofrece otra.
 - **Indicadores del día**: ventas, pedidos (y cuántos rechazados o cancelados), ticket promedio y hora pico, calculados con los pedidos de ejemplo y los tuyos (sin domicilio ni propina).
-- **Pedidos por aceptar**, **En preparación** (con el repartidor que viene o «Sin repartidor: lo asigna Operaciones») y **Listos para recoger**.
+- **Pedidos por aceptar**, **En preparación** (con el repartidor que viene o «Sin repartidor: lo asigna Operaciones», y el aviso de cuántos minutos se adelantará el reloj al marcarlo listo) y **Listos para recoger**.
 - **Menú de la sede**: **Agotar** y **Reactivar** cada plato; lo agotado aparece así en la app del Cliente para esa sede.
 - **Ventas de hoy**: más vendidos, ventas por hora y calificación promedio con el número de opiniones.
 
@@ -184,19 +201,19 @@ Ver los pasos [1](#paso-1-cliente-pide-y-paga-simulado), [4](#paso-4-repartidor-
 
 *Centro de operaciones después del recorrido: indicadores, mapa de la operación y alertas.*
 
-- **Indicadores**: pedidos hoy (34 después del recorrido, 2 rechazados o cancelados), en curso, repartidores conectados (5/6), tiempo promedio de entrega, entregados a tiempo y ticket promedio. «Todo se calcula con los pedidos de ejemplo de hoy y los que hagas en la demo».
-- **Exportar pedidos (CSV)**: descarga `pedidos-fogon-demo-2026-10-08.csv` con pedido, sede, zona, estado, horas, minutos, a tiempo, valores, medio de pago, repartidor y calificación.
+- **Indicadores**: pedidos hoy, en curso, repartidores conectados (5/6), tiempo promedio de entrega, entregados a tiempo y ticket promedio, con la fecha de la jornada («Jornada de ejemplo de hoy (14 oct. 2026)»). «Todo se calcula con los pedidos de ejemplo de hoy y los que hagas en la demo».
+- **Exportar pedidos (CSV)**: descarga `pedidos-fogon-demo-<fecha de hoy>.csv` con pedido, sede, zona, estado, horas, minutos, a tiempo, valores, medio de pago, repartidor y calificación.
 - **Mapa de la operación**: sedes, repartidores conectados y destinos de los pedidos en curso, en un mapa ilustrativo de Bogotá (no a escala; posiciones simuladas).
-- **Alertas**: la sede no respondió en 45 s (**Aceptar por la sede** o **Cancelar pedido**), pedido sin repartidor (**Asignar**), pedido tarde frente a lo prometido (**Avisar al cliente**, que escribe en el chat del pedido) y repartidor que rechazó (**Reasignar**). Cada una tiene **Detalle** con la línea de tiempo del pedido.
+- **Alertas**: la sede no respondió en 45 s (**Aceptar por la sede** o **Cancelar pedido**), pedido sin repartidor (**Asignar**), pedido tarde frente a lo prometido (**Avisar al cliente**, que escribe en el chat del pedido) y repartidor que rechazó (**Reasignar**). Cada una tiene **Detalle** con la línea de tiempo del pedido. Después del recorrido, el reloj adelantado deja ver alertas reales: el pedido de ejemplo que nadie asignó va tarde y el que nadie aceptó quedó escalado.
 - **Despacho**: pedidos en curso con sede, estado, repartidor, entrega prometida y minutos de retraso; **Asignar**, **Reasignar** y el ojo para ver el detalle.
 - **Lluvia en la ciudad**: **Recargo al cliente de $2.000** y **Bono al repartidor de $1.500**, para pedidos y ofertas nuevos.
 
 ![Tiempos, comisión y revisión por reglas](images/doc/demos/delivery/10-operaciones-reportes.jpg)
 
-*Tiempos por etapa, pedidos por zona, comisión que no pagaste, revisión por reglas y la lista de repartidores.*
+*Despacho, tiempos por etapa, pedidos por zona y comisión que no pagaste, después del recorrido.*
 
-- **Tiempos y zonas**: minutos promedio por etapa (aceptación, preparación, espera del repartidor y trayecto) y pedidos por zona.
-- **Comisión que no pagaste hoy**: con una comisión de agregador del 25 % y $6.000 de costo por domicilio propio (los dos se pueden cambiar), compara la comisión evitada con el costo de tus domicilios y lo cobrado a los clientes. En la prueba: ahorro neto estimado de $363.125 sobre 29 pedidos entregados.
+- **Tiempos y zonas**: minutos promedio por etapa (aceptación, preparación, espera del repartidor y trayecto) y pedidos por zona. Con el reloj que se adelanta, tu pedido suma tiempos reales (20 min de preparación, 11 de trayecto) y no baja los promedios.
+- **Comisión que no pagaste hoy**: con una comisión de agregador del 25 % y $6.000 de costo por domicilio propio (los dos se pueden cambiar), compara la comisión evitada con el costo de tus domicilios y lo cobrado a los clientes. En la prueba: ahorro neto estimado de $393.625 sobre 31 pedidos entregados.
 - **Revisión por reglas** («reglas configurables, no IA»): entrega confirmada a más de 300 m de la dirección, un mismo celular en 3 cuentas o más, y primer pedido contraentrega por más de $200.000. **Revisar** explica el riesgo y permite **Descartar (falsa alarma)**, **Bloquear cuenta** o, en la de GPS, **Suspender al repartidor**. Las cuentas bloqueadas se listan con **Desbloquear**.
 - **Repartidores**: estado (libre, pedidos en curso, desconectado o suspendido) y entregas del día; **Ver su app** abre la app del Repartidor como esa persona.
 
@@ -204,21 +221,21 @@ Ver los pasos [1](#paso-1-cliente-pide-y-paga-simulado), [4](#paso-4-repartidor-
 
 ![Documentos del repartidor](images/doc/demos/delivery/12-repartidor-documentos.jpg)
 
-*Calificaciones recientes y documentos de Camilo, con el SOAT por vencer.*
+*Calificaciones recientes y documentos de Camilo, con el SOAT por vencer en 12 días.*
 
 - **Ver la app como**: cualquiera de los seis repartidores de ejemplo; interruptor **Conectado/Desconectado** (no deja desconectarse con pedidos u ofertas pendientes).
 - **Ganancias de hoy** y **Calificación**. Pago de ejemplo por domicilio: $4.000 + $700 por km, más propina y bono.
 - **Ofertas de pedido**: **Aceptar** o **Rechazar** con motivo (me queda muy lejos, no tengo espacio en el maletín, estoy terminando otro pedido); el rechazo vuelve a Operaciones como alerta.
 - **Tarea actual**, **Indicaciones**, **Ruta con varias paradas** (orden por cercanía: «regla simple en la demo») y **Calificaciones recientes**. Ver el [paso 4](#paso-4-repartidor-recoge-y-entrega-con-el-código).
-- **Documentos del repartidor**: cédula, licencia, SOAT, técnico-mecánica, tarjeta de propiedad y planilla de seguridad social, con vencimientos frente a la fecha de la demo (avisa con 15 días o menos). **Actualizar** pide el archivo y una nueva fecha; el archivo no sale del navegador (solo se guarda su nombre).
+- **Documentos del repartidor**: cédula, licencia, SOAT, técnico-mecánica, tarjeta de propiedad y planilla de seguridad social, con vencimientos frente a la fecha de hoy (avisa con 15 días o menos). **Actualizar** pide el archivo y una nueva fecha posterior a hoy; el archivo no sale del navegador (solo se guarda su nombre).
 
 ### En el celular
 
 ![Vista móvil](images/doc/demos/delivery/13-movil.jpg)
 
-*La demo en un teléfono (390 px): pestañas en dos filas, el recorrido y la app del Cliente.*
+*La demo en un teléfono (390 px): encabezado con las salidas, pestañas en dos filas y el recorrido.*
 
-En el teléfono las pestañas pasan a dos filas, los pasos del recorrido se desplazan de lado y el panel de actividad queda debajo de la app. La página no se desborda a lo ancho.
+En el teléfono cada app ocupa el ancho de la pantalla y crece con su contenido (sin el marco de celular ni un desplazamiento propio), las ventanas suben desde abajo y quedan a la vista, los pasos del recorrido se desplazan de lado y el panel de actividad queda debajo de la app. La página no se desborda a lo ancho, en claro ni en oscuro.
 
 ---
 
@@ -226,16 +243,17 @@ En el teléfono las pestañas pasan a dos filas, los pasos del recorrido se desp
 
 | Parte | Real o simulado | Detalle |
 |---|---|---|
-| Marca, sedes, menú, clientes, repartidores y la jornada de pedidos | **Datos de ejemplo** | Fogón Demo y su jornada del 8 de octubre de 2026 son ficticios; se generan siempre iguales. |
+| Marca, sedes, menú, clientes, repartidores y la jornada de pedidos | **Datos de ejemplo** | Fogón Demo y su jornada son ficticios; se generan siempre iguales y la fecha es la de hoy en Colombia. |
 | Paso del pedido entre las 4 apps, estados, tiempos y código de entrega | **Real (en el navegador)** | Un solo estado compartido; cada acción se registra en «Actividad entre apps». |
+| Reloj de la demo | **Real (en el navegador)** | Empieza a las 7:05 p. m., avanza en tiempo real y se adelanta al terminar la preparación, al llegar el repartidor a la sede y al entregar; los pedidos de ejemplo en curso avanzan solos con él. |
 | Precios, domicilio por distancia, propina, puntos, división de la cuenta y recargo por lluvia | **Real (cálculo)** | Distancias aproximadas por cuadras con la nomenclatura. |
 | Indicadores, tiempos por etapa, pedidos por zona, comisión evitada y CSV | **Real (cálculo)** | Salen de los pedidos de ejemplo más los tuyos. |
 | Sugerencia de repartidor, ruta con varias paradas y revisión por reglas | **Reglas, no IA** | Lo dicen las propias pantallas. |
-| Pagos (Nequi, Daviplata, PSE, tarjeta) | **Simulado** | Siempre aprobados; no se cobra nada. |
+| Pagos (Nequi, Daviplata, PSE, tarjeta) | **Simulado** | Se aprueban, salvo que marques «Probar un pago rechazado»; no se cobra nada. |
 | WhatsApp al cliente y llamada enmascarada | **Simulado** | Vista previa y ventana explicativa; no se envía ni se llama. |
-| Mapa, posición del repartidor e indicaciones | **Simulado** | Mapa ilustrativo, no a escala. |
+| Mapa, posición del repartidor e indicaciones | **Simulado** | Mapa ilustrativo, no a escala; el recorrido en el mapa se ve acelerado. |
 | Foto, firma y documentos del repartidor | **Solo en el navegador** | No se suben a ningún servidor. |
-| Dónde se guardan tus cambios | **Solo en este navegador** | `localStorage`; no llegan a un servidor ni los ven otras personas. |
+| Dónde se guardan tus cambios | **Solo en este navegador** | `localStorage`; no llegan a un servidor ni los ven otras personas. **Reiniciar demo** los borra. |
 
 ```mermaid
 stateDiagram-v2
@@ -246,19 +264,19 @@ stateDiagram-v2
     state "Entregado" as ENT
     state "Rechazado" as REC
     state "Cancelado" as CAN
-    [*] --> PEN: Pedido del cliente
+    [*] --> PEN: Pedido del cliente (pago aprobado o contraentrega)
     PEN --> PRE: Acepta la sede u Operaciones
     PEN --> REC: La sede rechaza con motivo
     PEN --> CAN: Cancela el cliente u Operaciones
-    PRE --> LIS: Listo para recoger
+    PRE --> LIS: Listo para recoger (reloj al fin de la preparación)
     LIS --> CAM: El repartidor lo recoge
-    CAM --> ENT: Código o foto y firma
+    CAM --> ENT: Código o foto y firma (reloj + trayecto)
     ENT --> [*]
     REC --> [*]
     CAN --> [*]
 ```
 
-*Estados de un pedido en la demo. La asignación del repartidor (oferta enviada, aceptada o rechazada) corre en paralelo mientras el pedido se prepara.*
+*Estados de un pedido en la demo. Un pago rechazado no crea pedido. La asignación del repartidor (oferta enviada, aceptada o rechazada) corre en paralelo mientras el pedido se prepara.*
 
 ---
 
@@ -295,11 +313,8 @@ flowchart LR
 
 ## Limitaciones conocidas
 
-1. **La vista previa promete más de lo que hace la demo.** La tarjeta del hub y la pantalla de acceso hablan de «routing ML», «tracking en vivo + ETA ML», «pricing dinámico (surge)», «suscripción membership» y «KYC drivers». La demo sugiere repartidores y ordena paradas con reglas simples, el mapa y la posición son simulados, el único recargo es el fijo por lluvia, el club es una prueba simulada y los documentos del repartidor solo se revisan por fecha de vencimiento.
-2. **El reloj corre en tiempo real.** La jornada empieza a las 7:05 p. m. y avanza segundo a segundo, así que un recorrido de dos minutos deja tu pedido «entregado … 1 min desde que lo pediste» y baja los promedios de Operaciones. En el seguimiento, la «Llegada estimada» (7:16 p. m. en la prueba) y la hora del WhatsApp («llega aprox. a las 7:42 p. m.», que es la hora prometida) no coinciden.
-3. **45 segundos para aceptar.** Si se pasa el tiempo, el pedido no se cancela solo: queda escalado y hay que aceptarlo o cancelarlo desde Operaciones (o usar el Avance automático).
-4. **La sede puede marcar «Listo para recoger» en cualquier momento**, aunque no haya pasado el tiempo de preparación elegido.
-5. **Pagos siempre aprobados.** No hay caso de pago rechazado.
-6. **Los cambios viven solo en el navegador.** Si el prospecto cambia de equipo o borra los datos del sitio, vuelve a la jornada de ejemplo; no hay espacio compartido con el vendedor.
-7. **Marcos de celular con desplazamiento propio.** Cada app vive en un marco de 680 px de alto con su propio scroll; en el teléfono queda un «celular dentro del celular» y hay que desplazarse dentro del marco.
-8. **Detalle visual:** en el selector del tiempo de preparación de Comercio, la flecha se monta sobre la palabra «min».
+1. **La vista previa del catálogo todavía promete de más.** La tarjeta del hub y la pantalla de acceso (textos compartidos del catálogo, fuera de la demo) hablan de «routing ML», «tracking en vivo + ETA ML», «pricing dinámico (surge)», «suscripción membership» y «KYC drivers». La demo sugiere repartidores y ordena paradas con reglas simples, el mapa y la posición son simulados, el único recargo es el fijo por lluvia, el club es una prueba simulada y los documentos del repartidor se revisan por fecha de vencimiento. El texto corregido (ES y EN) quedó pedido para el catálogo.
+2. **Los cambios viven solo en el navegador.** Si el prospecto cambia de equipo o borra los datos del sitio, vuelve a la jornada de ejemplo; no hay espacio compartido con el vendedor.
+3. **En el escritorio cada app vive en un marco de celular de 680 px** con su propio desplazamiento (es la maqueta del teléfono); en un celular real la app ocupa la pantalla sin marco.
+4. **Los 45 segundos de la sede son reales.** Si se pasan, el pedido queda escalado: se puede aceptar igual desde Comercio u Operaciones, o usar el Avance automático.
+5. **El reloj se adelanta para toda la jornada.** Al saltar, los pedidos de ejemplo que esperan una acción (el que nadie aceptó, el que nadie asignó) también envejecen y aparecen como escalados o tarde en Operaciones; es lo que pasaría en una operación real, pero en una demo larga se acumulan alertas. **Reiniciar demo** vuelve a las 7:05 p. m.

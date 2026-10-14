@@ -6,7 +6,7 @@ import { CameraIcon } from '@heroicons/react/24/outline';
 import Button from '@/components/ui/Button';
 import type { Order } from './types';
 import { Modal } from './ui';
-import { useDelivery } from './store';
+import { useDelivery, clockJumpMinutes } from './store';
 
 /**
  * Prueba de entrega: código de 4 dígitos que el cliente recibió, o foto +
@@ -15,7 +15,7 @@ import { useDelivery } from './store';
  */
 export default function ProofOfDelivery({ order, onClose }: { order: Order; onClose: () => void }) {
   const t = useTranslations('demoDelivery');
-  const { dispatch, notify } = useDelivery();
+  const { state, dispatch, notify } = useDelivery();
   const [mode, setMode] = useState<'code' | 'photoSignature'>('code');
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
@@ -25,6 +25,7 @@ export default function ProofOfDelivery({ order, onClose }: { order: Order; onCl
   useEffect(() => () => { if (photo) URL.revokeObjectURL(photo.url); }, [photo]);
 
   const confirm = () => {
+    const jump = clockJumpMinutes(state, 'deliver', order.id);
     if (mode === 'code') {
       if (!/^\d{4}$/.test(code)) return setError(t('pod.codeFormat'));
       if (code !== order.code) return setError(t('pod.codeWrong'));
@@ -33,7 +34,7 @@ export default function ProofOfDelivery({ order, onClose }: { order: Order; onCl
       if (!photo || !signed) return setError(t('pod.needBoth'));
       dispatch({ type: 'deliver', id: order.id, method: 'photoSignature', photoName: photo.name });
     }
-    notify(t('pod.done', { id: order.id }));
+    notify(jump > 0 ? t('pod.doneJump', { id: order.id, min: jump }) : t('pod.done', { id: order.id }));
     onClose();
   };
 
@@ -49,13 +50,12 @@ export default function ProofOfDelivery({ order, onClose }: { order: Order; onCl
         </>
       }
     >
-      <div className="mb-3 grid grid-cols-2 gap-1 rounded-lg bg-secondary-100 p-1 text-xs dark:bg-secondary-800" role="tablist">
+      <div className="mb-3 grid grid-cols-2 gap-1 rounded-lg bg-secondary-100 p-1 text-xs dark:bg-secondary-800" role="group" aria-label={t('pod.modeLabel')}>
         {(['code', 'photoSignature'] as const).map((m) => (
           <button
             key={m}
             type="button"
-            role="tab"
-            aria-selected={mode === m}
+            aria-pressed={mode === m}
             onClick={() => { setMode(m); setError(''); }}
             className={`rounded-md py-1.5 font-semibold ${mode === m ? 'bg-white shadow dark:bg-secondary-900' : 'text-secondary-600 dark:text-secondary-300'}`}
           >
@@ -72,7 +72,7 @@ export default function ProofOfDelivery({ order, onClose }: { order: Order; onCl
               value={code}
               onChange={(e) => { setCode(e.target.value.replace(/\D/g, '').slice(0, 4)); setError(''); }}
               inputMode="numeric"
-              autoComplete="one-time-code"
+              autoComplete="off"
               placeholder="0000"
               className="block w-full rounded-lg border border-secondary-300 bg-white px-3 py-2 text-center font-mono text-2xl tracking-[0.5em] dark:border-secondary-600 dark:bg-secondary-900"
             />

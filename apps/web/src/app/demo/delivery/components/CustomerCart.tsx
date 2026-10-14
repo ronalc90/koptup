@@ -9,7 +9,7 @@ import {
 import { CheckCircleIcon as CheckSolid } from '@heroicons/react/24/solid';
 import Button from '@/components/ui/Button';
 import { MENU_BY_ID } from './data';
-import { CLUB_FREE_FROM, fmtNum, POINTS_REDEEM, POINTS_REDEEM_VALUE, TIP_OPTIONS, splitAmount } from './engine';
+import { CLUB_FREE_FROM, ONLINE_PAYMENTS, fmtNum, POINTS_REDEEM, POINTS_REDEEM_VALUE, TIP_OPTIONS, splitAmount } from './engine';
 import type { PaymentId } from './types';
 import { Row, useMoney } from './ui';
 import { useDelivery, cartPricing, placeOrderCheck, selectedSede, type PlaceError } from './store';
@@ -23,8 +23,6 @@ const PAYMENTS: { id: PaymentId; icon: typeof CreditCardIcon }[] = [
   { id: 'dataphone', icon: CalculatorIcon },
 ];
 
-export const ONLINE: PaymentId[] = ['nequi', 'daviplata', 'pse', 'card'];
-
 export default function CustomerCart() {
   const t = useTranslations('demoDelivery');
   const locale = useLocale();
@@ -34,12 +32,18 @@ export default function CustomerCart() {
   const c = state.customer;
   const pricing = cartPricing(state);
   const { option } = selectedSede(state);
-  const cod = !ONLINE.includes(c.payment);
+  const cod = !ONLINE_PAYMENTS.includes(c.payment);
   const back = () => dispatch({ type: 'customer', patch: { view: 'home' } });
 
   const submit = () => {
     const err = placeOrderCheck(state);
     setError(err);
+    if (err === 'declined') {
+      // El banco "rechaza" el pago (simulado): no se crea el pedido y el próximo intento se aprueba.
+      dispatch({ type: 'placeOrder' });
+      notify(t('customer.cart.declinedToast', { method: t(`payments.${c.payment}.name`) }), 'warn');
+      return;
+    }
     if (err) return;
     const id = `P-${state.seq}`;
     dispatch({ type: 'placeOrder' });
@@ -124,7 +128,7 @@ export default function CustomerCart() {
               type="button"
               role="radio"
               aria-checked={c.payment === id}
-              onClick={() => dispatch({ type: 'customer', patch: { payment: id, cashWith: null } })}
+              onClick={() => { dispatch({ type: 'customer', patch: { payment: id, cashWith: null } }); setError(null); }}
               className={`flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-xs ${c.payment === id ? 'border border-primary-500 bg-primary-50 dark:bg-primary-900/30' : 'border border-transparent bg-secondary-50 dark:bg-secondary-900'}`}
             >
               <span className="flex min-w-0 items-center gap-2">
@@ -156,6 +160,17 @@ export default function CustomerCart() {
             )}
           </label>
         )}
+        {!cod && (
+          <label className="mt-2 flex cursor-pointer items-start gap-2 rounded-lg bg-secondary-50 px-2 py-1.5 text-[11px] dark:bg-secondary-900">
+            <input
+              type="checkbox"
+              className="mt-0.5"
+              checked={c.declineNext}
+              onChange={() => { dispatch({ type: 'customer', patch: { declineNext: !c.declineNext } }); setError(null); }}
+            />
+            <span>{t('customer.cart.simulateDecline')}</span>
+          </label>
+        )}
         <p className="mt-2 text-[10px] text-secondary-500 dark:text-secondary-400">{t('customer.cart.paymentNote')}</p>
       </div>
 
@@ -173,7 +188,7 @@ export default function CustomerCart() {
           <select
             value={c.split}
             onChange={(e) => dispatch({ type: 'customer', patch: { split: parseInt(e.target.value, 10) } })}
-            className="rounded-lg border border-secondary-300 bg-white px-2 py-1 dark:border-secondary-600 dark:bg-secondary-900"
+            className="rounded-lg border border-secondary-300 bg-white py-1 pl-2 pr-8 dark:border-secondary-600 dark:bg-secondary-900"
           >
             {[1, 2, 3, 4].map((n) => (
               <option key={n} value={n}>{t('customer.cart.people', { n })}</option>
@@ -200,7 +215,7 @@ export default function CustomerCart() {
 
       {error && (
         <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-xs font-medium text-red-700 dark:bg-red-900/30 dark:text-red-200">
-          {t(`customer.cart.errors.${error}`)}
+          {t(`customer.cart.errors.${error}`, { method: t(`payments.${c.payment}.name`) })}
         </p>
       )}
 

@@ -7,7 +7,7 @@ import {
 } from '@heroicons/react/24/outline';
 import Button from '@/components/ui/Button';
 import { BRAND, SEDES, SEDE_BY_ID } from './data';
-import { ACCEPT_WINDOW_S, avg, driverPosition, fmtNum, fmtTime, km, pointsEarned, travelMin } from './engine';
+import { ACCEPT_WINDOW_S, avg, driverPosition, fmtNum, fmtTime, orderEta, pointsEarned } from './engine';
 import type { Order } from './types';
 import { MapView, Modal, Row, StageBadge, Stars, useMoney, type MapPoint, type MapRoute } from './ui';
 import { useDelivery, MAP_SPEEDUP } from './store';
@@ -21,11 +21,12 @@ function useOrder(): Order | undefined {
   return own.find((o) => o.id === state.customer.activeOrderId) ?? own[own.length - 1];
 }
 
-export function trackingText(t: ReturnType<typeof useTranslations>, o: Order, locale: string): string {
+/** Texto del WhatsApp de ejemplo: la hora es la misma «Llegada estimada» que ve el cliente. */
+export function trackingText(t: ReturnType<typeof useTranslations>, o: Order, eta: number | null, locale: string): string {
   return t('customer.tracking.whatsapp.message', {
     brand: BRAND,
     id: o.id,
-    time: fmtTime(o.t.created + (o.promisedMin ?? 40) * 60, locale),
+    time: fmtTime(eta ?? o.t.created + (o.promisedMin ?? 40) * 60, locale),
     code: o.code,
     link: `tu-dominio.com/seguimiento/${o.id}`,
   });
@@ -57,8 +58,7 @@ export function CustomerTracking() {
   const accepted = order.driverStatus === 'accepted' && driver;
   const stepIdx = STEPS.indexOf(order.stage as (typeof STEPS)[number]);
   const left = Math.max(0, ACCEPT_WINDOW_S - (state.now - order.t.created));
-  const ride = travelMin(km(sede.place, order.customer.place), driver?.vehicle);
-  const eta = order.stage === 'pickedUp' && order.t.pickedUp ? order.t.pickedUp + ride * 60 : order.promisedMin ? order.t.created + order.promisedMin * 60 : null;
+  const eta = orderEta(order, driver, sede);
   const driverRating = driver ? avg(state.orders.filter((o) => o.driverId === driver.id && o.rating).map((o) => o.rating!.stars)) : 0;
   const live = order.stage === 'preparing' || order.stage === 'ready' || order.stage === 'pickedUp';
 
@@ -74,7 +74,7 @@ export function CustomerTracking() {
   }
 
   const copy = () => {
-    const text = trackingText(t, order, locale);
+    const text = trackingText(t, order, eta, locale);
     if (navigator.clipboard?.writeText) {
       navigator.clipboard.writeText(text).then(() => notify(t('common.copied')), () => notify(t('common.copyFailed'), 'warn'));
     } else notify(t('common.copyFailed'), 'warn');
@@ -167,7 +167,7 @@ export function CustomerTracking() {
               <ClipboardDocumentIcon className="h-3.5 w-3.5" />{t('common.copy')}
             </button>
           </div>
-          <p className="whitespace-pre-line rounded-lg bg-white p-2 text-secondary-800 dark:bg-secondary-900 dark:text-secondary-100">{trackingText(t, order, locale)}</p>
+          <p className="whitespace-pre-line rounded-lg bg-white p-2 text-secondary-800 dark:bg-secondary-900 dark:text-secondary-100">{trackingText(t, order, eta, locale)}</p>
           <p className="mt-1 text-[10px] text-emerald-900/80 dark:text-emerald-200/80">{t('customer.tracking.whatsapp.note')}</p>
         </div>
       )}
@@ -235,7 +235,7 @@ export function MaskedCall({ name, onClose }: { name: string; onClose: () => voi
           <ShieldCheckIcon className="h-7 w-7" />
         </div>
         <p className="font-semibold">{t('call.connecting', { name })}</p>
-        <p className="font-mono text-xs text-secondary-500">+57 601 ••• •• 42</p>
+        <p className="font-mono text-xs text-secondary-600 dark:text-secondary-400">+57 601 ••• •• 42</p>
         <p className="text-xs text-secondary-600 dark:text-secondary-300">{t('call.body')}</p>
       </div>
     </Modal>

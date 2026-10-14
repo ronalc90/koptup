@@ -244,11 +244,15 @@ export function generateSampleDay(seed = 20261008): SampleDay {
 
   orders.sort((a, b) => a.t.created - b.t.created);
 
-  // Pedidos en curso a las 7:05 p. m.
+  // Pedidos en curso a las 7:05 p. m. Los que traen `plan` los termina solo el
+  // resto de la operación (la cocina y su repartidor) si nadie los toca antes;
+  // los demás esperan a que alguien actúe en la demo (aceptar, asignar…).
   const active = (spec: {
     sedeId: SedeId; zone: ZoneId; addr: { address: string; place: Place }; lines: [string, number][]; payment: PaymentId;
     name: string; createdAgo: number; stage: Order['stage']; prepMin?: number; driverId?: string; driverStatus?: Order['driverStatus'];
     acceptedAgo?: number; readyAgo?: number; pickedAgo?: number; tip?: number;
+    /** Minutos desde las 7:05 p. m. en que el resto de la operación avanza este pedido. */
+    plan?: { ready?: number; pickedUp?: number; delivered?: number };
   }): Order => {
     const thisSeq = seq++;
     const lines = makeLines(spec.lines);
@@ -281,14 +285,21 @@ export function generateSampleDay(seed = 20261008): SampleDay {
       },
       chat: [],
       driverRejections: 0,
+      plan: spec.plan
+        ? {
+            ready: spec.plan.ready !== undefined ? START_SOD + spec.plan.ready * 60 : undefined,
+            pickedUp: spec.plan.pickedUp !== undefined ? START_SOD + spec.plan.pickedUp * 60 : undefined,
+            delivered: spec.plan.delivered !== undefined ? START_SOD + spec.plan.delivered * 60 : undefined,
+          }
+        : undefined,
     };
   };
 
   orders.push(
-    active({ sedeId: 'chapinero', zone: 'teusaquillo', addr: { address: 'Carrera 20 # 39-14', place: { calle: 39, carrera: 20 } }, lines: [['ajiaco', 2], ['limonada', 2]], payment: 'nequi', name: 'Andrea F.', createdAgo: 43 * 60, stage: 'preparing', prepMin: 15, acceptedAgo: 42 * 60, driverId: 'd6', driverStatus: 'accepted' }),
-    active({ sedeId: 'usaquen', zone: 'usaquen', addr: { address: 'Calle 134 # 9-51', place: { calle: 134, carrera: 9 } }, lines: [['bandeja', 1], ['jugoLulo', 1]], payment: 'card', name: 'Martín E.', createdAgo: 31 * 60, stage: 'pickedUp', prepMin: 15, acceptedAgo: 30 * 60, readyAgo: 13 * 60, pickedAgo: 4 * 60, driverId: 'd2', driverStatus: 'accepted', tip: 3000 }),
+    active({ sedeId: 'chapinero', zone: 'teusaquillo', addr: { address: 'Carrera 20 # 39-14', place: { calle: 39, carrera: 20 } }, lines: [['ajiaco', 2], ['limonada', 2]], payment: 'nequi', name: 'Andrea F.', createdAgo: 43 * 60, stage: 'preparing', prepMin: 15, acceptedAgo: 42 * 60, driverId: 'd6', driverStatus: 'accepted', plan: { ready: 3, pickedUp: 5, delivered: 18 } }),
+    active({ sedeId: 'usaquen', zone: 'usaquen', addr: { address: 'Calle 134 # 9-51', place: { calle: 134, carrera: 9 } }, lines: [['bandeja', 1], ['jugoLulo', 1]], payment: 'card', name: 'Martín E.', createdAgo: 31 * 60, stage: 'pickedUp', prepMin: 15, acceptedAgo: 30 * 60, readyAgo: 13 * 60, pickedAgo: 4 * 60, driverId: 'd2', driverStatus: 'accepted', tip: 3000, plan: { delivered: 4 } }),
     active({ sedeId: 'cedritos', zone: 'cedritos', addr: { address: 'Calle 147 # 17-08', place: { calle: 147, carrera: 17 } }, lines: [['churrasco', 1], ['patacon', 1], ['aguaGas', 2]], payment: 'cash', name: 'Gloria P.', createdAgo: 19 * 60, stage: 'ready', prepMin: 15, acceptedAgo: 18 * 60, readyAgo: 2 * 60 }),
-    active({ sedeId: 'chapinero', zone: 'chapinero', addr: { address: 'Calle 70 # 12-33', place: { calle: 70, carrera: 12 } }, lines: [['sancocho', 1], ['natas', 1]], payment: 'daviplata', name: 'Hernán U.', createdAgo: 9 * 60, stage: 'preparing', prepMin: 20, acceptedAgo: 8 * 60, driverId: 'd3', driverStatus: 'offered' }),
+    active({ sedeId: 'chapinero', zone: 'chapinero', addr: { address: 'Calle 70 # 12-33', place: { calle: 70, carrera: 12 } }, lines: [['sancocho', 1], ['natas', 1]], payment: 'daviplata', name: 'Hernán U.', createdAgo: 9 * 60, stage: 'preparing', prepMin: 20, acceptedAgo: 8 * 60, driverId: 'd3', driverStatus: 'offered', plan: { ready: 12 } }),
     active({ sedeId: 'usaquen', zone: 'usaquen', addr: { address: 'Carrera 7 # 124-20', place: { calle: 124, carrera: 7 } }, lines: [['empanadas', 2], ['limonada', 1]], payment: 'pse', name: 'Lina K.', createdAgo: 15, stage: 'pending' }),
   );
 

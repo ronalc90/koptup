@@ -160,13 +160,12 @@ function CustomerHome({ onOpenItem }: { onOpenItem: (m: MenuItem) => void }) {
           />
         </div>
 
-        <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-1" role="tablist" aria-label={t('customer.home.categories')}>
+        <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-1" role="group" aria-label={t('customer.home.categories')}>
           {CATS.map((k) => (
             <button
               key={k}
               type="button"
-              role="tab"
-              aria-selected={cat === k}
+              aria-pressed={cat === k}
               onClick={() => setCat(k)}
               className={`whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold ${cat === k ? 'bg-orange-500 text-white' : 'bg-white text-secondary-700 ring-1 ring-secondary-200 dark:bg-secondary-800 dark:text-secondary-200 dark:ring-secondary-700'}`}
             >
