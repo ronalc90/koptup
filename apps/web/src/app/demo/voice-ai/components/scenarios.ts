@@ -12,15 +12,15 @@ export const SCENARIOS: Scenario[] = [
     number: '+57 310 *** 4821',
     maskedData: { doc: 'CC ****4567' },
     turns: [
-      { key: 't1', speaker: 'ai', sentiment: 'neutral', node: 'greeting', notice: true },
-      { key: 't2', speaker: 'customer', sentiment: 'negative', node: 'intent', intent: 'cardDeclined', confidence: 0.93 },
-      { key: 't3', speaker: 'ai', sentiment: 'neutral', node: 'identify' },
-      { key: 't4', speaker: 'customer', sentiment: 'neutral', node: 'identify', masked: true },
-      { key: 't5', speaker: 'ai', sentiment: 'neutral', node: 'action', fns: ['verifyCustomer', 'getTransactions'] },
-      { key: 't6', speaker: 'customer', sentiment: 'neutral', node: 'intent', intent: 'travelNotice', confidence: 0.91 },
-      { key: 't7', speaker: 'ai', sentiment: 'positive', node: 'action', fns: ['registerTravel', 'unblockCard'] },
-      { key: 't8', speaker: 'customer', sentiment: 'positive', node: 'close' },
-      { key: 't9', speaker: 'ai', sentiment: 'positive', node: 'close', fns: ['logCallCrm'] },
+      { key: 't1', speaker: 'ai', sec: 14, sentiment: 'neutral', node: 'greeting', notice: true },
+      { key: 't2', speaker: 'customer', sec: 7, sentiment: 'negative', node: 'intent', intent: 'cardDeclined', confidence: 0.93 },
+      { key: 't3', speaker: 'ai', sec: 5, sentiment: 'neutral', node: 'identify' },
+      { key: 't4', speaker: 'customer', sec: 3, sentiment: 'neutral', node: 'identify', masked: true },
+      { key: 't5', speaker: 'ai', sec: 12, sentiment: 'neutral', node: 'action', fns: ['verifyCustomer', 'getTransactions'] },
+      { key: 't6', speaker: 'customer', sec: 7, sentiment: 'neutral', node: 'intent', intent: 'travelNotice', confidence: 0.91 },
+      { key: 't7', speaker: 'ai', sec: 12, sentiment: 'positive', node: 'action', fns: ['registerTravel', 'unblockCard'] },
+      { key: 't8', speaker: 'customer', sec: 2, sentiment: 'positive', node: 'close' },
+      { key: 't9', speaker: 'ai', sec: 5, sentiment: 'positive', node: 'close', fns: ['logCallCrm'] },
     ],
     fns: [
       { key: 'verifyCustomer', system: 'core', args: { documento: 'CC ****4567', canal: 'voz' } },
@@ -37,17 +37,17 @@ export const SCENARIOS: Scenario[] = [
     maskedData: { doc: 'CC ****8912' },
     scheduled: { date: '2026-10-08', time: '08:30' },
     turns: [
-      { key: 't1', speaker: 'ai', sentiment: 'neutral', node: 'greeting', notice: true },
-      { key: 't2', speaker: 'customer', sentiment: 'neutral', node: 'identify' },
-      { key: 't3', speaker: 'ai', sentiment: 'neutral', node: 'identify' },
-      { key: 't4', speaker: 'customer', sentiment: 'neutral', node: 'identify', masked: true },
-      { key: 't5', speaker: 'ai', sentiment: 'neutral', node: 'intent', intent: 'confirmAppointment', confidence: 0.97, fns: ['verifyCustomer', 'getAppointment'] },
-      { key: 't6', speaker: 'customer', sentiment: 'neutral', node: 'intent', intent: 'rescheduleAppointment', confidence: 0.95 },
-      { key: 't7', speaker: 'ai', sentiment: 'neutral', node: 'action', fns: ['findAvailability'] },
-      { key: 't8', speaker: 'customer', sentiment: 'positive', node: 'action' },
-      { key: 't9', speaker: 'ai', sentiment: 'positive', node: 'action', fns: ['rescheduleAppointment', 'sendWhatsapp'] },
-      { key: 't10', speaker: 'customer', sentiment: 'positive', node: 'close' },
-      { key: 't11', speaker: 'ai', sentiment: 'positive', node: 'close', fns: ['logCallCrm'] },
+      { key: 't1', speaker: 'ai', sec: 12, sentiment: 'neutral', node: 'greeting', notice: true },
+      { key: 't2', speaker: 'customer', sec: 2, sentiment: 'neutral', node: 'identify' },
+      { key: 't3', speaker: 'ai', sec: 5, sentiment: 'neutral', node: 'identify' },
+      { key: 't4', speaker: 'customer', sec: 3, sentiment: 'neutral', node: 'identify', masked: true },
+      { key: 't5', speaker: 'ai', sec: 11, sentiment: 'neutral', node: 'intent', intent: 'confirmAppointment', confidence: 0.97, fns: ['verifyCustomer', 'getAppointment'] },
+      { key: 't6', speaker: 'customer', sec: 7, sentiment: 'neutral', node: 'intent', intent: 'rescheduleAppointment', confidence: 0.95 },
+      { key: 't7', speaker: 'ai', sec: 10, sentiment: 'neutral', node: 'action', fns: ['findAvailability'] },
+      { key: 't8', speaker: 'customer', sec: 3, sentiment: 'positive', node: 'action' },
+      { key: 't9', speaker: 'ai', sec: 13, sentiment: 'positive', node: 'action', fns: ['rescheduleAppointment', 'sendWhatsapp'] },
+      { key: 't10', speaker: 'customer', sec: 2, sentiment: 'positive', node: 'close' },
+      { key: 't11', speaker: 'ai', sec: 5, sentiment: 'positive', node: 'close', fns: ['logCallCrm'] },
     ],
     fns: [
       { key: 'verifyCustomer', system: 'agenda', args: { documento: 'CC ****8912', canal: 'voz' } },
@@ -66,17 +66,17 @@ export const SCENARIOS: Scenario[] = [
     scheduled: { date: '2026-10-08', time: '10:05' },
     collections: true,
     turns: [
-      { key: 't1', speaker: 'ai', sentiment: 'neutral', node: 'greeting', notice: true },
-      { key: 't2', speaker: 'customer', sentiment: 'neutral', node: 'identify' },
-      { key: 't3', speaker: 'ai', sentiment: 'neutral', node: 'identify' },
-      { key: 't4', speaker: 'customer', sentiment: 'neutral', node: 'identify', masked: true },
-      { key: 't5', speaker: 'ai', sentiment: 'neutral', node: 'intent', intent: 'paymentReminder', confidence: 0.98, fns: ['verifyCustomer', 'getBalance'] },
-      { key: 't6', speaker: 'customer', sentiment: 'negative', node: 'intent', intent: 'paymentAgreement', confidence: 0.92 },
-      { key: 't7', speaker: 'ai', sentiment: 'neutral', node: 'action', fns: ['quotePaymentPlan'] },
-      { key: 't8', speaker: 'customer', sentiment: 'positive', node: 'action' },
-      { key: 't9', speaker: 'ai', sentiment: 'positive', node: 'action', fns: ['createAgreement', 'createPaymentLink', 'sendWhatsapp'] },
-      { key: 't10', speaker: 'customer', sentiment: 'positive', node: 'close' },
-      { key: 't11', speaker: 'ai', sentiment: 'positive', node: 'close', fns: ['logCallCrm'] },
+      { key: 't1', speaker: 'ai', sec: 11, sentiment: 'neutral', node: 'greeting', notice: true },
+      { key: 't2', speaker: 'customer', sec: 2, sentiment: 'neutral', node: 'identify' },
+      { key: 't3', speaker: 'ai', sec: 5, sentiment: 'neutral', node: 'identify' },
+      { key: 't4', speaker: 'customer', sec: 2, sentiment: 'neutral', node: 'identify', masked: true },
+      { key: 't5', speaker: 'ai', sec: 10, sentiment: 'neutral', node: 'intent', intent: 'paymentReminder', confidence: 0.98, fns: ['verifyCustomer', 'getBalance'] },
+      { key: 't6', speaker: 'customer', sec: 7, sentiment: 'negative', node: 'intent', intent: 'paymentAgreement', confidence: 0.92 },
+      { key: 't7', speaker: 'ai', sec: 13, sentiment: 'neutral', node: 'action', fns: ['quotePaymentPlan'] },
+      { key: 't8', speaker: 'customer', sec: 2, sentiment: 'positive', node: 'action' },
+      { key: 't9', speaker: 'ai', sec: 8, sentiment: 'positive', node: 'action', fns: ['createAgreement', 'createPaymentLink', 'sendWhatsapp'] },
+      { key: 't10', speaker: 'customer', sec: 2, sentiment: 'positive', node: 'close' },
+      { key: 't11', speaker: 'ai', sec: 4, sentiment: 'positive', node: 'close', fns: ['logCallCrm'] },
     ],
     fns: [
       { key: 'verifyCustomer', system: 'cartera', args: { documento: 'CC ****3307', canal: 'voz' } },
@@ -84,7 +84,7 @@ export const SCENARIOS: Scenario[] = [
       { key: 'quotePaymentPlan', system: 'cartera', args: { credito: 'CR-40917', cuotas: 2, valor_total: 412500 } },
       { key: 'createAgreement', system: 'cartera', args: { credito: 'CR-40917', fechas: '2026-10-15, 2026-10-30', valor_cuota: 206250 } },
       { key: 'createPaymentLink', system: 'pagos', args: { valor: 206250, moneda: 'COP', vence: '2026-10-15' } },
-      { key: 'sendWhatsapp', system: 'whatsapp', args: { plantilla: 'link_de_pago', telefono: '+57 318 *** 4410' } },
+      { key: 'sendWhatsapp', system: 'whatsapp', args: { plantilla: 'enlace_de_pago', telefono: '+57 318 *** 4410' } },
       { key: 'logCallCrm', system: 'crm', args: { resultado: 'acuerdo_de_pago', intencion: 'acuerdo_de_pago' } },
     ],
   },
@@ -94,15 +94,15 @@ export const SCENARIOS: Scenario[] = [
     number: '+57 315 *** 7710',
     maskedData: { email: 'f*****o@c****.com' },
     turns: [
-      { key: 't1', speaker: 'ai', sentiment: 'neutral', node: 'greeting', notice: true },
-      { key: 't2', speaker: 'customer', sentiment: 'neutral', node: 'intent', intent: 'orderStatus', confidence: 0.96 },
-      { key: 't3', speaker: 'ai', sentiment: 'neutral', node: 'identify' },
-      { key: 't4', speaker: 'customer', sentiment: 'neutral', node: 'identify', masked: true },
-      { key: 't5', speaker: 'ai', sentiment: 'neutral', node: 'action', fns: ['verifyCustomer', 'getOrder'] },
-      { key: 't6', speaker: 'customer', sentiment: 'negative', node: 'intent', intent: 'damagedProduct', confidence: 0.9 },
-      { key: 't7', speaker: 'ai', sentiment: 'neutral', node: 'action', fns: ['createTicket', 'sendWhatsapp'] },
-      { key: 't8', speaker: 'customer', sentiment: 'neutral', node: 'transfer' },
-      { key: 't9', speaker: 'ai', sentiment: 'neutral', node: 'transfer', fns: ['transferToHuman', 'logCallCrm'] },
+      { key: 't1', speaker: 'ai', sec: 12, sentiment: 'neutral', node: 'greeting', notice: true },
+      { key: 't2', speaker: 'customer', sec: 4, sentiment: 'neutral', node: 'intent', intent: 'orderStatus', confidence: 0.96 },
+      { key: 't3', speaker: 'ai', sec: 8, sentiment: 'neutral', node: 'identify' },
+      { key: 't4', speaker: 'customer', sec: 2, sentiment: 'neutral', node: 'identify', masked: true },
+      { key: 't5', speaker: 'ai', sec: 13, sentiment: 'neutral', node: 'action', fns: ['verifyCustomer', 'getOrder'] },
+      { key: 't6', speaker: 'customer', sec: 8, sentiment: 'negative', node: 'intent', intent: 'damagedProduct', confidence: 0.9 },
+      { key: 't7', speaker: 'ai', sec: 14, sentiment: 'neutral', node: 'action', fns: ['createTicket', 'sendWhatsapp'] },
+      { key: 't8', speaker: 'customer', sec: 2, sentiment: 'neutral', node: 'transfer' },
+      { key: 't9', speaker: 'ai', sec: 10, sentiment: 'neutral', node: 'transfer', fns: ['transferToHuman', 'logCallCrm'] },
     ],
     fns: [
       { key: 'verifyCustomer', system: 'tienda', args: { correo: 'f*****o@c****.com', pedido: 'TU-58213' } },
@@ -121,27 +121,38 @@ export function getScenario(id: ScenarioId): Scenario {
   return SCENARIOS.find((s) => s.id === id) ?? SCENARIOS[0];
 }
 
-/** Registro de llamadas de una jornada de ejemplo (jueves 8 de octubre de 2026). */
+/** Duración total del guion de un escenario, en segundos. */
+export function scriptSeconds(s: Scenario): number {
+  return s.turns.reduce((acc, tn) => acc + tn.sec, 0);
+}
+
+/**
+ * Registro de llamadas de una jornada de ejemplo (jueves 8 de octubre de 2026).
+ * Las cuatro filas con `scenario` son las llamadas del guion (mismo número,
+ * hora, duración, motivo, resultado y sentimiento final): «Escuchar» las abre.
+ * Las demás solo existen en el registro.
+ */
 export const SAMPLE_CALLS: CallRow[] = [
-  { id: 'i1', time: '08:02', number: '+57 310 *** 4821', direction: 'inbound', intent: 'travelNotice', durationSec: 192, result: 'resolved', sentiment: 'positive', csat: 5, scenario: 'banca' },
-  { id: 'i2', time: '08:17', number: '+57 601 *** 2290', direction: 'inbound', intent: 'orderStatus', durationSec: 125, result: 'resolved', sentiment: 'neutral', csat: 4, scenario: 'pedido' },
-  { id: 'i3', time: '08:40', number: '+57 315 *** 7710', direction: 'inbound', intent: 'damagedProduct', durationSec: 288, result: 'transferred', sentiment: 'negative', csat: 3, scenario: 'pedido' },
+  { id: 'i1', time: '08:02', number: '+57 310 *** 4821', direction: 'inbound', intent: 'travelNotice', durationSec: scriptSeconds(getScenario('banca')), result: 'resolved', sentiment: 'positive', csat: 5, scenario: 'banca' },
+  { id: 'i2', time: '08:17', number: '+57 601 *** 2290', direction: 'inbound', intent: 'orderStatus', durationSec: 125, result: 'resolved', sentiment: 'neutral', csat: 4 },
+  { id: 'i3', time: '08:40', number: '+57 315 *** 7710', direction: 'inbound', intent: 'damagedProduct', durationSec: scriptSeconds(getScenario('pedido')), result: 'transferred', sentiment: 'neutral', csat: 3, scenario: 'pedido' },
   { id: 'i4', time: '09:05', number: '+57 604 *** 1187', direction: 'inbound', intent: 'balanceInquiry', durationSec: 94, result: 'resolved', sentiment: 'positive', csat: null },
-  { id: 'i5', time: '09:31', number: '+57 300 *** 6604', direction: 'inbound', intent: 'cardDeclined', durationSec: 171, result: 'resolved', sentiment: 'positive', csat: 5, scenario: 'banca' },
+  { id: 'i5', time: '09:31', number: '+57 300 *** 6604', direction: 'inbound', intent: 'cardDeclined', durationSec: 171, result: 'resolved', sentiment: 'positive', csat: 5 },
   { id: 'i6', time: '10:12', number: '+57 320 *** 0935', direction: 'inbound', intent: 'billingClaim', durationSec: 320, result: 'transferred', sentiment: 'negative', csat: 2 },
-  { id: 'i7', time: '10:44', number: '+57 601 *** 8472', direction: 'inbound', intent: 'orderStatus', durationSec: 38, result: 'abandoned', sentiment: 'neutral', csat: null, scenario: 'pedido' },
-  { id: 'o1', time: '08:30', number: '+57 311 *** 5129', direction: 'outbound', intent: 'confirmAppointment', durationSec: 118, result: 'resolved', sentiment: 'positive', csat: 5, scenario: 'salud' },
-  { id: 'o2', time: '09:10', number: '+57 316 *** 3348', direction: 'outbound', intent: 'rescheduleAppointment', durationSec: 164, result: 'resolved', sentiment: 'positive', csat: 4, scenario: 'salud' },
-  { id: 'o3', time: '09:45', number: '+57 302 *** 9021', direction: 'outbound', intent: 'paymentReminder', durationSec: 22, result: 'voicemail', sentiment: 'neutral', csat: null, scenario: 'cobranza' },
-  { id: 'o4', time: '10:05', number: '+57 318 *** 4410', direction: 'outbound', intent: 'paymentAgreement', durationSec: 216, result: 'resolved', sentiment: 'positive', csat: null, scenario: 'cobranza' },
-  { id: 'o5', time: '10:30', number: '+57 313 *** 7765', direction: 'outbound', intent: 'paymentReminder', durationSec: 0, result: 'noAnswer', sentiment: 'neutral', csat: null, scenario: 'cobranza' },
-  { id: 'o6', time: '11:02', number: '+57 305 *** 2286', direction: 'outbound', intent: 'confirmAppointment', durationSec: 81, result: 'resolved', sentiment: 'neutral', csat: 4, scenario: 'salud' },
+  { id: 'i7', time: '10:44', number: '+57 601 *** 8472', direction: 'inbound', intent: 'orderStatus', durationSec: 38, result: 'abandoned', sentiment: 'neutral', csat: null },
+  { id: 'o1', time: '08:30', number: '+57 311 *** 5129', direction: 'outbound', intent: 'rescheduleAppointment', durationSec: scriptSeconds(getScenario('salud')), result: 'resolved', sentiment: 'positive', csat: 5, scenario: 'salud' },
+  { id: 'o2', time: '09:10', number: '+57 316 *** 3348', direction: 'outbound', intent: 'confirmAppointment', durationSec: 164, result: 'resolved', sentiment: 'positive', csat: 4 },
+  { id: 'o3', time: '09:45', number: '+57 302 *** 9021', direction: 'outbound', intent: 'paymentReminder', durationSec: 22, result: 'voicemail', sentiment: 'neutral', csat: null },
+  { id: 'o4', time: '10:05', number: '+57 318 *** 4410', direction: 'outbound', intent: 'paymentAgreement', durationSec: scriptSeconds(getScenario('cobranza')), result: 'resolved', sentiment: 'positive', csat: null, scenario: 'cobranza' },
+  { id: 'o5', time: '10:30', number: '+57 313 *** 7765', direction: 'outbound', intent: 'paymentReminder', durationSec: 0, result: 'noAnswer', sentiment: 'neutral', csat: null },
+  { id: 'o6', time: '11:02', number: '+57 305 *** 2286', direction: 'outbound', intent: 'confirmAppointment', durationSec: 81, result: 'resolved', sentiment: 'neutral', csat: 4 },
 ];
 
 /**
- * Contactos de la campaña "Recordatorio de pago — cuota de octubre 2026".
- * El resultado de cada intento permitido es fijo (datos de ejemplo); el
- * bloqueo lo decide la regla de horario/festivos/exclusión/frecuencia.
+ * Contactos de ejemplo de la campaña "Recordatorio de pago — cuota de octubre 2026".
+ * El resultado de cada intento permitido es simulado (lo fija el contacto); el
+ * bloqueo lo decide la regla de horario, festivos, exclusión y frecuencia.
+ * Puedes agregar, excluir o quitar contactos (CampaignPanel).
  */
 export const CAMPAIGN_CONTACTS: CampaignContact[] = [
   { id: 'c1', name: 'Natalia O.', number: '+57 318 *** 4410', date: '2026-10-08', time: '10:05', outcome: 'agreement' },

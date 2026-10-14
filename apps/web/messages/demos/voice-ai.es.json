@@ -2,21 +2,27 @@
   "demoVoice": {
     "meta": {
       "title": "Demo de agente de voz con IA para call center",
-      "description": "Demo interactiva con datos de ejemplo: escucha cuatro llamadas en español (banca, salud, cobranza y pedidos) con la voz de tu navegador, transcripción sincronizada y enmascarada, intención, sentimiento, acciones simuladas del agente, transferencia a un asesor con contexto, campaña saliente con horarios de contacto y métricas calculadas.",
+      "description": "Demo interactiva con datos de ejemplo: escucha cuatro llamadas con guion en español (banca, salud, cobranza y pedidos) con la voz de tu navegador, con transcripción enmascarada, intención, sentimiento, acciones simuladas del agente y transferencia a un asesor con contexto; además, una campaña saliente editable que aplica horarios y festivos de Colombia, y métricas calculadas.",
       "breadcrumbHome": "Inicio",
       "breadcrumbDemos": "Demos",
       "breadcrumbName": "Agente de voz con IA"
     },
     "header": {
-      "back": "Volver a demos",
+      "back": "Volver al catálogo de demos",
       "title": "Agente de voz con IA para call center",
-      "subtitle": "Escucha llamadas de ejemplo de un agente de voz: transcripción, intención, sentimiento, acciones del agente y transferencia a un asesor con todo el contexto.",
+      "subtitle": "Escucha cuatro llamadas de ejemplo y mira, turno a turno, cómo un agente de voz con IA entiende al cliente, hace el trabajo en tus sistemas y, si hace falta, le pasa la llamada a un asesor con todo el contexto.",
       "sampleBadge": "Datos de ejemplo",
-      "scriptBadge": "Llamadas con guion",
-      "requestDemo": "Solicitar demo con tu guion",
+      "scriptBadge": "Llamadas con guion, sin IA en vivo",
+      "requestDemo": "Solicitar demo guiada",
       "reset": "Restablecer",
-      "resetHint": "Borra tus llamadas de prueba, la personalización y la campaña simulada",
-      "resetDone": "Demo restablecida."
+      "resetHint": "Borra tus llamadas de prueba, la personalización, el avance de los primeros pasos y los cambios de la campaña",
+      "resetDone": "Demo restablecida.",
+      "kicker": "Para gerentes de contact center, cobranza y agendamiento de citas",
+      "sampleBadgeHint": "Las empresas, las personas, los números y los documentos son ficticios.",
+      "quote": "Cotizar este agente",
+      "resetConfirm": "¿Borrar tus llamadas de prueba, la personalización, el avance de los primeros pasos y los cambios de la campaña?",
+      "resetYes": "Sí, restablecer",
+      "resetNo": "Cancelar"
     },
     "picker": {
       "title": "1. Elige un escenario",
@@ -28,7 +34,8 @@
       "companyPlaceholder": "Ej.: Mi Empresa S.A.S.",
       "agent": "Nombre del agente",
       "agentPlaceholder": "Sofía",
-      "personalizeHint": "Se usa en el saludo de la llamada. Se guarda solo en este navegador."
+      "personalizeHint": "Se usa en el saludo de la llamada. Se guarda solo en este navegador.",
+      "goToCall": "Escenario elegido: pulsa para ir a la llamada"
     },
     "direction": {
       "inbound": "Entrante",
@@ -67,7 +74,7 @@
       },
       "voice": {
         "available": "Escuchas la voz sintetizada de tu navegador ({voice}). En tu proyecto se usa una voz neural en español colombiano de un proveedor de voz (TTS).",
-        "unavailable": "Tu navegador no tiene voces en español instaladas: la llamada avanza solo con la transcripción.",
+        "unavailable": "Tu navegador no tiene voces en español instaladas: la llamada avanza solo con la transcripción. Para oírla, prueba en Chrome, Edge o Safari de escritorio.",
         "unsupported": "Tu navegador no permite síntesis de voz: la llamada avanza solo con la transcripción.",
         "muted": "Voz silenciada: la llamada avanza solo con la transcripción."
       }
@@ -140,7 +147,7 @@
     },
     "actions": {
       "title": "Acciones del agente",
-      "subtitle": "Funciones que el agente llama durante la conversación (function calling)",
+      "subtitle": "Funciones que el agente llama durante la conversación (function calling). En la demo las respuestas son simuladas: no se conecta a ningún sistema ni envía mensajes.",
       "status": {
         "pending": "pendiente",
         "running": "ejecutando…",
@@ -202,8 +209,8 @@
         "desc": "Registra el acuerdo de pago"
       },
       "createPaymentLink": {
-        "name": "generar_link_pago",
-        "desc": "Genera un link de pago para la primera cuota"
+        "name": "generar_enlace_pago",
+        "desc": "Genera un enlace de pago para la primera cuota"
       },
       "getOrder": {
         "name": "consultar_pedido",
@@ -223,7 +230,7 @@
       }
     },
     "systems": {
-      "core": "tu core bancario",
+      "core": "tu sistema bancario central",
       "agenda": "tu agenda médica",
       "cartera": "tu sistema de cartera",
       "pagos": "tu pasarela de pagos (p. ej. Wompi o PayU)",
@@ -303,7 +310,7 @@
     },
     "log": {
       "title": "Registro de llamadas",
-      "subtitle": "Jornada de ejemplo del jueves 8 de octubre de 2026, más tus llamadas de prueba",
+      "subtitle": "Jornada de ejemplo del jueves 8 de octubre de 2026 y, arriba, tus llamadas de prueba con su fecha y hora reales",
       "tabs": {
         "all": "Todas",
         "inbound": "Entrantes",
@@ -317,10 +324,11 @@
         "result": "Resultado",
         "sentiment": "Sentimiento",
         "csat": "Encuesta",
-        "scenario": "Escenario"
+        "scenario": "Guion",
+        "when": "Fecha y hora"
       },
-      "open": "Abrir",
-      "openHint": "Carga el escenario de ejemplo de este tipo de llamada",
+      "open": "Escuchar",
+      "openHint": "Abre esta llamada del guion en el reproductor y la inicia",
       "mine": "Tu prueba",
       "results": {
         "resolved": "Resuelta por IA",
@@ -335,7 +343,11 @@
       "clearMine": "Borrar mis pruebas",
       "cleared": "Se borraron tus llamadas de prueba.",
       "noCsat": "—",
-      "fileName": "registro-llamadas-ejemplo.csv"
+      "fileName": "registro-llamadas-ejemplo.csv",
+      "filterLabel": "Filtrar por canal",
+      "replay": "Repetir",
+      "replayHint": "Vuelve a reproducir esta llamada",
+      "noScript": "Esta llamada solo está en el registro: no tiene guion para escuchar"
     },
     "kpis": {
       "title": "Métricas de la jornada",
@@ -356,12 +368,12 @@
     },
     "campaign": {
       "title": "Campaña saliente: recordatorio de pago",
-      "subtitle": "Cuota de octubre de 2026 · {count} contactos programados entre el 8 y el 13 de octubre",
+      "subtitle": "Cuota de octubre de 2026 · {count, plural, one {# contacto programado} other {# contactos programados}}. Puedes agregar, excluir o quitar contactos y volver a simular.",
       "rulesTitle": "Reglas que aplica el marcador",
       "rules": {
         "window": "Lunes a viernes de 7:00 a 19:00 y sábados de 8:00 a 15:00",
         "noSunday": "Sin llamadas los domingos ni los festivos de Colombia",
-        "frequency": "Máximo 1 llamada por semana a cada persona (regla configurada en esta campaña)",
+        "frequency": "Máximo 1 llamada por semana al mismo número (cuenta el último contacto previo y las llamadas de esta campaña)",
         "exclusion": "Lista de exclusión: personas que pidieron no ser contactadas"
       },
       "legalNote": "Referencia: Ley 2300 de 2023 (horarios de contacto en cobranza). Las reglas exactas se validan con tu asesor legal y se configuran en la implementación.",
@@ -375,7 +387,8 @@
         "contact": "Contacto",
         "number": "Número",
         "scheduled": "Programada",
-        "result": "Resultado"
+        "result": "Resultado",
+        "actions": "Acciones"
       },
       "waiting": "En espera",
       "outcomes": {
@@ -392,7 +405,7 @@
         "afterClose": "Bloqueada: después del horario permitido",
         "excluded": "Excluida: está en la lista de exclusión",
         "frequency": "Bloqueada: ya se contactó esta semana",
-        "outOfRange": "La demo solo trae los festivos de 2026",
+        "outOfRange": "Elige una fecha entre 2024 y 2099",
         "invalid": "Fecha u hora no válida"
       },
       "metrics": {
@@ -403,14 +416,41 @@
         "voicemail": "Buzón de voz",
         "agreements": "Acuerdos de pago"
       },
-      "simulated": "Simulado en la demo: no se hace ninguna llamada. En tu proyecto el marcador usa tu troncal SIP o un proveedor de telefonía.",
+      "simulated": "Simulado en la demo: no se hace ninguna llamada y el resultado de cada llamada permitida lo fija el contacto. En tu proyecto el marcador usa tu troncal SIP o un proveedor de telefonía.",
       "tester": {
         "title": "Prueba la regla de horario",
-        "subtitle": "Elige una fecha de 2026 y una hora para ver si el marcador llamaría.",
+        "subtitle": "Elige una fecha y una hora para ver si el marcador llamaría. Los festivos de Colombia se calculan para cada año.",
         "date": "Fecha",
         "time": "Hora",
         "allowed": "Permitido: {when}",
         "blocked": "{reason} · {when}"
+      },
+      "continue": "Continuar campaña",
+      "custom": "Agregado por ti",
+      "empty": "No hay contactos en la campaña. Agrega uno o restablece la demo.",
+      "edited": "La campaña cambió: vuelve a simularla para ver los resultados.",
+      "exclude": "Excluir a {name}",
+      "include": "Quitar a {name} de la lista de exclusión",
+      "remove": "Quitar a {name} de la campaña",
+      "excludedToast": "{name} quedó en la lista de exclusión.",
+      "includedToast": "{name} salió de la lista de exclusión.",
+      "removedToast": "Quitaste a {name} de la campaña.",
+      "lockedWhileRunning": "Espera a que termine la simulación para editar la campaña.",
+      "form": {
+        "title": "Agregar contacto",
+        "hint": "Usa datos ficticios: el número se guarda enmascarado y solo en este navegador.",
+        "name": "Nombre",
+        "namePlaceholder": "Ej.: Andrés R.",
+        "number": "Celular o fijo (10 dígitos)",
+        "numberPlaceholder": "Ej.: 300 000 0000",
+        "date": "Fecha",
+        "time": "Hora",
+        "outcome": "Resultado simulado si se permite llamar",
+        "submit": "Agregar a la campaña",
+        "added": "Agregaste a {name} a la campaña.",
+        "errorName": "Escribe un nombre.",
+        "errorNumber": "Escribe un celular (3xx) o un fijo (60x) de 10 dígitos.",
+        "errorWhen": "Elige una fecha y una hora válidas."
       }
     },
     "dates": {
@@ -485,7 +525,7 @@
     },
     "settings": {
       "title": "Voz de la demo",
-      "subtitle": "La voz la genera tu navegador con las voces que tenga disponibles (Web Speech API). La demo no usa servidores propios para la voz.",
+      "subtitle": "La voz la genera tu navegador con las voces que tenga disponibles (síntesis de voz del navegador). La demo no usa servidores propios para la voz.",
       "voice": "Voz del agente",
       "voiceAuto": "Automática ({name})",
       "noVoices": "Este navegador no tiene voces en español.",
@@ -514,7 +554,7 @@
         },
         "integrations": {
           "title": "Integraciones",
-          "desc": "Tu core, agenda, CRM, mesa de ayuda, WhatsApp Business y pasarela de pagos, por API."
+          "desc": "Tu sistema central, agenda, CRM, mesa de ayuda, WhatsApp Business y pasarela de pagos, por API."
         }
       },
       "costNote": "Los minutos de telefonía, reconocimiento de voz, voz sintetizada y modelo de lenguaje los pagas directamente a cada proveedor."
@@ -565,8 +605,9 @@
       }
     },
     "footer": {
-      "sampleNote": "Datos de ejemplo: las empresas, las personas, los números y los documentos son ficticios. Las llamadas siguen un guion fijo (en esta demo no se ejecuta ningún modelo de IA), la voz la genera tu navegador y las integraciones (core bancario, agenda, cartera, WhatsApp, pagos, CRM) son simuladas. Tus llamadas de prueba y la personalización se guardan solo en este navegador.",
-      "cta": "Solicitar demo con tu guion"
+      "sampleNote": "Datos de ejemplo: las empresas, las personas, los números y los documentos son ficticios. Las llamadas siguen un guion fijo (en esta demo no se ejecuta ningún modelo de IA), la voz la genera tu navegador y las integraciones (sistema bancario, agenda, cartera, WhatsApp, pagos, CRM) son simuladas. Tus llamadas de prueba, la personalización y la campaña se guardan solo en este navegador.",
+      "cta": "Solicitar demo guiada",
+      "quote": "Cotizar este agente"
     },
     "scenarios": {
       "banca": {
@@ -600,7 +641,7 @@
         },
         "flow": {
           "greeting": "Saludo con el nombre del banco y aviso de grabación y tratamiento de datos.",
-          "identify": "Pide la cédula y la valida contra el core antes de dar información.",
+          "identify": "Pide la cédula y la valida contra el sistema del banco antes de dar información.",
           "intent": "Detecta «compra rechazada» y luego «aviso de viaje».",
           "action": "Consulta movimientos, registra el viaje y habilita la tarjeta.",
           "end": "Confirma, registra la llamada en el CRM y se despide."
@@ -678,7 +719,7 @@
       },
       "cobranza": {
         "name": "Cobranza preventiva: acuerdo de pago",
-        "desc": "Llamada saliente dentro del horario permitido para recordar una cuota; la clienta propone pagar en dos partes y el agente registra el acuerdo y envía el link de pago por WhatsApp.",
+        "desc": "Llamada saliente dentro del horario permitido para recordar una cuota; la clienta propone pagar en dos partes y el agente registra el acuerdo y envía el enlace de pago por WhatsApp.",
         "company": "Créditos Guadua",
         "customer": "Natalia Ortiz",
         "human": "Sergio Cárdenas",
@@ -696,7 +737,7 @@
           "t6": "Este mes estoy apretada. Puedo pagar la mitad ahora y el resto a fin de mes.",
           "t7": "Entiendo. Te puedo ofrecer un acuerdo: 206.250 pesos hasta el 15 de octubre y 206.250 pesos hasta el 30 de octubre, sin intereses de mora si cumples las dos fechas. ¿Te sirve?",
           "t8": "Sí, me sirve.",
-          "t9": "Listo: registré el acuerdo de pago y te envié por WhatsApp el link para pagar la primera parte.",
+          "t9": "Listo: registré el acuerdo de pago y te envié por WhatsApp el enlace para pagar la primera parte.",
           "t10": "Perfecto, muchas gracias.",
           "t11": "Gracias a ti, Natalia. Que tengas buen día."
         },
@@ -705,20 +746,20 @@
           "getBalance": "Crédito CR-40917 · cuota de octubre: $ 412.500 COP · vence el 15/10/2026 · sin mora",
           "quotePaymentPlan": "Plan propuesto: 2 pagos de $ 206.250 COP (15/10/2026 y 30/10/2026)",
           "createAgreement": "Acuerdo AP-1186 registrado: 2 pagos de $ 206.250 COP",
-          "createPaymentLink": "Link de pago generado por $ 206.250 COP; vence el 15/10/2026",
-          "sendWhatsapp": "Plantilla «link de pago» enviada a +57 318 *** 4410",
+          "createPaymentLink": "Enlace de pago generado por $ 206.250 COP; vence el 15/10/2026",
+          "sendWhatsapp": "Plantilla «enlace de pago» enviada a +57 318 *** 4410",
           "logCallCrm": "Caso CRM-20517 creado: acuerdo de pago"
         },
         "flow": {
           "greeting": "Llama dentro del horario permitido; saludo y aviso de grabación.",
           "identify": "Valida la cédula contra el sistema de cartera.",
           "intent": "Recuerda la cuota; la clienta pide un acuerdo de pago.",
-          "action": "Propone un plan, registra el acuerdo y envía el link de pago por WhatsApp.",
+          "action": "Propone un plan, registra el acuerdo y envía el enlace de pago por WhatsApp.",
           "end": "Cierra la llamada y registra el resultado en el CRM."
         },
         "assist": {
           "s1": "Confirma las dos fechas del acuerdo y el valor de cada pago.",
-          "s2": "Explica que el link de pago llegó por WhatsApp y vence el 15 de octubre.",
+          "s2": "Explica que el enlace de pago llegó por WhatsApp y vence el 15 de octubre.",
           "s3": "Si pide más plazo, revisa las opciones de refinanciación vigentes."
         },
         "kb": {
@@ -783,6 +824,51 @@
             "title": "Pedidos con varios paquetes",
             "body": "Un pedido puede llegar en varios paquetes desde bodegas distintas; cada paquete tiene su propio seguimiento."
           }
+        }
+      }
+    },
+    "howItWorks": {
+      "title": "Qué es real y qué es simulado en esta demo",
+      "show": "Ver",
+      "hide": "Ocultar",
+      "script": "Las cuatro llamadas siguen un guion fijo: no hay reconocimiento de voz ni un modelo de IA en vivo, y la intención, la confianza y el sentimiento están calculados de antemano.",
+      "voice": "La voz la genera tu navegador con las voces en español que tenga instaladas; si no tiene, la llamada avanza solo con la transcripción.",
+      "simulated": "Las acciones del agente, la transferencia, los WhatsApp y los enlaces de pago son simulados: la demo no se conecta a ningún sistema ni envía mensajes.",
+      "real": "Sí se calculan de verdad: las reglas de la campaña (horarios, festivos de Colombia de cada año, frecuencia y lista de exclusión), las métricas del registro y los archivos que descargas.",
+      "storage": "Tus llamadas de prueba, la personalización y la campaña se guardan solo en este navegador.",
+      "project": "En tu proyecto: número +57 o tu troncal SIP, reconocimiento de voz, modelo de lenguaje y voz neural, conectados a tus sistemas."
+    },
+    "guide": {
+      "title": "Primeros pasos",
+      "progress": "{done} de {total} hechos",
+      "show": "Mostrar",
+      "hide": "Ocultar",
+      "done": "Hecho",
+      "steps": {
+        "pick": {
+          "title": "Elige la llamada y tu empresa",
+          "text": "Cuatro llamadas de ejemplo: banca, salud, cobranza y pedidos. Escribe el nombre de tu empresa para oírlo en el saludo.",
+          "action": "Escribir mi empresa"
+        },
+        "listen": {
+          "title": "Escucha la llamada",
+          "text": "Pulsa «Iniciar llamada»: verás la transcripción, la intención y el sentimiento turno a turno.",
+          "action": "Iniciar llamada"
+        },
+        "result": {
+          "title": "Revisa el resultado",
+          "text": "Al terminar aparecen el resumen, las acciones que ejecutó el agente y la llamada en el registro.",
+          "action": "Saltar al final"
+        },
+        "transfer": {
+          "title": "Prueba la transferencia",
+          "text": "En «Pedido» el agente le pasa la llamada a un asesor con todo el contexto. También puedes transferir tú.",
+          "action": "Abrir la llamada de pedido"
+        },
+        "campaign": {
+          "title": "Simula la campaña de cobranza",
+          "text": "El marcador bloquea domingos, festivos, horarios no permitidos, llamadas repetidas y la lista de exclusión.",
+          "action": "Ir a la campaña"
         }
       }
     }

@@ -33,6 +33,8 @@ export type FnKey =
 export interface Turn {
   key: string;
   speaker: Speaker;
+  /** Duración del turno en segundos (fija: igual en español e inglés y con cualquier nombre de empresa). */
+  sec: number;
   sentiment: Sentiment;
   node: FlowNode;
   /** Intención detectada en este turno (clave de demoVoice.intents). */
@@ -75,6 +77,8 @@ export interface CallRow {
   id: string;
   /** Hora local HH:MM (fija en los datos de ejemplo). */
   time: string;
+  /** Fecha AAAA-MM-DD (solo en tus pruebas: la jornada de ejemplo es un día fijo). */
+  date?: string;
   number: string;
   direction: Direction;
   /** Clave de demoVoice.intents con el motivo principal. */
@@ -84,6 +88,7 @@ export interface CallRow {
   sentiment: Sentiment;
   /** Encuesta de satisfacción 1–5 (null si no respondió). */
   csat: number | null;
+  /** Llamada del guion que se puede escuchar con «Escuchar» (o repetir si es tuya). */
   scenario?: ScenarioId;
   /** Llamada hecha por la persona en esta demo. */
   mine?: boolean;
@@ -93,17 +98,23 @@ export interface CallRow {
 export interface CampaignContact {
   id: string;
   name: string;
+  /** Número enmascarado (+57 3xx *** 1234). La regla de frecuencia compara este valor. */
   number: string;
-  /** Fecha programada AAAA-MM-DD (2026). */
+  /** Fecha programada AAAA-MM-DD. */
   date: string;
   /** Hora programada HH:MM (24 h). */
   time: string;
   excluded?: boolean;
   /** Fecha del último contacto (para la regla de frecuencia). */
   lastContact?: string;
-  /** Resultado si la llamada se permite. */
-  outcome: 'agreement' | 'voicemail' | 'paid' | 'noAnswer' | 'callback';
+  /** Resultado simulado si la regla permite la llamada. */
+  outcome: CampaignOutcome;
+  /** Contacto que agregaste tú en la demo. */
+  custom?: boolean;
 }
+
+export type CampaignOutcome = 'agreement' | 'voicemail' | 'paid' | 'noAnswer' | 'callback';
+export const CAMPAIGN_OUTCOMES: CampaignOutcome[] = ['agreement', 'voicemail', 'paid', 'callback', 'noAnswer'];
 
 export type BlockReason = 'sunday' | 'holiday' | 'beforeOpen' | 'afterClose' | 'excluded' | 'frequency' | 'outOfRange' | 'invalid';
 

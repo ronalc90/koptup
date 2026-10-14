@@ -27,6 +27,7 @@ import { ComplianceRow, ContextRow, PanelTitle, SentimentGauge, SentimentPill } 
 import type { CheckState, T } from './parts';
 import type { FlowNode, FnKey, FnStatus, Phase, Scenario, Sentiment, Turn } from './types';
 import { fmtTime } from './types';
+import { pct } from './format';
 
 /** Todo lo que los paneles necesitan saber de la llamada actual (derivado en page.tsx). */
 export interface CallView {
@@ -107,7 +108,7 @@ export function IntentPanel({ v }: { v: CallView }) {
           </div>
           <div className="mt-3 flex items-center justify-between text-xs text-slate-400 mb-1.5">
             <span>{t('intent.confidence')}</span>
-            <span className="font-mono text-emerald-300">{conf}%</span>
+            <span className="font-mono text-emerald-300">{pct(conf, v.locale)}</span>
           </div>
           <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden">
             <div className="h-full bg-gradient-to-r from-emerald-500 to-cyan-400" style={{ width: `${conf}%` }} />

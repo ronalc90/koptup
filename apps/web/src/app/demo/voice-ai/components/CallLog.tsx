@@ -1,17 +1,26 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowDownTrayIcon, ChartBarIcon, PhoneIcon, PlayCircleIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { ArrowDownTrayIcon, ArrowPathIcon, ChartBarIcon, PhoneIcon, PlayCircleIcon, TrashIcon } from '@heroicons/react/24/outline';
 import Card from '@/components/ui/Card';
 import { cn } from '@/lib/utils';
 import { computeKpis, downloadText, toCsv } from './engine';
-import { decimal, pct } from './format';
-import { KpiCard, PanelTitle, SentimentPill, Tabs } from './parts';
+import { decimal, formatWhen, pct } from './format';
+import { KpiCard, PanelTitle, Segmented, SentimentPill } from './parts';
 import type { T } from './parts';
 import type { CallRow, ScenarioId } from './types';
 import { RESULT_TONE, fmtTime } from './types';
 
 type Tab = 'all' | 'inbound' | 'outbound';
+
+/** Fecha de la jornada de ejemplo (las filas sin fecha propia). */
+const SAMPLE_DAY = '2026-10-08';
+
+/** «jue 8 oct · 08:02»: fecha y hora de la fila (tus pruebas llevan su propia fecha). */
+function whenOf(t: T, r: CallRow): string {
+  if (r.mine && !r.date) return r.time;
+  return formatWhen(t, r.date ?? SAMPLE_DAY, r.time, 'short');
+}
 
 export function KpiPanel({ rows, t, locale }: { rows: CallRow[]; t: T; locale: string }) {
   const k = computeKpis(rows);
@@ -55,7 +64,7 @@ export default function CallLog({
   const exportCsv = () => {
     const data: (string | number)[][] = [
       [
-        t('log.columns.time'),
+        t('log.columns.when'),
         t('log.columns.number'),
         t('call.channel'),
         t('log.columns.reason'),
@@ -65,7 +74,7 @@ export default function CallLog({
         t('log.columns.csat'),
       ],
       ...shown.map((r) => [
-        r.mine ? `${r.time} (${t('log.mine')})` : r.time,
+        r.mine ? `${whenOf(t, r)} (${t('log.mine')})` : whenOf(t, r),
         r.number,
         t(`direction.${r.direction}`),
         t(`intents.${r.intent}`),
@@ -87,8 +96,8 @@ export default function CallLog({
         subtitle={t('log.subtitle')}
         right={
           <div className="flex flex-wrap items-center gap-2">
-            <Tabs<Tab>
-              label={t('log.title')}
+            <Segmented<Tab>
+              label={t('log.filterLabel')}
               value={tab}
               onChange={setTab}
               items={[
@@ -119,7 +128,53 @@ export default function CallLog({
         }
       />
 
-      <div className="overflow-x-auto rounded-lg border border-slate-800">
+      {/* Celular: una tarjeta por llamada, sin desplazamiento lateral. */}
+      <ul className="sm:hidden space-y-2" data-testid="voice-call-log-mobile">
+        {shown.length === 0 && <li className="rounded-lg border border-slate-800 px-3 py-6 text-center text-xs text-slate-400">{t('log.empty')}</li>}
+        {shown.map((r) => (
+          <li key={r.id} className={cn('rounded-lg border border-slate-800 p-3 text-xs', r.mine && 'bg-cyan-500/5 border-cyan-500/20')}>
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 font-mono text-slate-300">
+                  {r.mine ? whenOf(t, r) : r.time}
+                  {r.mine && (
+                    <span className="whitespace-nowrap rounded-full bg-cyan-500/15 px-1.5 py-0.5 font-sans text-[10px] text-cyan-300">{t('log.mine')}</span>
+                  )}
+                </div>
+                <div className="mt-0.5 text-sm font-medium text-slate-100">{t(`intents.${r.intent}`)}</div>
+              </div>
+              <span className={cn('shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-[11px] whitespace-nowrap', RESULT_TONE[r.result])}>
+                {t(`log.results.${r.result}`)}
+              </span>
+            </div>
+            <div className="mt-1 font-mono text-[11px] text-slate-400">
+              {r.number}
+              <span className="ml-1.5 font-sans text-slate-500">
+                {t(`direction.${r.direction}`)} · {fmtTime(r.durationSec)}
+              </span>
+            </div>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <SentimentPill value={r.sentiment} t={t} />
+              <span className="text-[11px] text-slate-400">
+                {t('log.columns.csat')}: <span className="font-mono text-slate-200">{r.csat ?? t('log.noCsat')}</span>
+              </span>
+              {r.scenario && (
+                <button
+                  type="button"
+                  onClick={() => onOpen(r.scenario as ScenarioId)}
+                  title={r.mine ? t('log.replayHint') : t('log.openHint')}
+                  className="ml-auto inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-cyan-500/40 bg-cyan-500/10 px-2 py-1 text-[11px] text-cyan-200 hover:bg-cyan-500/20"
+                >
+                  {r.mine ? <ArrowPathIcon className="h-3.5 w-3.5" /> : <PlayCircleIcon className="h-3.5 w-3.5" />}
+                  {r.mine ? t('log.replay') : t('log.open')}
+                </button>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      <div className="hidden sm:block relative overflow-x-auto rounded-lg border border-slate-800">
         <table className="w-full text-xs min-w-[720px]" data-testid="voice-call-log">
           <thead>
             <tr className="text-left text-slate-400 border-b border-slate-800 bg-slate-900/60">
@@ -144,7 +199,7 @@ export default function CallLog({
             {shown.map((r) => (
               <tr key={r.id} className={cn('border-b border-slate-800/60', r.mine && 'bg-cyan-500/5')}>
                 <td className="px-2.5 py-2 font-mono text-slate-300 whitespace-nowrap">
-                  {r.time}
+                  {r.mine ? whenOf(t, r) : r.time}
                   {r.mine && (
                     <span className="ml-1.5 rounded-full bg-cyan-500/15 px-1.5 py-0.5 font-sans text-[10px] text-cyan-300">{t('log.mine')}</span>
                   )}
@@ -165,16 +220,20 @@ export default function CallLog({
                 </td>
                 <td className="px-2.5 py-2 text-right font-mono text-slate-200">{r.csat ?? t('log.noCsat')}</td>
                 <td className="px-2.5 py-2 text-right">
-                  {r.scenario && (
+                  {r.scenario ? (
                     <button
                       type="button"
                       onClick={() => onOpen(r.scenario as ScenarioId)}
-                      title={t('log.openHint')}
-                      className="inline-flex items-center gap-1 rounded-md border border-cyan-500/40 bg-cyan-500/10 px-2 py-0.5 text-[11px] text-cyan-200 hover:bg-cyan-500/20"
+                      title={r.mine ? t('log.replayHint') : t('log.openHint')}
+                      className="inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-cyan-500/40 bg-cyan-500/10 px-2 py-0.5 text-[11px] text-cyan-200 hover:bg-cyan-500/20"
                     >
-                      <PlayCircleIcon className="h-3.5 w-3.5" />
-                      {t('log.open')}
+                      {r.mine ? <ArrowPathIcon className="h-3.5 w-3.5" /> : <PlayCircleIcon className="h-3.5 w-3.5" />}
+                      {r.mine ? t('log.replay') : t('log.open')}
                     </button>
+                  ) : (
+                    <span className="text-slate-600" title={t('log.noScript')}>
+                      —<span className="sr-only">{t('log.noScript')}</span>
+                    </span>
                   )}
                 </td>
               </tr>

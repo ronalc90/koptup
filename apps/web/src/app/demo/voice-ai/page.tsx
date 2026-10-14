@@ -8,7 +8,9 @@ import {
   ArrowPathIcon,
   ArrowsRightLeftIcon,
   BeakerIcon,
+  CalculatorIcon,
   ChevronDoubleRightIcon,
+  PresentationChartBarIcon,
   CpuChipIcon,
   InformationCircleIcon,
   MicrophoneIcon,
@@ -27,6 +29,8 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import { cn } from '@/lib/utils';
 import Waveform from './components/Waveform';
+import GettingStarted, { EMPTY_GUIDE, GUIDE_STEPS } from './components/GettingStarted';
+import type { GuideFlags, GuideStepId } from './components/GettingStarted';
 import CampaignPanel, { blockReasonText } from './components/CampaignPanel';
 import CallLog, { KpiPanel } from './components/CallLog';
 import {
@@ -37,15 +41,16 @@ import { PanelTitle } from './components/parts';
 import type { CheckState } from './components/parts';
 import { SAMPLE_CALLS, SCENARIOS, getScenario } from './components/scenarios';
 import {
-  buildTimeline, callClock, checkContactWindow, downloadText, estimateTurnSeconds, fnStatuses, sentimentTrend,
+  buildTimeline, callClock, checkContactWindow, downloadText, fnStatuses, sentimentTrend,
 } from './components/engine';
 import { formatWhen } from './components/format';
 import { useSpeech } from './components/useSpeech';
 import type { CallResult, CallRow, Phase, ScenarioId, Sentiment } from './components/types';
 import { fmtTime } from './components/types';
 
-/** Solicitud de demo: formulario de contacto con el producto preseleccionado. */
-const REQUEST_DEMO_HREF = '/contact?service=voice-ai-callcenter';
+/** Demo guiada con esta demo ya elegida y cotización con el producto preseleccionado. */
+const REQUEST_DEMO_HREF = '/solicitar-demo?demos=voice-ai';
+const QUOTE_HREF = '/contact?service=voice-ai-callcenter';
 const STORAGE_KEY = 'koptup-demo-voice-ai-v1';
 /** Registro de ejemplo ordenado por hora (entrantes y salientes mezcladas). */
 const SAMPLE_BY_TIME = [...SAMPLE_CALLS].sort((a, b) => a.time.localeCompare(b.time));
@@ -61,6 +66,37 @@ interface Saved {
   voiceUri?: string;
   speed?: Speed;
   voiceOn?: boolean;
+  guide?: Partial<GuideFlags>;
+  guideOpen?: boolean;
+}
+
+/** Fila de «Tu prueba» guardada en el navegador con la forma esperada. */
+function isCallRow(x: unknown): x is CallRow {
+  if (!x || typeof x !== 'object') return false;
+  const r = x as Record<string, unknown>;
+  return (
+    typeof r.id === 'string' &&
+    typeof r.time === 'string' &&
+    typeof r.number === 'string' &&
+    (r.direction === 'inbound' || r.direction === 'outbound') &&
+    typeof r.intent === 'string' &&
+    typeof r.durationSec === 'number' &&
+    typeof r.result === 'string' &&
+    typeof r.sentiment === 'string' &&
+    (r.scenario === undefined || SCENARIOS.some((sc) => sc.id === r.scenario))
+  );
+}
+
+/** Fecha (AAAA-MM-DD) y hora (HH:MM) actuales en Bogotá, sin depender del idioma del navegador. */
+function nowInBogota(): { date: string; time: string } {
+  try {
+    const now = new Date();
+    const date = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
+    const time = new Intl.DateTimeFormat('en-GB', { timeZone: 'America/Bogota', hour: '2-digit', minute: '2-digit', hour12: false }).format(now);
+    return { date: /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : '', time: /^\d{2}:\d{2}$/.test(time) ? time : '--:--' };
+  } catch {
+    return { date: '', time: '--:--' };
+  }
 }
 
 export default function VoiceAIPage() {
@@ -85,12 +121,24 @@ export default function VoiceAIPage() {
   const [loaded, setLoaded] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [resetKey, setResetKey] = useState(0);
+  const [guide, setGuide] = useState<GuideFlags>(EMPTY_GUIDE);
+  const [guideOpen, setGuideOpen] = useState(true);
+  const [confirmReset, setConfirmReset] = useState(false);
+  const [scrollTarget, setScrollTarget] = useState<'call' | 'summary' | 'campaign' | null>(null);
+  const [pendingSkip, setPendingSkip] = useState(false);
 
   const spokenRef = useRef(-1);
   const recordedRef = useRef(false);
   const elapsedRef = useRef(0);
   elapsedRef.current = elapsed;
   const callCardRef = useRef<HTMLDivElement>(null);
+  const summaryRef = useRef<HTMLDivElement>(null);
+  const campaignRef = useRef<HTMLDivElement>(null);
+  const companyRef = useRef<HTMLInputElement>(null);
+  const scenarioRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const resetBtnRef = useRef<HTMLButtonElement>(null);
+  const resetCancelRef = useRef<HTMLButtonElement>(null);
+  const resetWasOpen = useRef(false);
 
   /* ---------------------------- Persistencia ---------------------------- */
   useEffect(() => {
@@ -98,12 +146,17 @@ export default function VoiceAIPage() {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const s = JSON.parse(raw) as Saved;
-        if (Array.isArray(s.calls)) setMyCalls(s.calls.slice(0, 50));
+        if (Array.isArray(s.calls)) setMyCalls(s.calls.filter(isCallRow).slice(0, 50));
         if (typeof s.company === 'string') setCompany(s.company);
         if (typeof s.agent === 'string') setAgent(s.agent);
         if (typeof s.voiceUri === 'string') setVoiceUri(s.voiceUri);
         if (s.speed && SPEEDS.includes(s.speed)) setSpeed(s.speed);
         if (typeof s.voiceOn === 'boolean') setVoiceOn(s.voiceOn);
+        if (s.guide && typeof s.guide === 'object') {
+          const g = s.guide;
+          setGuide(GUIDE_STEPS.reduce((acc, id) => ({ ...acc, [id]: g[id] === true }), EMPTY_GUIDE));
+        }
+        if (typeof s.guideOpen === 'boolean') setGuideOpen(s.guideOpen);
       }
     } catch {
       /* almacenamiento no disponible */
@@ -114,12 +167,12 @@ export default function VoiceAIPage() {
   useEffect(() => {
     if (!loaded) return;
     try {
-      const data: Saved = { calls: myCalls, company, agent, voiceUri, speed, voiceOn };
+      const data: Saved = { calls: myCalls, company, agent, voiceUri, speed, voiceOn, guide, guideOpen };
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     } catch {
       /* almacenamiento no disponible */
     }
-  }, [loaded, myCalls, company, agent, voiceUri, speed, voiceOn]);
+  }, [loaded, myCalls, company, agent, voiceUri, speed, voiceOn, guide, guideOpen]);
 
   useEffect(() => {
     if (!toast) return;
@@ -127,6 +180,33 @@ export default function VoiceAIPage() {
     return () => clearTimeout(id);
   }, [toast]);
   const notify = useCallback((msg: string) => setToast(msg), []);
+  const markStep = useCallback((id: GuideStepId) => setGuide((g) => (g[id] ? g : { ...g, [id]: true })), []);
+  const onCampaignFinished = useCallback(() => markStep('campaign'), [markStep]);
+
+  // Desplazamiento a una sección después de que se pinta (p. ej. el resumen al saltar al final).
+  useEffect(() => {
+    if (!scrollTarget) return;
+    const el = scrollTarget === 'call' ? callCardRef.current : scrollTarget === 'summary' ? summaryRef.current : campaignRef.current;
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setScrollTarget(null);
+  }, [scrollTarget]);
+
+  // Foco: al abrir la confirmación va a «Cancelar»; al cerrarla vuelve a «Restablecer».
+  useEffect(() => {
+    if (confirmReset) resetCancelRef.current?.focus();
+    else if (resetWasOpen.current) resetBtnRef.current?.focus();
+    resetWasOpen.current = confirmReset;
+  }, [confirmReset]);
+
+  // Escape cancela la confirmación de «Restablecer».
+  useEffect(() => {
+    if (!confirmReset) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setConfirmReset(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [confirmReset]);
 
   /* ------------------------------ Guion ------------------------------ */
   const agentName = agent.trim() || t('picker.agentPlaceholder');
@@ -146,7 +226,8 @@ export default function VoiceAIPage() {
     }));
   }, [scenario, agentName, companyName, human, t]);
 
-  const durations = useMemo(() => texts.map((x) => estimateTurnSeconds(x.shown)), [texts]);
+  // Duración fija de cada turno (igual en español e inglés y con cualquier nombre de empresa).
+  const durations = useMemo(() => scenario.turns.map((tn) => tn.sec), [scenario]);
   const at = useMemo(() => buildTimeline(durations), [durations]);
   const last = scenario.turns.length - 1;
   const endsWithTransfer = scenario.turns[last].fns?.includes('transferToHuman') ?? false;
@@ -208,20 +289,11 @@ export default function VoiceAIPage() {
     const intentTurn = [...played].reverse().find((x) => x.intent) ?? scenario.turns.find((x) => x.intent);
     const lastCustomer = [...played].reverse().find((x) => x.speaker === 'customer');
     const result: CallResult = endReason === 'transferred' ? 'transferred' : endReason === 'hungup' ? 'abandoned' : 'resolved';
-    let time = '--:--';
-    try {
-      time = new Intl.DateTimeFormat(locale === 'en' ? 'en-US' : 'es-CO', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-        timeZone: 'America/Bogota',
-      }).format(new Date());
-    } catch {
-      /* sin Intl */
-    }
+    const { date, time } = nowInBogota();
     const row: CallRow = {
       id: `mine-${Date.now()}`,
       time,
+      ...(date ? { date } : {}),
       number: scenario.number,
       direction: scenario.direction,
       intent: intentTurn?.intent ?? 'orderStatus',
@@ -233,7 +305,9 @@ export default function VoiceAIPage() {
       mine: true,
     };
     setMyCalls((prev) => [row, ...prev].slice(0, 50));
-  }, [phase, endReason, cursor, scenario, at, durations, locale]);
+    markStep('result');
+    if (result === 'transferred') markStep('transfer');
+  }, [phase, endReason, cursor, scenario, at, durations, markStep]);
 
   const resetCall = useCallback(() => {
     speech.cancel();
@@ -250,6 +324,7 @@ export default function VoiceAIPage() {
     resetCall();
     setCursor(0);
     setPhase('playing');
+    markStep('listen');
   };
   const pause = () => {
     speech.cancel();
@@ -268,6 +343,16 @@ export default function VoiceAIPage() {
     setElapsed(durations[last] * 1000);
     finish(endsWithTransfer ? 'transferred' : 'completed');
   };
+  // «Saltar al final» desde los primeros pasos: espera a que la llamada esté en curso.
+  useEffect(() => {
+    if (!pendingSkip || (phase !== 'playing' && phase !== 'paused')) return;
+    setPendingSkip(false);
+    skipToEnd();
+    setScrollTarget('summary');
+    // skipToEnd usa el estado de este render; solo se reacciona a la petición y a la fase.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingSkip, phase]);
+
   const toggleVoice = () => {
     if (voiceOn) speech.cancel();
     setVoiceOn(!voiceOn);
@@ -275,10 +360,40 @@ export default function VoiceAIPage() {
   const chooseScenario = (id: ScenarioId) => {
     resetCall();
     setScenarioId(id);
+    markStep('pick');
   };
+  /** «Escuchar» o «Repetir» en el registro: abre esa llamada del guion y la inicia. */
   const openFromLog = (id: ScenarioId) => {
     chooseScenario(id);
-    callCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    start();
+    setScrollTarget('call');
+  };
+  /** Flechas en el grupo de escenarios (radio con foco itinerante). */
+  const onScenarioKey = (e: React.KeyboardEvent, i: number) => {
+    const delta = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+    if (!delta) return;
+    e.preventDefault();
+    const next = (i + delta + SCENARIOS.length) % SCENARIOS.length;
+    chooseScenario(SCENARIOS[next].id);
+    scenarioRefs.current[next]?.focus();
+  };
+  const guideAction = (id: GuideStepId) => {
+    if (id === 'pick') {
+      companyRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      companyRef.current?.focus({ preventScroll: true });
+    } else if (id === 'listen') {
+      start();
+      setScrollTarget('call');
+    } else if (id === 'result') {
+      if (phase !== 'playing' && phase !== 'paused') start();
+      // Se salta al final en el siguiente render, con el escenario ya iniciado.
+      setPendingSkip(true);
+    } else if (id === 'transfer') {
+      chooseScenario('pedido');
+      setScrollTarget('call');
+    } else {
+      setScrollTarget('campaign');
+    }
   };
   const resetAll = () => {
     resetCall();
@@ -289,6 +404,9 @@ export default function VoiceAIPage() {
     setVoiceUri('');
     setSpeed(1);
     setVoiceOn(true);
+    setGuide(EMPTY_GUIDE);
+    setGuideOpen(true);
+    setConfirmReset(false);
     setResetKey((k) => k + 1);
     try {
       window.localStorage.removeItem(STORAGE_KEY);
@@ -411,61 +529,122 @@ export default function VoiceAIPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-secondary-950 to-slate-950 text-slate-100">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Encabezado */}
-        <div className="rounded-2xl bg-gradient-to-br from-sky-600 to-sky-800 p-6 sm:p-8 mb-6 shadow-sm">
-          <div className="flex items-start justify-between gap-4 flex-wrap">
-            <div className="min-w-0">
-              <Button variant="ghost" className="mb-3 text-sky-100 hover:text-white hover:bg-white/10" asChild>
-                <Link href="/demo">
-                  <ArrowLeftIcon className="h-4 w-4 mr-2" />
-                  {t('header.back')}
-                </Link>
-              </Button>
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight flex items-center gap-3 text-white">
-                <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm shadow-lg">
-                  <MicrophoneIcon className="h-6 w-6 text-white" />
-                </span>
-                {t('header.title')}
-              </h1>
-              <p className="text-base sm:text-lg text-sky-50/90 mt-2 max-w-3xl">{t('header.subtitle')}</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <span className="inline-flex items-center gap-1 rounded-full border border-white/30 bg-white/10 px-2.5 py-0.5 text-xs text-white">
-                  <BeakerIcon className="h-3.5 w-3.5" />
-                  {t('header.sampleBadge')}
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-full border border-white/30 bg-white/10 px-2.5 py-0.5 text-xs text-white">
-                  <InformationCircleIcon className="h-3.5 w-3.5" />
-                  {t('header.scriptBadge')}
-                </span>
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Button size="sm" variant="outline" className="bg-white text-sky-800 border-white hover:bg-sky-50" asChild>
-                <Link href={REQUEST_DEMO_HREF}>{t('header.requestDemo')}</Link>
-              </Button>
-              <Button size="sm" variant="ghost" className="text-sky-50 hover:text-white hover:bg-white/10" onClick={resetAll} title={t('header.resetHint')}>
-                <ArrowPathIcon className="h-4 w-4 mr-1" />
-                {t('header.reset')}
-              </Button>
-            </div>
+        {/* Volver al catálogo y salidas comerciales */}
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 mb-3">
+          <Link
+            href="/demo"
+            className="inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-slate-300 hover:text-white"
+          >
+            <ArrowLeftIcon className="h-4 w-4" aria-hidden="true" />
+            {t('header.back')}
+          </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button size="sm" variant="outline" className="gap-1.5 !border-slate-500 !text-slate-100 hover:!bg-slate-800" asChild>
+              <Link href={REQUEST_DEMO_HREF}>
+                <PresentationChartBarIcon className="h-4 w-4" aria-hidden="true" />
+                {t('header.requestDemo')}
+              </Link>
+            </Button>
+            <Button size="sm" className="gap-1.5" asChild>
+              <Link href={QUOTE_HREF}>
+                <CalculatorIcon className="h-4 w-4" aria-hidden="true" />
+                {t('header.quote')}
+              </Link>
+            </Button>
           </div>
         </div>
+
+        {/* Encabezado: qué es y para quién */}
+        <div className="rounded-2xl bg-gradient-to-br from-sky-600 to-sky-800 p-6 sm:p-8 mb-4 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wide text-sky-100">{t('header.kicker')}</p>
+          <h1 className="mt-1 text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight flex items-center gap-3 text-white">
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm shadow-lg">
+              <MicrophoneIcon className="h-6 w-6 text-white" aria-hidden="true" />
+            </span>
+            {t('header.title')}
+          </h1>
+          <p className="text-base sm:text-lg text-sky-50/90 mt-2 max-w-3xl">{t('header.subtitle')}</p>
+        </div>
+
+        {/* Datos de ejemplo, qué es real y restablecer */}
+        <div className="flex flex-col lg:flex-row lg:items-start gap-3 mb-4">
+          <div className="self-start flex flex-wrap gap-2">
+            <span
+              className="inline-flex items-center gap-1 rounded-full border border-amber-400/40 bg-amber-500/10 px-2.5 py-1 text-xs font-medium text-amber-200"
+              title={t('header.sampleBadgeHint')}
+            >
+              <BeakerIcon className="h-3.5 w-3.5" aria-hidden="true" />
+              {t('header.sampleBadge')}
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-full border border-slate-600 bg-slate-800/60 px-2.5 py-1 text-xs text-slate-200">
+              <InformationCircleIcon className="h-3.5 w-3.5" aria-hidden="true" />
+              {t('header.scriptBadge')}
+            </span>
+          </div>
+          <details className="group flex-1 min-w-0 rounded-lg border border-slate-800 bg-slate-900/60 px-3 py-2 text-sm" data-testid="voice-how">
+            <summary className="cursor-pointer list-none flex items-center gap-2 rounded font-medium text-slate-200">
+              <InformationCircleIcon className="h-4 w-4 shrink-0 text-sky-300" aria-hidden="true" />
+              {t('howItWorks.title')}
+              <span className="ml-auto text-xs text-slate-400 group-open:hidden">{t('howItWorks.show')}</span>
+              <span className="ml-auto text-xs text-slate-400 hidden group-open:inline">{t('howItWorks.hide')}</span>
+            </summary>
+            <ul className="mt-2 space-y-1.5 text-xs text-slate-300 list-disc pl-5">
+              {(['script', 'voice', 'simulated', 'real', 'storage', 'project'] as const).map((k) => (
+                <li key={k}>{t(`howItWorks.${k}`)}</li>
+              ))}
+            </ul>
+          </details>
+          <div className="self-start">
+            {!confirmReset ? (
+              <Button
+                ref={resetBtnRef}
+                size="sm"
+                variant="ghost"
+                className="gap-1 text-slate-200 hover:text-white hover:bg-slate-800"
+                onClick={() => setConfirmReset(true)}
+                title={t('header.resetHint')}
+              >
+                <ArrowPathIcon className="h-4 w-4" aria-hidden="true" />
+                {t('header.reset')}
+              </Button>
+            ) : (
+              <div className="flex flex-wrap items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 max-w-md" role="alert">
+                <span className="text-xs text-slate-200">{t('header.resetConfirm')}</span>
+                <Button size="sm" variant="danger" onClick={resetAll}>
+                  {t('header.resetYes')}
+                </Button>
+                <Button ref={resetCancelRef} size="sm" variant="ghost" className="text-slate-200 hover:bg-slate-800" onClick={() => setConfirmReset(false)}>
+                  {t('header.resetNo')}
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <GettingStarted t={t} done={guide} open={guideOpen} onToggle={() => setGuideOpen((o) => !o)} onAction={guideAction} />
 
         {/* 1. Escenario */}
         <Card variant="bordered" className="bg-slate-900/60 border-slate-800 mb-6" padding="md">
           <PanelTitle icon={<PhoneIcon className="h-4 w-4 text-sky-400" />} title={t('picker.title')} subtitle={t('picker.subtitle')} />
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3" role="radiogroup" aria-label={t('picker.title')}>
-            {SCENARIOS.map((s) => {
+            {SCENARIOS.map((s, i) => {
               const sel = s.id === scenarioId;
               return (
                 <button
                   key={s.id}
+                  ref={(el) => {
+                    scenarioRefs.current[i] = el;
+                  }}
                   type="button"
                   role="radio"
                   aria-checked={sel}
-                  onClick={() => chooseScenario(s.id)}
+                  tabIndex={sel ? 0 : -1}
+                  onKeyDown={(e) => onScenarioKey(e, i)}
+                  // Elegir otro escenario lo carga; volver a pulsar el elegido lleva a la llamada.
+                  onClick={() => (sel ? setScrollTarget('call') : chooseScenario(s.id))}
+                  title={sel ? t('picker.goToCall') : undefined}
                   className={cn(
-                    'text-left rounded-xl border p-3 transition-colors min-w-0',
+                    'flex flex-col justify-start text-left rounded-xl border p-3 transition-colors min-w-0',
                     sel ? 'border-cyan-400/60 bg-cyan-500/10' : 'border-slate-700/60 bg-slate-800/30 hover:bg-slate-800/60',
                   )}
                 >
@@ -487,10 +666,15 @@ export default function VoiceAIPage() {
               <label className="text-[11px] text-slate-400">
                 {t('picker.company')}
                 <input
+                  ref={companyRef}
                   type="text"
+                  autoComplete="off"
                   value={company}
                   maxLength={40}
-                  onChange={(e) => setCompany(e.target.value)}
+                  onChange={(e) => {
+                    setCompany(e.target.value);
+                    markStep('pick');
+                  }}
                   placeholder={t('picker.companyPlaceholder')}
                   className="mt-1 w-full rounded-md border border-slate-700 bg-slate-900 px-2.5 py-1.5 text-sm text-slate-100 placeholder:text-slate-500"
                 />
@@ -499,9 +683,13 @@ export default function VoiceAIPage() {
                 {t('picker.agent')}
                 <input
                   type="text"
+                  autoComplete="off"
                   value={agent}
                   maxLength={20}
-                  onChange={(e) => setAgent(e.target.value)}
+                  onChange={(e) => {
+                    setAgent(e.target.value);
+                    markStep('pick');
+                  }}
                   placeholder={t('picker.agentPlaceholder')}
                   className="mt-1 w-full rounded-md border border-slate-700 bg-slate-900 px-2.5 py-1.5 text-sm text-slate-100 placeholder:text-slate-500"
                 />
@@ -681,7 +869,9 @@ export default function VoiceAIPage() {
           </div>
         </div>
 
-        <SummaryPanel v={view} onCopy={copySummary} onDownload={downloadTranscript} />
+        <div ref={summaryRef} className="scroll-mt-24">
+          <SummaryPanel v={view} onCopy={copySummary} onDownload={downloadTranscript} />
+        </div>
 
         {/* Transcripción + flujo */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
@@ -719,8 +909,8 @@ export default function VoiceAIPage() {
         </div>
 
         {/* Campaña saliente */}
-        <div className="mt-6">
-          <CampaignPanel t={t} notify={notify} resetKey={resetKey} />
+        <div className="mt-6 scroll-mt-24" ref={campaignRef}>
+          <CampaignPanel t={t} notify={notify} resetKey={resetKey} onFinished={onCampaignFinished} />
         </div>
 
         {/* Voz + implementación */}
@@ -786,9 +976,14 @@ export default function VoiceAIPage() {
             <InformationCircleIcon className="h-4 w-4 shrink-0 text-slate-500" />
             {t('footer.sampleNote')}
           </p>
-          <Button size="sm" variant="outline" className="!border-slate-500 !text-slate-100 hover:!bg-slate-800 shrink-0" asChild>
-            <Link href={REQUEST_DEMO_HREF}>{t('footer.cta')}</Link>
-          </Button>
+          <div className="flex flex-wrap gap-2 shrink-0">
+            <Button size="sm" variant="outline" className="!border-slate-500 !text-slate-100 hover:!bg-slate-800" asChild>
+              <Link href={REQUEST_DEMO_HREF}>{t('footer.cta')}</Link>
+            </Button>
+            <Button size="sm" asChild>
+              <Link href={QUOTE_HREF}>{t('footer.quote')}</Link>
+            </Button>
+          </div>
         </div>
       </div>
 
