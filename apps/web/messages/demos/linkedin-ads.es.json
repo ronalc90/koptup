@@ -1,49 +1,55 @@
 {
   "demoLinkedinAds": {
     "hero": {
+      "back": "Volver al catálogo de demos",
+      "requestDemo": "Solicitar demo guiada",
+      "quote": "Cotizar un motor de contenido",
       "badge": "Uso interno · Marketing",
-      "title": "Así usamos IA para nuestro contenido en LinkedIn",
-      "subtitle": "Es la herramienta interna con la que KopTup prepara publicaciones sobre sus demos: plan editorial de 30 días, posts, textos de anuncio, carruseles y capturas. No publica en LinkedIn: copias el texto y lo publicas tú.",
+      "title": "Generador de contenido para LinkedIn con IA",
+      "subtitle": "Es la herramienta con la que KopTup prepara sus publicaciones sobre sus propias demos: plan editorial de 30 días, publicaciones, textos de anuncio, carruseles e imágenes. No publica en LinkedIn: copias el texto y lo publicas tú.",
+      "forWhoLabel": "¿Para quién?",
+      "forWho": "Para equipos de marketing B2B y agencias que publican con constancia en LinkedIn: así funcionaría un motor de contenido con IA hecho a la medida de tu catálogo.",
       "chips": {
-        "demos": "{count} demos en el catálogo",
+        "demos": "{count} demos para promocionar",
         "days": "{count} días planificados",
         "combos": "{angles} ángulos × {tones} tonos",
-        "capture": "Foto y video de cada demo"
+        "capture": "Imágenes, foto y video de cada demo"
       },
-      "cta": "¿Quieres un motor de contenido así para tu empresa? Hablemos"
+      "start": "Empezar: publicación del día 1",
+      "seeCalendar": "Ver el calendario"
     },
     "badges": {
       "sampleData": "Datos de ejemplo",
+      "sampleDataHint": "El calendario, las plantillas y las vistas previas son de ejemplo; «Generar con IA» sí llama a un modelo real.",
       "notPublishing": "No publica en LinkedIn"
     },
     "tabs": {
+      "label": "Secciones de la demo",
       "overview": "Resumen",
       "calendar": "Calendario 30 días",
-      "generator": "Generador de posts",
+      "generator": "Generador de publicaciones",
       "capture": "Capturas y video"
     },
     "overview": {
-      "stats": {
-        "demos": "Demos para promocionar",
-        "days": "Días planificados",
-        "angles": "Ángulos de post",
-        "tones": "Tonos de voz"
-      },
+      "firstStepsTitle": "Primeros pasos",
+      "firstStepsDesc": "Tres pasos para pasar de una idea a una publicación lista para LinkedIn. Cada uno se marca solo cuando lo haces.",
+      "progress": "{done} de {total} pasos hechos",
+      "done": "Hecho",
       "stepLabel": "Paso {n}",
       "steps": {
         "calendar": {
-          "title": "Mira el plan de 30 días",
-          "desc": "Una demo distinta cada día, con el ángulo y el formato sugeridos. Haz clic en un día y el generador se carga con esa configuración.",
+          "title": "Elige un día del plan",
+          "desc": "Una demo distinta cada día, con ángulo y formato sugeridos. Haz clic en un día y el generador se carga con esa configuración.",
           "cta": "Abrir calendario"
         },
         "generator": {
-          "title": "Genera y edita el post",
-          "desc": "Elige demo, ángulo y tono. Obtienes gancho, cuerpo, llamado a la acción, hashtags, texto de anuncio y carrusel, con vista previa simulada.",
+          "title": "Genera y revisa la publicación",
+          "desc": "Con IA o con plantillas: gancho, cuerpo, llamado a la acción y etiquetas, más texto de anuncio y carrusel. Cópiala o guárdala como borrador.",
           "cta": "Abrir generador"
         },
         "capture": {
           "title": "Suma el visual",
-          "desc": "Crea una imagen de 1200×627 con plantillas o toma una foto o un video de la demo tal como la ves.",
+          "desc": "Crea una imagen de 1200×627 con plantillas o toma una foto o un video de la demo; úsala en la vista previa o descárgala.",
           "cta": "Abrir capturas"
         }
       },
@@ -67,146 +73,346 @@
         },
         "4": {
           "label": "Publica tú:",
-          "text": "copia el texto, sube la imagen o el video a LinkedIn y publica desde tu cuenta. Si quieres pauta, usa la pestaña de texto de anuncio."
+          "text": "copia el texto, sube la imagen o el video a LinkedIn y publica desde tu cuenta. Si quieres pauta, usa la vista «Texto de anuncio» del generador."
         }
       },
       "scopeTitle": "Qué hace y qué no hace esta demo",
       "doesTitle": "Hace",
       "doesNotTitle": "No hace",
       "does": {
-        "0": "Genera post, texto de anuncio y carrusel con IA (un modelo de OpenAI llamado desde el servidor de KopTup) o, si la IA no está disponible, con plantillas locales, y te dice cuál de las dos usó.",
+        "0": "Genera la publicación, el texto de anuncio y el carrusel con IA (un modelo de OpenAI llamado desde el servidor de KopTup, con un cupo de uso) o, si la IA no está disponible, con plantillas locales, y te dice cuál de las dos usó.",
         "1": "Te deja editar el texto, revisa alertas de veracidad, guarda borradores en este navegador y los exporta en CSV.",
-        "2": "Crea imágenes de 1200×627 con plantillas, descarga el carrusel en PDF y captura foto o video de cualquier demo de KopTup.",
+        "2": "Crea imágenes de 1200×627 con plantillas, descarga el carrusel en PDF y toma foto o video de las demos de KopTup que puedes abrir.",
         "3": "Agrega parámetros UTM a los enlaces para que puedas medir las visitas en tu analítica."
       },
       "doesNot": {
-        "0": "No se conecta a tu cuenta de LinkedIn ni publica por ti (simulado en la demo; en un proyecto a medida se puede conectar a la API de LinkedIn si tu empresa tiene acceso aprobado).",
+        "0": "No se conecta a tu cuenta de LinkedIn ni publica por ti. En un proyecto a medida se puede conectar a la API de LinkedIn si tu empresa tiene acceso aprobado.",
         "1": "No mide alcance, clics ni seguidores: la vista previa no muestra reacciones reales.",
         "2": "No inventa resultados: los textos no traen cifras ni testimonios de clientes; si agregas una cifra, debe tener fuente."
       }
     },
     "catalog": {
       "chatbot": {
+        "titulo": "Chatbot RAG con tus documentos",
+        "descripcion": "Un asistente que responde solo con tus documentos y cita la fuente de cada respuesta",
+        "funciones": [
+          "Prueba con un documento de ejemplo o con el tuyo (PDF, DOCX o TXT)",
+          "Cita la página o el fragmento de cada respuesta",
+          "Dice «no encontré» cuando la respuesta no está en los documentos",
+          "Configura tu propio asistente con su widget para la web"
+        ],
         "industria": "Atención al cliente",
         "publico": ["Clínicas", "Comercio electrónico", "Firmas de abogados", "Instituciones educativas", "Soporte interno"],
         "problema": "Los equipos pierden horas respondiendo las mismas preguntas y muchos chatbots responden sin una fuente que lo respalde"
       },
       "ecommerce": {
+        "titulo": "Tienda en línea",
+        "descripcion": "Una tienda de ejemplo para Colombia, de la compra al despacho y los reportes",
+        "funciones": [
+          "Catálogo, carrito con cupones y pago simulado (tarjeta, PSE, Nequi o contraentrega)",
+          "El pedido aparece en el panel de la tienda",
+          "Guía y seguimiento de envío simulados, con devoluciones",
+          "Reportes de ventas exportables a CSV"
+        ],
         "industria": "Comercio minorista",
         "publico": ["Comercios minoristas", "Fabricantes", "Marcas que venden directo"],
         "problema": "Muchas tiendas en línea muestran el mismo catálogo a todos y no guían la compra"
       },
       "dashboard-ejecutivo": {
+        "titulo": "Tablero ejecutivo",
+        "descripcion": "El tablero de gerencia de una empresa ficticia, con cifras que cuadran entre vistas",
+        "funciones": [
+          "Ventas frente a la meta, margen y estado de resultados",
+          "Cartera por edades y flujo de caja a 13 semanas",
+          "Alertas por reglas y preguntas guiadas",
+          "Informe en PDF y carga de tu propio CSV de ventas en el navegador"
+        ],
         "industria": "Gerencia",
         "publico": ["Gerentes generales", "Directores financieros", "Directores de área"],
         "problema": "Los reportes llegan tarde, en hojas de cálculo, y no explican qué cambió"
       },
       "gestor-documentos": {
+        "titulo": "Gestor documental con IA",
+        "descripcion": "Organiza, busca y resume documentos de empresa",
+        "funciones": [
+          "Archivo de ejemplo de una constructora con carpetas, búsqueda y papelera",
+          "Detección de cláusulas en contratos",
+          "Con sesión, subes tus PDF, DOCX, TXT o CSV y la IA los resume y etiqueta",
+          "Búsqueda por significado y «Explicar con IA»"
+        ],
         "industria": "Gestión documental",
         "publico": ["Áreas legales", "Áreas de cumplimiento", "Notarías", "Gestión humana"],
         "problema": "Los documentos se quedan en carpetas que nadie revisa hasta que llega una auditoría"
       },
       "sistema-reservas": {
+        "titulo": "Sistema de reservas",
+        "descripcion": "Reservas en línea para clínicas, spas y canchas, con la agenda del negocio",
+        "funciones": [
+          "El cliente elige sede, servicio, profesional y una hora libre",
+          "Abono simulado y confirmación con vista previa de WhatsApp y correo",
+          "Agenda por profesional para confirmar, reprogramar y marcar asistencia",
+          "Exporta la agenda a .ics y la lista a CSV"
+        ],
         "industria": "Servicios",
         "publico": ["Clínicas", "Restaurantes", "Salones de belleza", "Consultorios"],
         "problema": "Las citas se pierden porque la agenda está en un cuaderno o en chats sueltos"
       },
       "gestor-contenido": {
+        "titulo": "Gestor de contenido (CMS headless)",
+        "descripcion": "Contenido para web, app y asistente, del borrador a la publicación",
+        "funciones": [
+          "Tipos de contenido con vista previa web y app",
+          "Mejora de textos con IA",
+          "Revisión, aprobación y publicación programada con roles",
+          "Entrega por una API JSON y aviso a los canales con webhooks"
+        ],
         "industria": "Comunicaciones",
         "publico": ["Equipos de mercadeo", "Equipos de ventas", "Comunicación interna"],
         "problema": "Redactar correos, comunicados y propuestas toma más tiempo del que debería"
       },
       "control-proyectos": {
+        "titulo": "Gestión de proyectos con portal de cliente",
+        "descripcion": "Proyectos por encargo con un avance que el cliente puede ver",
+        "funciones": [
+          "Tablero, lista, calendario y cronograma con dependencias",
+          "Horas y presupuesto por hito",
+          "Portal donde el cliente ve el avance y aprueba entregables",
+          "Ejemplos de construcción, agencia creativa y software"
+        ],
         "industria": "Gestión de proyectos",
         "publico": ["Oficinas de proyectos", "Constructoras", "Empresas de software"],
         "problema": "Los proyectos se atrasan sin que nadie vea las señales a tiempo"
       },
       "crm-ia": {
+        "titulo": "CRM con IA",
+        "descripcion": "El embudo de ventas de un equipo B2B, con el puntaje de cada lead explicado",
+        "funciones": [
+          "Embudo de ventas que se arrastra",
+          "Puntaje de cada lead explicado factor por factor",
+          "Pronóstico en pesos frente a la meta",
+          "Borradores de WhatsApp y correo y secuencia de seguimiento"
+        ],
         "industria": "Ventas",
         "publico": ["Equipos comerciales", "Ejecutivos de cuenta", "Gerentes de ventas"],
         "problema": "Los vendedores olvidan seguimientos y dedican tiempo a oportunidades que no avanzan"
       },
       "erp": {
+        "titulo": "ERP modular",
+        "descripcion": "Ventas, inventario, compras, contabilidad y más, conectados entre sí",
+        "funciones": [
+          "Una factura descuenta inventario, genera su asiento y entra a cartera",
+          "Compras con aprobaciones",
+          "Contabilidad con PUC, tesorería y cartera",
+          "Talento humano y producción"
+        ],
         "industria": "Operaciones",
         "publico": ["Empresas de manufactura", "Distribuidoras", "Pymes en crecimiento"],
         "problema": "La empresa usa varios sistemas que no se hablan entre sí"
       },
       "helpdesk-ia": {
+        "titulo": "Mesa de ayuda con IA",
+        "descripcion": "Una bandeja para todos los canales de soporte, con respuestas redactadas con IA",
+        "funciones": [
+          "Bandeja única de correo, chat, WhatsApp y llamadas (simulados)",
+          "Clasificación y asignación automática por reglas",
+          "Respuesta redactada con IA que cita la base de conocimiento",
+          "SLA, encuestas y PQRS en días hábiles de Colombia"
+        ],
         "industria": "Soporte",
         "publico": ["Mesas de ayuda", "Servicio al cliente", "Soporte de TI"],
         "problema": "El equipo de soporte resuelve las mismas solicitudes todos los días"
       },
       "lms": {
+        "titulo": "Plataforma de cursos virtuales",
+        "descripcion": "Cursos en línea con tutor de IA y certificados verificables",
+        "funciones": [
+          "Catálogo y compra simulada de cursos",
+          "Lecciones con un tutor de IA que cita la lección",
+          "Evaluación final y ruta adaptativa",
+          "Certificados con QR verificable"
+        ],
         "industria": "Capacitación",
         "publico": ["Gestión humana", "Universidades corporativas", "Centros de formación"],
         "problema": "Los cursos internos se abandonan porque son largos y genéricos"
       },
       "telemedicina": {
+        "titulo": "Telemedicina para IPS",
+        "descripcion": "La jornada de una IPS: agenda, consulta virtual y facturación",
+        "funciones": [
+          "El paciente agenda y llena la pre-consulta con sus consentimientos",
+          "Consultorio virtual con sala de espera y videoconsulta simulada",
+          "Receta y notas de la consulta",
+          "Facturación y RIPS simulados"
+        ],
         "industria": "Salud",
         "publico": ["Clínicas", "IPS", "Consultorios especializados"],
         "problema": "Los pacientes de zonas apartadas tardan en conseguir una cita con un especialista"
       },
       "facturacion-electronica": {
+        "titulo": "Facturación electrónica (simulador)",
+        "descripcion": "Un simulador de facturación electrónica para Colombia",
+        "funciones": [
+          "Facturas, notas crédito y débito y documento equivalente POS",
+          "Valida el NIT con su dígito de verificación y calcula IVA y retenciones",
+          "PDF con QR y XML de ejemplo",
+          "Eventos RADIAN de ejemplo y libros del período"
+        ],
         "industria": "Contabilidad",
         "publico": ["Contadores", "Pymes", "Empresas medianas"],
         "problema": "Una factura electrónica mal emitida genera rechazos y reprocesos"
       },
       "wms-logistica": {
+        "titulo": "WMS y logística de bodegas",
+        "descripcion": "La operación de un operador logístico, de la recepción a la entrega",
+        "funciones": [
+          "Recepción con escaneo y ubicación con reglas",
+          "Olas de pedidos con reserva por fecha de vencimiento",
+          "Alistamiento, empaque y guía con etiqueta en PDF",
+          "Entrega con firma y seguimiento"
+        ],
         "industria": "Logística",
         "publico": ["Operadores logísticos", "Fabricantes con bodega propia"],
         "problema": "En la bodega se pierde tiempo buscando productos sin una ubicación clara"
       },
       "pos": {
+        "titulo": "Punto de venta (POS)",
+        "descripcion": "La caja de un minimercado y de un restaurante",
+        "funciones": [
+          "Venta con lector de código de barras y balanza",
+          "Mesas y comandas a cocina",
+          "Pago mixto y documento equivalente POS de ejemplo",
+          "Ventas sin internet y cierre de caja"
+        ],
         "industria": "Comercio físico",
         "publico": ["Tiendas", "Restaurantes", "Cadenas de comercio"],
         "problema": "La caja no está conectada con el inventario y los cierres se hacen a mano"
       },
       "hrms": {
+        "titulo": "Gestión humana y nómina",
+        "descripcion": "Expediente, vacaciones, selección y nómina colombiana en un solo lugar",
+        "funciones": [
+          "Expediente digital y vacaciones en días hábiles",
+          "Selección con puntaje por reglas",
+          "Nómina quincenal con aportes y provisiones",
+          "App del colaborador con un asistente que responde con el reglamento"
+        ],
         "industria": "Gestión humana",
         "publico": ["Gerentes de gestión humana", "Pymes", "Empresas con más de 50 personas"],
         "problema": "El área de gestión humana vive entre hojas de cálculo y formularios"
       },
       "automatizacion": {
+        "titulo": "Automatización de procesos",
+        "descripcion": "Un editor de flujos para automatizar tareas repetitivas",
+        "funciones": [
+          "Flujos de ejemplo: facturas de proveedores, cobranza y leads",
+          "Ejecución paso a paso con datos de entrada y salida",
+          "Editor para agregar y configurar pasos",
+          "Versiones, plantillas y casos para revisar"
+        ],
         "industria": "Operaciones",
         "publico": ["Equipos de operaciones", "Equipos de mercadeo", "Áreas administrativas"],
         "problema": "Hay tareas repetitivas que se podrían automatizar, pero parecen requerir programación"
       },
       "saas-boilerplate": {
+        "titulo": "Plataforma SaaS por suscripción",
+        "descripcion": "Cómo se vería tu software vendido por suscripción",
+        "funciones": [
+          "Alta de clientes con sus datos aislados",
+          "Cobros de suscripción simulados",
+          "Equipos, roles y acceso de soporte",
+          "Bitácora, webhooks y API de prueba"
+        ],
         "industria": "Startups",
         "publico": ["Fundadores", "Startups", "Equipos que lanzan un producto mínimo"],
         "problema": "Cada producto nuevo vuelve a construir lo mismo: acceso, cobros y panel de administración"
       },
       "voice-ai": {
+        "titulo": "Agente de voz con IA",
+        "descripcion": "Cómo atendería el teléfono un agente de voz, en llamadas de ejemplo",
+        "funciones": [
+          "Llamadas de ejemplo de banca, salud, cobranza y pedidos",
+          "Transcripción con los datos sensibles enmascarados",
+          "Intención, sentimiento y acciones del agente",
+          "Transferencia a un asesor con el contexto"
+        ],
         "industria": "Atención telefónica",
         "publico": ["Equipos de cobranza", "Servicio al cliente", "Agendamiento de citas"],
         "problema": "La atención telefónica solo crece contratando más personas"
       },
       "firma-electronica": {
+        "titulo": "Firma electrónica",
+        "descripcion": "Sobres de firma con evidencia verificable, de la plantilla a la firma",
+        "funciones": [
+          "Sobres desde plantillas con variables o desde un PDF",
+          "Vista del firmante con código de verificación",
+          "Evidencia con una cadena de hashes verificable",
+          "Indicadores de los sobres de ejemplo"
+        ],
         "industria": "Contratos",
         "publico": ["Firmas de abogados", "Gestión humana", "Inmobiliarias"],
         "problema": "Reunir las firmas de un contrato toma días de correos y reenvíos"
       },
       "scraping": {
+        "titulo": "Extracción y monitoreo de datos",
+        "descripcion": "Monitoreo de fuentes públicas: precios, contratación y normativa",
+        "funciones": [
+          "Extractor que se arma con clics",
+          "Qué cambió desde ayer",
+          "Alertas configurables",
+          "Descarga de datos y ficha legal de cada fuente"
+        ],
         "industria": "Inteligencia de mercado",
         "publico": ["Equipos de precios", "Investigación de mercados", "Inmobiliarias"],
         "problema": "Las empresas se enteran tarde de los cambios de precios y de catálogo de su mercado"
       },
       "code-review-ia": {
+        "titulo": "Revisión de código con IA",
+        "descripcion": "Revisión automática de pull requests con comentarios sobre el código",
+        "funciones": [
+          "Puntaje y riesgo de cada pull request",
+          "Comentarios anclados al cambio, con sugerencias",
+          "Hallazgos de seguridad y dependencias vulnerables",
+          "Revisión de tu propio diff con reglas locales"
+        ],
         "industria": "Desarrollo de software",
         "publico": ["Líderes técnicos", "Equipos de desarrollo", "Directores de tecnología"],
         "problema": "Los cambios de código esperan días por una revisión"
       },
       "moderacion-contenido": {
+        "titulo": "Moderación de contenido",
+        "descripcion": "La consola de moderación de una plataforma, con reglas que tú ajustas",
+        "funciones": [
+          "Casos de ejemplo clasificados con su explicación",
+          "Reglas por umbral que deciden la ruta de cada caso",
+          "Simulador con un lote de ejemplo",
+          "Revisión humana para los casos dudosos"
+        ],
         "industria": "Plataformas digitales",
         "publico": ["Mercados en línea", "Comunidades en línea", "Plataformas educativas"],
         "problema": "El contenido ofensivo y el spam en una comunidad dañan la marca"
       },
       "delivery": {
+        "titulo": "App de domicilios",
+        "descripcion": "El canal propio de domicilios de un restaurante, en cuatro apps conectadas",
+        "funciones": [
+          "App del cliente para pedir y pagar",
+          "App del comercio para aceptar y preparar",
+          "Operaciones asigna repartidores y vigila tiempos",
+          "El repartidor entrega con un código"
+        ],
         "industria": "Última milla",
         "publico": ["Empresas de domicilios", "Comercios con flota propia", "Restaurantes"],
         "problema": "Los repartidores hacen rutas ineficientes y el cliente no sabe dónde está su pedido"
       },
       "loyalty": {
+        "titulo": "Programa de fidelización",
+        "descripcion": "El club de puntos de una cadena de retail, de la caja a los resultados",
+        "funciones": [
+          "Inscripción y puntos en la caja",
+          "App del miembro para canjear",
+          "Reglas, niveles, misiones y campañas",
+          "Resultados y pasivo por puntos"
+        ],
         "industria": "Fidelización",
         "publico": ["Comercios minoristas", "Restaurantes", "Hoteles"],
         "problema": "Los programas de puntos aburren y casi nadie redime sus premios"
@@ -218,14 +424,14 @@
       "educativo": { "label": "Educativo", "desc": "Explica un concepto usando la demo como ejemplo" },
       "detras-camaras": { "label": "Detrás de cámaras", "desc": "Cómo se pensó y se construyó la demo" },
       "comparativa": { "label": "Comparativa", "desc": "Antes y después: el proceso manual frente a la solución" },
-      "tip-rapido": { "label": "Tip rápido", "desc": "Un consejo accionable que el lector puede aplicar hoy" },
+      "tip-rapido": { "label": "Consejo rápido", "desc": "Un consejo accionable que el lector puede aplicar hoy" },
       "pregunta-engagement": { "label": "Pregunta abierta", "desc": "Una pregunta que invita a comentar" }
     },
     "tones": {
       "profesional": { "label": "Profesional", "desc": "Formal y claro, sin exagerar" },
       "cercano": { "label": "Cercano", "desc": "Conversacional, con emojis y en primera persona" },
       "tecnico": { "label": "Técnico", "desc": "Arquitectura y decisiones técnicas" },
-      "storytelling": { "label": "Storytelling", "desc": "Una historia con inicio, nudo y cierre" },
+      "storytelling": { "label": "Narrativo", "desc": "Una historia con inicio, nudo y cierre" },
       "controversial": { "label": "Polémico", "desc": "Una opinión fuerte que invita al debate" }
     },
     "templates": {
@@ -261,7 +467,7 @@
           "La diferencia entre improvisar y tener {titulo}."
         ],
         "tip-rapido": [
-          "💡 Tip de hoy para equipos de {industriaLower}: {funcion0Lower}.",
+          "💡 Consejo de hoy para equipos de {industriaLower}: {funcion0Lower}.",
           "{emoji} Si tu equipo de {industriaLower} todavía hace esto a mano, este consejo es para ti.",
           "💡 Una idea rápida para sacarle más provecho a {titulo}.",
           "{emoji} Pequeño truco para {industriaLower}: pruébalo esta semana."
@@ -287,7 +493,7 @@
         "tecnico": [
           "¿Quieres que escriba sobre la arquitectura? Déjalo en los comentarios.",
           "Si te interesa el detalle técnico, escríbeme.",
-          "¿Qué stack usarías tú? Te leo."
+          "¿Con qué tecnologías lo harías tú? Te leo."
         ],
         "storytelling": [
           "¿Tu empresa tiene una historia parecida? Compártela 👇",
@@ -337,7 +543,7 @@
     },
     "calendar": {
       "title": "Calendario editorial · 30 días",
-      "subtitle": "Una demo distinta cada día, con ángulo y formato sugeridos. Los fines de semana van preguntas y consejos cortos. Haz clic en un día para generar el post.",
+      "subtitle": "Una demo distinta cada día, con ángulo y formato sugeridos. Los fines de semana van preguntas y consejos cortos. Haz clic en un día para generar la publicación.",
       "range": "Del {start} al {end}",
       "startsMonday": "El plan empieza un lunes.",
       "prevWeek": "Semana anterior",
@@ -380,7 +586,7 @@
         "17": "Un consejo para escribir correos más claros con ayuda de una plantilla.",
         "18": "Qué tuvimos en cuenta al diseñar la caja del punto de venta.",
         "19": "Caso hipotético: un área de gestión humana que cierra la nómina con menos reprocesos.",
-        "20": "Fin de semana: ¿qué construirías primero en tu producto SaaS?",
+        "20": "Fin de semana: ¿qué construirías primero en tu producto de software?",
         "21": "Fin de semana: un consejo para monitorear precios públicos de forma responsable.",
         "22": "Caso hipotético: una tienda que premia a sus clientes frecuentes.",
         "23": "Tono polémico: si la revisión de un cambio de código tarda días, el proceso se puede mejorar.",
@@ -397,23 +603,72 @@
       "plan": "Plan del día {n} · {type}: {note}",
       "ai": {
         "title": "Generar con IA",
-        "desc": "Un clic: un modelo de OpenAI, llamado desde el servidor de KopTup, redacta el post, el texto de anuncio y los slides del carrusel para la demo, el ángulo y el tono que elijas. Revisa siempre el resultado antes de publicarlo.",
-        "langNote": "La IA escribe en español neutro, con trato de tú.",
+        "desc": "Un clic: un modelo de OpenAI, llamado desde el servidor de KopTup, redacta la publicación, el texto de anuncio y las diapositivas del carrusel para la demo, el ángulo y el tono que elijas. Revisa siempre el resultado antes de publicarlo.",
+        "langNote": "La IA escribe en español neutro, con trato de tú. Cupo: 5 generaciones cada 10 minutos y 30 al día por cuenta.",
         "button": "Generar con IA",
         "regenerate": "Regenerar con IA",
         "loading": "Generando con IA…",
         "success": "Generado con IA ({model}).",
         "strategy": "Por qué este enfoque:",
-        "unavailable": "La IA no está disponible ahora mismo: {reason}.",
-        "fallbackLocal": "Te mostramos la versión de plantillas locales.",
+        "fallbackLocal": "Mientras tanto, ves la versión de plantillas locales (sin IA).",
         "fallbackEdited": "Se mantiene tu texto editado.",
-        "reasons": {
-          "notConfigured": "el servidor no tiene configurada la clave de OpenAI",
-          "limit": "se alcanzó el límite de generaciones, intenta más tarde",
-          "access": "necesitas acceso aprobado a esta demo",
-          "invalid": "la respuesta de la IA llegó incompleta",
-          "network": "no hubo conexión con el servidor",
-          "generic": "el servidor no pudo completar la solicitud"
+        "fallbackPrevious": "Se mantiene el texto que la IA generó antes para esta combinación.",
+        "errors": {
+          "budget": {
+            "title": "Cupo mensual de IA agotado",
+            "text": "Esta demo ya usó el presupuesto de IA del mes; se renueva el día 1 de cada mes."
+          },
+          "notConfigured": {
+            "title": "IA no disponible en este servidor",
+            "text": "La generación con IA no está configurada aquí (falta la clave del modelo)."
+          },
+          "rateLimited": {
+            "title": "Llegaste al límite de generaciones",
+            "text": "Puedes generar con IA 5 veces cada 10 minutos y 30 al día. Intenta de nuevo en unos minutos.",
+            "textWait": "Puedes generar con IA 5 veces cada 10 minutos y 30 al día. Intenta de nuevo en {min} min."
+          },
+          "limitsUnavailable": {
+            "title": "No pudimos verificar el cupo de IA",
+            "text": "Por eso no llamamos al modelo. Intenta de nuevo en unos minutos."
+          },
+          "login": {
+            "title": "Tu sesión terminó",
+            "text": "Inicia sesión de nuevo para generar con IA.",
+            "action": "Iniciar sesión"
+          },
+          "access": {
+            "title": "Tu cuenta no tiene acceso a esta demo",
+            "text": "Para generar con IA necesitas un acceso aprobado y vigente a esta demo.",
+            "action": "Solicitar acceso"
+          },
+          "disabled": {
+            "title": "Demo desactivada",
+            "text": "El equipo de KopTup desactivó esta demo por ahora."
+          },
+          "unavailable": {
+            "title": "La IA no responde ahora mismo",
+            "text": "El servicio de generación no está disponible. Intenta de nuevo en unos minutos."
+          },
+          "llm": {
+            "title": "El modelo no pudo responder",
+            "text": "Intenta de nuevo en un momento."
+          },
+          "invalid": {
+            "title": "La respuesta de la IA llegó incompleta",
+            "text": "Intenta de nuevo; a veces el modelo corta la respuesta."
+          },
+          "badRequest": {
+            "title": "No se pudo enviar la solicitud",
+            "text": "Los datos de la demo no son válidos para la IA."
+          },
+          "network": {
+            "title": "Sin conexión con el servidor",
+            "text": "Revisa tu conexión a internet e intenta de nuevo."
+          },
+          "generic": {
+            "title": "No se pudo generar con IA",
+            "text": "El servidor no pudo completar la solicitud."
+          }
         }
       },
       "source": {
@@ -422,18 +677,20 @@
         "edited": "Editado por ti"
       },
       "demoLabel": "Demo a promocionar",
-      "angleLabel": "Ángulo del post",
+      "angleLabel": "Ángulo de la publicación",
       "toneLabel": "Tono",
-      "variantLabel": "Variante",
+      "variantLabel": "Versión",
       "variantButton": "Generar otra versión",
       "variantN": "v{n}",
-      "variantHelp": "Cada versión cambia el gancho y el cierre con la misma información.",
+      "variantHelp": "Cada versión cambia el gancho y el cierre de las plantillas. Si generaste con IA en una versión, al volver a ella recuperas ese texto.",
+      "utmTitle": "Medición de visitas (UTM)",
       "utmLabel": "Agregar UTM a los enlaces",
       "utmHelp": "Agrega utm_source=linkedin, el medio y la campaña al enlace de la demo para medir las visitas en tu analítica.",
       "views": {
-        "organic": "Post orgánico",
+        "label": "Formato",
+        "organic": "Publicación",
         "ad": "Texto de anuncio",
-        "carousel": "Carrusel {count} slides"
+        "carousel": "Carrusel ({count} diapositivas)"
       },
       "post": {
         "textLabel": "Texto para LinkedIn (editable)",
@@ -441,12 +698,13 @@
         "copy": "Copiar texto",
         "copied": "¡Copiado!",
         "copyError": "No se pudo copiar automáticamente; selecciona el texto y cópialo.",
-        "reset": "Restablecer",
+        "reset": "Restablecer texto",
         "saveDraft": "Guardar borrador",
         "saved": "Borrador guardado",
         "previewLabel": "Vista previa estilo LinkedIn (simulada)",
         "removeImage": "Quitar imagen",
-        "imageHint": "Agrega una imagen desde la pestaña Capturas y video."
+        "imageHint": "Todavía no tiene imagen.",
+        "goToCapture": "Crea una en Capturas y video"
       },
       "ad": {
         "headline": "Título",
@@ -468,9 +726,9 @@
         }
       },
       "carousel": {
-        "count": "{count} slides · 1080×1080 cada uno",
-        "hint": "Descarga el PDF (una página por slide) o copia los textos para tu herramienta de diseño.",
-        "slideN": "Slide {n}/{total}",
+        "count": "{count} diapositivas · 1080×1080 cada una",
+        "hint": "Descarga el PDF (una página por diapositiva) o copia los textos para tu herramienta de diseño.",
+        "slideN": "Diapositiva {n}/{total}",
         "downloadPdf": "Descargar PDF",
         "generating": "Generando PDF…",
         "downloaded": "PDF descargado",
@@ -491,11 +749,12 @@
         "utm": "El enlace lleva UTM",
         "noUtm": "El enlace no lleva UTM",
         "length": "Dentro del máximo de 3.000 caracteres",
-        "tooLong": "Supera los 3.000 caracteres de LinkedIn"
+        "tooLong": "Supera los 3.000 caracteres de LinkedIn",
+        "addLink": "Agregar el enlace a la demo"
       },
       "drafts": {
         "title": "Borradores guardados ({count})",
-        "empty": "Aún no tienes borradores. Guarda uno desde el post orgánico.",
+        "empty": "Aún no tienes borradores. Guarda uno desde la vista «Publicación».",
         "stored": "Se guardan solo en este navegador.",
         "open": "Abrir",
         "copy": "Copiar",
@@ -527,7 +786,7 @@
       "simulated": "Vista previa simulada · sin reacciones reales",
       "seeMore": "… ver más",
       "seeLess": "ver menos",
-      "imageAlt": "Imagen que acompaña el post",
+      "imageAlt": "Imagen que acompaña la publicación",
       "actions": {
         "like": "Recomendar",
         "comment": "Comentar",
@@ -536,15 +795,16 @@
       }
     },
     "capture": {
-      "title": "Capturas para el post",
-      "subtitle": "Crea una imagen con plantilla o captura la demo tal como la ves. Descarga PNG o WebM.",
+      "title": "Capturas para la publicación",
+      "subtitle": "Crea una imagen con plantilla o captura la demo tal como la ves. Descarga PNG o WebM, o úsala en la vista previa.",
       "demoLabel": "Demo",
       "modes": {
+        "label": "Tipo de visual",
         "auto": "Captura automática",
         "visual": "Plantilla diseñada"
       },
-      "useInPost": "Usar en la vista previa del post",
-      "usedInPost": "Imagen agregada a la vista previa del post.",
+      "useInPost": "Usar en la vista previa de la publicación",
+      "usedInPost": "Imagen agregada a la vista previa de la publicación.",
       "goToGenerator": "Ir al generador",
       "downloadPng": "Descargar PNG",
       "downloadWebm": "Descargar WebM",
@@ -554,6 +814,7 @@
       "webmNote": "LinkedIn no acepta videos WebM. Conviértelo a MP4, por ejemplo con ffmpeg:",
       "auto": {
         "info": "La demo real carga en el recuadro. La foto toma exactamente lo que se ve en él; el video graba mientras navegas por la demo, a pocos cuadros por segundo (depende de tu equipo). No pide permisos porque la demo está en el mismo sitio.",
+        "accessNote": "Si tu cuenta no tiene acceso a una demo con solicitud, el recuadro muestra su pantalla de acceso: elige una demo abierta.",
         "photo": "Tomar foto",
         "capturing": "Capturando…",
         "record": "Grabar video",
@@ -573,6 +834,7 @@
           "headline": "Titular destacado",
           "features": "Lista de funciones"
         },
+        "stylesLabel": "Estilo de la imagen",
         "download": "Descargar PNG 1200×627",
         "generating": "Generando…",
         "sizeNote": "1200×627 px es el tamaño recomendado por LinkedIn para imágenes con enlace.",
@@ -583,6 +845,13 @@
           "seeDemo": "Mira la demo"
         }
       }
+    },
+    "reset": {
+      "button": "Restablecer",
+      "question": "¿Borrar borradores y preferencias de este navegador?",
+      "confirm": "Sí, restablecer",
+      "cancel": "Cancelar",
+      "done": "Listo: la demo volvió a empezar"
     }
   }
 }

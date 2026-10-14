@@ -7,6 +7,17 @@ export const LS_BORRADORES = 'koptup-linkedin-ads-borradores-v1';
 export const LS_INICIO_CALENDARIO = 'koptup-linkedin-ads-inicio-v1';
 export const LS_UTM = 'koptup-linkedin-ads-utm-v1';
 
+/** Borra todo lo que la demo guarda en este navegador (borradores y preferencias). */
+export function borrarDatosLocales(): void {
+  for (const clave of [LS_BORRADORES, LS_INICIO_CALENDARIO, LS_UTM]) {
+    try {
+      window.localStorage.removeItem(clave);
+    } catch {
+      // Sin acceso al almacenamiento: no hay nada que borrar.
+    }
+  }
+}
+
 export function leerLS<T>(clave: string, porDefecto: T): T {
   try {
     const raw = window.localStorage.getItem(clave);

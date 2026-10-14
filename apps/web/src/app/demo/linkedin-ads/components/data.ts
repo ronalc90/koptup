@@ -1,15 +1,15 @@
 /**
  * Datos de la herramienta interna de contenido para LinkedIn.
  *
- * Fuente única: el título, la descripción y las funciones de cada demo se leen
- * de los mismos textos de la tarjeta del catálogo de /demo (`demos.*` y
- * `demosExtra.*` en messages). Aquí solo vive la metadata que no es una
- * afirmación sobre el producto (emoji, ruta, hashtags y la clave de la tarjeta);
- * el sector, el público y el problema están en
- * `messages/demos/linkedin-ads.{es,en}.json` (`demoLinkedinAds.catalog.<id>`).
+ * Los textos de cada demo (título, descripción, funciones, sector, público y
+ * problema) están en `messages/demos/linkedin-ads.{es,en}.json`
+ * (`demoLinkedinAds.catalog.<id>`) y no en la tarjeta del hub: lo que sale de
+ * aquí se publica en LinkedIn, así que dice solo lo que cada demo hace de
+ * verdad (ver docs/wiki/Guia-Demo-<slug>.md). Aquí solo vive la metadata que
+ * no es una afirmación sobre el producto (emoji, ruta y hashtags).
  *
- * Sin métricas: ninguna demo trae cifras de resultados. Los posts no pueden
- * presentar cifras ni testimonios como resultados de KopTup.
+ * Sin métricas: ninguna demo trae cifras de resultados. Las publicaciones no
+ * pueden presentar cifras ni testimonios como resultados de KopTup.
  */
 
 export type AnguloPost =
@@ -29,14 +29,10 @@ export interface DemoMeta {
   id: string;
   path: string;
   emoji: string;
-  /** Espacio de nombres de la tarjeta en /demo. */
-  hubNs: 'demos' | 'demosExtra';
-  /** Clave de la tarjeta dentro de ese espacio de nombres. */
-  hubKey: string;
   hashtags: string[];
 }
 
-/** Demo ya localizada (textos de la tarjeta del catálogo + catálogo propio). */
+/** Demo ya localizada (con los textos de `demoLinkedinAds.catalog`). */
 export interface KoptupDemo {
   id: string;
   slug: string;
@@ -52,31 +48,31 @@ export interface KoptupDemo {
 }
 
 export const DEMOS_META: DemoMeta[] = [
-  { id: 'chatbot', path: '/demo/chatbot', emoji: '🤖', hubNs: 'demos', hubKey: 'chatbot', hashtags: ['#RAG', '#Chatbot', '#IAGenerativa'] },
-  { id: 'ecommerce', path: '/demo/ecommerce', emoji: '🛒', hubNs: 'demos', hubKey: 'ecommerce', hashtags: ['#ComercioElectrónico', '#Retail', '#TiendaEnLínea'] },
-  { id: 'dashboard-ejecutivo', path: '/demo/dashboard-ejecutivo', emoji: '📊', hubNs: 'demos', hubKey: 'executive', hashtags: ['#AnalíticaDeDatos', '#Gerencia', '#Indicadores'] },
-  { id: 'gestor-documentos', path: '/demo/gestor-documentos', emoji: '📄', hubNs: 'demos', hubKey: 'documents', hashtags: ['#GestiónDocumental', '#Cumplimiento', '#Productividad'] },
-  { id: 'sistema-reservas', path: '/demo/sistema-reservas', emoji: '📅', hubNs: 'demos', hubKey: 'reservations', hashtags: ['#Reservas', '#Citas', '#Servicios'] },
-  { id: 'gestor-contenido', path: '/demo/gestor-contenido', emoji: '✍️', hubNs: 'demos', hubKey: 'contentManager', hashtags: ['#Contenido', '#Comunicaciones', '#Mercadeo'] },
-  { id: 'control-proyectos', path: '/demo/control-proyectos', emoji: '📋', hubNs: 'demos', hubKey: 'projects', hashtags: ['#GestiónDeProyectos', '#Kanban', '#Equipos'] },
-  { id: 'crm-ia', path: '/demo/crm-ia', emoji: '💼', hubNs: 'demosExtra', hubKey: 'crm', hashtags: ['#CRM', '#Ventas', '#VentasB2B'] },
-  { id: 'erp', path: '/demo/erp', emoji: '🏭', hubNs: 'demosExtra', hubKey: 'erp', hashtags: ['#ERP', '#Operaciones', '#Pymes'] },
-  { id: 'helpdesk-ia', path: '/demo/helpdesk-ia', emoji: '🎧', hubNs: 'demosExtra', hubKey: 'helpdesk', hashtags: ['#MesaDeAyuda', '#Soporte', '#ServicioAlCliente'] },
-  { id: 'lms', path: '/demo/lms', emoji: '🎓', hubNs: 'demosExtra', hubKey: 'lms', hashtags: ['#Capacitación', '#Aprendizaje', '#Educación'] },
-  { id: 'telemedicina', path: '/demo/telemedicina', emoji: '🩺', hubNs: 'demosExtra', hubKey: 'telemedicina', hashtags: ['#Telemedicina', '#Salud', '#SaludDigital'] },
-  { id: 'facturacion-electronica', path: '/demo/facturacion-electronica', emoji: '🧾', hubNs: 'demosExtra', hubKey: 'billing', hashtags: ['#FacturaciónElectrónica', '#Contabilidad', '#Pymes'] },
-  { id: 'wms-logistica', path: '/demo/wms-logistica', emoji: '📦', hubNs: 'demosExtra', hubKey: 'wms', hashtags: ['#Logística', '#Bodegas', '#CadenaDeSuministro'] },
-  { id: 'pos', path: '/demo/pos', emoji: '💳', hubNs: 'demosExtra', hubKey: 'pos', hashtags: ['#PuntoDeVenta', '#Retail', '#Restaurantes'] },
-  { id: 'hrms', path: '/demo/hrms', emoji: '👥', hubNs: 'demosExtra', hubKey: 'hrms', hashtags: ['#GestiónHumana', '#Talento', '#Nómina'] },
-  { id: 'automatizacion', path: '/demo/automatizacion', emoji: '⚡', hubNs: 'demosExtra', hubKey: 'automation', hashtags: ['#Automatización', '#Procesos', '#Productividad'] },
-  { id: 'saas-boilerplate', path: '/demo/saas-boilerplate', emoji: '🚀', hubNs: 'demosExtra', hubKey: 'saas', hashtags: ['#SaaS', '#Startups', '#Emprendimiento'] },
-  { id: 'voice-ai', path: '/demo/voice-ai', emoji: '📞', hubNs: 'demosExtra', hubKey: 'voice', hashtags: ['#IAConversacional', '#AtenciónTelefónica', '#ServicioAlCliente'] },
-  { id: 'firma-electronica', path: '/demo/firma-electronica', emoji: '✒️', hubNs: 'demosExtra', hubKey: 'sign', hashtags: ['#FirmaElectrónica', '#Contratos', '#Legal'] },
-  { id: 'scraping', path: '/demo/scraping', emoji: '🕷️', hubNs: 'demosExtra', hubKey: 'scraping', hashtags: ['#Datos', '#InteligenciaDeMercado', '#Precios'] },
-  { id: 'code-review-ia', path: '/demo/code-review-ia', emoji: '💻', hubNs: 'demosExtra', hubKey: 'codeReview', hashtags: ['#DesarrolloDeSoftware', '#CalidadDeSoftware', '#Programación'] },
-  { id: 'moderacion-contenido', path: '/demo/moderacion-contenido', emoji: '🛡️', hubNs: 'demosExtra', hubKey: 'moderation', hashtags: ['#Moderación', '#Comunidades', '#Confianza'] },
-  { id: 'delivery', path: '/demo/delivery', emoji: '🛵', hubNs: 'demosExtra', hubKey: 'delivery', hashtags: ['#Domicilios', '#ÚltimaMilla', '#Logística'] },
-  { id: 'loyalty', path: '/demo/loyalty', emoji: '⭐', hubNs: 'demosExtra', hubKey: 'loyalty', hashtags: ['#Fidelización', '#Clientes', '#Retail'] },
+  { id: 'chatbot', path: '/demo/chatbot', emoji: '🤖', hashtags: ['#RAG', '#Chatbot', '#IAGenerativa'] },
+  { id: 'ecommerce', path: '/demo/ecommerce', emoji: '🛒', hashtags: ['#ComercioElectrónico', '#Retail', '#TiendaEnLínea'] },
+  { id: 'dashboard-ejecutivo', path: '/demo/dashboard-ejecutivo', emoji: '📊', hashtags: ['#AnalíticaDeDatos', '#Gerencia', '#Indicadores'] },
+  { id: 'gestor-documentos', path: '/demo/gestor-documentos', emoji: '📄', hashtags: ['#GestiónDocumental', '#Cumplimiento', '#Productividad'] },
+  { id: 'sistema-reservas', path: '/demo/sistema-reservas', emoji: '📅', hashtags: ['#Reservas', '#Citas', '#Servicios'] },
+  { id: 'gestor-contenido', path: '/demo/gestor-contenido', emoji: '✍️', hashtags: ['#Contenido', '#Comunicaciones', '#Mercadeo'] },
+  { id: 'control-proyectos', path: '/demo/control-proyectos', emoji: '📋', hashtags: ['#GestiónDeProyectos', '#Kanban', '#Equipos'] },
+  { id: 'crm-ia', path: '/demo/crm-ia', emoji: '💼', hashtags: ['#CRM', '#Ventas', '#VentasB2B'] },
+  { id: 'erp', path: '/demo/erp', emoji: '🏭', hashtags: ['#ERP', '#Operaciones', '#Pymes'] },
+  { id: 'helpdesk-ia', path: '/demo/helpdesk-ia', emoji: '🎧', hashtags: ['#MesaDeAyuda', '#Soporte', '#ServicioAlCliente'] },
+  { id: 'lms', path: '/demo/lms', emoji: '🎓', hashtags: ['#Capacitación', '#Aprendizaje', '#Educación'] },
+  { id: 'telemedicina', path: '/demo/telemedicina', emoji: '🩺', hashtags: ['#Telemedicina', '#Salud', '#SaludDigital'] },
+  { id: 'facturacion-electronica', path: '/demo/facturacion-electronica', emoji: '🧾', hashtags: ['#FacturaciónElectrónica', '#Contabilidad', '#Pymes'] },
+  { id: 'wms-logistica', path: '/demo/wms-logistica', emoji: '📦', hashtags: ['#Logística', '#Bodegas', '#CadenaDeSuministro'] },
+  { id: 'pos', path: '/demo/pos', emoji: '💳', hashtags: ['#PuntoDeVenta', '#Retail', '#Restaurantes'] },
+  { id: 'hrms', path: '/demo/hrms', emoji: '👥', hashtags: ['#GestiónHumana', '#Talento', '#Nómina'] },
+  { id: 'automatizacion', path: '/demo/automatizacion', emoji: '⚡', hashtags: ['#Automatización', '#Procesos', '#Productividad'] },
+  { id: 'saas-boilerplate', path: '/demo/saas-boilerplate', emoji: '🚀', hashtags: ['#SaaS', '#Startups', '#Emprendimiento'] },
+  { id: 'voice-ai', path: '/demo/voice-ai', emoji: '📞', hashtags: ['#IAConversacional', '#AtenciónTelefónica', '#ServicioAlCliente'] },
+  { id: 'firma-electronica', path: '/demo/firma-electronica', emoji: '✒️', hashtags: ['#FirmaElectrónica', '#Contratos', '#Legal'] },
+  { id: 'scraping', path: '/demo/scraping', emoji: '🕷️', hashtags: ['#Datos', '#InteligenciaDeMercado', '#Precios'] },
+  { id: 'code-review-ia', path: '/demo/code-review-ia', emoji: '💻', hashtags: ['#DesarrolloDeSoftware', '#CalidadDeSoftware', '#Programación'] },
+  { id: 'moderacion-contenido', path: '/demo/moderacion-contenido', emoji: '🛡️', hashtags: ['#Moderación', '#Comunidades', '#Confianza'] },
+  { id: 'delivery', path: '/demo/delivery', emoji: '🛵', hashtags: ['#Domicilios', '#ÚltimaMilla', '#Logística'] },
+  { id: 'loyalty', path: '/demo/loyalty', emoji: '⭐', hashtags: ['#Fidelización', '#Clientes', '#Retail'] },
 ];
 
 export const HASHTAGS_GLOBALES = ['#KopTup', '#SoftwareAMedida', '#TransformaciónDigital', '#Colombia'];

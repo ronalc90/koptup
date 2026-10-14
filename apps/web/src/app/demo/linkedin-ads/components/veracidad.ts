@@ -5,6 +5,8 @@
  * Es una ayuda: no reemplaza la revisión humana.
  */
 
+import { incluyeEnlace } from './generador';
+
 export interface RevisionVeracidad {
   cifras: string[];
   testimonio: boolean;
@@ -34,13 +36,14 @@ function limpiar(texto: string): string {
   return texto.replace(/https?:\/\/\S+/g, ' ').replace(/#[\p{L}\d_]+/gu, ' ');
 }
 
-export function revisarTexto(texto: string, pathDemo: string): RevisionVeracidad {
+/** Revisa el texto; `urlDemo` es la URL canónica de la demo (sin UTM). */
+export function revisarTexto(texto: string, urlDemo: string): RevisionVeracidad {
   const limpio = limpiar(texto);
   const cifras = Array.from(new Set((limpio.match(RE_CIFRAS) ?? []).map((c) => c.trim()))).slice(0, 6);
   return {
     cifras,
     testimonio: RE_TESTIMONIO.test(limpio),
-    enlace: texto.includes(pathDemo),
+    enlace: incluyeEnlace(texto, urlDemo),
     utm: /[?&]utm_source=linkedin\b/.test(texto),
     caracteres: texto.length,
   };

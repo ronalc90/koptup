@@ -20,6 +20,8 @@ interface DemoCaptureProps {
   demoId: string;
   onDemoChange: (id: string) => void;
   onImageCaptured: (dataUrl: string) => void;
+  /** Se llama al descargar una imagen o un video (primeros pasos). */
+  onDescarga?: () => void;
   onIrAlGenerador: () => void;
 }
 
@@ -31,7 +33,14 @@ type ModoCaptura = 'auto' | 'visual';
  *   con html-to-image (foto PNG o video WebM a partir de cuadros).
  * - Plantilla: SVG 1200×627 exportado a PNG.
  */
-export default function DemoCapture({ demos, demoId, onDemoChange, onImageCaptured, onIrAlGenerador }: DemoCaptureProps) {
+export default function DemoCapture({
+  demos,
+  demoId,
+  onDemoChange,
+  onImageCaptured,
+  onDescarga,
+  onIrAlGenerador,
+}: DemoCaptureProps) {
   const t = useTranslations('demoLinkedinAds.capture');
   const demo = demos.find((d) => d.id === demoId) ?? demos[0];
   // La plantilla va primero: no carga otra demo hasta que eliges la captura automática.
@@ -72,7 +81,11 @@ export default function DemoCapture({ demos, demoId, onDemoChange, onImageCaptur
         </label>
       </div>
 
-      <div className="flex flex-wrap items-center gap-1 rounded-lg bg-secondary-100 p-1 text-xs dark:bg-secondary-800" role="tablist">
+      <div
+        className="flex flex-wrap items-center gap-1 rounded-lg bg-secondary-100 p-1 text-xs dark:bg-secondary-800"
+        role="tablist"
+        aria-label={t('modes.label')}
+      >
         {(
           [
             { key: 'visual', label: t('modes.visual'), Icon: PhotoIcon },
@@ -83,9 +96,11 @@ export default function DemoCapture({ demos, demoId, onDemoChange, onImageCaptur
           return (
             <button
               key={key}
+              id={`li-modo-${key}`}
               type="button"
               role="tab"
               aria-selected={activo}
+              aria-controls="li-panel-modo"
               onClick={() => setModo(key)}
               className={`inline-flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-3 py-1.5 transition ${
                 activo
@@ -117,7 +132,13 @@ export default function DemoCapture({ demos, demoId, onDemoChange, onImageCaptur
         </div>
       ) : null}
 
-      {modo === 'auto' ? <AutoCapture demo={demo} onUsar={usarEnPost} /> : <VisualGenerator demo={demo} onUsar={usarEnPost} />}
+      <div id="li-panel-modo" role="tabpanel" aria-labelledby={`li-modo-${modo}`}>
+        {modo === 'auto' ? (
+          <AutoCapture demo={demo} onUsar={usarEnPost} onDescarga={onDescarga} />
+        ) : (
+          <VisualGenerator demo={demo} onUsar={usarEnPost} onDescarga={onDescarga} />
+        )}
+      </div>
     </div>
   );
 }
@@ -173,11 +194,13 @@ function ResultadoFoto({
   url,
   nombre,
   onUsar,
+  onDescarga,
 }: {
   titulo: string;
   url: string;
   nombre: string;
   onUsar: () => void;
+  onDescarga?: () => void;
 }) {
   const t = useTranslations('demoLinkedinAds.capture');
   return (
@@ -191,9 +214,10 @@ function ResultadoFoto({
         <a
           href={url}
           download={nombre}
+          onClick={onDescarga}
           className="inline-flex items-center gap-2 rounded-md bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700"
         >
-          <ArrowDownTrayIcon className="h-4 w-4" />
+          <ArrowDownTrayIcon className="h-4 w-4" aria-hidden="true" />
           {t('downloadPng')}
         </a>
         <button
@@ -208,16 +232,29 @@ function ResultadoFoto({
   );
 }
 
-function ResultadoVideo({ titulo, url, nombre, detalle }: { titulo: string; url: string; nombre: string; detalle?: string }) {
+function ResultadoVideo({
+  titulo,
+  url,
+  nombre,
+  detalle,
+  onDescarga,
+}: {
+  titulo: string;
+  url: string;
+  nombre: string;
+  detalle?: string;
+  onDescarga?: () => void;
+}) {
   const t = useTranslations('demoLinkedinAds.capture');
   return (
     <div className="space-y-2" data-testid="capture-video">
       <p className="text-xs font-semibold uppercase tracking-wide text-secondary-500 dark:text-secondary-400">{titulo}</p>
-      <video src={url} controls className="w-full rounded-lg border border-secondary-200 dark:border-secondary-700" />
+      <video src={url} controls aria-label={titulo} className="w-full rounded-lg border border-secondary-200 dark:border-secondary-700" />
       {detalle ? <p className="text-[11px] text-secondary-600 dark:text-secondary-300">{detalle}</p> : null}
       <a
         href={url}
         download={nombre}
+        onClick={onDescarga}
         className="inline-flex items-center gap-2 rounded-md bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-rose-700"
       >
         <ArrowDownTrayIcon className="h-4 w-4" />
@@ -254,7 +291,15 @@ function mimeVideo(): string {
 
 /* ───────────────────── Modo 1: captura automática (iframe) ───────────────────── */
 
-function AutoCapture({ demo, onUsar }: { demo: KoptupDemo; onUsar: (dataUrl: string) => void }) {
+function AutoCapture({
+  demo,
+  onUsar,
+  onDescarga,
+}: {
+  demo: KoptupDemo;
+  onUsar: (dataUrl: string) => void;
+  onDescarga?: () => void;
+}) {
   const t = useTranslations('demoLinkedinAds.capture');
   const locale = useLocale();
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -426,8 +471,8 @@ function AutoCapture({ demo, onUsar }: { demo: KoptupDemo; onUsar: (dataUrl: str
   return (
     <div className="space-y-4">
       <p className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs leading-relaxed text-emerald-900 dark:border-emerald-800/60 dark:bg-emerald-950/40 dark:text-emerald-200">
-        <CameraIcon className="mr-1 inline h-4 w-4" />
-        {t('auto.info')}
+        <CameraIcon className="mr-1 inline h-4 w-4" aria-hidden="true" />
+        {t('auto.info')} {t('auto.accessNote')}
       </p>
 
       <MarcoDemo demo={demo} iframeRef={iframeRef} onLoad={() => setTimeout(() => setCargada(true), 400)} />
@@ -472,6 +517,7 @@ function AutoCapture({ demo, onUsar }: { demo: KoptupDemo; onUsar: (dataUrl: str
           url={photoUrl}
           nombre={`koptup-${demo.slug}-captura.png`}
           onUsar={() => onUsar(photoUrl)}
+          onDescarga={onDescarga}
         />
       ) : null}
 
@@ -485,6 +531,7 @@ function AutoCapture({ demo, onUsar }: { demo: KoptupDemo; onUsar: (dataUrl: str
             frames: video.cuadros,
             fps: fmt.format(video.segundos > 0 ? video.cuadros / video.segundos : 0),
           })}
+          onDescarga={onDescarga}
         />
       ) : null}
     </div>
@@ -548,7 +595,15 @@ function TextoMultilinea({
 
 const FUENTE = 'Inter, Arial, Helvetica, sans-serif';
 
-function VisualGenerator({ demo, onUsar }: { demo: KoptupDemo; onUsar: (dataUrl: string) => void }) {
+function VisualGenerator({
+  demo,
+  onUsar,
+  onDescarga,
+}: {
+  demo: KoptupDemo;
+  onUsar: (dataUrl: string) => void;
+  onDescarga?: () => void;
+}) {
   const t = useTranslations('demoLinkedinAds.capture');
   const [estilo, setEstilo] = useState<Estilo>('browser');
   const [generando, setGenerando] = useState(false);
@@ -561,8 +616,10 @@ function VisualGenerator({ demo, onUsar }: { demo: KoptupDemo; onUsar: (dataUrl:
     setGenerando(true);
     try {
       const dataUrl = await svgToPng(svgRef.current, 1200, 627);
-      if (accion === 'descargar') descargarUrl(dataUrl, `koptup-${demo.slug}-${estilo}.png`);
-      else onUsar(dataUrl);
+      if (accion === 'descargar') {
+        descargarUrl(dataUrl, `koptup-${demo.slug}-${estilo}.png`);
+        onDescarga?.();
+      } else onUsar(dataUrl);
     } catch (e) {
       setError(t('visual.error', { msg: e instanceof Error ? e.message : String(e) }));
     } finally {
@@ -578,13 +635,12 @@ function VisualGenerator({ demo, onUsar }: { demo: KoptupDemo; onUsar: (dataUrl:
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-2" role="tablist">
+      <div className="flex flex-wrap gap-2" role="group" aria-label={t('visual.stylesLabel')}>
         {(['browser', 'headline', 'features'] as Estilo[]).map((key) => (
           <button
             key={key}
             type="button"
-            role="tab"
-            aria-selected={estilo === key}
+            aria-pressed={estilo === key}
             onClick={() => setEstilo(key)}
             className={`rounded-md border px-3 py-1.5 text-xs font-semibold transition ${
               estilo === key
