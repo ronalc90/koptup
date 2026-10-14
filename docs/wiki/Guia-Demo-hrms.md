@@ -315,7 +315,7 @@ sequenceDiagram
     participant B as Servidor KopTup /api/chatbot
     participant M as Modelo de IA
     C->>B: Pide el bot de ejemplo compartido con los 5 documentos (POST /sample-bots)
-    B-->>C: Identificador del bot (el mismo para todos los visitantes; se crea e indexa una sola vez)
+    B-->>C: Identificador del bot (el mismo para todos los visitantes, se crea e indexa una sola vez)
     C->>B: Pregunta y últimos mensajes
     B->>B: Busca los fragmentos del reglamento
     alt Hay clave del proveedor y cupo del mes
