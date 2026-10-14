@@ -13,7 +13,6 @@ import { defaultWebRoot, extractPricing, loadWebPricingSources, renderPricingDat
 
 function main(): void {
   const webRoot = process.argv[2] ? path.resolve(process.argv[2]) : defaultWebRoot();
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const data = extractPricing(loadWebPricingSources(webRoot, (file) => require(file)));
   const out = path.resolve(__dirname, '../data/pricing.data.ts');
   fs.writeFileSync(out, renderPricingDataModule(data), 'utf8');

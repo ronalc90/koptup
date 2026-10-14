@@ -196,18 +196,25 @@ export function createApp(): Express {
   app.use('/api/admin/demo-grants', adminDemoGrantsRouter);
   app.use('/api/admin/demo-catalog', adminDemoCatalogRouter);
   app.use('/api/admin/audit-log', adminAuditLogRouter);
+  // Flujo de compra (pipeline de leads, propuestas, anticipo y pagos): sigue en
+  // desarrollo y sin revisar, así que solo se monta con COMMERCE_ENABLED=true.
+  const commerceEnabled = process.env.COMMERCE_ENABLED === 'true';
   // Pipeline comercial, propuestas y configuración comercial (wiki 05 §8, §9
   // y §21): también antes de /api/admin, porque `sales` los usa.
-  app.use('/api/admin/leads', adminLeadsRouter);
-  app.use('/api/admin/proposals', adminProposalsRouter);
-  app.use('/api/admin/settings', adminSettingsRouter);
+  if (commerceEnabled) {
+    app.use('/api/admin/leads', adminLeadsRouter);
+    app.use('/api/admin/proposals', adminProposalsRouter);
+    app.use('/api/admin/settings', adminSettingsRouter);
+  }
   // Derechos del titular (Ley 1581): buscar, exportar y suprimir (solo admin).
   app.use('/api/admin/privacy', adminPrivacyRouter);
   app.use('/api/admin', adminRoutes);
   // Propuesta pública por token, portal (Solicitar propuesta, Mis propuestas) y pagos.
-  app.use('/api/proposals/public', publicProposalsRouter);
-  app.use('/api/me', meCommerceRouter);
-  app.use('/api/payments', paymentsRouter);
+  if (commerceEnabled) {
+    app.use('/api/proposals/public', publicProposalsRouter);
+    app.use('/api/me', meCommerceRouter);
+    app.use('/api/payments', paymentsRouter);
+  }
   app.use('/api/linkedin-ads', linkedinAdsRoutes);
 
   app.use((_req: Request, res: Response) => sendError(res, 404, 'not_found', 'Esta ruta no existe.'));

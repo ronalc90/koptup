@@ -13,7 +13,6 @@ import fs from 'fs';
 import path from 'path';
 import type { Bilingual, PricingData, PricingOffering, PricingRagPlan, PricingTier, RagPlanId, TierKey } from './pricing.types';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export interface WebPricingSources {
   ragPlansModule: any;

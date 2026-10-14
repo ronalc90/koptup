@@ -20,7 +20,6 @@ describe('precios del backend sincronizados con la web', () => {
   });
 
   it('data/pricing.data.ts coincide con la web (si falla: npm run sync:pricing)', () => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const fromWeb = extractPricing(loadWebPricingSources(webRoot, (file) => require(file)));
     expect(PRICING_DATA).toEqual(fromWeb);
   });

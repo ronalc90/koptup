@@ -128,16 +128,18 @@ const startServer = async () => {
     // Job de vencimiento de accesos a demos y recordatorios (candado en Redis).
     const { startDemoGrantsJob, stopDemoGrantsJob } = await import('./jobs/demo-grants.job');
     startDemoGrantsJob();
-    // Job de vencimiento de propuestas (candado en Redis).
+    // Job de vencimiento de propuestas (candado en Redis): solo con el flujo de
+    // compra activo (COMMERCE_ENABLED=true; sigue en desarrollo).
+    const commerceEnabled = process.env.COMMERCE_ENABLED === 'true';
     const { startProposalsExpiryJob, stopProposalsExpiryJob } = await import('./jobs/proposals-expiry.job');
-    startProposalsExpiryJob();
+    if (commerceEnabled) startProposalsExpiryJob();
     // Plazo de conservación de datos personales (candado en Redis, una vez al día).
     const { startRetentionJob, stopRetentionJob } = await import('./jobs/retention.job');
     startRetentionJob();
     // Pago en línea con Wompi: solo con sus variables (sin ellas no se ofrece).
     const { readWompiConfig } = await import('./services/wompi.service');
     const wompi = readWompiConfig();
-    if (wompi.enabled) logger.info(`[wompi] Pago del anticipo con Wompi activo (${wompi.config!.env})`);
+    if (commerceEnabled && wompi.enabled) logger.info(`[wompi] Pago del anticipo con Wompi activo (${wompi.config!.env})`);
     else if (wompi.reason !== 'faltan_variables') logger.warn(`[wompi] Wompi apagado: ${wompi.reason}`);
 
     // Análisis IA de cuentas médicas con PDFs grandes puede tardar minutos.
