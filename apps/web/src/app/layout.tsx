@@ -38,6 +38,11 @@ export const metadata = {
     statusBarStyle: 'default',
     title: 'KopTup',
   },
+  // Next 14 solo emite la etiqueta de Apple (obsoleta en Chrome, que avisa en
+  // consola); la estándar va aparte.
+  other: {
+    'mobile-web-app-capable': 'yes',
+  },
   // Description, canonical y og/twitter de la home (y valores por defecto del
   // sitio para las páginas que no definen los suyos).
   description: HOME_DESCRIPTION,
