@@ -288,7 +288,7 @@
       "localNone": "I could not find that information in this course’s material. Try other words or one of the suggested questions.",
       "rateLimited": "You asked many questions in a row. Wait a moment and try again.",
       "noMaterial": "This course has no text material for the tutor. Add it when you create the course (text of each lesson).",
-      "privacy": "Your questions are sent to KopTup’s server only to answer them in this demo and are not stored. Do not type personal data."
+      "privacy": "Your questions are sent to KopTup’s server and its AI provider only to answer them in this demo; the conversation is not stored. Do not type personal data."
     },
     "quiz": {
       "title": "Final assessment",
@@ -303,6 +303,7 @@
       "passed": "You passed!",
       "failed": "Not passed yet",
       "scoreLine": "Result: {score} of {total} ({pct})",
+      "lastLine": "Last attempt: {score} of {total} ({pct})",
       "best": "best attempt: {best} of {total}",
       "perfectBadge": "Badge unlocked: Perfect score",
       "review": "Review these lessons before trying again:",
@@ -636,7 +637,7 @@
       "linkData": "Data carried in the link (not confirmed)",
       "replaced": "Certificate void",
       "replacedBody": "Certificate {code} was reissued with code {by} and is no longer valid.",
-      "mismatchBody": "Certificate {code} is in this browser’s registry, but with different data: the link does not match that certificate.",
+      "otherCertBody": "The sample signature in the link matches, but in this browser code {code} belongs to another demo certificate: each browser numbers its certificates separately, so only the browser where it was issued can confirm it. In a real project, the code is unique and anyone verifies it online against the server registry.",
       "allDemos": "See all demos"
     },
     "common": {

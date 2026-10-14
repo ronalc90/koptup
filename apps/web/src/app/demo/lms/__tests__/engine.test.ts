@@ -25,7 +25,8 @@ import {
   toCsv,
   totals,
 } from '../lib/engine';
-import { buildCohort, buildState } from '../lib/seed';
+import { addDays } from '../lib/dates';
+import { buildCohort, buildState, studentName } from '../lib/seed';
 import { courseDocs } from '../lib/tutor';
 import { activeCertificates, salesList, headerStats } from '../lib/selectors';
 import { reducer, type Action, type Payload } from '../lib/store';
@@ -222,6 +223,33 @@ describe('demo LMS · motor', () => {
     const renamed = act(act(s, { type: 'profile.update', profile: { ...s.profile, name: 'Laura Martínez' } }), { type: 'cert.reissue', id: c.id });
     const by = activeCertificates(renamed)[0].id;
     expect(registryLookup(certificatesFromStored(JSON.stringify(renamed)), p)).toEqual({ status: 'replaced', by });
+    // Mismo código, pero de otro certificado (otro navegador numera igual): nunca se informa como «anulado».
+    expect(registryLookup(certificatesFromStored(JSON.stringify(renamed)), { ...p, n: 'Otra Persona' })).toEqual({ status: 'mismatch' });
+  });
+
+  it('el registro guardado vence con la misma regla de 7 días que la demo', () => {
+    const s = buildState(TODAY);
+    const stored = JSON.stringify(s);
+    expect(certificatesFromStored(stored, TODAY)).toHaveLength(1);
+    expect(certificatesFromStored(stored, addDays(TODAY, 7))).toHaveLength(1);
+    expect(certificatesFromStored(stored, addDays(TODAY, 8))).toBeNull();
+    expect(certificatesFromStored(stored, addDays(TODAY, -1))).toBeNull();
+  });
+
+  it('los estudiantes de ejemplo tienen nombres únicos y apellidos variados', () => {
+    const names = Array.from({ length: 320 }, (_, i) => studentName(i));
+    expect(new Set(names).size).toBe(names.length);
+    const cohort = buildState(TODAY).cohort;
+    const lastNames = new Map<string, number>();
+    const seen = new Set<string>();
+    for (const r of cohort) {
+      if (seen.has(r.studentId)) continue;
+      seen.add(r.studentId);
+      const last = r.name.split(' ').pop() as string;
+      lastNames.set(last, (lastNames.get(last) ?? 0) + 1);
+    }
+    expect(lastNames.size).toBeGreaterThanOrEqual(25);
+    expect(Math.max(...lastNames.values()) / seen.size).toBeLessThan(0.08);
   });
 
   it('marca las vistas de rol visitadas (primeros pasos)', () => {

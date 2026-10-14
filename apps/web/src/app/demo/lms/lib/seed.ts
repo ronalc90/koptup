@@ -9,7 +9,7 @@ import { CITIES, COHORT_SIZE, COURSES, FIRST_NAMES, LAST_NAMES } from './catalog
 import { lessonsOf, prng, totals } from './engine';
 import type { CohortEnrollment, Coupon, Enrollment, LmsState, PayMethod, Sale } from './types';
 
-export const STATE_VERSION = 5;
+export const STATE_VERSION = 6;
 
 /** Cursos en los que el alumno de ejemplo ya está inscrito al empezar (marcan los primeros pasos). */
 export const SEED_ENROLLED: readonly string[] = ['datos', 'excel'];
@@ -22,8 +22,15 @@ export const SEED_COUPONS: Coupon[] = [
 
 const POOL = 320;
 
+/**
+ * Nombre de un estudiante de ejemplo. El apellido se desplaza según el nombre
+ * para usar todos los apellidos (antes salían solo los 11 primeros y había
+ * demasiados «Gómez»); cada combinación sigue siendo única en el grupo.
+ */
 export function studentName(sid: number): string {
-  return `${FIRST_NAMES[sid % FIRST_NAMES.length]} ${LAST_NAMES[Math.floor(sid / FIRST_NAMES.length) % LAST_NAMES.length]}`;
+  const first = sid % FIRST_NAMES.length;
+  const round = Math.floor(sid / FIRST_NAMES.length);
+  return `${FIRST_NAMES[first]} ${LAST_NAMES[(round + first * 7) % LAST_NAMES.length]}`;
 }
 
 function hashId(s: string): number {

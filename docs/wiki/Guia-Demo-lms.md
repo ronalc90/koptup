@@ -99,7 +99,7 @@ Pulsa **Ir al tutor** en Primeros pasos (o baja hasta **Tutor con IA**) y toca u
 1. **Modo de la respuesta**: «Respondió un modelo de IA (…) usando solo el material del curso». Si el servidor no tiene IA configurada, si se agotó el cupo de IA de la demo o si el proveedor falla, lo dice y muestra los fragmentos; si no hay conexión con el servidor, busca en el material dentro del navegador y lo marca «Búsqueda local (sin IA)».
 2. **Fuentes del material**: lección y minuto de cada fragmento (por ejemplo, «Lección 4 · Métricas que importan: CAC y conversión · min 07:30»).
 3. **Ir a esa parte de la lección**: cada fuente (y cada número entre corchetes de la respuesta) abre la lección en ese minuto.
-4. **Pregunta sobre el curso…**: preguntas libres. Debajo: «Tus preguntas se envían al servidor de KopTup solo para responder en esta demo y no se guardan. No escribas datos personales». El ícono de papelera limpia la conversación.
+4. **Pregunta sobre el curso…**: preguntas libres. Debajo: «Tus preguntas se envían al servidor de KopTup y a su proveedor de IA solo para responder en esta demo; la conversación no se guarda. No escribas datos personales». El ícono de papelera limpia la conversación.
 5. **Ruta adaptativa**: lecciones completadas, la siguiente y la evaluación final.
 
 Qué decir: «El tutor no inventa: responde con el material del curso y te lleva al minuto exacto donde se explica».
@@ -114,7 +114,7 @@ Pulsa **Ir a la evaluación** en Primeros pasos: abre «Excel para análisis de 
 
 1. **Aún no apruebas**: «Resultado: 2 de 4 (50 %)». Se aprueba con 70 % o más.
 2. **Repasa estas lecciones**: las lecciones de las preguntas falladas (BUSCARX y tablas dinámicas); cada una abre la lección.
-3. **Volver a intentar**: repite la evaluación; queda el mejor intento.
+3. **Volver a intentar**: repite la evaluación; queda el mejor intento. Si ya aprobaste y un intento posterior sale más bajo, la tarjeta sigue diciendo «¡Aprobaste!», muestra «Último intento: … · mejor intento: …» y las lecciones para repasar; el certificado no se pierde.
 4. **Ruta adaptativa**: «Última evaluación: 50 %» y dos tarjetas **Refuerzo recomendado** con esas lecciones.
 
 Al repetir con todas buenas: «¡Aprobaste! Resultado: 4 de 4 (100 %)», «Insignia desbloqueada: Evaluación perfecta», «Certificado AQ-2026-0200 emitido.» y **Ver certificado**. La ruta cambia a **Siguiente curso recomendado** («Finanzas para no financieros»). Si faltan lecciones, en lugar del certificado dice «Te faltan N lecciones para obtener el certificado».
@@ -148,11 +148,12 @@ La página de verificación es pública (no pide sesión ni acceso a la demo) y 
 |---|---|
 | **Certificado válido** | El enlace es íntegro y el código está en el registro de este navegador con los mismos datos. |
 | **No se puede confirmar en este navegador** | El enlace es íntegro, pero el certificado no está en el registro de este navegador (por ejemplo, lo abre un tercero). La página lo explica y dice que en un proyecto real cualquiera lo verifica en línea contra el registro del servidor. |
-| **Certificado anulado** | El certificado se reemitió con otro código. |
-| **Los datos no coinciden** | El enlace fue modificado o no corresponde al certificado del registro. |
+| **No se puede confirmar en este navegador** (otro certificado con el mismo código) | El enlace es íntegro, pero en este navegador ese código es de otro certificado de la demo. Cada navegador numera sus certificados por separado (por ejemplo, el primero que emites suele ser `AQ-2026-0200` en cualquier navegador), así que si alguien que también usó la demo abre tu enlace ve este aviso y no un «Certificado anulado» o «Los datos no coinciden» que no le corresponden. |
+| **Certificado anulado** | Ese mismo certificado (mismo código y mismos datos) se reemitió con otro código en el navegador donde se emitió. |
+| **Los datos no coinciden** | El enlace fue modificado: la firma de ejemplo no corresponde a los datos. |
 | **Enlace incompleto o inválido** | Falta información en el enlace. |
 
-Debajo, «Verificación simulada…» repite que en la demo solo se confirman los certificados emitidos en ese navegador, y hay botones **Ir a la demo de cursos** y **Ver todas las demos**.
+Debajo, «Verificación simulada…» repite que en la demo solo se confirman los certificados emitidos en ese navegador, y hay botones **Ir a la demo de cursos** y **Ver todas las demos**. El registro que consulta la página vence igual que la demo: si los datos de ese navegador tienen más de 7 días, ya no confirma nada.
 
 Para cerrar, pulsa **Ver como administrador** en Primeros pasos: en **Ventas** aparece tu compra al inicio de la tabla con la marca «tu compra» (ver [Administrador](#administrador)).
 
@@ -274,7 +275,7 @@ Además:
 
 *La demo en un teléfono de 390 px: qué es, salidas comerciales, encabezado de la academia y primeros pasos plegados; a la derecha, una lección de lectura.*
 
-En el teléfono el encabezado deja de ser fijo, los botones comerciales se apilan, el selector de rol y **Restablecer** pasan debajo del nombre, las secciones se desplazan de lado, los primeros pasos van en una columna, las cifras de dos en dos y los cursos en una columna. La página no se desborda a lo ancho.
+En el teléfono el encabezado deja de ser fijo, los botones comerciales se apilan, las cifras en pesos de Ventas no se parten en dos líneas, el selector de rol y **Restablecer** pasan debajo del nombre, las secciones se desplazan de lado, los primeros pasos van en una columna, las cifras de dos en dos y los cursos en una columna. La página no se desborda a lo ancho.
 
 ---
 
@@ -282,7 +283,7 @@ En el teléfono el encabezado deja de ser fijo, los botones comerciales se apila
 
 | Parte | Real o simulado | Detalle |
 |---|---|---|
-| Academia, cursos, instructores, estudiantes, reseñas y ventas de ejemplo | **Datos de ejemplo** | Academia Quindé es ficticia (NIT de ejemplo con dígito de verificación válido); las fechas se calculan con el día. |
+| Academia, cursos, instructores, estudiantes, reseñas y ventas de ejemplo | **Datos de ejemplo** | Academia Quindé es ficticia (NIT de ejemplo con dígito de verificación válido); los estudiantes combinan nombres y apellidos colombianos comunes sin repetir personas, en diez ciudades del país; las fechas se calculan con el día. |
 | Tutor con IA | **IA real** | Llama al servidor de KopTup (`/api/chatbot`) con el guion de las lecciones, usando un bot de ejemplo compartido por curso e idioma; si no hay IA disponible lo dice, y sin conexión busca en el navegador. |
 | Pago con PSE, tarjeta o Nequi, factura electrónica y correo de confirmación | **Simulados** | No se cobra nada ni se envían datos a una pasarela. El comprobante PDF no es una factura. |
 | Validaciones del pago y cupones | **Reales (en el navegador)** | Tarjeta, vencimiento, CVV, celular, documento y cupones activos. |
@@ -331,9 +332,9 @@ flowchart LR
 
 ## Limitaciones conocidas
 
-En el recorrido no aparecieron errores en la consola, ni en español ni en inglés, en claro ni en oscuro, a 1440 px ni a 390 px, y ninguna vista se desborda a lo ancho. Una prueba automática hizo clic en los controles visibles de la vista inicial y no encontró botones muertos: los únicos que «no cambiaron nada» fueron la pestaña ya activa (Alumno y Catálogo). Una revisión automática de accesibilidad (axe) de todas las secciones, de las ventanas (compra, ficha del curso, Restablecer, clase en vivo) y de la página de verificación no encontró controles sin etiqueta ni textos con contraste insuficiente; las ventanas se cierran con Escape, el foco no se sale de ellas y vuelve al botón que las abrió. Lo que sí conviene saber:
+En el recorrido no aparecieron errores en la consola, ni en español ni en inglés, en claro ni en oscuro, a 1440 px ni a 390 px, y ninguna vista se desborda a lo ancho. Una prueba automática hizo clic en los controles visibles de la vista inicial y no encontró botones muertos: los únicos que «no cambiaron nada» fueron la pestaña ya activa (Alumno y Catálogo). Si la prueba reutiliza el mismo navegador sin limpiar los datos de la demo, marca como muertos los botones de Primeros pasos: es un falso positivo de la herramienta (ubica los botones por posición y, después de pulsar **Ocultar los pasos**, que el navegador recuerda, esos botones ya no están en la página). Con los datos limpios en cada carga solo queda la pestaña activa, y una comprobación directa confirmó que **Comprar un curso** abre la compra e **Ir al tutor** e **Ir a la evaluación** llevan a su sección. Una revisión automática de accesibilidad (axe) de todas las secciones, de las ventanas (compra, ficha del curso, Restablecer, clase en vivo) y de la página de verificación no encontró controles sin etiqueta ni textos con contraste insuficiente; las ventanas se cierran con Escape, el foco no se sale de ellas y vuelve al botón que las abrió. Lo que sí conviene saber:
 
-1. **La verificación solo confirma certificados emitidos en el mismo navegador.** El registro de certificados de la demo vive en el navegador de quien los emite; un tercero que escanea el QR ve «No se puede confirmar en este navegador» y la explicación. En un proyecto real el registro está en el servidor.
+1. **La verificación solo confirma certificados emitidos en el mismo navegador.** El registro de certificados de la demo vive en el navegador de quien los emite y cada navegador numera sus certificados por separado; un tercero que escanea el QR ve «No se puede confirmar en este navegador» y la explicación (también si en su navegador ese código es de otro certificado de la demo). En un proyecto real el registro está en el servidor y los códigos son únicos.
 2. **La tarjeta del catálogo y la pantalla de acceso todavía usan el texto anterior.** Dicen «LMS / E-learning», «AI tutor 1:1», «quizzes auto-generados» y «subtítulos multi-idioma», con términos en inglés; la demo genera preguntas con reglas («sin IA»), los subtítulos son en español e inglés y las clases en vivo son una sala simulada. Además, la misma demo tiene tres nombres: «LMS / E-learning» en la tarjeta, «Plataforma de aprendizaje (LMS)» en la pantalla de acceso y «Plataforma de cursos virtuales (LMS)» dentro de la demo. El cambio de esos textos está propuesto al catálogo.
 3. **Los cambios viven solo en el navegador**, por 7 días. Compras, avances, notas, certificados, cupones y cursos creados no llegan a un servidor ni los ven otras personas; en otro equipo o navegador la demo vuelve a los datos de ejemplo.
 4. **Los roles no tienen permisos**: cualquiera con acceso a la demo cambia a Instructor o Administrador con un clic (el selector lo dice).

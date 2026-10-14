@@ -6,7 +6,8 @@ import { useTranslations } from 'next-intl';
 import { CheckBadgeIcon, ExclamationTriangleIcon, ShieldCheckIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import { ACADEMY } from '../lib/catalog';
 import { certificatesFromStored, decodeCert, formatNit, registryLookup, type CertCheck, type CertPayload, type RegistryCheck } from '../lib/engine';
-import { STORAGE_KEY } from '../lib/store';
+import { localToday } from '../lib/dates';
+import { MAX_AGE_DAYS, STORAGE_KEY } from '../lib/store';
 import { SimNote, btn, useFmt } from './ui';
 
 type Outcome =
@@ -14,9 +15,8 @@ type Outcome =
   | { kind: 'invalid' }
   | { kind: 'tampered'; payload: CertPayload }
   | { kind: 'valid'; payload: CertPayload; signature: string }
-  | { kind: 'unconfirmed'; payload: CertPayload; signature: string }
-  | { kind: 'replaced'; payload: CertPayload; by: string }
-  | { kind: 'mismatch'; payload: CertPayload };
+  | { kind: 'unconfirmed'; payload: CertPayload; signature: string; otherCert: boolean }
+  | { kind: 'replaced'; payload: CertPayload; by: string };
 
 /**
  * Cruza la firma de ejemplo del enlace con el registro de certificados de la
@@ -27,11 +27,12 @@ type Outcome =
 function outcomeOf(check: CertCheck, registry: RegistryCheck | null): Outcome {
   if (check.status === 'invalid') return { kind: 'invalid' };
   if (check.status === 'tampered') return { kind: 'tampered', payload: check.payload };
-  if (!registry || registry.status === 'none' || registry.status === 'notFound') {
-    return { kind: 'unconfirmed', payload: check.payload, signature: check.signature };
+  if (!registry || registry.status === 'none' || registry.status === 'notFound' || registry.status === 'mismatch') {
+    // «mismatch» con la firma correcta: en este navegador ese código es de otro certificado de la demo
+    // (cada navegador numera los suyos), no un enlace alterado.
+    return { kind: 'unconfirmed', payload: check.payload, signature: check.signature, otherCert: registry?.status === 'mismatch' };
   }
   if (registry.status === 'replaced') return { kind: 'replaced', payload: check.payload, by: registry.by };
-  if (registry.status === 'mismatch') return { kind: 'mismatch', payload: check.payload };
   return { kind: 'valid', payload: check.payload, signature: check.signature };
 }
 
@@ -50,7 +51,7 @@ export default function VerifyView() {
     } catch {
       stored = null;
     }
-    const registry = check.status === 'valid' ? registryLookup(certificatesFromStored(stored), check.payload) : null;
+    const registry = check.status === 'valid' ? registryLookup(certificatesFromStored(stored, localToday(), MAX_AGE_DAYS), check.payload) : null;
     setOutcome(outcomeOf(check, registry));
   }, []);
 
@@ -110,7 +111,9 @@ export default function VerifyView() {
                 <ExclamationTriangleIcon className="w-7 h-7 shrink-0" aria-hidden="true" />
                 <div>
                   <p className="text-lg font-bold">{t('unconfirmed')}</p>
-                  <p className="text-sm text-amber-900 dark:text-amber-100">{t('unconfirmedBody', { code: outcome.payload.c })}</p>
+                  <p className="text-sm text-amber-900 dark:text-amber-100">
+                    {t(outcome.otherCert ? 'otherCertBody' : 'unconfirmedBody', { code: outcome.payload.c })}
+                  </p>
                 </div>
               </div>
               <p className="text-xs font-semibold text-secondary-600 dark:text-secondary-300">{t('linkData')}</p>
@@ -124,12 +127,12 @@ export default function VerifyView() {
                 <p className="text-sm">{t('replacedBody', { code: outcome.payload.c, by: outcome.by })}</p>
               </div>
             </div>
-          ) : outcome.kind === 'mismatch' || outcome.kind === 'tampered' ? (
+          ) : outcome.kind === 'tampered' ? (
             <div className="flex items-start gap-2 text-red-700 dark:text-red-300">
               <XCircleIcon className="w-7 h-7 shrink-0" aria-hidden="true" />
               <div>
                 <p className="text-lg font-bold">{t('tampered')}</p>
-                <p className="text-sm">{t(outcome.kind === 'mismatch' ? 'mismatchBody' : 'tamperedBody', { code: outcome.payload.c })}</p>
+                <p className="text-sm">{t('tamperedBody', { code: outcome.payload.c })}</p>
               </div>
             </div>
           ) : (

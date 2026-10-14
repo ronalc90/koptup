@@ -105,12 +105,13 @@ function SalesView() {
       />
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {kpis.map((k) => (
-          <Card key={k.label} variant="bordered">
+          <Card key={k.label} variant="bordered" padding="none" className="p-4 sm:p-6">
             <CardContent className="p-0">
               <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${k.color} flex items-center justify-center mb-3`}>
                 <k.icon className="w-5 h-5 text-white" />
               </div>
-              <p className="text-xl sm:text-2xl font-bold text-secondary-900 dark:text-white break-words">{k.value}</p>
+              {/* Cifras en COP sin partir: en el celular la letra baja un punto. */}
+              <p className="text-lg sm:text-2xl font-bold text-secondary-900 dark:text-white whitespace-nowrap">{k.value}</p>
               <p className="text-xs text-secondary-500 dark:text-secondary-400 mt-1">{k.label}</p>
             </CardContent>
           </Card>

@@ -462,11 +462,17 @@ export function decodeCert(d: string | null | undefined): CertCheck {
  * emitieron (localStorage). La página de verificación lo consulta para
  * confirmar un certificado; en un proyecto real el registro está en el
  * servidor y cualquiera puede consultarlo.
- *  - none: este navegador no tiene datos de la demo;
+ *  - none: este navegador no tiene datos de la demo (o ya vencieron);
  *  - notFound: el código no está en el registro de este navegador;
- *  - replaced: el certificado se reemitió con otro código (queda anulado);
- *  - mismatch: el código existe pero con otros datos;
+ *  - mismatch: el código existe pero con otros datos. Cada navegador numera
+ *    sus certificados por separado, así que casi siempre es el certificado de
+ *    otra persona que también usó la demo (no un enlace alterado: la firma ya
+ *    se comprobó antes);
+ *  - replaced: ESTE certificado (mismos datos) se reemitió con otro código y
+ *    quedó anulado;
  *  - found: coincide con el registro.
+ * Los datos se comparan antes que la anulación: un código igual de otro
+ * navegador nunca se informa como «anulado».
  */
 export type RegistryCheck =
   | { status: 'none' }
@@ -479,17 +485,25 @@ export function registryLookup(certs: Pick<Certificate, 'id' | 'name' | 'date' |
   if (!certs) return { status: 'none' };
   const c = certs.find((x) => x.id === p.c);
   if (!c) return { status: 'notFound' };
-  if (c.replacedBy) return { status: 'replaced', by: c.replacedBy };
   if (c.name !== p.n || c.date !== p.f || c.hours !== p.h) return { status: 'mismatch' };
+  if (c.replacedBy) return { status: 'replaced', by: c.replacedBy };
   return { status: 'found' };
 }
 
-/** Lee los certificados del estado guardado de la demo (o null si no hay estado válido). */
-export function certificatesFromStored(raw: string | null): Certificate[] | null {
+/**
+ * Lee los certificados del estado guardado de la demo (o null si no hay
+ * estado válido). Con `today`, aplica la misma caducidad que la demo: un
+ * estado guardado hace más de `maxAgeDays` días ya no cuenta como registro.
+ */
+export function certificatesFromStored(raw: string | null, today?: ISODate, maxAgeDays = 7): Certificate[] | null {
   if (!raw) return null;
   try {
-    const s = JSON.parse(raw) as { certificates?: unknown };
+    const s = JSON.parse(raw) as { certificates?: unknown; savedAt?: unknown };
     if (!s || !Array.isArray(s.certificates)) return null;
+    if (today && typeof s.savedAt === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s.savedAt)) {
+      const age = diffDays(today, s.savedAt);
+      if (age > maxAgeDays || age < 0) return null;
+    }
     return s.certificates.filter(
       (c): c is Certificate =>
         !!c && typeof c === 'object' && typeof (c as Certificate).id === 'string' && typeof (c as Certificate).name === 'string',

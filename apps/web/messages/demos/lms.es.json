@@ -288,7 +288,7 @@
       "localNone": "No encontré esa información en el material de este curso. Prueba con otras palabras o con una de las preguntas sugeridas.",
       "rateLimited": "Hiciste muchas preguntas seguidas. Espera un momento y vuelve a intentarlo.",
       "noMaterial": "Este curso no tiene material de texto para el tutor. Agrégalo al crear el curso (texto de cada lección).",
-      "privacy": "Tus preguntas se envían al servidor de KopTup solo para responder en esta demo y no se guardan. No escribas datos personales."
+      "privacy": "Tus preguntas se envían al servidor de KopTup y a su proveedor de IA solo para responder en esta demo; la conversación no se guarda. No escribas datos personales."
     },
     "quiz": {
       "title": "Evaluación final",
@@ -303,6 +303,7 @@
       "passed": "¡Aprobaste!",
       "failed": "Aún no apruebas",
       "scoreLine": "Resultado: {score} de {total} ({pct})",
+      "lastLine": "Último intento: {score} de {total} ({pct})",
       "best": "mejor intento: {best} de {total}",
       "perfectBadge": "Insignia desbloqueada: Evaluación perfecta",
       "review": "Repasa estas lecciones antes de volver a intentarlo:",
@@ -636,7 +637,7 @@
       "linkData": "Datos que trae el enlace (sin confirmar)",
       "replaced": "Certificado anulado",
       "replacedBody": "El certificado {code} se reemitió con el código {by} y ya no es válido.",
-      "mismatchBody": "El certificado {code} está en el registro de este navegador, pero con otros datos: el enlace no corresponde a ese certificado.",
+      "otherCertBody": "La firma de ejemplo del enlace coincide, pero en este navegador el código {code} pertenece a otro certificado de la demo: cada navegador numera sus certificados por separado, así que solo el navegador donde se emitió puede confirmarlo. En un proyecto real, el código es único y cualquiera lo verifica en línea contra el registro del servidor.",
       "allDemos": "Ver todas las demos"
     },
     "common": {

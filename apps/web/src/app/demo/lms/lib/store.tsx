@@ -15,7 +15,7 @@ import type { Course, LmsState, PayMethod, Profile, Role } from './types';
 
 /** Clave del estado en localStorage (la lee también la página de verificación). */
 export const STORAGE_KEY = 'koptup.lms.state';
-const MAX_AGE_DAYS = 7;
+export const MAX_AGE_DAYS = 7;
 
 export type Payload =
   | { type: 'reset' }
