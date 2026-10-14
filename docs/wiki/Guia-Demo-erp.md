@@ -245,7 +245,7 @@ stateDiagram-v2
 - **Cartera por edades** y **Cuentas por pagar por edades**: sin vencer, 1–30, 31–60, 61–90 y más de 90 días.
 - **Cartera por cliente**: facturas, saldo, vencido y vencido a más de 60 días; **Ver facturas** despliega el detalle y **Recordatorio** arma un mensaje de cobro con las facturas vencidas para **Copiar mensaje**. No envía nada: «Simulado: la demo no envía nada». **Exportar CSV** (`cartera-AAAA-MM-DD.csv`).
 - **Conciliación bancaria**: Pendientes, Conciliados y Todos; sugerencias por reglas para recaudos, comisiones bancarias, 4x1000 y consignaciones por identificar (ver el [paso 5](#paso-5-tesorería-concilia-un-pago-del-extracto)).
-- **Importar extracto (CSV)**: columnas fecha, descripción y valor (separador `;` o `,`, hasta 1 MB, fechas entre el inicio de la historia y la fecha de cierre). Muestra una vista previa y tiene **Descargar CSV de ejemplo** (`extracto-ejemplo-surtidora-montevera.csv`). El archivo se lee en el navegador.
+- **Importar extracto (CSV)**: columnas fecha, descripción y valor (separador `;` o `,`, hasta 1 MB, fechas del mes abierto: los meses anteriores son de consulta y las filas con otra fecha se omiten). Muestra una vista previa y tiene **Descargar CSV de ejemplo** (`extracto-ejemplo-surtidora-montevera.csv`). El archivo se lee en el navegador.
 
 ### Talento humano
 

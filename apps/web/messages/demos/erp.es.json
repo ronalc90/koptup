@@ -66,7 +66,7 @@
       "cancel": "Cancelar",
       "showMore": "Ver más ({shown} de {total})",
       "exportCsv": "Exportar CSV",
-      "csvDone": "Descargaste un CSV con {n} filas.",
+      "csvDone": "Descargaste un CSV con {n, plural, one {1 fila} other {# filas}}.",
       "noResults": "No hay resultados para tu búsqueda en este período.",
       "currency": "Moneda",
       "moduleNames": {
@@ -588,7 +588,7 @@
         "title": "Libro diario (PUC)",
         "subtitle": "Asientos por partida doble generados por cada operación. Haz clic en un comprobante para ver su origen.",
         "empty": "No hay asientos en este período.",
-        "totals": "Totales ({n} comprobantes)"
+        "totals": "Totales ({n, plural, one {1 comprobante} other {# comprobantes}})"
       },
       "cols": {
         "date": "Fecha",
@@ -696,7 +696,7 @@
       "aging": {
         "ar": "Cartera por edades",
         "ap": "Cuentas por pagar por edades",
-        "cutoff": "Corte {date} · {n} documentos",
+        "cutoff": "Corte {date} · {n, plural, one {1 documento} other {# documentos}}",
         "buckets": {
           "current": "Sin vencer",
           "d30": "Vencida 1–30 días",
@@ -790,17 +790,17 @@
       "import": {
         "title": "Importar extracto bancario",
         "subtitle": "Archivo CSV con columnas: fecha, descripción, valor.",
-        "save": "Importar {n} movimientos",
+        "save": "Importar {n, plural, one {1 movimiento} other {# movimientos}}",
         "company": "Cuenta de la empresa",
         "choose": "Elegir archivo CSV",
         "sample": "Descargar CSV de ejemplo",
-        "format": "Fechas AAAA-MM-DD o DD/MM/AAAA entre el {min} y el {max}. Valores positivos para entradas y negativos para salidas. Separador ; o ,.",
-        "preview": "{n} movimientos listos para importar ({skipped} filas omitidas por formato).",
+        "format": "Fechas del mes abierto, entre el {min} y el {max} (AAAA-MM-DD o DD/MM/AAAA): los meses anteriores son de consulta. Valores positivos para entradas y negativos para salidas. Separador ; o ,.",
+        "preview": "{n, plural, one {1 movimiento listo} other {# movimientos listos}} para importar ({skipped, plural, =0 {ninguna fila omitida} one {1 fila omitida} other {# filas omitidas}} por formato o por fecha fuera del mes abierto).",
         "date": "Fecha",
         "desc": "Descripción",
         "amount": "Valor",
         "note": "El archivo se lee en tu navegador y no se envía a ningún servidor.",
-        "done": "Importaste {n} movimientos. Revísalos en «Pendientes».",
+        "done": "{n, plural, one {Importaste 1 movimiento. Revísalo en «Pendientes».} other {Importaste # movimientos. Revísalos en «Pendientes».}}",
         "errors": {
           "tooBig": "El archivo pesa más de 1 MB.",
           "empty": "El archivo está vacío.",

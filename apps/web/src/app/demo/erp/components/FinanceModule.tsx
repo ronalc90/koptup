@@ -481,6 +481,7 @@ function ImportBank({ onClose }: { onClose: () => void }) {
   const [error, setError] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
   const f = useFmt();
+  const openMonthStart = `${WORK_DATE.slice(0, 7)}-01`;
 
   const sample = () => {
     const open = state.sales.filter((s) => s.company === company && s.status === 'invoiced' && !s.creditNote && saleOpenAt(s, computed, WORK_DATE) > 0).slice(-2);
@@ -511,7 +512,8 @@ function ImportBank({ onClose }: { onClose: () => void }) {
       const date = parseDate(cols[0] || '');
       const amount = parseAmount(cols[2] || '');
       const desc = (cols[1] || '').slice(0, 80);
-      if (!date || date < state.startDate || date > WORK_DATE || !desc || !Number.isFinite(amount) || amount === 0) {
+      // Solo el mes abierto: los meses anteriores son de consulta (conciliar un movimiento lo registra con su fecha)
+      if (!date || date < openMonthStart || date > WORK_DATE || !desc || !Number.isFinite(amount) || amount === 0) {
         bad++;
         return;
       }
@@ -577,7 +579,7 @@ function ImportBank({ onClose }: { onClose: () => void }) {
           />
         </div>
       </div>
-      <p className="text-[11px] text-secondary-500 mb-3">{t('import.format', { min: f.date(state.startDate), max: f.date(WORK_DATE) })}</p>
+      <p className="text-[11px] text-secondary-500 mb-3">{t('import.format', { min: f.date(openMonthStart), max: f.date(WORK_DATE) })}</p>
       {error && <p className="text-xs text-red-600 mb-2">{error}</p>}
       {preview && (
         <>
