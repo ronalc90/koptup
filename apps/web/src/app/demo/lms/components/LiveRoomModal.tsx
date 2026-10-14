@@ -57,7 +57,7 @@ export default function LiveRoomModal({ session, startMs, onClose }: { session: 
       <div className="p-4 sm:p-5 grid lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 space-y-3">
           <div className="relative aspect-video rounded-xl bg-gradient-to-br from-slate-800 to-slate-950 flex items-center justify-center overflow-hidden">
-            <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-red-500 text-white text-[11px] font-bold">
+            <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-red-600 text-white text-[11px] font-bold">
               <span className="w-1.5 h-1.5 rounded-full bg-white" />
               {t('live.live')} · {mm}:{ss}
             </span>
@@ -74,7 +74,8 @@ export default function LiveRoomModal({ session, startMs, onClose }: { session: 
               <div className="grid grid-cols-2 gap-2 p-4 w-full max-w-md">
                 {people
                   .map((p, i) => ({ p, i }))
-                  .filter((x) => roomOf(x.i) === myRoom)
+                  // En la sala que elijas apareces tú, aunque no sea la que te asignaron.
+                  .filter((x) => (x.i === people.length - 1 ? true : roomOf(x.i) === myRoom))
                   .map((x) => (
                     <div key={x.p} className="aspect-video rounded-lg bg-white/10 flex flex-col items-center justify-center text-white">
                       <span className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-sm font-bold">{initials(x.p)}</span>
@@ -126,7 +127,8 @@ export default function LiveRoomModal({ session, startMs, onClose }: { session: 
             </h3>
             <ul className="space-y-1.5">
               {Array.from({ length: session.rooms }).map((_, r) => {
-                const members = people.filter((_, i) => roomOf(i) === r);
+                const where = myRoom ?? assigned;
+                const members = people.filter((_, i) => (i === people.length - 1 ? r === where : roomOf(i) === r));
                 const here = myRoom === r;
                 return (
                   <li key={r} className={`p-2 rounded-lg border text-xs ${here ? 'border-primary-400 bg-primary-50 dark:bg-primary-900/30' : 'border-secondary-200 dark:border-secondary-700'}`}>
@@ -156,7 +158,11 @@ export default function LiveRoomModal({ session, startMs, onClose }: { session: 
               <UsersIcon className="w-4 h-4" />
               {t('live.participants', { count: session.attendees + 1 })}
             </h3>
-            <ul className="text-xs text-secondary-600 dark:text-secondary-300 space-y-1 max-h-40 overflow-y-auto">
+            <ul
+              tabIndex={0}
+              aria-label={t('live.participants', { count: session.attendees + 1 })}
+              className="text-xs text-secondary-600 dark:text-secondary-300 space-y-1 max-h-40 overflow-y-auto rounded"
+            >
               <li className="font-semibold">{course?.instructor} ({t('live.host')})</li>
               {people.map((p) => (
                 <li key={p}>{p === state.profile.name ? `${p} (${t('gamification.you')})` : p}</li>

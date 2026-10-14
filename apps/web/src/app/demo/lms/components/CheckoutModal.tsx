@@ -342,22 +342,22 @@ export default function CheckoutModal({ courseId, onClose, onLearn }: { courseId
                   {couponMsg && <p className={`text-[11px] ${couponMsg.ok ? 'text-emerald-700 dark:text-emerald-300' : 'text-red-600 dark:text-red-400'}`}>{couponMsg.text}</p>}
                   <p className="text-[11px] text-secondary-500 dark:text-secondary-400">{t('checkout.couponHint')}</p>
                   <dl className="text-sm space-y-1">
-                    <div className="flex justify-between">
+                    <div className="flex justify-between gap-3">
                       <dt className="text-secondary-600 dark:text-secondary-300">{t('checkout.price')}</dt>
-                      <dd>{f.money(tt.gross)}</dd>
+                      <dd className="whitespace-nowrap">{f.money(tt.gross)}</dd>
                     </div>
                     {tt.discount > 0 && (
-                      <div className="flex justify-between text-emerald-700 dark:text-emerald-300">
+                      <div className="flex justify-between gap-3 text-emerald-700 dark:text-emerald-300">
                         <dt>{t('checkout.discount', { code: coupon?.code ?? '' })}</dt>
-                        <dd>- {f.money(tt.discount)}</dd>
+                        <dd className="whitespace-nowrap">- {f.money(tt.discount)}</dd>
                       </div>
                     )}
-                    <div className="flex justify-between text-base font-bold border-t border-secondary-200 dark:border-secondary-700 pt-2 mt-2 text-secondary-900 dark:text-white">
+                    <div className="flex justify-between gap-3 text-base font-bold border-t border-secondary-200 dark:border-secondary-700 pt-2 mt-2 text-secondary-900 dark:text-white">
                       <dt>{t('checkout.total')}</dt>
-                      <dd>{f.money(tt.total)}</dd>
+                      <dd className="whitespace-nowrap">{f.money(tt.total)}</dd>
                     </div>
-                    <p className="text-[11px] text-secondary-500 dark:text-secondary-400">{t('checkout.ivaNote', { iva: f.money(tt.iva) })}</p>
                   </dl>
+                  <p className="text-[11px] text-secondary-500 dark:text-secondary-400">{t('checkout.ivaNote', { iva: f.money(tt.iva) })}</p>
                 </>
               )}
             </div>
@@ -396,7 +396,7 @@ export default function CheckoutModal({ courseId, onClose, onLearn }: { courseId
               <div className="p-3 rounded-lg bg-secondary-50 dark:bg-secondary-800/50">
                 <dt className="text-[11px] text-secondary-500 dark:text-secondary-400">{t('receipt.invoice')}</dt>
                 <dd className="font-mono font-semibold text-secondary-900 dark:text-white">
-                  {sale.invoice} <span className="font-sans font-normal text-[11px] text-secondary-500">({t('receipt.invoiceSim')})</span>
+                  {sale.invoice} <span className="font-sans font-normal text-[11px] text-secondary-500 dark:text-secondary-400">({t('receipt.invoiceSim')})</span>
                 </dd>
               </div>
               <div className="p-3 rounded-lg bg-secondary-50 dark:bg-secondary-800/50">

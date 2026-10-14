@@ -17,7 +17,7 @@ import {
 import { COUPON_RE, pick, toCsv } from '../lib/engine';
 import { downloadText } from '../lib/files';
 import { useLmsReady } from '../lib/store';
-import { allCourses, salesInWindow, salesList } from '../lib/selectors';
+import { activeCertificates, allCourses, salesInWindow, salesList } from '../lib/selectors';
 import type { PayMethod, Sale } from '../lib/types';
 import { certPayload, useOrigin } from './EngagementSections';
 import { verifyUrl } from '../lib/engine';
@@ -27,6 +27,8 @@ import { Empty, SectionTitle, SimNote, btn, inputCls, labelCls, selectCls, useFm
 const METHODS: PayMethod[] = ['pse', 'card', 'nequi'];
 const METHOD_COLOR: Record<PayMethod, string> = { pse: 'from-cyan-400 to-cyan-600', card: 'from-indigo-400 to-indigo-600', nequi: 'from-fuchsia-400 to-fuchsia-600' };
 const PAGE = 12;
+/** Filtros de la tabla de ventas: ancho según su contenido (sin el w-full de selectCls). */
+const filterSelect = `${selectCls.replace('w-full ', '')} w-full sm:w-auto`;
 
 function SalesView() {
   const t = useTranslations('demoLms');
@@ -124,7 +126,7 @@ function SalesView() {
                 <div key={x.m}>
                   <div className="flex items-center justify-between text-sm mb-1 gap-2">
                     <span className="text-secondary-800 dark:text-secondary-100">
-                      {t(`pay.${x.m}`)} <span className="text-[11px] text-secondary-500">({t('admin.salesN', { count: x.count })})</span>
+                      {t(`pay.${x.m}`)} <span className="text-[11px] text-secondary-500 dark:text-secondary-400">({t('admin.salesN', { count: x.count })})</span>
                     </span>
                     <span className="font-semibold text-secondary-700 dark:text-secondary-200">{f.money(x.total)}</span>
                   </div>
@@ -144,7 +146,7 @@ function SalesView() {
                 <div key={x.c.id}>
                   <div className="flex items-center justify-between text-sm mb-1 gap-2">
                     <span className="text-secondary-800 dark:text-secondary-100 truncate min-w-0">
-                      {pick(x.c.title, f.locale)} <span className="text-[11px] text-secondary-500">({t('admin.salesN', { count: x.count })})</span>
+                      {pick(x.c.title, f.locale)} <span className="text-[11px] text-secondary-500 dark:text-secondary-400">({t('admin.salesN', { count: x.count })})</span>
                     </span>
                     <span className="font-semibold text-secondary-700 dark:text-secondary-200 shrink-0">{f.money(x.total)}</span>
                   </div>
@@ -162,7 +164,7 @@ function SalesView() {
         <CardContent className="p-0 space-y-3">
           <div className="flex flex-wrap gap-2 items-center">
             <input
-              className={`${inputCls} sm:w-72`}
+              className={`${inputCls.replace('w-full ', '')} w-full sm:w-auto sm:flex-1 sm:min-w-[16rem]`}
               placeholder={t('admin.searchPh')}
               aria-label={t('admin.searchPh')}
               value={search}
@@ -171,12 +173,12 @@ function SalesView() {
                 setLimit(PAGE);
               }}
             />
-            <select className={`${selectCls} w-auto`} value={period} onChange={(e) => setPeriod(e.target.value as '30' | '90' | 'all')} aria-label={t('admin.period')}>
+            <select className={filterSelect} value={period} onChange={(e) => setPeriod(e.target.value as '30' | '90' | 'all')} aria-label={t('admin.period')}>
               <option value="30">{t('admin.period30')}</option>
               <option value="90">{t('admin.period90')}</option>
               <option value="all">{t('admin.periodAll')}</option>
             </select>
-            <select className={`${selectCls} w-auto`} value={method} onChange={(e) => setMethod(e.target.value as PayMethod | 'all')} aria-label={t('admin.colMethod')}>
+            <select className={filterSelect} value={method} onChange={(e) => setMethod(e.target.value as PayMethod | 'all')} aria-label={t('admin.colMethod')}>
               <option value="all">{t('admin.allMethods')}</option>
               {METHODS.map((m) => (
                 <option key={m} value={m}>
@@ -184,7 +186,7 @@ function SalesView() {
                 </option>
               ))}
             </select>
-            <select className={`${selectCls} w-auto max-w-[14rem]`} value={course} onChange={(e) => setCourse(e.target.value)} aria-label={t('admin.colCourse')}>
+            <select className={`${filterSelect} sm:max-w-[16rem]`} value={course} onChange={(e) => setCourse(e.target.value)} aria-label={t('admin.colCourse')}>
               <option value="all">{t('analytics.allCourses')}</option>
               {courses.map((c) => (
                 <option key={c.id} value={c.id}>
@@ -219,7 +221,7 @@ function SalesView() {
                       <td className="py-2 pr-3">
                         {s.buyer}
                         {s.mine && <span className="ml-1 text-[10px] text-cyan-700 dark:text-cyan-300">({t('admin.yourPurchase')})</span>}
-                        <span className="block text-[11px] text-secondary-500 font-mono">{s.ref}</span>
+                        <span className="block text-[11px] text-secondary-500 dark:text-secondary-400 font-mono">{s.ref}</span>
                       </td>
                       <td className="py-2 pr-3 text-xs">{courseTitle(s.courseId)}</td>
                       <td className="py-2 pr-3 text-xs whitespace-nowrap">
@@ -358,7 +360,7 @@ function IssuedView() {
   const perCourse = courses
     .map((c) => {
       const rows = state.cohort.filter((r) => r.courseId === c.id);
-      const done = rows.filter((r) => r.progress >= 100).length + (state.certificates.some((x) => x.courseId === c.id) ? 1 : 0);
+      const done = rows.filter((r) => r.progress >= 100).length + (activeCertificates(state).some((x) => x.courseId === c.id) ? 1 : 0);
       const enrolled = rows.length + (state.enrollments[c.id] ? 1 : 0);
       return { c, done, enrolled };
     })
@@ -410,6 +412,7 @@ function IssuedView() {
                       </p>
                       <p className="text-xs text-secondary-500 dark:text-secondary-400">
                         {title} · {f.date(c.date)}
+                        {c.replacedBy && <span className="ml-1 text-amber-700 dark:text-amber-300">· {t('admin.issuedReplaced', { code: c.replacedBy })}</span>}
                       </p>
                     </div>
                     {origin && (

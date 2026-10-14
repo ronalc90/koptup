@@ -214,7 +214,7 @@ export default function CourseModal({
         </div>
 
         <div className="flex items-center gap-2 pt-2">
-          <Button variant="outline" size="md" className="flex-1" onClick={onClose}>
+          <Button variant="outline" size="md" className="flex-1 dark:text-primary-300 dark:border-primary-400" onClick={onClose}>
             {t('common.close')}
           </Button>
           {enr ? (

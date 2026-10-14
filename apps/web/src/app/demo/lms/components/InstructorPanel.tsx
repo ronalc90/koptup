@@ -46,6 +46,7 @@ export default function InstructorPanel() {
   const f = useFmt();
   const { state, today, dispatch } = useLmsReady();
   const [scope, setScope] = useState('all');
+  const [riskLimit, setRiskLimit] = useState(8);
   const courses = allCourses(state);
   const rows = useMemo(() => cohortWithMe(state, today).filter((r) => scope === 'all' || r.courseId === scope), [state, today, scope]);
   const scopedCourses = scope === 'all' ? courses : courses.filter((c) => c.id === scope);
@@ -91,7 +92,10 @@ export default function InstructorPanel() {
           <>
             <select
               value={scope}
-              onChange={(e) => setScope(e.target.value)}
+              onChange={(e) => {
+                setScope(e.target.value);
+                setRiskLimit(8);
+              }}
               aria-label={t('analytics.scope')}
               className="text-sm rounded-lg border border-secondary-200 dark:border-secondary-700 bg-white dark:bg-secondary-800 pl-3 pr-9 py-2 text-secondary-800 dark:text-secondary-100 max-w-[16rem]"
             >
@@ -195,13 +199,13 @@ export default function InstructorPanel() {
                   </tr>
                 </thead>
                 <tbody>
-                  {a.atRisk.slice(0, 8).map((r) => {
+                  {a.atRisk.slice(0, riskLimit).map((r) => {
                     const sent = state.reminders[r.id];
                     return (
                       <tr key={r.id} className="border-t border-secondary-100 dark:border-secondary-800">
                         <td className="py-2 pr-3 text-secondary-800 dark:text-secondary-100">
                           {r.name}
-                          <span className="block text-[11px] text-secondary-500">{r.city}</span>
+                          <span className="block text-[11px] text-secondary-500 dark:text-secondary-400">{r.city}</span>
                         </td>
                         <td className="py-2 pr-3 text-secondary-600 dark:text-secondary-300 text-xs">{courseTitle(r.courseId)}</td>
                         <td className="py-2 pr-3">{f.pct(r.progress)}</td>
@@ -213,7 +217,7 @@ export default function InstructorPanel() {
                         </td>
                         <td className="py-2 text-right">
                           {r.studentId === 'me' ? (
-                            <span className="text-[11px] text-secondary-500">{t('gamification.you')}</span>
+                            <span className="text-[11px] text-secondary-500 dark:text-secondary-400">{t('gamification.you')}</span>
                           ) : sent ? (
                             <span className="text-[11px] text-emerald-700 dark:text-emerald-300">{t('analytics.reminded')}</span>
                           ) : (
@@ -234,6 +238,13 @@ export default function InstructorPanel() {
                   })}
                 </tbody>
               </table>
+            </div>
+          )}
+          {a.atRisk.length > riskLimit && (
+            <div className="mt-3 text-center">
+              <button type="button" className={btn.outline} onClick={() => setRiskLimit((n) => n + 8)}>
+                {t('admin.showMore', { count: Math.min(8, a.atRisk.length - riskLimit) })}
+              </button>
             </div>
           )}
           <div className="mt-3">
@@ -260,7 +271,7 @@ export default function InstructorPanel() {
                     <div className="flex items-center justify-between mb-1 gap-2">
                       <span className="text-sm text-secondary-800 dark:text-secondary-100 min-w-0 truncate">
                         {pick(m.lesson.title, f.locale)}
-                        <span className="text-[11px] text-secondary-500"> · {courseTitle(m.courseId)}</span>
+                        <span className="text-[11px] text-secondary-500 dark:text-secondary-400"> · {courseTitle(m.courseId)}</span>
                       </span>
                       <span className="text-xs font-semibold text-secondary-600 dark:text-secondary-300 shrink-0">{f.pct(m.rate)}</span>
                     </div>

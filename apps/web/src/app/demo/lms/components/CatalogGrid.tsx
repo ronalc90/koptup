@@ -200,7 +200,7 @@ export default function CatalogGrid({
                     </div>
                   )}
                   <div className="flex items-center gap-2 mt-auto pt-4">
-                    <Button variant="outline" size="sm" className="flex-1" onClick={() => onOpen(c.id)}>
+                    <Button variant="outline" size="sm" className="flex-1 dark:text-primary-300 dark:border-primary-400" onClick={() => onOpen(c.id)}>
                       {t('catalog.viewDetails')}
                     </Button>
                     {enr ? (

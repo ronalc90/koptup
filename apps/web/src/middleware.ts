@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { API_BASE } from '@/lib/backend-url';
 import { STAFF_ROLES, adminRolesFor, hasRole, homePathForRole, prospectCanAccess } from '@/lib/auth-roles';
-import { DEMO_DEFAULTS_BY_SLUG, type DemoAccessMode, isKnownDemoSlug } from '@/lib/demo-access-defaults';
+import { DEMO_DEFAULTS_BY_SLUG, type DemoAccessMode, isKnownDemoSlug, isPublicDemoSubpath } from '@/lib/demo-access-defaults';
 
 /**
  * Guardia del lado del servidor para las áreas privadas de la web y para las
@@ -302,18 +302,9 @@ function accessScreen(
   return res;
 }
 
-/**
- * Páginas dentro de una demo con acceso controlado que son públicas: la
- * verificación del certificado del LMS es lo que abre el código QR del
- * certificado, y quien la consulta (un tercero) no tiene acceso a la demo. La
- * página solo decodifica y verifica los datos que trae su propia URL.
- */
-const PUBLIC_DEMO_SUBPATHS = new Set(['/demo/lms/verificar']);
-
-function isPublicDemoSubpath(pathname: string): boolean {
-  const normalized = pathname.length > 1 ? pathname.replace(/\/+$/, '').toLowerCase() : pathname;
-  return PUBLIC_DEMO_SUBPATHS.has(normalized);
-}
+// Las páginas públicas dentro de una demo con acceso controlado (la
+// verificación del certificado del LMS) están en PUBLIC_DEMO_SUBPATHS de
+// lib/demo-access-defaults: DemoAccessWatcher usa la misma lista.
 
 async function demoGate(req: NextRequest): Promise<NextResponse> {
   const slug = req.nextUrl.pathname.split('/')[2]?.toLowerCase() ?? '';

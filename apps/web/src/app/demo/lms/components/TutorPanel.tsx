@@ -114,7 +114,7 @@ export default function TutorPanel({ course, onJump }: { course: Course; onJump:
             : t('tutor.statusIdle');
 
   return (
-    <Card variant="bordered" className="flex flex-col">
+    <Card variant="bordered" id="lms-tutor" className="flex flex-col scroll-mt-48">
       <CardContent className="p-0 flex flex-col">
         <div className="flex items-start justify-between gap-2 mb-2">
           <div className="flex items-center gap-2 min-w-0">
@@ -152,7 +152,7 @@ export default function TutorPanel({ course, onJump }: { course: Course; onJump:
               <div
                 className={`max-w-[90%] rounded-2xl px-3 py-2 text-sm whitespace-pre-wrap break-words ${
                   m.from === 'user'
-                    ? 'bg-primary-500 text-white rounded-br-sm'
+                    ? 'bg-primary-600 text-white rounded-br-sm'
                     : m.mode === 'error'
                       ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-900 dark:text-amber-100 rounded-bl-sm'
                       : 'bg-secondary-100 dark:bg-secondary-800 text-secondary-800 dark:text-secondary-100 rounded-bl-sm'
@@ -234,7 +234,7 @@ export default function TutorPanel({ course, onJump }: { course: Course; onJump:
             <PaperAirplaneIcon className="w-4 h-4" />
           </Button>
         </form>
-        <p className="text-[10px] text-secondary-400 dark:text-secondary-500 mt-2">{t('tutor.privacy')}</p>
+        <p className="text-[10px] text-secondary-500 dark:text-secondary-400 mt-2">{t('tutor.privacy')}</p>
       </CardContent>
     </Card>
   );

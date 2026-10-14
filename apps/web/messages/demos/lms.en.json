@@ -8,8 +8,46 @@
       "breadcrumbDemos": "Demos",
       "breadcrumbTitle": "Course platform (LMS)"
     },
+    "shell": {
+      "back": "Back to the demo catalog",
+      "kicker": "Interactive demo · Education",
+      "title": "Online course platform (LMS)",
+      "subtitle": "For academies, training centers and companies that train their teams. Explore Academia Quindé, a sample academy: buy a course, study with the AI tutor, take the assessment and download your certificate; then see what the instructor and the administrator see.",
+      "realNote": "The tutor uses real AI over the course material; payments, e-invoicing, emails and live classes are simulated. What you do is saved only in this browser for 7 days.",
+      "requestDemo": "Request a guided demo",
+      "quote": "Get a quote for my academy"
+    },
+    "guide": {
+      "title": "First steps: explore the demo in 5 minutes",
+      "progress": "{done} of {total} done",
+      "show": "Show the steps",
+      "hide": "Hide the steps",
+      "done": "Done",
+      "steps": {
+        "buy": {
+          "title": "Buy a course",
+          "text": "Pick a course, apply the BIENVENIDA10 coupon and pay with test PSE, card or Nequi. Nothing is charged.",
+          "action": "Buy a course"
+        },
+        "tutor": {
+          "title": "Ask the AI tutor",
+          "text": "In My courses, tap a suggested question: the tutor answers with the course material and takes you to the lesson and minute.",
+          "action": "Go to the tutor"
+        },
+        "quiz": {
+          "title": "Pass and get your certificate",
+          "text": "Complete the lessons, take the final assessment (70% to pass) and download the certificate with its QR.",
+          "action": "Go to the assessment"
+        },
+        "academy": {
+          "title": "See the academy side",
+          "text": "As Administrator you see your purchase in Sales, the coupons and the issued certificates; as Instructor, dropout risk and the course builder.",
+          "action": "View as administrator"
+        }
+      }
+    },
     "header": {
-      "subtitle": "Online course platform · demo with sample data",
+      "subtitle": "Fictional continuing-education academy · Pereira",
       "sampleBadge": "Sample data",
       "sampleHint": "Fictitious academy. Payments, e-invoicing, emails and live classes are simulated; the tutor uses real AI over the course material.",
       "roleLabel": "View as",
@@ -24,7 +62,8 @@
       "resetTitle": "Reset the demo?",
       "resetBody": "This deletes your purchases, progress, notes, new certificates, coupons and courses created in this browser, and restores the initial sample data.",
       "resetConfirm": "Yes, reset",
-      "resetDone": "Done: the demo is back to the sample data."
+      "resetDone": "Done: the demo is back to the sample data.",
+      "roleHint": "Switch views: in the demo you can see all three roles; in your project each role signs in with its own account and permissions."
     },
     "nav": {
       "catalog": "Catalog",
@@ -186,7 +225,7 @@
       "base": "Taxable base",
       "iva": "VAT 19%",
       "total": "Total paid",
-      "footer": "Sample academy created for the Koptup demo. In your project, the payment is processed by the gateway (Wompi or PayU) and the electronic invoice is issued by your DIAN-authorized provider."
+      "footer": "Sample academy created for the KopTup demo. In your project, the payment is processed by the gateway (Wompi or PayU) and the electronic invoice is issued by your DIAN-authorized provider."
     },
     "learning": {
       "empty": "You do not have any courses yet. Buy or enroll in one from the catalog.",
@@ -237,7 +276,7 @@
       "sources": "Sources from the material",
       "openSource": "Go to this part of the lesson",
       "minute": "min {time}",
-      "statusIdle": "Real AI (through Koptup’s server) over the lesson scripts. Every answer cites its sources.",
+      "statusIdle": "Real AI (through KopTup’s server) over the lesson scripts. Every answer cites its sources.",
       "statusLlm": "An AI model ({model}) answered using only the course material.",
       "statusExtractive_noKey": "The server has no AI configured: showing the most relevant passages of the material, without rewriting them.",
       "statusExtractive_budget": "The demo’s AI quota ran out: showing the most relevant passages of the material.",
@@ -249,7 +288,7 @@
       "localNone": "I could not find that information in this course’s material. Try other words or one of the suggested questions.",
       "rateLimited": "You asked many questions in a row. Wait a moment and try again.",
       "noMaterial": "This course has no text material for the tutor. Add it when you create the course (text of each lesson).",
-      "privacy": "Your questions are sent to Koptup’s server only to answer them in this demo. Do not type personal data."
+      "privacy": "Your questions are sent to KopTup’s server only to answer them in this demo and are not stored. Do not type personal data."
     },
     "quiz": {
       "title": "Final assessment",
@@ -265,7 +304,7 @@
       "failed": "Not passed yet",
       "scoreLine": "Result: {score} of {total} ({pct})",
       "best": "best attempt: {best} of {total}",
-      "perfectBadge": "Badge unlocked: Quiz genius",
+      "perfectBadge": "Badge unlocked: Perfect score",
       "review": "Review these lessons before trying again:",
       "certIssued": "Certificate {code} issued.",
       "seeCert": "See certificate",
@@ -308,7 +347,7 @@
       "reminderOff": "Reminder off.",
       "addCalendar": "Add to calendar",
       "icsDone": "You downloaded the event (.ics) for your calendar.",
-      "icsNote": "Sample session from Koptup’s LMS demo.",
+      "icsNote": "Sample session from KopTup’s LMS demo.",
       "openClass": "Class open to the whole academy community.",
       "simNote": "Classes are simulated. In your project they are created in Zoom, Google Meet or Microsoft Teams from the platform, and attendance is recorded automatically.",
       "simRoom": "Simulated room",
@@ -337,9 +376,9 @@
       "weekly": "Weekly challenge: complete {goal} lessons in 7 days (+{xp} XP)",
       "weeklyDone": "Weekly challenge done! +{xp} XP",
       "howTitle": "How are your points calculated?",
-      "howLessons": "{n} lessons completed × {xp} XP",
-      "howQuiz": "{n} assessments passed × {xp} XP, plus {bonus} XP for each perfect score ({perfect})",
-      "howCerts": "{n} certificates × {xp} XP",
+      "howLessons": "{n, plural, one {# lesson completed} other {# lessons completed}} × {xp} XP",
+      "howQuiz": "{n, plural, one {# assessment passed} other {# assessments passed}} × {xp} XP, plus {bonus} XP for each perfect score ({perfect})",
+      "howCerts": "{n, plural, one {# valid certificate} other {# valid certificates}} × {xp} XP",
       "howLevel": "You level up every {xp} XP.",
       "badges": "Badges",
       "unlocked": "{n}/{total} unlocked",
@@ -353,7 +392,7 @@
       "b1Desc": "Complete your first lesson.",
       "b2": "Consistency",
       "b2Desc": "Study 3 days in a row.",
-      "b3": "Quiz genius",
+      "b3": "Perfect score",
       "b3Desc": "Score 100% in an assessment.",
       "b4": "Curious",
       "b4Desc": "Ask the tutor 3 questions.",
@@ -365,11 +404,11 @@
     "certificates": {
       "title": "Certificates",
       "subtitle": "With a unique code and a QR that opens the verification page.",
-      "nameLabel": "Name on your certificates",
+      "nameLabel": "Your name for certificates",
       "nameSave": "Save name",
-      "nameSaved": "Name updated on your certificates.",
+      "nameSaved": "Name saved: it will be used on your next certificates.",
       "nameError": "Type at least 3 characters.",
-      "nameHint": "Type your name to see your certificates with it (saved only in this browser).",
+      "nameHint": "Used on the certificates you earn from now on (saved only in this browser). Certificates already issued keep the name they were issued with; you can reissue them with the new name.",
       "noCerts": "You do not have certificates yet. Complete a course and pass the final assessment.",
       "completion": "Certificate of completion",
       "issuedTo": "Awarded to",
@@ -381,7 +420,7 @@
       "share": "Copy link",
       "linkCopied": "Verification link copied.",
       "copyPrompt": "Copy the verification link:",
-      "simNote": "Sample certificates. The verification page checks a sample signature carried in the link; in your project the code is looked up in the server’s certificate registry.",
+      "simNote": "Sample certificates. In the demo, the certificate registry lives in this browser: the verification page only confirms certificates issued here (simulated). In your project, the code is looked up in the server registry and anyone can verify it.",
       "pdfHeading": "CERTIFICATE OF COMPLETION",
       "pdfCertifies": "{org} certifies that",
       "pdfCompleted": "has successfully completed the course",
@@ -390,7 +429,11 @@
       "pdfDirectorName": "Academic coordination",
       "pdfDirector": "Sample signature",
       "pdfVerify": "Verify by scanning the QR",
-      "pdfSample": "SAMPLE DOCUMENT generated by the Koptup demo. Fictitious academy: this certificate does not accredit real studies."
+      "pdfSample": "SAMPLE DOCUMENT generated by the KopTup demo. Fictitious academy: this certificate does not certify real studies.",
+      "otherName": "Issued to {name}.",
+      "reissue": "Reissue to {name}",
+      "reissued": "Certificate reissued as {code}. Code {old} is now void.",
+      "replacesNote": "Replaces certificate {old}, which is now void."
     },
     "analytics": {
       "title": "Instructor analytics",
@@ -564,7 +607,8 @@
       "issuedTitle": "Issued certificates",
       "issuedSubtitle": "{count, plural, one {# certificate issued} other {# certificates issued}} at the sample academy.",
       "issuedMine": "Issued during your demo walkthrough",
-      "issuedNote": "Sample students do not have individual certificates in the demo; yours do have a code and a verifiable QR."
+      "issuedNote": "Sample students do not have individual certificates in the demo; yours do have a code and a verifiable QR.",
+      "issuedReplaced": "replaced by {code}"
     },
     "verify": {
       "metaTitle": "Verify certificate",
@@ -583,8 +627,17 @@
       "tamperedBody": "The information in the link for certificate {code} was modified: the signature does not match.",
       "invalid": "Incomplete or invalid link",
       "invalidBody": "Scan the certificate QR or open the verification link from the demo.",
-      "note": "Sample verification: in the demo, the certificate data travels in the link with a sample signature. In your project, the code is looked up in the server’s certificate registry.",
-      "backToDemo": "Go to the course demo"
+      "note": "Simulated verification: in the demo, the certificate registry lives in the browser where certificates were issued, so this page only confirms certificates issued in this browser. In your project, the code is looked up in the server registry from any device.",
+      "backToDemo": "Go to the course demo",
+      "sampleAcademy": "sample academy",
+      "validBody": "It is in the demo certificate registry of this browser and matches its sample signature.",
+      "unconfirmed": "Cannot be confirmed in this browser",
+      "unconfirmedBody": "The sample signature in the link matches, but certificate {code} is not in this browser’s registry. In the demo, certificates are stored only in the browser where they were issued, so they can only be confirmed there. In a real project, anyone verifies it online against the server registry.",
+      "linkData": "Data carried in the link (not confirmed)",
+      "replaced": "Certificate void",
+      "replacedBody": "Certificate {code} was reissued with code {by} and is no longer valid.",
+      "mismatchBody": "Certificate {code} is in this browser’s registry, but with different data: the link does not match that certificate.",
+      "allDemos": "See all demos"
     },
     "common": {
       "close": "Close",

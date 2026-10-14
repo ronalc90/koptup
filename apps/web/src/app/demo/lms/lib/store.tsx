@@ -7,16 +7,17 @@
  * de montar para que el HTML del servidor y el del cliente coincidan.
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from 'react';
-import { diffDays, localToday, yearOf, type ISODate } from './dates';
-import { eligibleForCertificate, gradeQuiz, lessonsOf, totals } from './engine';
+import { diffDays, localToday, type ISODate } from './dates';
+import { certCode, eligibleForCertificate, gradeQuiz, lessonsOf, totals } from './engine';
 import { buildState, rebaseCohort, STATE_VERSION } from './seed';
 import { courseById } from './selectors';
-import type { Course, LmsState, PayMethod, Profile } from './types';
+import type { Course, LmsState, PayMethod, Profile, Role } from './types';
 
-const STORAGE_KEY = 'koptup.lms.state';
+/** Clave del estado en localStorage (la lee también la página de verificación). */
+export const STORAGE_KEY = 'koptup.lms.state';
 const MAX_AGE_DAYS = 7;
 
-type Payload =
+export type Payload =
   | { type: 'reset' }
   | { type: 'load'; state: LmsState }
   | { type: 'profile.update'; profile: Profile }
@@ -36,7 +37,9 @@ type Payload =
   | { type: 'course.save'; course: Course }
   | { type: 'course.publish'; id: string; published: boolean }
   | { type: 'course.remove'; id: string }
-  | { type: 'remind'; ids: string[] };
+  | { type: 'remind'; ids: string[] }
+  | { type: 'cert.reissue'; id: string }
+  | { type: 'role.visit'; role: Role };
 
 export type Action = Payload & { today: ISODate };
 
@@ -45,7 +48,7 @@ function issueCertificateIfEligible(s: LmsState, courseId: string, today: ISODat
   const course = courseById(s, courseId);
   if (!enr || !course || enr.certificateId || !eligibleForCertificate(course, enr)) return s;
   const seq = s.seq + 1;
-  const id = `AQ-${yearOf(today)}-${String(seq).padStart(4, '0')}`;
+  const id = certCode(today, seq);
   return {
     ...s,
     seq,
@@ -57,14 +60,36 @@ function issueCertificateIfEligible(s: LmsState, courseId: string, today: ISODat
   };
 }
 
-function reducer(s: LmsState | null, a: Action): LmsState | null {
+/** Reducer de la demo (exportado para las pruebas). */
+export function reducer(s: LmsState | null, a: Action): LmsState | null {
   if (a.type === 'reset') return buildState(a.today);
   if (a.type === 'load') return a.state;
   if (!s) return s;
   const today = a.today;
   switch (a.type) {
     case 'profile.update':
-      return { ...s, profile: a.profile, certificates: s.certificates.map((c) => ({ ...c, name: a.profile.name })) };
+      // Los certificados ya emitidos conservan el nombre con el que se emitieron.
+      return { ...s, profile: a.profile };
+    case 'cert.reissue': {
+      // Reemisión con el nombre actual: certificado nuevo con otro código; el anterior queda anulado.
+      const old = s.certificates.find((c) => c.id === a.id);
+      if (!old || old.replacedBy || old.name === s.profile.name) return s;
+      const seq = s.seq + 1;
+      const id = certCode(today, seq);
+      const enr = s.enrollments[old.courseId];
+      return {
+        ...s,
+        seq,
+        enrollments: enr && enr.certificateId === old.id ? { ...s.enrollments, [old.courseId]: { ...enr, certificateId: id } } : s.enrollments,
+        certificates: [
+          { ...old, id, name: s.profile.name, date: today, replaces: old.id, replacedBy: undefined },
+          ...s.certificates.map((c) => (c.id === old.id ? { ...c, replacedBy: id } : c)),
+        ],
+      };
+    }
+    case 'role.visit':
+      if (s.visited?.[a.role]) return s;
+      return { ...s, visited: { ...s.visited, [a.role]: true } };
     case 'purchase': {
       const course = courseById(s, a.courseId);
       if (!course || s.enrollments[a.courseId]) return s;

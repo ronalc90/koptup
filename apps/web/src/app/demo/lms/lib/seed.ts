@@ -11,6 +11,9 @@ import type { CohortEnrollment, Coupon, Enrollment, LmsState, PayMethod, Sale } 
 
 export const STATE_VERSION = 5;
 
+/** Cursos en los que el alumno de ejemplo ya está inscrito al empezar (marcan los primeros pasos). */
+export const SEED_ENROLLED: readonly string[] = ['datos', 'excel'];
+
 export const SEED_COUPONS: Coupon[] = [
   { code: 'BIENVENIDA10', pct: 10, active: true, uses: 0 },
   { code: 'EMPRESA20', pct: 20, active: true, uses: 0 },

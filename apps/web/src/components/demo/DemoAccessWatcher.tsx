@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { isKnownDemoSlug } from '@/lib/demo-access-defaults';
+import { isKnownDemoSlug, isPublicDemoSubpath } from '@/lib/demo-access-defaults';
 import { apiRequest, hasSessionCookie, type DemoAccessDecision } from '@/lib/demo-system';
 
 /** Cada cuánto se revisa el acceso con la demo abierta. */
@@ -23,13 +23,17 @@ const LOST = new Set(['sin_sesion', 'sin_acceso', 'expirado', 'revocado', 'desac
  * - Si el backend no responde, no se hace nada (no se saca a nadie por una
  *   falla momentánea).
  * - El chequeo no cuenta como visita (`registrar=0`).
+ * - Las páginas públicas dentro de una demo (la verificación del certificado
+ *   del LMS) no se vigilan: no piden acceso, y recargarlas sin sesión las
+ *   dejaba en un ciclo de recargas sin fin.
  */
 export default function DemoAccessWatcher() {
   const pathname = usePathname();
   const slug = pathname?.split('/')[2] ?? '';
+  const publicPage = isPublicDemoSubpath(pathname);
 
   useEffect(() => {
-    if (!isKnownDemoSlug(slug)) return;
+    if (!isKnownDemoSlug(slug) || publicPage) return;
     let stopped = false;
     let lastCheck = 0;
     let timer: number | undefined;
@@ -67,7 +71,7 @@ export default function DemoAccessWatcher() {
     document.addEventListener('visibilitychange', onVisible);
     window.addEventListener('focus', onVisible);
     return stop;
-  }, [slug]);
+  }, [slug, publicPage]);
 
   return null;
 }

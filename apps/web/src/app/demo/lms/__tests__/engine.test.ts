@@ -5,6 +5,7 @@
 import { COURSES } from '../lib/catalog';
 import {
   achievements,
+  certificatesFromStored,
   checkCoupon,
   decodeCert,
   eligibleForCertificate,
@@ -17,14 +18,20 @@ import {
   localSearch,
   luhn,
   nitDv,
+  registryLookup,
   riskOf,
+  stem,
   streakDays,
   toCsv,
   totals,
 } from '../lib/engine';
 import { buildCohort, buildState } from '../lib/seed';
 import { courseDocs } from '../lib/tutor';
-import { salesList, headerStats } from '../lib/selectors';
+import { activeCertificates, salesList, headerStats } from '../lib/selectors';
+import { reducer, type Action, type Payload } from '../lib/store';
+import type { LmsState } from '../lib/types';
+
+const act = (s: LmsState, a: Payload) => reducer(s, { ...a, today: TODAY } as Action) as LmsState;
 
 const TODAY = '2026-10-08';
 const course = (id: string) => COURSES.find((c) => c.id === id)!;
@@ -165,5 +172,61 @@ describe('demo LMS · motor', () => {
     expect(generateQuestions(texts, 3)).toEqual(qs);
     expect(generateQuestions(['Muy corto.'], 3)).toEqual([]);
   });
-});
 
+  it('no propone opciones que solo cambian en plural o tildes', () => {
+    expect(stem('Entradas')).toBe(stem('entrada'));
+    expect(stem('clientes')).toBe(stem('cliente'));
+    expect(stem('ciudades')).toBe(stem('ciudad'));
+    const texts = [
+      'Cada entrada de inventario se registra con fecha, cantidad y costo unitario del producto recibido.',
+      'Las entradas y las salidas de mercancía se concilian cada semana contra el conteo físico de la bodega.',
+      'El margen de contribución muestra cuánto aporta cada producto después de cubrir su costo variable directo.',
+      'Los proveedores entregan facturas electrónicas que la contabilidad revisa antes de programar los pagos.',
+      'Un presupuesto mensual compara lo planeado con lo ejecutado y explica las diferencias más importantes.',
+    ];
+    const qs = generateQuestions(texts, 5);
+    expect(qs.length).toBeGreaterThan(0);
+    for (const q of qs) expect(new Set(q.options.map(stem)).size).toBe(q.options.length);
+    // Cada pregunta recuerda de qué texto (lección) salió.
+    for (const q of qs) expect(texts[q.source]).toContain(q.options[q.correct]);
+  });
+
+  it('cambiar el nombre no reescribe certificados ya emitidos; reemitir anula el anterior', () => {
+    let s = buildState(TODAY);
+    const original = s.certificates[0];
+    s = act(s, { type: 'profile.update', profile: { ...s.profile, name: 'Laura Martínez' } });
+    expect(s.certificates[0].name).toBe('Valentina Ríos');
+    s = act(s, { type: 'cert.reissue', id: original.id });
+    const vigentes = activeCertificates(s);
+    expect(vigentes).toHaveLength(1);
+    expect(vigentes[0].name).toBe('Laura Martínez');
+    expect(vigentes[0].replaces).toBe(original.id);
+    expect(vigentes[0].id).toBe(`AQ-2026-${String(s.seq).padStart(4, '0')}`);
+    expect(s.certificates.find((c) => c.id === original.id)?.replacedBy).toBe(vigentes[0].id);
+    expect(s.enrollments.datos.certificateId).toBe(vigentes[0].id);
+    // Reemitir otra vez con el mismo nombre no hace nada; los logros cuentan un solo certificado.
+    expect(act(s, { type: 'cert.reissue', id: vigentes[0].id })).toBe(s);
+    expect(achievements(s, TODAY).xp).toBe(7 * 50 + 100 + 50 + 200);
+  });
+
+  it('el registro del navegador confirma, anula o no encuentra un certificado', () => {
+    const s = buildState(TODAY);
+    const c = s.certificates[0];
+    const p = { c: c.id, n: c.name, t: 'Protección de datos personales (Ley 1581)', h: c.hours, f: c.date, o: 'Academia Quindé S.A.S.' };
+    const stored = JSON.stringify(s);
+    expect(registryLookup(certificatesFromStored(stored), p)).toEqual({ status: 'found' });
+    expect(registryLookup(certificatesFromStored(null), p)).toEqual({ status: 'none' });
+    expect(registryLookup(certificatesFromStored('{roto'), p)).toEqual({ status: 'none' });
+    expect(registryLookup(certificatesFromStored(stored), { ...p, c: 'AQ-2026-9999' })).toEqual({ status: 'notFound' });
+    expect(registryLookup(certificatesFromStored(stored), { ...p, n: 'Otra Persona' })).toEqual({ status: 'mismatch' });
+    const renamed = act(act(s, { type: 'profile.update', profile: { ...s.profile, name: 'Laura Martínez' } }), { type: 'cert.reissue', id: c.id });
+    const by = activeCertificates(renamed)[0].id;
+    expect(registryLookup(certificatesFromStored(JSON.stringify(renamed)), p)).toEqual({ status: 'replaced', by });
+  });
+
+  it('marca las vistas de rol visitadas (primeros pasos)', () => {
+    const s = act(buildState(TODAY), { type: 'role.visit', role: 'admin' });
+    expect(s.visited).toEqual({ admin: true });
+    expect(act(s, { type: 'role.visit', role: 'admin' })).toBe(s);
+  });
+});

@@ -6,7 +6,7 @@
  */
 import { addDays, bogotaInstant, diffDays, type ISODate } from './dates';
 import type {
-  CohortEnrollment, Coupon, Course, Enrollment, L, Lesson, LmsState, Locale, QuizQuestion,
+  Certificate, CohortEnrollment, Coupon, Course, Enrollment, L, Lesson, LmsState, Locale, QuizQuestion,
 } from './types';
 
 export const IVA_RATE = 0.19;
@@ -166,6 +166,11 @@ export function learningPath(course: Course, enr: Enrollment | undefined, nextCo
   return steps;
 }
 
+/** Código de certificado de la academia de ejemplo: AQ-AAAA-NNNN (consecutivo). */
+export function certCode(today: ISODate, seq: number): string {
+  return `AQ-${today.slice(0, 4)}-${String(seq).padStart(4, '0')}`;
+}
+
 /** ¿Ya cumple para el certificado? Todas las lecciones y evaluación aprobada. */
 export function eligibleForCertificate(course: Course, enr: Enrollment): boolean {
   const all = lessonsOf(course);
@@ -205,6 +210,8 @@ export function streakDays(dates: ISODate[], today: ISODate): number {
 
 export function achievements(s: LmsState, today: ISODate): Achievements {
   const enrs = Object.values(s.enrollments);
+  // Los certificados reemitidos quedan anulados: cuenta solo los vigentes.
+  const certs = s.certificates.filter((c) => !c.replacedBy).length;
   const dates = enrs.flatMap((e) => Object.values(e.completed));
   const lessonsDone = dates.length;
   const quizzesPassed = enrs.filter((e) => e.quiz && quizPct(e.quiz.best, e.quiz.total) >= PASS_PCT).length;
@@ -216,7 +223,7 @@ export function achievements(s: LmsState, today: ISODate): Achievements {
     lessonsDone * XP.lesson +
     quizzesPassed * XP.quizPass +
     perfectQuizzes * XP.quizPerfect +
-    s.certificates.length * XP.certificate +
+    certs * XP.certificate +
     (weeklyDone ? XP.weekly : 0);
   const level = Math.floor(xp / LEVEL_XP) + 1;
   return {
@@ -236,7 +243,7 @@ export function achievements(s: LmsState, today: ISODate): Achievements {
       b3: perfectQuizzes >= 1,
       b4: s.tutorQuestions >= 3,
       b5: s.notes.length >= 3,
-      b6: s.certificates.length >= 1,
+      b6: certs >= 1,
     },
   };
 }
@@ -450,6 +457,48 @@ export function decodeCert(d: string | null | undefined): CertCheck {
   }
 }
 
+/**
+ * Registro de certificados de la demo: vive en el navegador donde se
+ * emitieron (localStorage). La página de verificación lo consulta para
+ * confirmar un certificado; en un proyecto real el registro está en el
+ * servidor y cualquiera puede consultarlo.
+ *  - none: este navegador no tiene datos de la demo;
+ *  - notFound: el código no está en el registro de este navegador;
+ *  - replaced: el certificado se reemitió con otro código (queda anulado);
+ *  - mismatch: el código existe pero con otros datos;
+ *  - found: coincide con el registro.
+ */
+export type RegistryCheck =
+  | { status: 'none' }
+  | { status: 'notFound' }
+  | { status: 'replaced'; by: string }
+  | { status: 'mismatch' }
+  | { status: 'found' };
+
+export function registryLookup(certs: Pick<Certificate, 'id' | 'name' | 'date' | 'hours' | 'replacedBy'>[] | null, p: CertPayload): RegistryCheck {
+  if (!certs) return { status: 'none' };
+  const c = certs.find((x) => x.id === p.c);
+  if (!c) return { status: 'notFound' };
+  if (c.replacedBy) return { status: 'replaced', by: c.replacedBy };
+  if (c.name !== p.n || c.date !== p.f || c.hours !== p.h) return { status: 'mismatch' };
+  return { status: 'found' };
+}
+
+/** Lee los certificados del estado guardado de la demo (o null si no hay estado válido). */
+export function certificatesFromStored(raw: string | null): Certificate[] | null {
+  if (!raw) return null;
+  try {
+    const s = JSON.parse(raw) as { certificates?: unknown };
+    if (!s || !Array.isArray(s.certificates)) return null;
+    return s.certificates.filter(
+      (c): c is Certificate =>
+        !!c && typeof c === 'object' && typeof (c as Certificate).id === 'string' && typeof (c as Certificate).name === 'string',
+    );
+  } catch {
+    return null;
+  }
+}
+
 export function verifyUrl(origin: string, p: CertPayload): string {
   return `${origin}/demo/lms/verificar?d=${encodeCert(p)}`;
 }
@@ -511,6 +560,8 @@ export interface GeneratedQuestion {
   q: string;
   options: string[];
   correct: number;
+  /** Índice del texto (lección) de donde salió la frase: alimenta la ruta de refuerzo. */
+  source: number;
 }
 
 function hashStr(s: string): number {
@@ -520,35 +571,61 @@ function hashStr(s: string): number {
 }
 
 /**
+ * Raíz simple de una palabra para comparar opciones: minúsculas, sin tildes
+ * y sin plural («Entradas» y «entrada» son la misma opción).
+ */
+export function stem(word: string): string {
+  let w = word.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  // «clientes» → «cliente» → «client»; «ciudades» → «ciudade» → «ciudad».
+  if (w.length > 4 && w.endsWith('s')) w = w.slice(0, -1);
+  if (w.length > 4 && w.endsWith('e')) w = w.slice(0, -1);
+  return w;
+}
+
+function uniqueByStem(words: string[]): string[] {
+  const seen = new Set<string>();
+  return words.filter((w) => {
+    const k = stem(w);
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+}
+
+/**
  * Arma preguntas de completar a partir del texto: en cada frase oculta su
  * palabra clave (la más larga que no sea palabra vacía) y usa como
  * distractores las palabras clave de otras frases. Es determinista.
  */
 export function generateQuestions(texts: string[], max = 3, prompt = 'Completa: '): GeneratedQuestion[] {
-  const sentences = texts
-    .flatMap((t) => t.split(/(?<=[.!?])\s+|\n+/))
-    .map((s) => s.trim())
-    .filter((s) => s.length >= 35 && s.length <= 260);
+  const parts = texts.flatMap((t, source) =>
+    t
+      .split(/(?<=[.!?])\s+|\n+/)
+      .map((s) => ({ s: s.trim(), source }))
+      .filter((x) => x.s.length >= 35 && x.s.length <= 260),
+  );
+  const sentences = parts.map((x) => x.s);
   const wordsOf = (s: string) => (s.match(/[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]{5,}/g) ?? []).filter((w) => !STOP.has(w.toLowerCase()));
   const keyOf = (s: string) => [...wordsOf(s)].sort((a, b) => b.length - a.length || a.localeCompare(b))[0];
   // Distractores: palabras clave de todo el texto (las más largas primero).
   const vocabulary = [...new Set(sentences.flatMap(wordsOf))].sort((a, b) => b.length - a.length || a.localeCompare(b));
   const out: GeneratedQuestion[] = [];
   const usedKeys = new Set<string>();
-  for (const s of sentences) {
+  for (const { s, source } of parts) {
     if (out.length >= max) break;
     const key = keyOf(s);
-    if (!key || usedKeys.has(key.toLowerCase())) continue;
-    const inSentence = new Set(wordsOf(s).map((w) => w.toLowerCase()));
-    const pool = vocabulary.filter((w) => !inSentence.has(w.toLowerCase())).slice(0, 12);
+    if (!key || usedKeys.has(stem(key))) continue;
+    const inSentence = new Set(wordsOf(s).map(stem));
+    // Sin palabras de la frase ni variantes de la respuesta (singular/plural, tildes).
+    const pool = uniqueByStem(vocabulary.filter((w) => !inSentence.has(stem(w)) && stem(w) !== stem(key))).slice(0, 12);
     if (pool.length < 3) continue;
-    usedKeys.add(key.toLowerCase());
+    usedKeys.add(stem(key));
     const off = hashStr(key) % pool.length;
     const distractors = [0, 1, 2].map((i) => pool[(off + i) % pool.length]);
     const correct = hashStr(s) % 4;
     const options = [...distractors];
     options.splice(correct, 0, key);
-    out.push({ q: prompt + s.replace(key, '_____'), options, correct });
+    out.push({ q: prompt + s.replace(key, '_____'), options, correct, source });
   }
   return out;
 }

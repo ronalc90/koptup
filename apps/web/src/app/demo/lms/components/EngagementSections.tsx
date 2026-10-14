@@ -28,12 +28,12 @@ import {
   VideoCameraIcon,
 } from '@heroicons/react/24/outline';
 import { ACADEMY, CLASSMATES, COURSES, LIVE, type LiveTemplate } from '../lib/catalog';
-import { achievements, icsFor, LEVEL_XP, pick, sessionStart, verifyUrl, WEEKLY_GOAL, XP, type CertPayload } from '../lib/engine';
+import { achievements, certCode, icsFor, LEVEL_XP, pick, sessionStart, verifyUrl, WEEKLY_GOAL, XP, type CertPayload } from '../lib/engine';
 import { downloadText } from '../lib/files';
 import { certificatePdf } from '../lib/pdf';
 import { encodeQr, qrSvgPath } from '../lib/qr';
 import { useLmsReady } from '../lib/store';
-import { courseById } from '../lib/selectors';
+import { activeCertificates, courseById } from '../lib/selectors';
 import type { Certificate } from '../lib/types';
 import LiveRoomModal from './LiveRoomModal';
 import { Empty, SectionTitle, SimNote, btn, inputCls, labelCls, useFmt } from './ui';
@@ -125,7 +125,7 @@ export function LiveSection({ onOpenCourse }: { onOpenCourse: (id: string) => vo
                 <div className="relative aspect-video bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_40%,rgba(255,255,255,0.2),transparent_60%)]" />
                   {status === 'live' ? (
-                    <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500 text-white text-xs font-bold animate-pulse">
+                    <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-600 text-white text-xs font-bold animate-pulse">
                       <span className="w-2 h-2 rounded-full bg-white" />
                       {t('live.live')}
                     </div>
@@ -277,7 +277,7 @@ export function GamificationSection() {
                     <FireIcon className="w-7 h-7 text-rose-500 shrink-0" />
                     <div>
                       <p className="text-xl font-bold text-rose-600 dark:text-rose-300">{t('gamification.days', { count: a.streak })}</p>
-                      <p className="text-[11px] text-rose-600/80 dark:text-rose-300/80">{t('gamification.streak')}</p>
+                      <p className="text-[11px] text-rose-700 dark:text-rose-300">{t('gamification.streak')}</p>
                     </div>
                   </div>
                   <div className="p-3 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 flex items-center gap-3">
@@ -286,7 +286,7 @@ export function GamificationSection() {
                       <p className="text-xl font-bold text-indigo-600 dark:text-indigo-300">
                         {Math.min(a.weekly, WEEKLY_GOAL)}/{WEEKLY_GOAL}
                       </p>
-                      <p className="text-[11px] text-indigo-600/80 dark:text-indigo-300/80">
+                      <p className="text-[11px] text-indigo-700 dark:text-indigo-300">
                         {a.weeklyDone ? t('gamification.weeklyDone', { xp: XP.weekly }) : t('gamification.weekly', { goal: WEEKLY_GOAL, xp: XP.weekly })}
                       </p>
                     </div>
@@ -299,7 +299,7 @@ export function GamificationSection() {
               <ul className="mt-2 space-y-1 list-disc pl-5">
                 <li>{t('gamification.howLessons', { n: a.lessonsDone, xp: XP.lesson })}</li>
                 <li>{t('gamification.howQuiz', { n: a.quizzesPassed, xp: XP.quizPass, perfect: a.perfectQuizzes, bonus: XP.quizPerfect })}</li>
-                <li>{t('gamification.howCerts', { n: state.certificates.length, xp: XP.certificate })}</li>
+                <li>{t('gamification.howCerts', { n: activeCertificates(state).length, xp: XP.certificate })}</li>
                 <li>{t('gamification.howLevel', { xp: LEVEL_XP })}</li>
               </ul>
             </details>
@@ -321,7 +321,7 @@ export function GamificationSection() {
                   <div
                     key={b.key}
                     className={`relative aspect-square rounded-xl flex flex-col items-center justify-center p-2 text-center transition ${
-                      on ? `bg-gradient-to-br ${b.color} text-white shadow-md` : 'bg-secondary-100 dark:bg-secondary-800 text-secondary-400'
+                      on ? `bg-gradient-to-br ${b.color} text-white shadow-md` : 'bg-secondary-100 dark:bg-secondary-800 text-secondary-600 dark:text-secondary-400'
                     }`}
                     title={t(`badges.${b.key}Desc`)}
                   >
@@ -429,9 +429,11 @@ export async function downloadCertificate(c: Certificate, courseTitle: string, i
 export function CertificatesSection({ onCatalog }: { onCatalog: () => void }) {
   const t = useTranslations('demoLms');
   const f = useFmt();
-  const { state, dispatch } = useLmsReady();
+  const { state, today, dispatch } = useLmsReady();
   const origin = useOrigin();
   const [name, setName] = useState(state.profile.name);
+
+  const certs = activeCertificates(state);
 
   const saveName = () => {
     const v = name.trim();
@@ -441,6 +443,12 @@ export function CertificatesSection({ onCatalog }: { onCatalog: () => void }) {
     }
     dispatch({ type: 'profile.update', profile: { ...state.profile, name: v } });
     toast.success(t('certificates.nameSaved'));
+  };
+
+  const reissue = (c: Certificate) => {
+    const next = certCode(today, state.seq + 1);
+    dispatch({ type: 'cert.reissue', id: c.id });
+    toast.success(t('certificates.reissued', { old: c.id, code: next }), { duration: 6000 });
   };
 
   return (
@@ -470,7 +478,7 @@ export function CertificatesSection({ onCatalog }: { onCatalog: () => void }) {
         </CardContent>
       </Card>
 
-      {state.certificates.length === 0 ? (
+      {certs.length === 0 ? (
         <Card variant="bordered">
           <CardContent className="p-0">
             <Empty>
@@ -483,10 +491,11 @@ export function CertificatesSection({ onCatalog }: { onCatalog: () => void }) {
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {state.certificates.map((c) => {
+          {certs.map((c) => {
             const course = courseById(state, c.courseId);
             const title = course ? pick(course.title, f.locale) : c.courseId;
             const url = origin ? verifyUrl(origin, certPayload(c, title)) : '';
+            const otherName = c.name !== state.profile.name;
             return (
               <Card key={c.id} variant="elevated" padding="none" className="overflow-hidden">
                 <div className={`p-6 bg-gradient-to-br ${course?.gradient ?? 'from-slate-700 to-slate-900'} text-white relative`}>
@@ -520,6 +529,19 @@ export function CertificatesSection({ onCatalog }: { onCatalog: () => void }) {
                     </div>
                   </div>
                 </div>
+                {(otherName || c.replaces) && (
+                  <div className="px-4 pt-3 space-y-1.5">
+                    {c.replaces && <p className="text-[11px] text-secondary-500 dark:text-secondary-400">{t('certificates.replacesNote', { old: c.replaces })}</p>}
+                    {otherName && (
+                      <div className="flex items-center justify-between gap-2 flex-wrap p-2 rounded-lg bg-amber-50 dark:bg-amber-900/20">
+                        <p className="text-[11px] text-amber-900 dark:text-amber-100">{t('certificates.otherName', { name: c.name })}</p>
+                        <button type="button" className={btn.small} onClick={() => reissue(c)}>
+                          {t('certificates.reissue', { name: state.profile.name })}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
                 <CardContent className="p-4 flex items-center gap-2 flex-wrap">
                   <a href={url || undefined} target="_blank" rel="noopener noreferrer" className={`${btn.outline} flex-1`} aria-disabled={!url}>
                     <QrCodeIcon className="w-4 h-4" />

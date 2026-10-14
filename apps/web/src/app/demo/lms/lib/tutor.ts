@@ -1,9 +1,14 @@
 /**
  * Tutor IA del curso: usa las rutas reales del chatbot RAG del backend
  * (`/api/chatbot`), igual que el resto de demos con IA:
- *   1. La primera vez que preguntas en un curso, crea un bot (`POST /bots`) y
- *      le sube el guion de cada lección como documento de texto
- *      (`POST /bots/:id/docs`). El id queda en localStorage para reutilizarlo.
+ *   1. Cursos del catálogo de ejemplo: pide el bot de ejemplo COMPARTIDO del
+ *      curso (`POST /sample-bots` con el guion de cada lección). El servidor
+ *      devuelve el mismo bot a todos los visitantes (la clave es la huella del
+ *      contenido), así que no se crea un bot por visitante ni se gasta el
+ *      límite de bots nuevos por hora; sus conversaciones no se guardan.
+ *      Cursos creados en la vista Instructor (o un servidor sin esa ruta):
+ *      crea un bot de ejemplo propio (`POST /bots` con `kind: "sample"`) y le
+ *      sube el guion (`POST /bots/:id/docs`); el id queda en localStorage.
  *   2. Cada pregunta va a `POST /bots/:id/chat`: el backend busca los
  *      fragmentos del material y, si tiene clave del proveedor de IA, llama al
  *      modelo con reglas para no inventar y citar la fuente. Sin clave
@@ -26,10 +31,12 @@ export type TutorErrorKind = 'network' | 'rateLimited' | 'server';
 
 export class TutorError extends Error {
   readonly kind: TutorErrorKind;
+  readonly status: number;
 
-  constructor(kind: TutorErrorKind, message: string) {
+  constructor(kind: TutorErrorKind, message: string, status = 0) {
     super(message);
     this.kind = kind;
+    this.status = status;
   }
 }
 
@@ -91,8 +98,8 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
   } catch {
     throw new TutorError('network', 'network');
   }
-  if (res.status === 429) throw new TutorError('rateLimited', 'HTTP 429');
-  if (!res.ok) throw new TutorError('server', `HTTP ${res.status}`);
+  if (res.status === 429) throw new TutorError('rateLimited', 'HTTP 429', 429);
+  if (!res.ok) throw new TutorError('server', `HTTP ${res.status}`, res.status);
   return (await res.json()) as T;
 }
 
@@ -131,32 +138,54 @@ function persona(course: Course, locale: Locale): string {
 }
 
 const inflight = new Map<string, Promise<StoredBot>>();
+/** Bots compartidos ya resueltos en esta visita (el servidor siempre devuelve el mismo). */
+const shared = new Map<string, StoredBot>();
+/** El servidor no ofrece POST /sample-bots (versión anterior): se usa un bot propio. */
+let sharedUnavailable = false;
+
+function botConfig(course: Course, locale: Locale) {
+  return {
+    name: 'Tutor: ' + pick(course.title, locale).slice(0, 60),
+    systemPrompt: persona(course, locale),
+    tone: 'friendly',
+    languages: [locale],
+    avatar: 'AQ',
+    color: '#0891b2',
+  };
+}
+
+function fileOf(d: { name: string; text: string }) {
+  return { name: d.name, size: new TextEncoder().encode(d.text).length, mime: 'text/plain', contentBase64: toBase64(d.text) };
+}
+
+/** Máximo de documentos de un bot de ejemplo compartido (igual que el backend). */
+const SHARED_MAX_FILES = 5;
+
+async function sharedBot(key: string, course: Course, locale: Locale): Promise<StoredBot> {
+  const cached = shared.get(key);
+  if (cached) return cached;
+  const docs = courseDocs(course, locale);
+  const r = await call<{ botId: string }>('/sample-bots', {
+    method: 'POST',
+    body: JSON.stringify({ sampleKey: `lms:${course.id}:${locale}:v${TUTOR_VERSION}`, config: botConfig(course, locale), files: docs.map(fileOf) }),
+  });
+  const entry: StoredBot = { botId: r.botId, ownerToken: null, version: TUTOR_VERSION, docs: docs.length };
+  shared.set(key, entry);
+  return entry;
+}
 
 async function createBot(key: string, course: Course, locale: Locale): Promise<StoredBot> {
   const docs = courseDocs(course, locale);
   const created = await call<{ botId: string; ownerToken?: string }>('/bots', {
     method: 'POST',
-    body: JSON.stringify({
-      name: (locale === 'en' ? 'Tutor: ' : 'Tutor: ') + pick(course.title, locale).slice(0, 60),
-      systemPrompt: persona(course, locale),
-      tone: 'friendly',
-      languages: [locale],
-      avatar: 'AQ',
-      color: '#0891b2',
-    }),
+    // Bot de ejemplo: sus conversaciones no se guardan y el servidor lo borra tras 30 días sin uso.
+    body: JSON.stringify({ ...botConfig(course, locale), kind: 'sample' }),
   });
   const ownerToken = typeof created.ownerToken === 'string' && created.ownerToken ? created.ownerToken : null;
   await call(`/bots/${encodeURIComponent(created.botId)}/docs`, {
     method: 'POST',
     headers: ownerToken ? { [OWNER_HEADER]: ownerToken } : {},
-    body: JSON.stringify({
-      files: docs.map((d) => ({
-        name: d.name,
-        size: new TextEncoder().encode(d.text).length,
-        mime: 'text/plain',
-        contentBase64: toBase64(d.text),
-      })),
-    }),
+    body: JSON.stringify({ files: docs.map(fileOf) }),
   });
   const entry: StoredBot = { botId: created.botId, ownerToken, version: TUTOR_VERSION, docs: docs.length };
   writeEntry(key, entry);
@@ -164,6 +193,15 @@ async function createBot(key: string, course: Course, locale: Locale): Promise<S
 }
 
 async function resolveBot(key: string, course: Course, locale: Locale): Promise<StoredBot> {
+  if (!course.custom && !sharedUnavailable && courseDocs(course, locale).length <= SHARED_MAX_FILES) {
+    try {
+      return await sharedBot(key, course, locale);
+    } catch (err) {
+      // Solo un servidor sin la ruta (404) pasa al bot propio; el resto de errores se informan.
+      if (!(err instanceof TutorError) || err.status !== 404) throw err;
+      sharedUnavailable = true;
+    }
+  }
   const stored = readAll()[key];
   const docs = courseDocs(course, locale).length;
   if (stored && stored.version === TUTOR_VERSION && stored.docs === docs) {
@@ -213,6 +251,7 @@ export async function askTutor(
     // El servidor pudo reiniciarse y perder el bot: se recrea una vez.
     if (err instanceof TutorError && err.kind === 'server') {
       writeEntry(`${locale}:${course.id}`, null);
+      shared.delete(`${locale}:${course.id}`);
       const again = await ensureBot(course, locale);
       r = await call<ChatResponse>(`/bots/${encodeURIComponent(again.botId)}/chat`, {
         method: 'POST',

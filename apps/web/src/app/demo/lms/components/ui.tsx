@@ -15,11 +15,14 @@ export function useFmt() {
     const money = new Intl.NumberFormat(tag, { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
     const int = new Intl.NumberFormat(tag, { maximumFractionDigits: 0 });
     const dec = new Intl.NumberFormat(tag, { maximumFractionDigits: 1 });
+    const dec2 = new Intl.NumberFormat(tag, { maximumFractionDigits: 2 });
     return {
       locale,
       money: (n: number) => money.format(Math.round(n)),
       int: (n: number) => int.format(n),
       dec: (n: number) => dec.format(n),
+      /** Velocidad de reproducción sin redondear (0,75x, 1,25x). */
+      speed: (n: number) => `${dec2.format(n)}x`,
       pct: (n: number) => (locale === 'en' ? `${int.format(n)}%` : `${int.format(n)} %`),
       date: (d: ISODate, style?: DateStyle) => formatDate(d, locale, style),
     };
@@ -45,6 +48,8 @@ export const btn = {
     'inline-flex items-center justify-center gap-1 p-1.5 rounded-md text-secondary-500 hover:bg-secondary-100 dark:hover:bg-secondary-800 disabled:opacity-50',
 };
 
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 export function Modal({
   open,
   onClose,
@@ -63,10 +68,38 @@ export function Modal({
   closeLabel: string;
 }) {
   const panel = useRef<HTMLDivElement>(null);
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
+  // Al abrir: foco en la ventana; Escape la cierra; Tab no sale de ella; al cerrar, el foco vuelve a donde estaba.
   useEffect(() => {
     if (!open) return;
+    const opener = document.activeElement as HTMLElement | null;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        closeRef.current();
+        return;
+      }
+      if (e.key !== 'Tab' || !panel.current) return;
+      const items = Array.from(panel.current.querySelectorAll<HTMLElement>(FOCUSABLE)).filter((el) => el.offsetParent !== null);
+      if (items.length === 0) {
+        e.preventDefault();
+        panel.current.focus();
+        return;
+      }
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement;
+      if (e.shiftKey && (active === first || active === panel.current)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      } else if (!panel.current.contains(active)) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener('keydown', onKey);
     const prev = document.body.style.overflow;
@@ -75,8 +108,9 @@ export function Modal({
     return () => {
       document.removeEventListener('keydown', onKey);
       document.body.style.overflow = prev;
+      if (opener && document.contains(opener)) opener.focus({ preventScroll: true });
     };
-  }, [open, onClose]);
+  }, [open]);
   if (!open || typeof document === 'undefined') return null;
   const width = size === 'xl' ? 'max-w-4xl' : size === 'lg' ? 'max-w-3xl' : 'max-w-lg';
   return createPortal(
