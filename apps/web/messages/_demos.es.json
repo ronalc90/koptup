@@ -4706,6 +4706,22 @@
       "breadcrumbHome": "Inicio",
       "breadcrumbDemos": "Demos"
     },
+    "header": {
+      "back": "Volver al catálogo de demos",
+      "audience": "Para restaurantes, cadenas y comercios con domicilio propio que hoy dependen de los agregadores. Empieza con el recorrido sugerido: haz un pedido como cliente y síguelo hasta la entrega.",
+      "requestDemo": "Solicitar demo guiada",
+      "quote": "Cotizar tu app de domicilios",
+      "howTitle": "Qué es real y qué es simulado",
+      "show": "Ver",
+      "hide": "Ocultar",
+      "how": {
+        "real": "Real en tu navegador: el pedido pasa por las 4 apps con un solo estado; precios, domicilio por distancia, propina, puntos, indicadores, tiempos por etapa, comisión evitada y el CSV se calculan con los pedidos.",
+        "rules": "Reglas, no IA: la sugerencia del repartidor (el más cercano y libre), el orden de las paradas y la revisión de pedidos sospechosos.",
+        "clock": "Reloj de la demo: la jornada de ejemplo es la de hoy y empieza a las 7:05 p. m.; avanza en tiempo real y se adelanta cuando la cocina termina, el repartidor llega a la sede o entrega, para que los tiempos sean realistas.",
+        "simulated": "Simulado: pagos (siempre se aprueban, salvo que actives el rechazo de prueba), WhatsApp, llamada enmascarada, GPS, mapa y posición del repartidor. En tu proyecto se conectan con la pasarela, WhatsApp Business, telefonía y un servicio de mapas.",
+        "storage": "Lo que haces se guarda solo en este navegador; «Reiniciar demo» vuelve a los datos de ejemplo."
+      }
+    },
     "tabs": {
       "label": "Apps de la demo",
       "customer": "Cliente",
@@ -4745,9 +4761,9 @@
       },
       "next": {
         "order": "Empieza en Cliente: agrega platos al carrito y haz el pedido.",
-        "accept": "Siguiente: en Comercio acepta el pedido {id} antes de que se acaben los 45 s.",
+        "accept": "Siguiente: en Comercio acepta el pedido {id}. La sede tiene 45 s; si se pasan, igual puedes aceptarlo y Operaciones recibe una alerta.",
         "assign": "Siguiente: en Operaciones asigna un repartidor al pedido {id} (Despacho o Alertas).",
-        "deliver": "Siguiente: en Comercio marca el pedido {id} «Listo para recoger»; luego, en Repartidor, acepta la oferta, recógelo y confirma la entrega con el código que ve el cliente.",
+        "deliver": "Siguiente: en Comercio marca el pedido {id} «Listo para recoger» (el reloj se adelanta hasta el fin de la preparación); luego, en Repartidor, acepta la oferta, recógelo y confirma la entrega con el código que ve el cliente.",
         "rate": "Siguiente: en Cliente califica la entrega del pedido {id}."
       },
       "done": "¡Listo! Recorriste el pedido en las 4 apps. En Operaciones mira los tiempos por etapa y la comisión que no pagaste.",
@@ -4757,7 +4773,7 @@
     },
     "activity": {
       "title": "Actividad entre apps",
-      "hint": "Cada acción en una app se refleja en las demás. El reloj de la demo empezó a las 7:05 p. m. y avanza en tiempo real.",
+      "hint": "Cada acción en una app se refleja en las demás. El reloj de la demo empieza a las 7:05 p. m., avanza en tiempo real y se adelanta cuando la cocina termina, el repartidor llega a la sede o entrega.",
       "clockHint": "Reloj de la demo",
       "empty": "Aquí verás cómo tu pedido pasa de una app a otra.",
       "app": {
@@ -4798,7 +4814,9 @@
       "driverOffline": "{driver} se desconectó",
       "docUpdated": "Documento actualizado: {doc}",
       "autoOn": "Avance automático activado",
-      "autoOff": "Avance automático desactivado"
+      "autoOff": "Avance automático desactivado",
+      "clockJump": "Reloj de la demo adelantado {min} min: {why, select, prep {terminó la preparación de {id}} toSede {el repartidor llegó a la sede por {id}} other {el repartidor llegó a la dirección de {id}}}",
+      "paymentDeclined": "Pago con {method} rechazado (simulado): no se creó el pedido"
     },
     "common": {
       "back": "Volver",
@@ -4815,8 +4833,10 @@
       "yours": "Tuyo",
       "yes": "sí",
       "no": "no",
-      "mapHint": "Mapa ilustrativo, no a escala · posición simulada",
-      "mapHintOps": "Mapa ilustrativo de Bogotá, no a escala · posiciones simuladas"
+      "mapHint": "Mapa ilustrativo, no a escala · posición simulada y acelerada",
+      "mapHintOps": "Mapa ilustrativo de Bogotá, no a escala · posiciones simuladas",
+      "closeToast": "Cerrar aviso",
+      "stars": "{n, plural, one {# estrella} other {# estrellas}}"
     },
     "stage": {
       "pending": "Por confirmar",
@@ -5056,7 +5076,10 @@
       "needBoth": "Para entregar sin código necesitas la foto y la firma.",
       "privacy": "En la demo la foto y la firma no salen de tu navegador; en tu proyecto se guardan como evidencia de la entrega.",
       "confirm": "Confirmar entrega",
-      "done": "Pedido {id} entregado"
+      "done": "Pedido {id} entregado",
+      "doneJump": "Pedido {id} entregado · el reloj de la demo se adelantó {min} min (trayecto)",
+      "modeLabel": "Cómo confirmas la entrega",
+      "alreadyClosed": "El pedido {id} ya se cerró en la operación: no hay nada que confirmar."
     },
     "docs": {
       "title": "Documentos del repartidor",
@@ -5110,7 +5133,7 @@
         "popular": "Popular",
         "soldOut": "Agotado en esta sede",
         "add": "Agregar {item}",
-        "added": "{item} agregado al carrito",
+        "added": "Agregaste {item} al carrito",
         "myOrders": "Mis pedidos ({n})",
         "viewCart": "Ver carrito · {n} · {total}",
         "pickSede": "Elige la sede",
@@ -5175,8 +5198,11 @@
           "noSede": "Ninguna sede abierta cubre tu dirección.",
           "soldOut": "Hay productos agotados en la sede: quítalos del carrito.",
           "cash": "El efectivo con el que vas a pagar no alcanza para el total.",
-          "blocked": "Tu cuenta está bloqueada en la demo: desbloquéala en Operaciones."
-        }
+          "blocked": "Tu cuenta está bloqueada en la demo: desbloquéala en Operaciones.",
+          "declined": "El banco rechazó el pago con {method} (simulado): fondos insuficientes. No se creó el pedido ni se cobró nada; vuelve a intentarlo o elige otro medio de pago."
+        },
+        "simulateDecline": "Probar un pago rechazado: el banco rechaza el próximo pago (simulado).",
+        "declinedToast": "Pago rechazado por el banco (simulado). No se creó el pedido: vuelve a intentarlo o elige otro medio."
       },
       "tracking": {
         "title": "Pedido {id}",
@@ -5194,7 +5220,8 @@
         "sub": {
           "pending": "La sede tiene {s} s para responder.",
           "pendingLate": "La sede no respondió a tiempo: Operaciones ya recibió una alerta.",
-          "preparing": "La {sede} lo prepara en unos {min} min.",
+          "preparing": "La {sede} lo está preparando: listo en unos {min} min.",
+          "preparingLate": "La {sede} ya pasó el tiempo de preparación: está terminando tu pedido.",
           "readyDriver": "Esperando que {driver} lo recoja.",
           "readyNoDriver": "Operaciones está asignando un repartidor.",
           "pickedUp": "{driver} va hacia tu dirección.",
@@ -5216,7 +5243,8 @@
         "whatsapp": {
           "title": "Vista previa del WhatsApp que recibes",
           "message": "{brand}: tu pedido {id} fue confirmado y llega aprox. a las {time}\nSíguelo aquí: {link}\nCódigo de entrega: {code} (dáselo al repartidor)",
-          "note": "Simulado: no se envía nada. En tu proyecto se envía con WhatsApp Business; el enlace es de ejemplo."
+          "note": "Simulado: no se envía nada. En tu proyecto se envía con WhatsApp Business; el enlace es de ejemplo.",
+          "link": "tu-dominio.com/seguimiento/{id}"
         },
         "rated": "Gracias por calificar",
         "pointsEarned": "Ganaste {n} puntos con este pedido · ahora tienes {balance}.",
@@ -5303,7 +5331,9 @@
       "analytics": "Ventas de hoy",
       "topItems": "Más vendidos (unidades)",
       "salesByHour": "Ventas por hora",
-      "rating": "Calificación promedio ({n} opiniones)"
+      "rating": "Calificación promedio ({n} opiniones)",
+      "readyToastJump": "{id} listo para recoger · el reloj de la demo se adelantó {min} min (fin de la preparación)",
+      "readyJumpHint": "En la demo, al marcarlo listo el reloj se adelanta {min} min hasta el fin de la preparación elegida."
     },
     "driver": {
       "hello": "Hola, {name}",
@@ -5340,6 +5370,7 @@
       "pickup": "Recogí el pedido",
       "pickedToast": "{id} recogido: el cliente ya lo ve en camino",
       "waitingSede": "La sede aún lo prepara (faltan ~{min} min). Cuando lo marque listo podrás recogerlo.",
+      "waitingSedeLate": "La sede ya pasó el tiempo de preparación. Cuando lo marque listo podrás recogerlo.",
       "deliverAt": "Entrega a {name}: {address}",
       "collectCash": "Cobra {total} en efectivo.",
       "collectCashChange": "Cobra {total} en efectivo: paga con {with}, lleva {change} de cambio.",
@@ -5357,11 +5388,14 @@
       "stopDropoff": "Entregar {id} · {place}",
       "recentRatings": "Calificaciones recientes",
       "noRatings": "Todavía sin calificaciones.",
-      "footer": "Ganancias, calificaciones y documentos se calculan con los datos de ejemplo de esta demo."
+      "footer": "Ganancias, calificaciones y documentos se calculan con los datos de ejemplo de esta demo.",
+      "pickedToastJump": "{id} recogido · el reloj de la demo se adelantó {min} min (llegada a la sede)",
+      "pickupJumpHint": "Llegas a la sede en ~{min} min: al recogerlo, el reloj de la demo se adelanta.",
+      "deliverJumpHint": "El trayecto toma ~{min} min: al confirmar la entrega, el reloj de la demo se adelanta."
     },
     "ops": {
       "title": "Centro de operaciones · {brand}",
-      "subtitle": "Jornada de ejemplo del {date} · reloj de la demo {time}",
+      "subtitle": "Jornada de ejemplo de hoy ({date}) · reloj de la demo {time}",
       "exportCsv": "Exportar pedidos (CSV)",
       "csvToast": "CSV descargado con {n} pedidos",
       "kpis": {
@@ -5530,7 +5564,8 @@
         "payment": "medio_pago",
         "driver": "repartidor",
         "rating": "calificacion"
-      }
+      },
+      "csvFile": "pedidos-fogon-demo-{date}.csv"
     }
   },
   "demoEcommerce2": {
@@ -14705,77 +14740,42 @@
   },
   "demoPos": {
     "meta": {
-      "title": "POS para tiendas y restaurantes: demo interactiva",
-      "description": "Demo de punto de venta con datos de ejemplo de Colombia: vende con lector de código de barras y balanza o por mesas con comandas a cocina, cobra con pago mixto, emite un documento equivalente POS de ejemplo, simula la venta sin internet y cierra caja con reportes X y Z. Incluye consola de sedes con inventario y traslados. Todo corre en tu navegador.",
+      "title": "POS para retail y restaurantes: demo interactiva",
+      "description": "Demo de punto de venta con datos de ejemplo de Colombia: vende con lector de código de barras, balanza o por mesas con comandas a cocina, cobra con pago mixto, emite un documento equivalente POS de ejemplo, sigue vendiendo sin internet y cierra caja con reporte X y Z. Incluye consola de sedes con inventario y traslados.",
       "breadcrumbHome": "Inicio",
       "breadcrumbDemos": "Demos",
-      "breadcrumbName": "POS para tiendas y restaurantes"
+      "breadcrumbName": "POS para retail y restaurantes"
     },
-    "header": {
-      "back": "Volver al catálogo de demos",
-      "guidedDemo": "Solicitar demo guiada",
-      "quote": "Cotizar tu POS",
-      "kicker": "Demo interactiva · Para tiendas, minimercados y restaurantes",
-      "simBadge": "DIAN, pagos y periféricos simulados",
-      "localBadge": "Se guarda solo en este navegador"
-    },
-    "pageTitle": "POS para tiendas y restaurantes",
-    "pageSubtitle": "Para dueños y administradores de minimercados, tiendas y restaurantes con una o varias sedes. Vende con lector de código de barras y balanza o por mesas con comandas a cocina, cobra con pago mixto, emite el documento equivalente POS de ejemplo y cierra caja con reportes X y Z. Empieza por los primeros pasos.",
+    "pageTitle": "POS para retail y restaurantes",
+    "pageSubtitle": "Vende con lector de código de barras y balanza, o por mesas con comandas a cocina. Cobra con pago mixto, emite el documento equivalente POS, sigue vendiendo sin internet y cierra caja con reporte Z. Todo funciona en esta página.",
     "sampleBadge": "Datos de ejemplo",
     "sampleHint": "Los negocios (Mercado La Ceiba y Fogón Andino), sus NIT, sedes, direcciones, empleados, clientes, cédulas, celulares, códigos de barras, existencias y cifras son inventados.",
     "howItWorks": {
       "title": "Qué es real en esta demo",
       "real": "Todo se calcula en tu navegador: existencias por sede, impuestos incluidos en el precio (IVA 19 %, IVA 5 %, exentos o INC 8 %), puntos, cambio, propina, comandas, reportes X y Z, arqueo de caja, comisiones y consola de sedes. Tus ventas y cambios se guardan solo en este navegador.",
       "scanner": "El campo «Escanear» acepta un lector de código de barras real conectado como teclado (USB o Bluetooth); si no tienes uno, usa los códigos de ejemplo.",
-      "simulated": "Son simulados: la transmisión del documento a la DIAN (el CUDE se calcula aquí con SHA-384, en ambiente de pruebas, y no sale de tu navegador), el datafono, el cobro con QR, la balanza, la impresora y el cajón, y el envío del recibo por WhatsApp o correo. El botón «Sin internet» es un interruptor de la demo: no corta tu conexión ni guarda nada en otro lugar.",
+      "simulated": "Son simulados: la transmisión del documento a la DIAN (el CUDE se calcula aquí con SHA-384, en ambiente de pruebas, y no sale de tu navegador), el datafono, el cobro con QR, la balanza, la impresora y el cajón, y el envío del recibo por WhatsApp o correo. El botón «Sin internet» es un interruptor de la demo: no corta tu conexión.",
       "project": "En tu proyecto, la caja se instala como aplicación en tablet o PC, guarda las ventas en el dispositivo cuando se cae internet y las sincroniza al volver, emite el documento electrónico con tu proveedor tecnológico autorizado y se conecta a tu datafono, impresora térmica, lector, cajón monedero y balanza."
     },
-    "guide": {
-      "title": "Primeros pasos: recorrido sugerido (unos 5 minutos)",
-      "progress": "{done} de {total} hechos",
-      "intro": "Cada paso te lleva a su lugar en la demo y se marca solo cuando lo haces. Vas de la venta en el mostrador al cierre de caja.",
-      "step": "Paso {n}",
-      "done": "Hecho",
-      "hide": "Ocultar",
-      "show": "Ver pasos",
+    "tour": {
+      "title": "Recorrido sugerido (3 minutos)",
       "steps": {
-        "s1": {
-          "title": "Escanea y pesa",
-          "text": "Minimercado: pulsa «Escanear», usa un código de ejemplo (o tu lector) y pesa un producto por kilo con «Leer balanza».",
-          "go": "Abrir el escáner"
-        },
-        "s2": {
-          "title": "Cobra con pago mixto",
-          "text": "Busca al cliente 300 123 4567, canjea puntos y cobra con dos medios de pago, por ejemplo efectivo y datafono.",
-          "go": "Ir al ticket"
-        },
-        "s3": {
-          "title": "Vende sin internet",
-          "text": "Pulsa «En línea» para simular un corte, haz una venta (queda en cola) y vuelve a conectarte para ver la sincronización.",
-          "go": "Ir al interruptor"
-        },
-        "s4": {
-          "title": "Mesas y cocina",
-          "text": "Restaurante: abre una mesa, pide un plato con modificadores, envíalo a cocina y avanza la comanda en «Cocina».",
-          "go": "Ir a Mesas"
-        },
-        "s5": {
-          "title": "Cierra la caja",
-          "text": "En «Reportes X/Z» revisa el turno por medio de pago e impuestos y ciérralo con arqueo: sale el reporte Z.",
-          "go": "Ir a Reportes"
-        }
+        "1": "Retail: pulsa «Escanear», usa un código de ejemplo y pesa un producto por kilo con «Leer balanza».",
+        "2": "En el ticket busca el cliente 300 123 4567, canjea 500 puntos y cobra con pago mixto: parte en efectivo y el resto con tarjeta o QR.",
+        "3": "Activa «Sin internet», haz otra venta (queda en cola) y vuelve a conectarte para ver la sincronización.",
+        "4": "Restaurante: abre una mesa en «Mesas», toma el pedido con modificadores, envíalo a cocina y avanza la comanda en «Cocina (KDS)».",
+        "5": "En «Reportes X/Z» revisa lo vendido por medio de pago y cierra el turno con arqueo; en «Sedes» traslada existencias entre sedes."
       }
     },
     "reset": {
       "button": "Restablecer datos",
       "confirm": "¿Borrar tus ventas y cambios de esta demo?",
       "yes": "Sí, restablecer",
-      "done": "Datos de ejemplo restablecidos",
-      "hint": "Borra tus ventas, cierres, clientes registrados, precios y traslados de los dos negocios y vuelve a los datos de ejemplo."
+      "done": "Datos de ejemplo restablecidos"
     },
     "presets": {
       "label": "Tipo de negocio",
-      "retail": "Minimercado",
+      "retail": "Retail · minimercado",
       "restaurant": "Restaurante"
     },
     "toolbar": {
@@ -14797,14 +14797,10 @@
       "label": "Secciones del POS",
       "sale": "Venta",
       "tables": "Mesas",
-      "kds": "Cocina",
+      "kds": "Cocina (KDS)",
       "reports": "Reportes X/Z",
       "console": "Sedes",
-      "staff": "Empleados",
-      "badge": {
-        "kds": "{n, plural, one {# comanda pendiente} other {# comandas pendientes}}",
-        "tables": "{n, plural, one {# mesa abierta} other {# mesas abiertas}}"
-      }
+      "staff": "Empleados"
     },
     "categories": {
       "all": "Todo",
@@ -14874,7 +14870,7 @@
       "title": "Ticket",
       "clear": "Vaciar ticket",
       "counter": "Mostrador / para llevar",
-      "tableInfo": "Mesa {n} · {guests, plural, one {# persona} other {# personas}}",
+      "tableInfo": "Mesa {n} · {guests} pers.",
       "waiter": "Mesero/a: {name}",
       "changeTable": "Cambiar mesa",
       "seller": "Asesor/a",
@@ -14897,8 +14893,7 @@
       "bill": "Pre-cuenta",
       "billToast": "Mesa {n}: cuenta pedida",
       "pay": "Cobrar {amount}",
-      "goToTicket": "Ver ticket ({n}) · {amount}",
-      "billAgain": "Ver pre-cuenta"
+      "goToTicket": "Ver ticket ({n}) · {amount}"
     },
     "loyalty": {
       "lookupPlaceholder": "Cédula o celular del cliente",
@@ -14952,7 +14947,7 @@
       "methods": {
         "cash": "Efectivo",
         "card": "Tarjeta (datafono)",
-        "qr": "QR (transferencia o billetera)",
+        "qr": "QR (Bre-B o billetera)",
         "gift": "Bono de regalo"
       },
       "methodHints": {
@@ -14996,10 +14991,7 @@
         },
         "doc": "Número de documento",
         "name": "Nombre o razón social",
-        "email": "Correo para enviar la factura",
-        "nitFormat": "Escribe el NIT con su dígito de verificación, separado por un guion.",
-        "nitDv": "El dígito de verificación no corresponde a ese NIT: debería ser {dv}.",
-        "nitPlaceholder": "NIT con dígito de verificación"
+        "email": "Correo para enviar la factura"
       },
       "missing": {
         "tip": "Pregunta por la propina (puede ser «Sin propina»).",
@@ -15008,17 +15000,6 @@
       },
       "confirm": "Confirmar cobro",
       "processing": "Registrando…"
-    },
-    "bill": {
-      "title": "Pre-cuenta · Mesa {n}",
-      "subtitle": "Lo que lleva la mesa para revisarlo con el cliente antes de cobrar.",
-      "heading": "PRE-CUENTA",
-      "guests": "{n, plural, one {# persona} other {# personas}}",
-      "subtotal": "Total consumo",
-      "tip": "Propina sugerida ({pct} %)",
-      "totalWithTip": "Total con propina sugerida",
-      "tipNote": "La propina es voluntaria: el cliente decide si la deja y cuánto al momento de pagar.",
-      "notFiscal": "Documento informativo: no es factura ni documento equivalente."
     },
     "receipt": {
       "titlePos": "Documento equivalente POS",
@@ -15092,14 +15073,14 @@
       "release": "Liberar mesa sin consumo"
     },
     "kds": {
-      "title": "Pantalla de cocina",
+      "title": "Cocina (KDS)",
       "subtitle": "Comandas de esta sede por estación, con el tiempo que llevan.",
       "stations": {
         "all": "Todas",
         "kitchen": "Cocina",
         "bar": "Bar"
       },
-      "counts": "{n, plural, one {# nueva} other {# nuevas}} · {p} en preparación · {r, plural, one {# lista} other {# listas}}",
+      "counts": "{n} nuevas · {p} en preparación · {r} listas",
       "order": "Comanda #{n}",
       "elapsed": "{min} min",
       "states": {
@@ -15145,12 +15126,7 @@
       "refund": "Anular",
       "refundConfirm": "¿Anular con nota crédito?",
       "refundDone": "Venta {n} anulada con nota crédito",
-      "closures": "Cierres Z de hoy en esta sede",
-      "titleClosed": "Reporte Z · Turno {n} (cerrado)",
-      "closedAt": "cerrado a las {time}",
-      "closedHint": "Estas son las cifras del turno que cerraste. Abre la caja para empezar el turno {next}.",
-      "printSummary": "Imprimir resumen",
-      "viewZ": "Ver reporte Z"
+      "closures": "Cierres Z de esta sesión"
     },
     "shift": {
       "openTitle": "Abrir caja",
@@ -15179,12 +15155,11 @@
     },
     "cash": {
       "title": "Caja",
-      "openSince": "Turno {n} desde las {time} · {name}",
-      "open": "Turno {n} · {name}"
+      "openSince": "Turno {n} desde las {time} · {name}"
     },
     "hardware": {
       "title": "Periféricos",
-      "subtitle": "Simulados en la demo, salvo el lector de código de barras: cualquiera que escriba como teclado funciona de verdad. En tu proyecto todos se conectan a la caja.",
+      "subtitle": "Simulados en la demo; en tu proyecto se conectan a la caja.",
       "printer": "Impresora térmica 80 mm",
       "scanner": "Lector de código de barras",
       "terminal": "Datafono",
@@ -15213,7 +15188,7 @@
       "closed": "Caja cerrada",
       "myTill": "Tu caja (esta demo)",
       "otherTills": "Otras cajas (ejemplo)",
-      "salesValue": "{n, plural, one {# venta} other {# ventas}} · {amount}",
+      "salesValue": "{n} · {amount}",
       "dayTotal": "Total del día",
       "lowStock": "{n, plural, one {# producto con existencias bajas} other {# productos con existencias bajas}}",
       "switch": "Vender en esta sede",
@@ -15296,9 +15271,6 @@
       "yes": "Sí",
       "no": "No",
       "simulated": "simulado"
-    },
-    "toasts": {
-      "newDay": "Empezó un día nuevo: la demo volvió a los datos de ejemplo de hoy."
     }
   },
   "demoSaas": {

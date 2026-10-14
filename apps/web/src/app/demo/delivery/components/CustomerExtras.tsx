@@ -85,7 +85,7 @@ export function CustomerAddress() {
     <div className="space-y-3 p-4">
       <Header title={t('customer.address.title')} onBack={() => dispatch({ type: 'customer', patch: { view: 'home' } })} backLabel={t('common.back')} />
 
-      <div className="space-y-1.5" role="radiogroup" aria-label={t('customer.address.savedList')}>
+      <div className="space-y-1.5" role="group" aria-label={t('customer.address.savedList')}>
         {state.customer.addresses.map((a) => {
           const selected = a.id === state.customer.addressId;
           const lbl = ['casa', 'oficina'].includes(a.label) ? t(`customer.addressLabels.${a.label}`) : a.label;
@@ -93,8 +93,7 @@ export function CustomerAddress() {
             <button
               key={a.id}
               type="button"
-              role="radio"
-              aria-checked={selected}
+              aria-pressed={selected}
               onClick={() => dispatch({ type: 'customer', patch: { addressId: a.id, sedeId: null, view: 'home' } })}
               className={`flex w-full items-center justify-between gap-2 rounded-lg border px-3 py-2 text-left text-xs ${selected ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/30' : 'border-secondary-200 bg-white dark:border-secondary-700 dark:bg-secondary-800'}`}
             >

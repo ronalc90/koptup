@@ -7,7 +7,7 @@ import {
 } from '@heroicons/react/24/outline';
 import Button from '@/components/ui/Button';
 import { BRAND, SEDES, SEDE_BY_ID } from './data';
-import { ACCEPT_WINDOW_S, avg, driverPosition, fmtNum, fmtTime, orderEta, pointsEarned } from './engine';
+import { ACCEPT_WINDOW_S, avg, driverPosition, fmtNum, fmtTime, orderEta, pointsEarned, readyAt } from './engine';
 import type { Order } from './types';
 import { MapView, Modal, Row, StageBadge, Stars, useMoney, type MapPoint, type MapRoute } from './ui';
 import { useDelivery, MAP_SPEEDUP } from './store';
@@ -28,7 +28,7 @@ export function trackingText(t: ReturnType<typeof useTranslations>, o: Order, et
     id: o.id,
     time: fmtTime(eta ?? o.t.created + (o.promisedMin ?? 40) * 60, locale),
     code: o.code,
-    link: `tu-dominio.com/seguimiento/${o.id}`,
+    link: t('customer.tracking.whatsapp.link', { id: o.id }),
   });
 }
 
@@ -58,6 +58,7 @@ export function CustomerTracking() {
   const accepted = order.driverStatus === 'accepted' && driver;
   const stepIdx = STEPS.indexOf(order.stage as (typeof STEPS)[number]);
   const left = Math.max(0, ACCEPT_WINDOW_S - (state.now - order.t.created));
+  const prepLeft = Math.ceil((readyAt(order) - state.now) / 60);
   const eta = orderEta(order, driver, sede);
   const driverRating = driver ? avg(state.orders.filter((o) => o.driverId === driver.id && o.rating).map((o) => o.rating!.stars)) : 0;
   const live = order.stage === 'preparing' || order.stage === 'ready' || order.stage === 'pickedUp';
@@ -88,7 +89,9 @@ export function CustomerTracking() {
         <p className="text-sm font-bold">{t(`customer.tracking.headline.${order.stage}`)}</p>
         <p className="mt-0.5 text-xs text-secondary-600 dark:text-secondary-300">
           {order.stage === 'pending' && (left > 0 ? t('customer.tracking.sub.pending', { s: left }) : t('customer.tracking.sub.pendingLate'))}
-          {order.stage === 'preparing' && t('customer.tracking.sub.preparing', { min: order.prepMin ?? 15, sede: t(`sedes.${sede.id}`) })}
+          {order.stage === 'preparing' && (prepLeft > 0
+            ? t('customer.tracking.sub.preparing', { min: prepLeft, sede: t(`sedes.${sede.id}`) })
+            : t('customer.tracking.sub.preparingLate', { sede: t(`sedes.${sede.id}`) }))}
           {order.stage === 'ready' && (accepted ? t('customer.tracking.sub.readyDriver', { driver: driver.name }) : t('customer.tracking.sub.readyNoDriver'))}
           {order.stage === 'pickedUp' && t('customer.tracking.sub.pickedUp', { driver: driver?.name ?? '' })}
           {order.stage === 'delivered' && t('customer.tracking.sub.delivered', { time: fmtTime(order.t.delivered ?? state.now, locale), min: Math.max(1, Math.round(((order.t.delivered ?? state.now) - order.t.created) / 60)) })}

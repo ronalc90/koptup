@@ -121,13 +121,12 @@ export default function CustomerCart() {
 
       <div className="rounded-xl border border-secondary-200 bg-white p-3 dark:border-secondary-700 dark:bg-secondary-800">
         <p className="mb-2 text-xs font-semibold">{t('customer.cart.paymentMethod')}</p>
-        <div className="space-y-1.5" role="radiogroup" aria-label={t('customer.cart.paymentMethod')}>
+        <div className="space-y-1.5" role="group" aria-label={t('customer.cart.paymentMethod')}>
           {PAYMENTS.map(({ id, icon: Icon }) => (
             <button
               key={id}
               type="button"
-              role="radio"
-              aria-checked={c.payment === id}
+              aria-pressed={c.payment === id}
               onClick={() => { dispatch({ type: 'customer', patch: { payment: id, cashWith: null } }); setError(null); }}
               className={`flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-xs ${c.payment === id ? 'border border-primary-500 bg-primary-50 dark:bg-primary-900/30' : 'border border-transparent bg-secondary-50 dark:bg-secondary-900'}`}
             >
@@ -188,7 +187,7 @@ export default function CustomerCart() {
           <select
             value={c.split}
             onChange={(e) => dispatch({ type: 'customer', patch: { split: parseInt(e.target.value, 10) } })}
-            className="rounded-lg border border-secondary-300 bg-white py-1 pl-2 pr-8 dark:border-secondary-600 dark:bg-secondary-900"
+            className="rounded-lg border border-secondary-300 bg-white py-1 pl-2 pr-8 text-xs dark:border-secondary-600 dark:bg-secondary-900"
           >
             {[1, 2, 3, 4].map((n) => (
               <option key={n} value={n}>{t('customer.cart.people', { n })}</option>

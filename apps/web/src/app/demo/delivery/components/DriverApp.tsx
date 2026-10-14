@@ -7,7 +7,7 @@ import {
 } from '@heroicons/react/24/outline';
 import Button from '@/components/ui/Button';
 import { SEDES, SEDE_BY_ID } from './data';
-import { DRIVER_BASE_PAY, DRIVER_PAY_PER_KM, driverPay, fmtKm, fmtNum, isActive, km, navSteps, planRoute, streetName, travelMin, type NavStep } from './engine';
+import { DRIVER_BASE_PAY, DRIVER_PAY_PER_KM, driverPay, fmtKm, fmtNum, isActive, km, navSteps, planRoute, readyAt, streetName, travelMin, type NavStep } from './engine';
 import type { Order } from './types';
 import { Modal, PhoneFrame, Stars, useMoney } from './ui';
 import { useDelivery, clockJumpMinutes } from './store';
@@ -70,6 +70,8 @@ export default function DriverApp() {
   const from = next?.kind === 'dropoff' && current ? SEDE_BY_ID[current.sedeId].place : driver.place;
   const steps = next ? navSteps(from, next.place) : [];
   const step = Math.min(navIdx, Math.max(0, steps.length - 1));
+  // Minutos que le faltan a la sede para terminar la preparación (0 o menos: ya debería estar lista).
+  const prepLeft = current ? Math.ceil((readyAt(current) - state.now) / 60) : 0;
 
   const toggleOnline = () => {
     if (driver.online && mine.some(isActive)) return notify(t('driver.cantGoOffline'), 'warn');
@@ -204,7 +206,7 @@ export default function DriverApp() {
                   </>
                 ) : (
                   <p className="rounded-lg bg-secondary-100 px-2 py-1.5 dark:bg-secondary-900">
-                    {t('driver.waitingSede', { min: Math.max(0, (current.prepMin ?? 15) - Math.floor((state.now - (current.t.accepted ?? current.t.created)) / 60)) })}
+                    {prepLeft > 0 ? t('driver.waitingSede', { min: prepLeft }) : t('driver.waitingSedeLate')}
                   </p>
                 )}
               </>

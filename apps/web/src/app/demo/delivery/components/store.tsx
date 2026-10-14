@@ -312,7 +312,8 @@ function applyDeliver(s: DemoState, id: string, method: 'code' | 'photoSignature
 /**
  * El resto de la operación: los pedidos de ejemplo que ya estaban en curso
  * (los que traen `plan`) avanzan solos cuando el reloj llega a su hora, si
- * siguen en el paso que corresponde. Los que hace o toca el visitante no.
+ * siguen en el paso que corresponde. Los que hace o toca el visitante no
+ * (ver `byVisitor`).
  */
 function progressPlans(s: DemoState): DemoState {
   let next = s;
@@ -326,6 +327,21 @@ function progressPlans(s: DemoState): DemoState {
     if (p.delivered !== undefined && s.now >= p.delivered) next = applyDeliver(next, o.id, 'code', Math.max(p.delivered, cur2.t.pickedUp ?? p.delivered));
   }
   return next;
+}
+
+/**
+ * Acción del visitante sobre un pedido. Si es un pedido de ejemplo con plan,
+ * desde ese momento lo sigue el visitante: se le quita el plan antes de actuar,
+ * para que el salto del reloj no lo cierre por su cuenta (p. ej. una entrega con
+ * foto y firma registrada como «código» porque el plan llegó primero). Si la
+ * acción no aplica, no cambia nada.
+ */
+function byVisitor(s: DemoState, id: string, act: (s: DemoState) => DemoState): DemoState {
+  const o = find(s, id);
+  if (!o || o.own || !o.plan) return act(s);
+  const untracked = patchOrder(s, id, (x) => ({ ...x, plan: undefined }));
+  const next = act(untracked);
+  return next === untracked ? s : next;
 }
 
 function markReady(s: DemoState, id: string): DemoState {
@@ -480,23 +496,23 @@ function reducer(s: DemoState, a: Action): DemoState {
     case 'placeOrder':
       return placeOrderCheck(s) === 'declined' ? declinePayment(s) : placeOrder(s);
     case 'accept':
-      return accept(s, a.id, a.prepMin, a.by);
+      return byVisitor(s, a.id, (x) => accept(x, a.id, a.prepMin, a.by));
     case 'reject':
-      return reject(s, a.id, a.reason);
+      return byVisitor(s, a.id, (x) => reject(x, a.id, a.reason));
     case 'ready':
-      return markReady(s, a.id);
+      return byVisitor(s, a.id, (x) => markReady(x, a.id));
     case 'assign':
-      return assign(s, a.id, a.driverId);
+      return byVisitor(s, a.id, (x) => assign(x, a.id, a.driverId));
     case 'driverAccept':
-      return driverAccept(s, a.id);
+      return byVisitor(s, a.id, (x) => driverAccept(x, a.id));
     case 'driverReject':
-      return driverReject(s, a.id, a.reason);
+      return byVisitor(s, a.id, (x) => driverReject(x, a.id, a.reason));
     case 'pickup':
-      return pickup(s, a.id);
+      return byVisitor(s, a.id, (x) => pickup(x, a.id));
     case 'deliver':
-      return deliver(s, a.id, a.method, a.photoName);
+      return byVisitor(s, a.id, (x) => deliver(x, a.id, a.method, a.photoName));
     case 'cancel':
-      return cancel(s, a.id, a.by, a.reason);
+      return byVisitor(s, a.id, (x) => cancel(x, a.id, a.by, a.reason));
     case 'chat':
       return patchOrder(s, a.id, (o) => ({ ...o, chat: [...o.chat, { ...a.msg, at: s.now }].slice(-40) }));
     case 'rate': {

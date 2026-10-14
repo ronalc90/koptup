@@ -27,7 +27,7 @@ Entre el encabezado y las pestañas está el desplegable **Qué es real y qué e
 
 El guion sigue la barra **Recorrido sugerido: un pedido de punta a punta** de la propia demo: cada paso se marca en verde solo cuando lo haces de verdad, y al pulsar un paso la demo te lleva a la app que corresponde. Empieza con los datos limpios: si alguien ya usó la demo en ese navegador, pulsa **Reiniciar demo** y confirma.
 
-> **Cómo corre el tiempo.** El reloj de la demo avanza en tiempo real y **se adelanta** cuando algo tomaría minutos: al marcar «Listo para recoger» salta al final de la preparación elegida, al recoger salta hasta que el repartidor llega a la sede (si aún no ha llegado) y al confirmar la entrega salta lo que dura el trayecto. Cada salto queda escrito en la actividad («Reloj de la demo adelantado 20 min: terminó la preparación de P-1036») y el botón avisa antes cuántos minutos se adelantará. Mientras tanto, los pedidos de ejemplo que ya estaban en curso siguen su camino solos. La sede tiene **45 segundos reales** para aceptar; si se pasan, el pedido queda «Sin respuesta · escalado a Operaciones», pero la sede todavía puede aceptarlo (y Operaciones también, en su nombre). Si prefieres no correr, activa **Avance automático**: tu pedido avanza un paso cada 4 segundos.
+> **Cómo corre el tiempo.** El reloj de la demo avanza en tiempo real y **se adelanta** cuando algo tomaría minutos: al marcar «Listo para recoger» salta al final de la preparación elegida, al recoger salta hasta que el repartidor llega a la sede (si aún no ha llegado) y al confirmar la entrega salta lo que dura el trayecto. Cada salto queda escrito en la actividad («Reloj de la demo adelantado 20 min: terminó la preparación de P-1036») y el botón avisa antes cuántos minutos se adelantará. Mientras tanto, los pedidos de ejemplo que ya estaban en curso siguen su camino solos; si tocas uno de ellos (por ejemplo, lo marcas listo en Comercio o lo entregas como su repartidor), desde ahí lo sigues tú y ya no avanza solo. La sede tiene **45 segundos reales** para aceptar; si se pasan, el pedido queda «Sin respuesta · escalado a Operaciones», pero la sede todavía puede aceptarlo (y Operaciones también, en su nombre). Si prefieres no correr, activa **Avance automático**: tu pedido avanza un paso cada 4 segundos.
 
 ![Recorrido de la demo](images/doc/demos/delivery/recorrido.gif)
 
@@ -123,7 +123,7 @@ Mientras tanto, el cliente ve su pedido en camino. Ábrelo en **Cliente** para m
 - **Llegada estimada** 7:36 p. m. (la salida de la sede más el trayecto) y «Prometido: antes de las 7:42 p. m.». La vista previa del WhatsApp dice la misma hora («llega aprox. a las 7:36 p. m.»).
 - **Código de entrega** (`1905` en la prueba): el cliente se lo da al repartidor.
 - **Chatear con el repartidor** y el botón verde para llamarlo. El chat se habilita cuando un repartidor acepta y se cierra al entregar.
-- **Vista previa del WhatsApp que recibes**, con un enlace de seguimiento de ejemplo y el código. Es simulado; **Copiar** copia el texto.
+- **Vista previa del WhatsApp que recibes**, con un enlace de seguimiento de ejemplo (`tu-dominio.com/seguimiento/P-1036`; en inglés, `your-domain.com/track/…`) y el código. Es simulado; **Copiar** copia el texto.
 
 Vuelve a **Repartidor**, pulsa **Confirmar entrega** y escribe el código:
 
@@ -169,7 +169,7 @@ Cierra en **Operaciones** con [Tiempos y zonas y la comisión que no pagaste](#o
 | **Actividad entre apps** | Lo que va pasando, en orden y con la hora del reloj de la demo, incluidos los saltos del reloj y lo que hacen solos los pedidos de ejemplo. |
 | **Datos de ejemplo** | Insignia; al pasar el mouse dice que la marca, las sedes, los clientes, los repartidores y las cifras son ficticios, y que pagos, WhatsApp, llamadas, GPS y mapa son simulados. |
 
-Las ventanas se cierran con **Escape**, mantienen el foco adentro mientras están abiertas y lo devuelven al control que las abrió.
+Las ventanas se cierran con **Escape**, mantienen el foco adentro mientras están abiertas y lo devuelven al control que las abrió. Cada acción muestra un aviso corto (abajo a la derecha; en el celular, arriba, para no tapar las ventanas ni «Ver carrito»). Si cambias de app con un botón de otra app (por ejemplo, **Ver su app** al final de Operaciones o **Ir a Comercio** en el seguimiento), la página sube hasta la app nueva.
 
 ### Cliente
 
@@ -202,8 +202,8 @@ Ver los pasos [1](#paso-1-cliente-pide-y-paga-simulado), [4](#paso-4-repartidor-
 *Centro de operaciones después del recorrido: indicadores, mapa de la operación y alertas.*
 
 - **Indicadores**: pedidos hoy, en curso, repartidores conectados (5/6), tiempo promedio de entrega, entregados a tiempo y ticket promedio, con la fecha de la jornada («Jornada de ejemplo de hoy (14 oct. 2026)»). «Todo se calcula con los pedidos de ejemplo de hoy y los que hagas en la demo».
-- **Exportar pedidos (CSV)**: descarga `pedidos-fogon-demo-<fecha de hoy>.csv` con pedido, sede, zona, estado, horas, minutos, a tiempo, valores, medio de pago, repartidor y calificación.
-- **Mapa de la operación**: sedes, repartidores conectados y destinos de los pedidos en curso, en un mapa ilustrativo de Bogotá (no a escala; posiciones simuladas).
+- **Exportar pedidos (CSV)**: descarga `pedidos-fogon-demo-<fecha de hoy>.csv` (en inglés, `orders-fogon-demo-<fecha>.csv`, con los encabezados en inglés) con pedido, sede, zona, estado, horas, minutos, a tiempo, valores, medio de pago, repartidor y calificación.
+- **Mapa de la operación**: sedes, repartidores conectados y destinos de los pedidos en curso, en un mapa ilustrativo de Bogotá (no a escala; posiciones simuladas, como dice la leyenda debajo del mapa).
 - **Alertas**: la sede no respondió en 45 s (**Aceptar por la sede** o **Cancelar pedido**), pedido sin repartidor (**Asignar**), pedido tarde frente a lo prometido (**Avisar al cliente**, que escribe en el chat del pedido) y repartidor que rechazó (**Reasignar**). Cada una tiene **Detalle** con la línea de tiempo del pedido. Después del recorrido, el reloj adelantado deja ver alertas reales: el pedido de ejemplo que nadie asignó va tarde y el que nadie aceptó quedó escalado.
 - **Despacho**: pedidos en curso con sede, estado, repartidor, entrega prometida y minutos de retraso; **Asignar**, **Reasignar** y el ojo para ver el detalle.
 - **Lluvia en la ciudad**: **Recargo al cliente de $2.000** y **Bono al repartidor de $1.500**, para pedidos y ofertas nuevos.
@@ -235,7 +235,7 @@ Ver los pasos [1](#paso-1-cliente-pide-y-paga-simulado), [4](#paso-4-repartidor-
 
 *La demo en un teléfono (390 px): encabezado con las salidas, pestañas en dos filas y el recorrido.*
 
-En el teléfono cada app ocupa el ancho de la pantalla y crece con su contenido (sin el marco de celular ni un desplazamiento propio), las ventanas suben desde abajo y quedan a la vista, los pasos del recorrido se desplazan de lado y el panel de actividad queda debajo de la app. La página no se desborda a lo ancho, en claro ni en oscuro.
+En el teléfono cada app ocupa el ancho de la pantalla y crece con su contenido (sin el marco de celular ni un desplazamiento propio), las ventanas suben desde abajo y quedan a la vista (los avisos salen arriba, para no taparlas), la tabla de Despacho se desplaza de lado, los pasos del recorrido se desplazan de lado y el panel de actividad queda debajo de la app. La página no se desborda a lo ancho, en claro ni en oscuro.
 
 ---
 

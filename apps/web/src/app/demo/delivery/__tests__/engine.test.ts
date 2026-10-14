@@ -315,3 +315,38 @@ describe('fecha de la jornada', () => {
     expect(migrateSaved({ v: 99 })).toBeNull();
   });
 });
+
+describe('pedidos de ejemplo que toca el visitante', () => {
+  it('la entrega con foto y firma de un pedido de ejemplo queda como la hizo el visitante', () => {
+    let s = initialState();
+    const martin = s.orders.find((o) => o.customer.name === 'Martín E.')!;
+    expect(martin.stage).toBe('pickedUp');
+    expect(martin.plan?.delivered).toBeDefined();
+    // Al confirmar, el reloj salta justo a la hora en que su plan lo entregaría: gana lo que hizo el visitante.
+    s = reducer(s, { type: 'deliver', id: martin.id, method: 'photoSignature', photoName: 'entrega.jpg' });
+    const o = s.orders.find((x) => x.id === martin.id)!;
+    expect(o.stage).toBe('delivered');
+    expect(o.pod).toMatchObject({ method: 'photoSignature', photoName: 'entrega.jpg' });
+    expect(o.plan).toBeUndefined();
+    expect(s.log.filter((l) => l.key === 'delivered' && l.params?.id === martin.id)).toEqual([
+      expect.objectContaining({ params: { id: martin.id, method: 'photoSignature' } }),
+    ]);
+  });
+
+  it('desde que el visitante lo toca, el pedido de ejemplo ya no avanza solo', () => {
+    let s = initialState();
+    const andrea = s.orders.find((o) => o.customer.name === 'Andrea F.')!;
+    s = reducer(s, { type: 'ready', id: andrea.id });
+    expect(s.orders.find((x) => x.id === andrea.id)!.plan).toBeUndefined();
+    for (let i = 0; i < 25 * 60; i++) s = reducer(s, { type: 'tick' });
+    // Su plan lo habría recogido y entregado; ahora espera a que el visitante lo recoja como su repartidora.
+    expect(s.orders.find((x) => x.id === andrea.id)!.stage).toBe('ready');
+  });
+
+  it('una acción que no aplica no cambia nada (ni el plan)', () => {
+    const s = initialState();
+    const martin = s.orders.find((o) => o.customer.name === 'Martín E.')!;
+    // Un pedido en camino no se puede reasignar.
+    expect(reducer(s, { type: 'assign', id: martin.id, driverId: 'd1' })).toBe(s);
+  });
+});

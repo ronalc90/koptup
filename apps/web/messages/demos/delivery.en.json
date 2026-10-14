@@ -8,7 +8,7 @@
       "sampleDataHint": "Brand, stores, customers, couriers, orders and figures are fictitious. Payments, WhatsApp messages, calls, GPS and the map are simulated.",
       "footer": "Demo with sample data from a fictitious brand (Fogón Demo) with 3 stores in Bogotá. Payments with Nequi, Daviplata, PSE or card, the WhatsApp message, the masked call, the courier position and the map are simulated: in your project they connect to the payment gateway, WhatsApp Business, a telephony provider, the courier's phone GPS and a map service (e.g. Google Maps or Mapbox). What you do is saved only in this browser.",
       "seoTitle": "Delivery app: customer, store, operations and courier",
-      "seoDescription": "Interactive demo of an own delivery channel with sample data: order with simulated payment, store acceptance, assignment of the nearest courier, delivery with a code and calculated timing reports. Simulated map and tracking.",
+      "seoDescription": "Interactive demo of your own delivery channel with sample data: order with simulated payment, store acceptance, assignment of the nearest courier, delivery with a code and calculated timing reports. Simulated map and tracking.",
       "breadcrumbHome": "Home",
       "breadcrumbDemos": "Demos"
     },
@@ -384,7 +384,8 @@
       "confirm": "Confirm delivery",
       "done": "Order {id} delivered",
       "doneJump": "Order {id} delivered · the demo clock moved ahead {min} min (ride)",
-      "modeLabel": "How you confirm delivery"
+      "modeLabel": "How you confirm delivery",
+      "alreadyClosed": "Order {id} was already closed in the operation: there is nothing to confirm."
     },
     "docs": {
       "title": "Courier documents",
@@ -438,7 +439,7 @@
         "popular": "Popular",
         "soldOut": "Sold out at this store",
         "add": "Add {item}",
-        "added": "{item} added to the cart",
+        "added": "You added {item} to the cart",
         "myOrders": "My orders ({n})",
         "viewCart": "View cart · {n} · {total}",
         "pickSede": "Choose the store",
@@ -525,7 +526,8 @@
         "sub": {
           "pending": "The store has {s} s to respond.",
           "pendingLate": "The store did not respond in time: Operations already got an alert.",
-          "preparing": "{sede} is preparing it in about {min} min.",
+          "preparing": "{sede} is preparing it: ready in about {min} min.",
+          "preparingLate": "{sede} is past its preparation time: it is finishing your order.",
           "readyDriver": "Waiting for {driver} to pick it up.",
           "readyNoDriver": "Operations is assigning a courier.",
           "pickedUp": "{driver} is heading to your address.",
@@ -547,7 +549,8 @@
         "whatsapp": {
           "title": "Preview of the WhatsApp message you get",
           "message": "{brand}: your order {id} is confirmed and arrives around {time}\nTrack it here: {link}\nDelivery code: {code} (give it to the courier)",
-          "note": "Simulated: nothing is sent. In your project it is sent with WhatsApp Business; the link is an example."
+          "note": "Simulated: nothing is sent. In your project it is sent with WhatsApp Business; the link is an example.",
+          "link": "your-domain.com/track/{id}"
         },
         "rated": "Thanks for your rating",
         "pointsEarned": "You earned {n} points with this order · you now have {balance}.",
@@ -673,6 +676,7 @@
       "pickup": "I picked up the order",
       "pickedToast": "{id} picked up: the customer now sees it on the way",
       "waitingSede": "The store is still preparing it (~{min} min left). Once it is marked ready you can pick it up.",
+      "waitingSedeLate": "The store is past its preparation time. Once it marks the order ready you can pick it up.",
       "deliverAt": "Deliver to {name}: {address}",
       "collectCash": "Collect {total} in cash.",
       "collectCashChange": "Collect {total} in cash: they pay with {with}, bring {change} in change.",
@@ -866,7 +870,8 @@
         "payment": "payment_method",
         "driver": "courier",
         "rating": "rating"
-      }
+      },
+      "csvFile": "orders-fogon-demo-{date}.csv"
     }
   }
 }

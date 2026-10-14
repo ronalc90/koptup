@@ -109,7 +109,7 @@ export default function MerchantApp() {
                 onClick={() => dispatch({ type: 'set', patch: { merchantSede: s.id as SedeId } })}
                 className={`relative rounded-lg px-1 py-1.5 text-[11px] font-semibold ${sedeId === s.id ? 'bg-white text-secondary-900 shadow dark:bg-secondary-900 dark:text-white' : 'text-secondary-600 dark:text-secondary-300'}`}
               >
-                {t(`sedes.${s.id}`).replace(/^Sede\s/, '')}
+                {t(`zones.${s.zone}`)}
                 {n > 0 && (
                   <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-600 px-1 text-[9px] text-white">
                     {n}<span className="sr-only"> · {t('tabs.count.merchant', { n })}</span>

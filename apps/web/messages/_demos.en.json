@@ -4702,9 +4702,25 @@
       "sampleDataHint": "Brand, stores, customers, couriers, orders and figures are fictitious. Payments, WhatsApp messages, calls, GPS and the map are simulated.",
       "footer": "Demo with sample data from a fictitious brand (Fogón Demo) with 3 stores in Bogotá. Payments with Nequi, Daviplata, PSE or card, the WhatsApp message, the masked call, the courier position and the map are simulated: in your project they connect to the payment gateway, WhatsApp Business, a telephony provider, the courier's phone GPS and a map service (e.g. Google Maps or Mapbox). What you do is saved only in this browser.",
       "seoTitle": "Delivery app: customer, store, operations and courier",
-      "seoDescription": "Interactive demo of an own delivery channel with sample data: order with simulated payment, store acceptance, assignment of the nearest courier, delivery with a code and calculated timing reports. Simulated map and tracking.",
+      "seoDescription": "Interactive demo of your own delivery channel with sample data: order with simulated payment, store acceptance, assignment of the nearest courier, delivery with a code and calculated timing reports. Simulated map and tracking.",
       "breadcrumbHome": "Home",
       "breadcrumbDemos": "Demos"
+    },
+    "header": {
+      "back": "Back to the demo catalog",
+      "audience": "For restaurants, chains and stores with their own delivery that depend on aggregator apps today. Start with the suggested walkthrough: place an order as a customer and follow it to delivery.",
+      "requestDemo": "Request a guided demo",
+      "quote": "Get a quote for your delivery app",
+      "howTitle": "What is real and what is simulated",
+      "show": "Show",
+      "hide": "Hide",
+      "how": {
+        "real": "Real in your browser: the order goes through the 4 apps with a single shared state; prices, distance-based delivery fee, tip, points, KPIs, stage times, avoided commission and the CSV are calculated from the orders.",
+        "rules": "Rules, not AI: the courier suggestion (closest and free), the stop order and the review of suspicious orders.",
+        "clock": "Demo clock: the sample day is today and starts at 7:05 PM; it runs in real time and jumps ahead when the kitchen finishes, the courier reaches the store or delivers, so the times are realistic.",
+        "simulated": "Simulated: payments (always approved unless you turn on the test decline), WhatsApp, masked call, GPS, map and courier position. In your project they connect to the payment gateway, WhatsApp Business, a telephony provider and a maps service.",
+        "storage": "What you do is saved only in this browser; “Reset demo” goes back to the sample data."
+      }
     },
     "tabs": {
       "label": "Demo apps",
@@ -4745,9 +4761,9 @@
       },
       "next": {
         "order": "Start in Customer: add dishes to the cart and place the order.",
-        "accept": "Next: in Store, accept order {id} before the 45 s run out.",
+        "accept": "Next: in Store, accept order {id}. The store has 45 s; if they run out you can still accept it and Operations gets an alert.",
         "assign": "Next: in Operations, assign a courier to order {id} (Dispatch or Alerts).",
-        "deliver": "Next: in Store, mark order {id} “Ready for pickup”; then, in Courier, accept the offer, pick it up and confirm the delivery with the code the customer sees.",
+        "deliver": "Next: in Store, mark order {id} “Ready for pickup” (the clock jumps to the end of preparation); then, in Courier, accept the offer, pick it up and confirm delivery with the code the customer sees.",
         "rate": "Next: in Customer, rate the delivery of order {id}."
       },
       "done": "Done! You followed the order through the 4 apps. In Operations, check the time per stage and the commission you did not pay.",
@@ -4757,7 +4773,7 @@
     },
     "activity": {
       "title": "Activity across apps",
-      "hint": "Every action in one app shows up in the others. The demo clock started at 7:05 PM and runs in real time.",
+      "hint": "Every action in one app shows up in the others. The demo clock starts at 7:05 PM, runs in real time and jumps ahead when the kitchen finishes, the courier reaches the store or delivers.",
       "clockHint": "Demo clock",
       "empty": "Here you will see your order move from one app to another.",
       "app": {
@@ -4798,7 +4814,9 @@
       "driverOffline": "{driver} went offline",
       "docUpdated": "Document updated: {doc}",
       "autoOn": "Auto-advance on",
-      "autoOff": "Auto-advance off"
+      "autoOff": "Auto-advance off",
+      "clockJump": "Demo clock moved ahead {min} min: {why, select, prep {{id} finished cooking} toSede {the courier reached the store for {id}} other {the courier reached the address of {id}}}",
+      "paymentDeclined": "{method} payment declined (simulated): no order was created"
     },
     "common": {
       "back": "Back",
@@ -4815,8 +4833,10 @@
       "yours": "Yours",
       "yes": "yes",
       "no": "no",
-      "mapHint": "Illustrative map, not to scale · simulated position",
-      "mapHintOps": "Illustrative map of Bogotá, not to scale · simulated positions"
+      "mapHint": "Illustrative map, not to scale · simulated, sped-up position",
+      "mapHintOps": "Illustrative map of Bogotá, not to scale · simulated positions",
+      "closeToast": "Close notice",
+      "stars": "{n, plural, one {# star} other {# stars}}"
     },
     "stage": {
       "pending": "Awaiting confirmation",
@@ -5056,7 +5076,10 @@
       "needBoth": "To deliver without a code you need the photo and the signature.",
       "privacy": "In the demo the photo and signature never leave your browser; in your project they are stored as proof of delivery.",
       "confirm": "Confirm delivery",
-      "done": "Order {id} delivered"
+      "done": "Order {id} delivered",
+      "doneJump": "Order {id} delivered · the demo clock moved ahead {min} min (ride)",
+      "modeLabel": "How you confirm delivery",
+      "alreadyClosed": "Order {id} was already closed in the operation: there is nothing to confirm."
     },
     "docs": {
       "title": "Courier documents",
@@ -5110,7 +5133,7 @@
         "popular": "Popular",
         "soldOut": "Sold out at this store",
         "add": "Add {item}",
-        "added": "{item} added to the cart",
+        "added": "You added {item} to the cart",
         "myOrders": "My orders ({n})",
         "viewCart": "View cart · {n} · {total}",
         "pickSede": "Choose the store",
@@ -5175,8 +5198,11 @@
           "noSede": "No open store covers your address.",
           "soldOut": "Some items are sold out at the store: remove them from the cart.",
           "cash": "The cash you will pay with does not cover the total.",
-          "blocked": "Your account is blocked in the demo: unblock it in Operations."
-        }
+          "blocked": "Your account is blocked in the demo: unblock it in Operations.",
+          "declined": "The bank declined the {method} payment (simulated): insufficient funds. No order was created and nothing was charged; try again or choose another payment method."
+        },
+        "simulateDecline": "Try a declined payment: the bank declines the next payment (simulated).",
+        "declinedToast": "Payment declined by the bank (simulated). No order was created: try again or choose another method."
       },
       "tracking": {
         "title": "Order {id}",
@@ -5194,7 +5220,8 @@
         "sub": {
           "pending": "The store has {s} s to respond.",
           "pendingLate": "The store did not respond in time: Operations already got an alert.",
-          "preparing": "{sede} is preparing it in about {min} min.",
+          "preparing": "{sede} is preparing it: ready in about {min} min.",
+          "preparingLate": "{sede} is past its preparation time: it is finishing your order.",
           "readyDriver": "Waiting for {driver} to pick it up.",
           "readyNoDriver": "Operations is assigning a courier.",
           "pickedUp": "{driver} is heading to your address.",
@@ -5216,7 +5243,8 @@
         "whatsapp": {
           "title": "Preview of the WhatsApp message you get",
           "message": "{brand}: your order {id} is confirmed and arrives around {time}\nTrack it here: {link}\nDelivery code: {code} (give it to the courier)",
-          "note": "Simulated: nothing is sent. In your project it is sent with WhatsApp Business; the link is an example."
+          "note": "Simulated: nothing is sent. In your project it is sent with WhatsApp Business; the link is an example.",
+          "link": "your-domain.com/track/{id}"
         },
         "rated": "Thanks for your rating",
         "pointsEarned": "You earned {n} points with this order · you now have {balance}.",
@@ -5303,7 +5331,9 @@
       "analytics": "Today's sales",
       "topItems": "Best sellers (units)",
       "salesByHour": "Sales by hour",
-      "rating": "Average rating ({n} reviews)"
+      "rating": "Average rating ({n} reviews)",
+      "readyToastJump": "{id} ready for pickup · the demo clock moved ahead {min} min (end of preparation)",
+      "readyJumpHint": "In the demo, marking it ready moves the clock ahead {min} min to the end of the chosen preparation time."
     },
     "driver": {
       "hello": "Hi, {name}",
@@ -5340,6 +5370,7 @@
       "pickup": "I picked up the order",
       "pickedToast": "{id} picked up: the customer now sees it on the way",
       "waitingSede": "The store is still preparing it (~{min} min left). Once it is marked ready you can pick it up.",
+      "waitingSedeLate": "The store is past its preparation time. Once it marks the order ready you can pick it up.",
       "deliverAt": "Deliver to {name}: {address}",
       "collectCash": "Collect {total} in cash.",
       "collectCashChange": "Collect {total} in cash: they pay with {with}, bring {change} in change.",
@@ -5357,11 +5388,14 @@
       "stopDropoff": "Deliver {id} · {place}",
       "recentRatings": "Recent ratings",
       "noRatings": "No ratings yet.",
-      "footer": "Earnings, ratings and documents are calculated from this demo's sample data."
+      "footer": "Earnings, ratings and documents are calculated from this demo's sample data.",
+      "pickedToastJump": "{id} picked up · the demo clock moved ahead {min} min (arrival at the store)",
+      "pickupJumpHint": "You reach the store in ~{min} min: when you pick it up, the demo clock moves ahead.",
+      "deliverJumpHint": "The ride takes ~{min} min: when you confirm delivery, the demo clock moves ahead."
     },
     "ops": {
       "title": "Operations center · {brand}",
-      "subtitle": "Sample day, {date} · demo clock {time}",
+      "subtitle": "Sample day for today ({date}) · demo clock {time}",
       "exportCsv": "Export orders (CSV)",
       "csvToast": "CSV downloaded with {n} orders",
       "kpis": {
@@ -5530,7 +5564,8 @@
         "payment": "payment_method",
         "driver": "courier",
         "rating": "rating"
-      }
+      },
+      "csvFile": "orders-fogon-demo-{date}.csv"
     }
   },
   "demoEcommerce2": {
@@ -14705,77 +14740,42 @@
   },
   "demoPos": {
     "meta": {
-      "title": "POS for stores and restaurants: interactive demo",
-      "description": "Point-of-sale demo with sample data from Colombia: sell with a barcode scanner and a scale or by table with kitchen tickets, take split payments, issue a sample electronic POS document, simulate selling offline and close the till with X and Z reports. Includes a multi-store console with inventory and transfers. Everything runs in your browser.",
+      "title": "POS for retail and restaurants: interactive demo",
+      "description": "Point-of-sale demo with sample data from Colombia: sell with a barcode scanner, a scale or by table with kitchen tickets, take split payments, issue a sample electronic POS document, keep selling offline and close the till with X and Z reports. Includes a multi-store console with inventory and transfers.",
       "breadcrumbHome": "Home",
       "breadcrumbDemos": "Demos",
-      "breadcrumbName": "POS for stores and restaurants"
+      "breadcrumbName": "POS for retail and restaurants"
     },
-    "header": {
-      "back": "Back to the demo catalog",
-      "guidedDemo": "Request a guided demo",
-      "quote": "Get a quote for your POS",
-      "kicker": "Interactive demo · For stores, grocery stores and restaurants",
-      "simBadge": "DIAN, payments and devices simulated",
-      "localBadge": "Saved only in this browser"
-    },
-    "pageTitle": "POS for stores and restaurants",
-    "pageSubtitle": "For owners and managers of grocery stores, shops and restaurants with one or more locations. Sell with a barcode scanner and a scale or by table with kitchen tickets, take split payments, issue a sample electronic POS document and close the till with X and Z reports. Start with the first steps.",
+    "pageTitle": "POS for retail and restaurants",
+    "pageSubtitle": "Sell with a barcode scanner and a scale, or by table with kitchen tickets. Take split payments, issue the electronic POS document, keep selling offline and close the till with a Z report. Everything works on this page.",
     "sampleBadge": "Sample data",
     "sampleHint": "The businesses (Mercado La Ceiba and Fogón Andino), their tax IDs, stores, addresses, employees, customers, ID numbers, phone numbers, barcodes, stock and figures are made up.",
     "howItWorks": {
       "title": "What is real in this demo",
       "real": "Everything is calculated in your browser: stock per store, taxes included in prices (19% VAT, 5% VAT, exempt or 8% consumption tax), points, change, tips, kitchen tickets, X and Z reports, cash count, commissions and the store console. Your sales and changes are saved only in this browser.",
       "scanner": "The “Scan” field accepts a real barcode scanner connected as a keyboard (USB or Bluetooth); if you don't have one, use the sample codes.",
-      "simulated": "Simulated: sending the document to the DIAN (the CUDE is computed here with SHA-384, in test mode, and never leaves your browser), the card terminal, QR payments, the scale, printer and cash drawer, and sending the receipt by WhatsApp or email. The “Offline” button is a demo switch: it does not cut your connection or store anything elsewhere.",
+      "simulated": "Simulated: sending the document to the DIAN (the CUDE is computed here with SHA-384, in test mode, and never leaves your browser), the card terminal, QR payments, the scale, printer and cash drawer, and sending the receipt by WhatsApp or email. The “Offline” button is a demo switch: it does not cut your connection.",
       "project": "In your project, the till installs as an app on a tablet or PC, stores sales on the device when the internet goes down and syncs them when it comes back, issues the electronic document through your authorized technology provider and connects to your card terminal, thermal printer, scanner, cash drawer and scale."
     },
-    "guide": {
-      "title": "First steps: suggested walkthrough (about 5 minutes)",
-      "progress": "{done} of {total} done",
-      "intro": "Each step takes you to its place in the demo and checks itself off when you do it. You go from a counter sale to closing the till.",
-      "step": "Step {n}",
-      "done": "Done",
-      "hide": "Hide",
-      "show": "Show steps",
+    "tour": {
+      "title": "Suggested walkthrough (3 minutes)",
       "steps": {
-        "s1": {
-          "title": "Scan and weigh",
-          "text": "Grocery store: press “Scan”, use a sample code (or your scanner) and weigh a per-kilo product with “Read scale”.",
-          "go": "Open the scanner"
-        },
-        "s2": {
-          "title": "Split payment",
-          "text": "Look up customer 300 123 4567, redeem points and charge with two payment methods, for example cash and card terminal.",
-          "go": "Go to the ticket"
-        },
-        "s3": {
-          "title": "Sell offline",
-          "text": "Press “Online” to simulate an outage, make a sale (it is queued) and reconnect to watch it sync.",
-          "go": "Go to the switch"
-        },
-        "s4": {
-          "title": "Tables and kitchen",
-          "text": "Restaurant: open a table, order a dish with modifiers, send it to the kitchen and move the ticket forward in “Kitchen”.",
-          "go": "Go to Tables"
-        },
-        "s5": {
-          "title": "Close the till",
-          "text": "In “X/Z reports” review the shift by payment method and tax, then close it with a cash count: you get the Z report.",
-          "go": "Go to Reports"
-        }
+        "1": "Retail: press “Scan”, use a sample code and weigh a per-kilo product with “Read scale”.",
+        "2": "In the ticket, look up customer 300 123 4567, redeem 500 points and take a split payment: part cash, the rest by card or QR.",
+        "3": "Turn on “Offline”, make another sale (it is queued) and reconnect to see it sync.",
+        "4": "Restaurant: open a table in “Tables”, take the order with modifiers, send it to the kitchen and move the ticket forward in “Kitchen (KDS)”.",
+        "5": "In “X/Z reports” review sales by payment method and close the shift with a cash count; in “Stores” move stock between stores."
       }
     },
     "reset": {
       "button": "Reset data",
       "confirm": "Delete your sales and changes in this demo?",
       "yes": "Yes, reset",
-      "done": "Sample data restored",
-      "hint": "Deletes your sales, closings, registered customers, prices and transfers for both businesses and goes back to the sample data."
+      "done": "Sample data restored"
     },
     "presets": {
       "label": "Business type",
-      "retail": "Grocery store",
+      "retail": "Retail · grocery",
       "restaurant": "Restaurant"
     },
     "toolbar": {
@@ -14797,14 +14797,10 @@
       "label": "POS sections",
       "sale": "Sale",
       "tables": "Tables",
-      "kds": "Kitchen",
+      "kds": "Kitchen (KDS)",
       "reports": "X/Z reports",
       "console": "Stores",
-      "staff": "Staff",
-      "badge": {
-        "kds": "{n, plural, one {# pending ticket} other {# pending tickets}}",
-        "tables": "{n, plural, one {# open table} other {# open tables}}"
-      }
+      "staff": "Staff"
     },
     "categories": {
       "all": "All",
@@ -14874,7 +14870,7 @@
       "title": "Ticket",
       "clear": "Empty ticket",
       "counter": "Counter / takeaway",
-      "tableInfo": "Table {n} · {guests, plural, one {# guest} other {# guests}}",
+      "tableInfo": "Table {n} · {guests} guests",
       "waiter": "Server: {name}",
       "changeTable": "Change table",
       "seller": "Sales associate",
@@ -14897,8 +14893,7 @@
       "bill": "Pre-bill",
       "billToast": "Table {n}: bill requested",
       "pay": "Charge {amount}",
-      "goToTicket": "View ticket ({n}) · {amount}",
-      "billAgain": "View pre-bill"
+      "goToTicket": "View ticket ({n}) · {amount}"
     },
     "loyalty": {
       "lookupPlaceholder": "Customer ID or mobile",
@@ -14952,7 +14947,7 @@
       "methods": {
         "cash": "Cash",
         "card": "Card (terminal)",
-        "qr": "QR (bank transfer or wallet)",
+        "qr": "QR (Bre-B or wallet)",
         "gift": "Gift card"
       },
       "methodHints": {
@@ -14996,10 +14991,7 @@
         },
         "doc": "Document number",
         "name": "Name or company name",
-        "email": "Email to send the invoice",
-        "nitFormat": "Enter the NIT with its check digit, separated by a hyphen.",
-        "nitDv": "The check digit does not match that NIT: it should be {dv}.",
-        "nitPlaceholder": "NIT with check digit"
+        "email": "Email to send the invoice"
       },
       "missing": {
         "tip": "Ask about the tip (it can be “No tip”).",
@@ -15008,17 +15000,6 @@
       },
       "confirm": "Confirm payment",
       "processing": "Recording…"
-    },
-    "bill": {
-      "title": "Pre-bill · Table {n}",
-      "subtitle": "What the table has ordered, to review with the customer before charging.",
-      "heading": "PRE-BILL",
-      "guests": "{n, plural, one {# guest} other {# guests}}",
-      "subtotal": "Total consumption",
-      "tip": "Suggested tip ({pct}%)",
-      "totalWithTip": "Total with suggested tip",
-      "tipNote": "The tip is voluntary: the customer decides whether to leave it and how much when paying.",
-      "notFiscal": "For information only: this is not an invoice or a POS document."
     },
     "receipt": {
       "titlePos": "POS equivalent document",
@@ -15092,7 +15073,7 @@
       "release": "Release table with no order"
     },
     "kds": {
-      "title": "Kitchen display",
+      "title": "Kitchen (KDS)",
       "subtitle": "This store's tickets by station, with how long they have been waiting.",
       "stations": {
         "all": "All",
@@ -15145,12 +15126,7 @@
       "refund": "Void",
       "refundConfirm": "Void with a credit note?",
       "refundDone": "Sale {n} voided with a credit note",
-      "closures": "Today's Z closings at this store",
-      "titleClosed": "Z report · Shift {n} (closed)",
-      "closedAt": "closed at {time}",
-      "closedHint": "These are the figures of the shift you closed. Open the till to start shift {next}.",
-      "printSummary": "Print summary",
-      "viewZ": "View Z report"
+      "closures": "Z closings in this session"
     },
     "shift": {
       "openTitle": "Open till",
@@ -15179,12 +15155,11 @@
     },
     "cash": {
       "title": "Till",
-      "openSince": "Shift {n} since {time} · {name}",
-      "open": "Shift {n} · {name}"
+      "openSince": "Shift {n} since {time} · {name}"
     },
     "hardware": {
       "title": "Peripherals",
-      "subtitle": "Simulated in the demo, except the barcode scanner: any scanner that types like a keyboard really works. In your project they all connect to the till.",
+      "subtitle": "Simulated in the demo; in your project they connect to the till.",
       "printer": "80 mm thermal printer",
       "scanner": "Barcode scanner",
       "terminal": "Card terminal",
@@ -15213,7 +15188,7 @@
       "closed": "Till closed",
       "myTill": "Your till (this demo)",
       "otherTills": "Other tills (sample)",
-      "salesValue": "{n, plural, one {# sale} other {# sales}} · {amount}",
+      "salesValue": "{n} · {amount}",
       "dayTotal": "Day total",
       "lowStock": "{n, plural, one {# product low on stock} other {# products low on stock}}",
       "switch": "Sell at this store",
@@ -15296,9 +15271,6 @@
       "yes": "Yes",
       "no": "No",
       "simulated": "simulated"
-    },
-    "toasts": {
-      "newDay": "A new day has started: the demo went back to today’s sample data."
     }
   },
   "demoSaas": {

@@ -25,6 +25,13 @@ export default function ProofOfDelivery({ order, onClose }: { order: Order; onCl
   useEffect(() => () => { if (photo) URL.revokeObjectURL(photo.url); }, [photo]);
 
   const confirm = () => {
+    // El resto de la operación pudo cerrar el pedido mientras la ventana estaba abierta.
+    const live = state.orders.find((o) => o.id === order.id);
+    if (!live || live.stage !== 'pickedUp') {
+      notify(t('pod.alreadyClosed', { id: order.id }), 'info');
+      onClose();
+      return;
+    }
     const jump = clockJumpMinutes(state, 'deliver', order.id);
     if (mode === 'code') {
       if (!/^\d{4}$/.test(code)) return setError(t('pod.codeFormat'));

@@ -384,7 +384,8 @@
       "confirm": "Confirmar entrega",
       "done": "Pedido {id} entregado",
       "doneJump": "Pedido {id} entregado · el reloj de la demo se adelantó {min} min (trayecto)",
-      "modeLabel": "Cómo confirmas la entrega"
+      "modeLabel": "Cómo confirmas la entrega",
+      "alreadyClosed": "El pedido {id} ya se cerró en la operación: no hay nada que confirmar."
     },
     "docs": {
       "title": "Documentos del repartidor",
@@ -438,7 +439,7 @@
         "popular": "Popular",
         "soldOut": "Agotado en esta sede",
         "add": "Agregar {item}",
-        "added": "{item} agregado al carrito",
+        "added": "Agregaste {item} al carrito",
         "myOrders": "Mis pedidos ({n})",
         "viewCart": "Ver carrito · {n} · {total}",
         "pickSede": "Elige la sede",
@@ -525,7 +526,8 @@
         "sub": {
           "pending": "La sede tiene {s} s para responder.",
           "pendingLate": "La sede no respondió a tiempo: Operaciones ya recibió una alerta.",
-          "preparing": "La {sede} lo prepara en unos {min} min.",
+          "preparing": "La {sede} lo está preparando: listo en unos {min} min.",
+          "preparingLate": "La {sede} ya pasó el tiempo de preparación: está terminando tu pedido.",
           "readyDriver": "Esperando que {driver} lo recoja.",
           "readyNoDriver": "Operaciones está asignando un repartidor.",
           "pickedUp": "{driver} va hacia tu dirección.",
@@ -547,7 +549,8 @@
         "whatsapp": {
           "title": "Vista previa del WhatsApp que recibes",
           "message": "{brand}: tu pedido {id} fue confirmado y llega aprox. a las {time}\nSíguelo aquí: {link}\nCódigo de entrega: {code} (dáselo al repartidor)",
-          "note": "Simulado: no se envía nada. En tu proyecto se envía con WhatsApp Business; el enlace es de ejemplo."
+          "note": "Simulado: no se envía nada. En tu proyecto se envía con WhatsApp Business; el enlace es de ejemplo.",
+          "link": "tu-dominio.com/seguimiento/{id}"
         },
         "rated": "Gracias por calificar",
         "pointsEarned": "Ganaste {n} puntos con este pedido · ahora tienes {balance}.",
@@ -673,6 +676,7 @@
       "pickup": "Recogí el pedido",
       "pickedToast": "{id} recogido: el cliente ya lo ve en camino",
       "waitingSede": "La sede aún lo prepara (faltan ~{min} min). Cuando lo marque listo podrás recogerlo.",
+      "waitingSedeLate": "La sede ya pasó el tiempo de preparación. Cuando lo marque listo podrás recogerlo.",
       "deliverAt": "Entrega a {name}: {address}",
       "collectCash": "Cobra {total} en efectivo.",
       "collectCashChange": "Cobra {total} en efectivo: paga con {with}, lleva {change} de cambio.",
@@ -866,7 +870,8 @@
         "payment": "medio_pago",
         "driver": "repartidor",
         "rating": "calificacion"
-      }
+      },
+      "csvFile": "pedidos-fogon-demo-{date}.csv"
     }
   }
 }

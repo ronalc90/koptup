@@ -64,7 +64,7 @@ export default function OpsApp() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `pedidos-fogon-demo-${state.date}.csv`;
+    a.download = t('ops.csvFile', { date: state.date });
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -99,7 +99,7 @@ export default function OpsApp() {
             <Kpi title={t('ops.kpis.active')} value={String(k.active)} icon={TruckIcon} color="text-orange-500" />
             <Kpi title={t('ops.kpis.drivers')} value={`${online.length}/${state.drivers.length}`} icon={UserGroupIcon} color="text-emerald-500" />
             <Kpi title={t('ops.kpis.avgDelivery')} value={`${k.avgDeliveryMin} ${t('common.min')}`} icon={ClockIcon} color="text-amber-500" />
-            <Kpi title={t('ops.kpis.onTime')} value={`${k.onTimePct} %`} icon={CheckBadgeIcon} color="text-sky-500" />
+            <Kpi title={t('ops.kpis.onTime')} value={locale === 'en' ? `${k.onTimePct}%` : `${k.onTimePct} %`} icon={CheckBadgeIcon} color="text-sky-500" />
             <Kpi title={t('ops.kpis.avgTicket')} value={money(k.avgTicket)} icon={BanknotesIcon} color="text-violet-500" />
           </div>
           <p className="mt-2 text-[11px] text-secondary-500 dark:text-secondary-400">{t('ops.kpis.note')}</p>

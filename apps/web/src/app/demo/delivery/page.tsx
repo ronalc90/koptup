@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, type KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import {
@@ -45,6 +45,16 @@ function Shell() {
   const [confirmReset, setConfirmReset] = useState(false);
   const tab = state.tab;
   const tabRefs = useRef<Partial<Record<AppTab, HTMLButtonElement | null>>>({});
+  const prevTab = useRef(tab);
+
+  // Si cambias de app con un botón de otra app (p. ej. «Ver su app» al final de Operaciones),
+  // la página sube hasta la app nueva; si la app ya se ve, no se mueve.
+  useEffect(() => {
+    if (prevTab.current === tab) return;
+    prevTab.current = tab;
+    const el = document.getElementById('delivery-apps');
+    if (el && el.getBoundingClientRect().top < 0) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [tab]);
 
   // Pestañas con teclado: flechas, Inicio y Fin cambian de app y mueven el foco.
   const onTabKey = (e: KeyboardEvent<HTMLButtonElement>) => {
