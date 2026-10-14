@@ -35,7 +35,8 @@ export function DocumentsPanel({ store, onStartNote }: { store: BillingStore; on
       return (
         d.id.toLowerCase().includes(q) ||
         d.client.name.toLowerCase().replace(/[.\s-]/g, '').includes(q) ||
-        d.client.idNumber.includes(q)
+        // NIT con o sin DV ("901.234.517-9" o "901234517").
+        `${d.client.idNumber}${d.client.dv}`.includes(q)
       );
     });
     const key = (d: BillingDoc) => d.issueDate + d.issueTime;
@@ -476,7 +477,14 @@ function FixModal({ doc, store, onClose }: { doc: BillingDoc; store: BillingStor
     setBusy(true);
     const before = formatNit(doc.client.idNumber, doc.client.dv);
     const fixed: BillingDoc = { ...doc, client: { ...doc.client, idNumber: chk.digits, dv: chk.dv }, rejection: undefined };
-    const cufe = await sha384Hex(cufeInput(fixed, store.state.issuer));
+    let cufe: string;
+    try {
+      cufe = await sha384Hex(cufeInput(fixed, store.state.issuer));
+    } catch {
+      setBusy(false);
+      toast.error(t('emission.cryptoError'));
+      return;
+    }
     await new Promise((r) => setTimeout(r, 700));
     const { date, time } = colombiaNow();
     const h = (key: HistoryEntry['key'], detail?: string): HistoryEntry => ({ date, time: time.slice(0, 5), key, detail });
@@ -496,6 +504,14 @@ function FixModal({ doc, store, onClose }: { doc: BillingDoc; store: BillingStor
     }));
     toast.success(t('fix.done', { id: doc.id }));
     onClose();
+    // El botón «Corregir y reenviar» ya no existe: el foco pasa a «Ver» del mismo documento.
+    const viewLabel = t('documents.actions.viewAria', { id: doc.id });
+    setTimeout(() => {
+      const view = Array.from(document.querySelectorAll<HTMLButtonElement>('#documentos button[aria-label]')).find(
+        (b) => b.getAttribute('aria-label') === viewLabel && b.offsetParent !== null,
+      );
+      view?.focus();
+    }, 0);
   };
 
   return (

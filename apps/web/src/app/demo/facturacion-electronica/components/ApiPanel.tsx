@@ -57,8 +57,10 @@ export function ApiPanel({ store }: { store: BillingStore }) {
     const prefix = type === 'factura' ? state.issuer.prefix : PREFIXES[type];
     const number = `${prefix}${nextNumber(state.docs, type, prefix)}`;
     const path = { factura: 'invoices', notaCredito: 'credit-notes', notaDebito: 'debit-notes', pos: 'pos-documents' }[type];
+    const host = `https://${t('api.sample.host')}`;
+    const docId = t('api.sample.docId');
     const body = {
-      external_id: 'pedido-10482',
+      external_id: t('api.sample.externalId'),
       issue_date: today,
       ...(ref ? { reference: { number: ref.id, concept_code: draft.concept || null } } : {}),
       customer:
@@ -70,8 +72,8 @@ export function ApiPanel({ store }: { store: BillingStore }) {
     };
     if (tab === 'request') {
       return [
-        `curl -X POST https://api.tu-empresa.example/v1/${path} \\`,
-        '  -H "Authorization: Bearer <tu-llave-de-api>" \\',
+        `curl -X POST ${host}/v1/${path} \\`,
+        `  -H "Authorization: Bearer <${t('api.sample.apiKey')}>" \\`,
         '  -H "Content-Type: application/json" \\',
         "  -d '" + JSON.stringify(body, null, 2).replace(/'/g, "'\\''") + "'",
       ].join('\n');
@@ -79,13 +81,13 @@ export function ApiPanel({ store }: { store: BillingStore }) {
     if (tab === 'response') {
       return JSON.stringify(
         {
-          id: 'doc_ejemplo_01',
+          id: docId,
           number,
           status: state.dianDown ? 'contingency' : 'accepted',
-          [type === 'factura' ? 'cufe' : 'cude']: '<sha384-96-caracteres>',
+          [type === 'factura' ? 'cufe' : 'cude']: `<${t('api.sample.hash')}>`,
           totals: { subtotal: totals.subtotal, vat: totals.iva, total: totals.total },
-          pdf_url: `https://api.tu-empresa.example/v1/documents/doc_ejemplo_01/pdf`,
-          xml_url: `https://api.tu-empresa.example/v1/documents/doc_ejemplo_01/xml`,
+          pdf_url: `${host}/v1/documents/${docId}/pdf`,
+          xml_url: `${host}/v1/documents/${docId}/xml`,
         },
         null,
         2,
@@ -95,8 +97,8 @@ export function ApiPanel({ store }: { store: BillingStore }) {
       {
         event: 'invoice.accepted',
         created_at: `${today}T10:15:00-05:00`,
-        data: { id: 'doc_ejemplo_01', number, status: 'accepted', total: totals.total },
-        signature: 'sha256=<firma-hmac-del-webhook>',
+        data: { id: docId, number, status: 'accepted', total: totals.total },
+        signature: `sha256=<${t('api.sample.signature')}>`,
       },
       null,
       2,

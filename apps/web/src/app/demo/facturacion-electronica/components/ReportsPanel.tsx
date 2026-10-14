@@ -7,8 +7,8 @@ import { ArrowDownTrayIcon, DocumentChartBarIcon } from '@heroicons/react/24/out
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import type { BillingDoc, IncomingInvoice } from './data';
-import { docTotals, downloadBlob, downloadText, formatDate, incomingIva, incomingStage, incomingTotal, isIssued, toCsv } from './docs';
-import { formatCOP } from './fiscal';
+import { docTotals, downloadBlob, downloadText, formatDate, incomingIva, incomingStage, incomingTotal, isAddressedTo, isIssued, toCsv } from './docs';
+import { formatCOP, formatNit } from './fiscal';
 import { makeBookPdf } from './pdf';
 import { focusRing, inputCls, onTabsKeyDown, SectionTitle, useMonthLabel, useMonths } from './ui';
 import type { BillingStore } from './useBillingStore';
@@ -35,6 +35,19 @@ export function periodsOf(docs: BillingDoc[], incoming: IncomingInvoice[], today
   return Array.from(set).sort().reverse();
 }
 
+/**
+ * Compras del libro: facturas de proveedores dirigidas al NIT del emisor, sin reclamo,
+ * del período elegido ('all' = todos los meses). Una factura dirigida a otro NIT nunca
+ * entra (ni su IVA cuenta como descontable), se le haya avisado o no al proveedor.
+ */
+export function purchasesOf(incoming: IncomingInvoice[], period: string, today: string, issuerNit: string): IncomingInvoice[] {
+  return incoming.filter((i) => {
+    if (!isAddressedTo(i, issuerNit)) return false;
+    const stage = incomingStage(i, today);
+    return stage !== 'claimed' && stage !== 'returned' && (period === 'all' || i.issueDate.startsWith(period));
+  });
+}
+
 export function ReportsPanel({ store }: { store: BillingStore }) {
   const t = useTranslations('demoBilling');
   const months = useMonths();
@@ -53,12 +66,8 @@ export function ReportsPanel({ store }: { store: BillingStore }) {
     [state.docs, period],
   );
   const purchases = useMemo(
-    () =>
-      state.incoming.filter((i) => {
-        const stage = incomingStage(i, today);
-        return stage !== 'claimed' && stage !== 'returned' && (period === 'all' || i.issueDate.startsWith(period));
-      }),
-    [state.incoming, period, today],
+    () => purchasesOf(state.incoming, period, today, state.issuer.nit),
+    [state.incoming, period, today, state.issuer.nit],
   );
 
   const table: Table = useMemo(() => buildTable(book, docs, purchases, t, today), [book, docs, purchases, t, today]);
@@ -80,7 +89,7 @@ export function ReportsPanel({ store }: { store: BillingStore }) {
       const rows = [...table.raw, ...(table.total ? [table.total] : [])].map((r) => r.map((v, i) => fmtCell(v, i)));
       const blob = await makeBookPdf({
         title: bookName,
-        subtitle: `${state.issuer.name} · NIT ${state.issuer.nit}-${state.issuer.dv} · ${periodLabel}`,
+        subtitle: `${state.issuer.name} · NIT ${formatNit(state.issuer.nit, state.issuer.dv)} · ${periodLabel}`,
         sample: t('reports.pdfSample'),
         head: table.head,
         rows,

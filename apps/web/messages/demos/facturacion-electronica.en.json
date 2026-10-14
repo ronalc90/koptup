@@ -51,7 +51,7 @@
       "rejectedHint": "Fix them in Issued documents",
       "rejectedNone": "No pending rejections",
       "radian": "Supplier invoices to handle",
-      "radianHint": "Invoices with pending RADIAN events (of {total})",
+      "radianHint": "Of {total} received: not yet accepted, claimed or returned to the supplier",
       "rateValue": "{rate}%"
     },
     "tour": {
@@ -491,11 +491,11 @@
       "deadline": "Deadline to accept or claim: {date} ({n, plural, one {# business day left} other {# business days left}}; if you don't answer, tacit acceptance applies).",
       "deadlineToday": "The deadline to accept or claim ends today ({date}); if you do not respond, tacit acceptance applies.",
       "tacitNote": "Three business days passed since the goods or service were received with no acceptance or claim: the deadline ended on {date} and tacit acceptance (034) applied; the supplier registers it.",
-      "notAddressedHelp": "This invoice is not addressed to your NIT, so you cannot register RADIAN events on it. Let the supplier know so they cancel it with a credit note and issue it to the right NIT.",
+      "notAddressedHelp": "This invoice is not addressed to your NIT: it stays out of your purchase ledger and takes no RADIAN events. Let the supplier know so they cancel it with a credit note and issue it to the right NIT.",
       "closed": "Handling closed",
       "eventDone": "Event {code} ({name}) registered for {number} (simulated)",
       "returnDone": "Notice registered: {supplier} must cancel invoice {number} with a credit note (simulated)",
-      "returnedNote": "You notified the supplier on {date} (simulated): it is left out of the purchase ledger.",
+      "returnedNote": "You notified the supplier on {date} (simulated).",
       "note": "Simulated: in your project the events are registered with the DIAN through the technology provider, and invoices arrive in the reception mailbox."
     },
     "reports": {
@@ -518,7 +518,7 @@
       },
       "notes": {
         "sales": "Invoices, POS documents and debit notes add up; credit notes subtract. Rejected documents are excluded.",
-        "purchases": "Supplier invoices in the period; claimed invoices and those returned to the supplier are excluded.",
+        "purchases": "Supplier invoices addressed to your NIT; claimed invoices and those addressed to another NIT are excluded.",
         "vat": "Estimated summary to review with your accountant; it does not replace the tax return.",
         "withholding": "Withholdings your customers would apply according to the reference rates."
       },
@@ -590,6 +590,14 @@
         "debit_note_issued": "A debit note linked to an invoice was issued.",
         "reception_received": "A supplier invoice arrived.",
         "reception_event_registered": "A RADIAN event was registered."
+      },
+      "sample": {
+        "host": "api.your-company.example",
+        "apiKey": "your-api-key",
+        "externalId": "order-10482",
+        "docId": "doc_sample_01",
+        "hash": "96-character-sha384",
+        "signature": "webhook-hmac-signature"
       }
     },
     "project": {
@@ -598,7 +606,7 @@
       "items": {
         "provider": {
           "title": "Transmission to the DIAN",
-          "text": "Through a partner authorized technology provider or your own software enabled with the DIAN. KopTup is not an authorized technology provider."
+          "text": "Through the authorized technology provider you choose or your own software enabled with the DIAN. KopTup builds the integration; it is not an authorized technology provider."
         },
         "signature": {
           "title": "Digital signature",

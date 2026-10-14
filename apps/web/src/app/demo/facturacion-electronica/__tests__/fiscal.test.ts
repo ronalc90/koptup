@@ -18,7 +18,7 @@ import { buildSampleDocs, buildSampleIncoming, DEFAULT_LINES, resolutionFor, SAM
 import { buildXml, claimDeadline, docTotals, incomingStage, invoiceBalance, isPendingStage, nextNumber, returnedQty } from '../components/docs';
 import { draftLines, draftParty, defaultDraft } from '../components/draft';
 import { initialState, restoreState } from '../components/useBillingStore';
-import { periodsOf } from '../components/ReportsPanel';
+import { periodsOf, purchasesOf } from '../components/ReportsPanel';
 import { encodeQr } from '../components/qr';
 
 const TODAY = '2026-10-14';
@@ -151,6 +151,18 @@ describe('RADIAN', () => {
     const returned = { ...byId('in-5'), returnedDate: TODAY };
     expect(incomingStage(returned, TODAY)).toBe('returned');
     expect(isPendingStage('returned')).toBe(false);
+  });
+
+  it('el libro de compras nunca incluye la factura dirigida a otro NIT ni las reclamadas', () => {
+    const ids = (list: { id: string }[]) => list.map((i) => i.id).sort();
+    // Antes de avisarle al proveedor, la de otro NIT tampoco entra (ni su IVA como descontable).
+    expect(ids(purchasesOf(incoming, 'all', TODAY, SAMPLE_ISSUER.nit))).toEqual(['in-1', 'in-2', 'in-3', 'in-4', 'in-6']);
+    const claimed = incoming.map((i) => (i.id === 'in-4' ? { ...i, events: [...i.events, { code: '031' as const, date: TODAY }] } : i));
+    expect(ids(purchasesOf(claimed, 'all', TODAY, SAMPLE_ISSUER.nit))).toEqual(['in-1', 'in-2', 'in-3', 'in-6']);
+    // Si el emisor personalizado tiene ese otro NIT, la factura sí es suya.
+    expect(ids(purchasesOf(incoming, 'all', TODAY, '901512364'))).toContain('in-5');
+    // Por período: solo las del mes elegido.
+    expect(purchasesOf(incoming, '2026-10', TODAY, SAMPLE_ISSUER.nit).every((i) => i.issueDate.startsWith('2026-10'))).toBe(true);
   });
 });
 

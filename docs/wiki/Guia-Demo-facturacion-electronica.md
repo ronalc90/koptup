@@ -71,7 +71,7 @@ Pulsa **Emitir factura**. Las cinco fases se marcan en unos dos segundos.
 5. **Ver detalle y enviar**: abre el detalle del documento (ver [Detalle del documento](#detalle-del-documento)). Al lado, **Emitir otro documento** limpia el formulario.
 6. **Vista previa**: ahora muestra «Mostrando FE1014, recién emitido».
 
-El documento sale con la fecha y la hora actuales de Colombia (por ejemplo, «Emitido el 14 oct 2026 a las 01:50»).
+El documento sale con la fecha y la hora actuales de Colombia (por ejemplo, «Emitido el 14 oct 2026 a las 01:50»). Como el resultado es más corto que el formulario, al terminar la página sube hasta él y el foco queda en su título, así no se pierde de vista (ni con el teclado o un lector de pantalla).
 
 ### Paso 3. Descarga el PDF con QR o el XML
 
@@ -81,7 +81,7 @@ Baja a **Documentos emitidos** (paso 2 del recorrido). La factura nueva está de
 
 *Lista de documentos con búsqueda, filtros y acciones por fila.*
 
-1. **Buscar** por número, cliente o NIT (Escape borra la búsqueda).
+1. **Buscar** por número, cliente o NIT, con o sin el dígito de verificación (`901.234.517-9` o `901234517`); Escape borra la búsqueda.
 2. **Filtros**: tipo (factura, nota crédito, nota débito, POS), estado (aceptado, rechazado, en contingencia) y orden (más recientes, más antiguos, mayor o menor valor).
 3. **Acciones**: **Ver**, **PDF**, **XML** y, en las facturas aceptadas, **Nota crédito** y **Nota débito**. Pulsa **PDF**: se descarga `FE1014.pdf` (ver el [PDF de ejemplo](#pdf-y-xml)).
 4. **Corregir y reenviar**: solo en la factura rechazada de los datos de ejemplo (`FE1013`).
@@ -119,6 +119,8 @@ Baja a **Facturas de proveedores (RADIAN)**.
 6. **Aceptar (033)**: registra la aceptación expresa. Pulsa este botón: la factura pasa a **Aceptada** y «Por gestionar» baja de 4 a 3.
 7. **Reclamar (031)**: despliega el motivo (01 a 04) y **Registrar reclamo**.
 
+Con el teclado, al registrar un evento el foco pasa a la siguiente acción de la misma factura (por ejemplo, de **Acuse de recibo (030)** a **Recibo del bien o servicio (032)** y luego a **Aceptar (033)**).
+
 Más abajo, la factura de Mensajería Cumbre Express viene **dirigida a otro NIT**:
 
 ![Factura dirigida a otro NIT](images/doc/demos/facturacion-electronica/14-radian-otro-nit.jpg)
@@ -126,8 +128,8 @@ Más abajo, la factura de Mensajería Cumbre Express viene **dirigida a otro NIT
 *Una factura que no es para tu empresa no admite eventos RADIAN: se le avisa al proveedor.*
 
 1. La validación **Dirigida a otro NIT (901.512.364)** sale en rojo.
-2. La demo explica que no puedes registrarle eventos RADIAN y que el proveedor debe anularla con una nota crédito y emitirla al NIT correcto.
-3. **Avisar al proveedor (simulado)**: la factura queda **Devuelta al proveedor**, sale de «Por gestionar» y no entra al libro de compras. No es un evento RADIAN ni sale ningún mensaje.
+2. La demo explica que no entra a tu libro de compras, que no puedes registrarle eventos RADIAN y que el proveedor debe anularla con una nota crédito y emitirla al NIT correcto. Desde que llega, ni la factura ni su IVA cuentan en el libro de compras ni en el resumen de IVA.
+3. **Avisar al proveedor (simulado)**: la factura queda **Devuelta al proveedor** y sale de «Por gestionar». No es un evento RADIAN ni sale ningún mensaje.
 
 ### Paso 6. Exporta un libro fiscal
 
@@ -164,7 +166,7 @@ La demo es una sola página larga, sin pestañas de navegación: encabezado, pre
 | **Emitidos en {mes}** | Facturas, notas y POS del mes en curso (7 al empezar, con la fecha de la captura) y cuántos hay en cola de contingencia. |
 | **Aceptación DIAN (simulada)** | Porcentaje de aceptados sobre transmitidos (94 %: 15 de 16 al empezar). |
 | **Rechazos por corregir** | Documentos rechazados (1 al empezar: `FE1013`). |
-| **Proveedores por gestionar** | Facturas de proveedores sin aceptar, reclamar ni devolver (4 de 6 al empezar). |
+| **Proveedores por gestionar** | Facturas de proveedores sin aceptar, reclamar ni avisar al proveedor («De 6 recibidas…»; 4 al empezar). |
 | **Prueba el flujo en 3 minutos** | Los 5 pasos del recorrido con su avance («0 de 5») y, al terminar, la invitación a la demo guiada. |
 
 Mientras se arman los datos de ejemplo (un instante después de cargar), la página muestra «Preparando los datos de ejemplo con la fecha de hoy…». Si lo guardado en ese navegador era de otro mes, la demo vuelve a armar los datos con la fecha de hoy, conserva el emisor personalizado y lo avisa («Actualizamos los datos de ejemplo a octubre de 2026: lo que habías hecho en septiembre de 2026 se descartó…»).
@@ -272,7 +274,7 @@ Ver el [paso 6](#paso-6-exporta-un-libro-fiscal).
 | Libro | Qué incluye |
 |---|---|
 | Libro de ventas | Facturas, POS y notas débito suman; las notas crédito restan. No incluye rechazados. |
-| Libro de compras | Facturas de proveedores del período; no incluye las reclamadas ni las devueltas al proveedor. |
+| Libro de compras | Facturas de proveedores dirigidas a tu NIT; no incluye las reclamadas ni las dirigidas a otro NIT (con o sin aviso al proveedor). |
 | Resumen de IVA | IVA generado por tarifa, exentas, excluidas, notas, IVA descontable y saldo estimado. |
 | Retenciones (informativas) | ReteFuente, ReteIVA y ReteICA que te practicarían tus clientes, por factura. |
 
@@ -284,8 +286,8 @@ Cada libro muestra el número de registros, una fila de total y se descarga en C
 
 *Panel «API para conectar tu sistema» (diseño de referencia) y lo que se implementa en el proyecto real.*
 
-- **API para conectar tu sistema** lleva el rótulo **Diseño de referencia** y dice: «Esta API se construye en tu proyecto; no es un servicio público disponible hoy». Las pestañas **Solicitud**, **Respuesta** y **Aviso (webhook)** muestran ejemplos; la solicitud (`curl`) se arma con lo que tengas en el formulario de emisión (solo las notas llevan el bloque `reference` de la factura de referencia) y con la fecha de hoy. **Copiar** la copia al portapapeles. Debajo, 10 **Rutas de la API** (el libro de ventas pide el mes en curso) y 6 **Avisos automáticos (webhooks)** de ejemplo.
-- **Qué se implementa en tu proyecto**: transmisión por un proveedor tecnológico autorizado («KopTup no es proveedor tecnológico autorizado»), firma digital con certificado, integración por API, conservación de XML y PDF, y otros países (México, Perú y Chile se cotizan aparte; el simulador muestra solo Colombia).
+- **API para conectar tu sistema** lleva el rótulo **Diseño de referencia** y dice: «Esta API se construye en tu proyecto; no es un servicio público disponible hoy». Las pestañas **Solicitud**, **Respuesta** y **Aviso (webhook)** muestran ejemplos; la solicitud (`curl`) se arma con lo que tengas en el formulario de emisión (solo las notas llevan el bloque `reference` de la factura de referencia) y con la fecha de hoy. **Copiar** la copia al portapapeles. Debajo, 10 **Rutas de la API** (el libro de ventas pide el mes en curso) y 6 **Avisos automáticos (webhooks)** de ejemplo. Los valores de relleno (dominio, llave, identificadores) salen en el idioma de la página.
+- **Qué se implementa en tu proyecto**: transmisión por el proveedor tecnológico autorizado que elijas o por tu propio software habilitado («KopTup hace la integración; no es proveedor tecnológico autorizado»), firma digital con certificado, integración por API, conservación de XML y PDF, y otros países (México, Perú y Chile se cotizan aparte; el simulador muestra solo Colombia).
 
 ### En el celular
 
@@ -304,7 +306,7 @@ En pantallas pequeñas los botones del encabezado, los rótulos y **Restablecer 
 | Emisor, clientes, proveedores, documentos y cifras | **Datos de ejemplo** | Empresas ficticias; los correos usan dominios `.example`. |
 | Fechas de los datos de ejemplo | **Relativas a hoy** | Se calculan con la fecha de hoy en Colombia, en días hábiles y con los festivos colombianos. |
 | Validación del NIT con su DV | **Real** | Algoritmo de la DIAN, calculado en el navegador. |
-| Cálculo de IVA, retenciones, saldos, plazos y libros | **Real (en el navegador)** | Con tarifas de referencia que se ajustan con el contador. |
+| Cálculo de IVA, retenciones, saldos, plazos y libros | **Real (en el navegador)** | Con tarifas de referencia que se ajustan con el contador. El libro de compras y el IVA descontable solo toman facturas dirigidas a tu NIT y sin reclamo. |
 | CUFE / CUDE | **De ejemplo** | SHA-384 con la fórmula del anexo técnico, pero con datos ficticios y una clave técnica de ejemplo. |
 | QR | **Real** | Se puede escanear; contiene los datos del documento de ejemplo. |
 | PDF y XML | **Reales, sin validez fiscal** | Se generan en el navegador; XML UBL 2.1 simplificado, sin firma. |
@@ -343,4 +345,5 @@ flowchart LR
 2. **Todo es simulado**: no hay firma, transmisión ni respuesta real de la DIAN; el CUFE usa una clave técnica de ejemplo y los documentos no tienen validez fiscal.
 3. **Los cambios viven solo en el navegador.** Otro equipo o navegador ve los datos de ejemplo. Al cambiar de mes, la demo vuelve a armar los datos con la fecha de hoy y descarta lo emitido el mes anterior (conserva el emisor personalizado y lo avisa).
 4. **Un solo caso de rechazo, por diseño.** Solo la factura `FE1013` de los datos de ejemplo llega rechazada: las validaciones previas impiden emitir documentos nuevos con errores. Para repetir la corrección, usa **Restablecer datos**.
-5. **RADIAN simplificado.** Aceptar (033) o reclamar (031) exige antes el acuse (030) y el recibo del bien o servicio (032). La aceptación tácita se muestra cuando vence el plazo, pero el evento 034 no se registra en la demo (en la realidad lo registra el proveedor).
+5. **RADIAN simplificado.** Aceptar (033) o reclamar (031) exige antes el acuse (030) y el recibo del bien o servicio (032), como pide la norma para la factura como título valor. La aceptación tácita se muestra cuando vence el plazo, pero el evento 034 no se registra en la demo (en la realidad lo registra el proveedor).
+6. **En inglés, los documentos siguen en español.** La interfaz está traducida, pero los datos de los documentos (productos, conceptos de los proveedores, razones sociales, el texto del QR y del XML) quedan en español, como en una factura colombiana, y los valores en pesos usan el formato colombiano (`$ 1.450.000`).

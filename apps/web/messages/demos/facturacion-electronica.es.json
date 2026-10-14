@@ -51,7 +51,7 @@
       "rejectedHint": "Corrígelos en Documentos emitidos",
       "rejectedNone": "Sin rechazos pendientes",
       "radian": "Proveedores por gestionar",
-      "radianHint": "Facturas con eventos RADIAN pendientes (de {total})",
+      "radianHint": "De {total} recibidas: sin aceptar, reclamar ni avisar al proveedor",
       "rateValue": "{rate} %"
     },
     "tour": {
@@ -491,11 +491,11 @@
       "deadline": "Plazo para aceptar o reclamar: {date} ({n, plural, one {queda # día hábil} other {quedan # días hábiles}}; si no respondes, opera la aceptación tácita).",
       "deadlineToday": "Hoy ({date}) vence el plazo para aceptar o reclamar; si no respondes, opera la aceptación tácita.",
       "tacitNote": "Pasaron 3 días hábiles desde el recibo del bien o servicio sin aceptación ni reclamo: el plazo venció el {date} y operó la aceptación tácita (034), que registra el proveedor.",
-      "notAddressedHelp": "Esta factura no está dirigida a tu NIT, así que no puedes registrarle eventos RADIAN. Avísale al proveedor para que la anule con una nota crédito y la emita al NIT correcto.",
+      "notAddressedHelp": "Esta factura no está dirigida a tu NIT: no entra a tu libro de compras ni admite eventos RADIAN. Avísale al proveedor para que la anule con una nota crédito y la emita al NIT correcto.",
       "closed": "Gestión cerrada",
       "eventDone": "Evento {code} ({name}) registrado para {number} (simulado)",
       "returnDone": "Aviso registrado: {supplier} debe anular la factura {number} con una nota crédito (simulado)",
-      "returnedNote": "Le avisaste al proveedor el {date} (simulado): no entra al libro de compras.",
+      "returnedNote": "Le avisaste al proveedor el {date} (simulado).",
       "note": "Simulado: en tu proyecto los eventos se registran ante la DIAN a través del proveedor tecnológico, y las facturas llegan al buzón de correo de recepción."
     },
     "reports": {
@@ -518,7 +518,7 @@
       },
       "notes": {
         "sales": "Facturas, POS y notas débito suman; las notas crédito restan. No incluye documentos rechazados.",
-        "purchases": "Facturas de proveedores del período; no incluye las reclamadas ni las devueltas al proveedor.",
+        "purchases": "Facturas de proveedores dirigidas a tu NIT; no incluye las reclamadas ni las dirigidas a otro NIT.",
         "vat": "Resumen estimado para revisar con tu contador; no reemplaza la declaración.",
         "withholding": "Retenciones que te practicarían tus clientes según las tarifas de referencia."
       },
@@ -590,6 +590,14 @@
         "debit_note_issued": "Se emitió una nota débito ligada a una factura.",
         "reception_received": "Llegó una factura de proveedor.",
         "reception_event_registered": "Se registró un evento RADIAN."
+      },
+      "sample": {
+        "host": "api.tu-empresa.example",
+        "apiKey": "tu-llave-de-api",
+        "externalId": "pedido-10482",
+        "docId": "doc_ejemplo_01",
+        "hash": "sha384-de-96-caracteres",
+        "signature": "firma-hmac-del-aviso"
       }
     },
     "project": {
@@ -598,7 +606,7 @@
       "items": {
         "provider": {
           "title": "Transmisión a la DIAN",
-          "text": "A través de un proveedor tecnológico autorizado aliado o de tu propio software habilitado ante la DIAN. KopTup no es proveedor tecnológico autorizado."
+          "text": "A través del proveedor tecnológico autorizado que elijas o de tu propio software habilitado ante la DIAN. KopTup hace la integración; no es proveedor tecnológico autorizado."
         },
         "signature": {
           "title": "Firma digital",

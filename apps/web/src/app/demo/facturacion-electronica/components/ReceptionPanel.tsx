@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import { InboxArrowDownIcon } from '@heroicons/react/24/outline';
@@ -29,6 +29,17 @@ export function ReceptionPanel({ store }: { store: BillingStore }) {
   const { state, today, addRadianEvent, returnIncoming } = store;
   const [claiming, setClaiming] = useState<string | null>(null);
   const [reason, setReason] = useState<ClaimReason>('01');
+  // Tras registrar un evento, el botón pulsado desaparece: el foco pasa a la siguiente
+  // acción de la misma factura (o a la factura) para no perder el lugar con el teclado.
+  const focusAfter = useRef<string | null>(null);
+  useEffect(() => {
+    const id = focusAfter.current;
+    if (!id) return;
+    focusAfter.current = null;
+    const card = document.getElementById(`fe-in-${id}`);
+    const next = card?.querySelector<HTMLButtonElement>('[data-radian-action]:not([disabled])');
+    (next || card)?.focus();
+  }, [state.incoming]);
 
   const stages = state.incoming.map((i) => incomingStage(i, today));
   const pending = stages.filter(isPendingStage).length;
@@ -36,12 +47,14 @@ export function ReceptionPanel({ store }: { store: BillingStore }) {
   const closedOther = stages.filter((s) => s === 'claimed' || s === 'returned').length;
 
   const register = (inv: IncomingInvoice, code: RadianCode, why?: ClaimReason) => {
+    focusAfter.current = inv.id;
     addRadianEvent(inv.id, { code, date: colombiaNow().date, reason: why });
     toast.success(t('reception.eventDone', { code, name: t(`reception.events.${code}`), number: inv.number }));
     setClaiming(null);
   };
 
   const giveBack = (inv: IncomingInvoice) => {
+    focusAfter.current = inv.id;
     returnIncoming(inv.id, colombiaNow().date);
     toast.success(t('reception.returnDone', { number: inv.number, supplier: inv.supplier.name }));
   };
@@ -75,7 +88,13 @@ export function ReceptionPanel({ store }: { store: BillingStore }) {
           const deadline = claimDeadline(inv, today);
           const has = (c: RadianCode) => inv.events.some((e) => e.code === c);
           return (
-            <div key={inv.id} className="rounded-lg border border-secondary-200 dark:border-secondary-700 p-3">
+            <div
+              key={inv.id}
+              id={`fe-in-${inv.id}`}
+              tabIndex={-1}
+              aria-label={`${inv.supplier.name} · ${t('reception.invoice', { number: inv.number })}`}
+              className="rounded-lg border border-secondary-200 dark:border-secondary-700 p-3 scroll-mt-24 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+            >
               <div className="flex flex-col md:flex-row md:items-start gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
@@ -130,23 +149,23 @@ export function ReceptionPanel({ store }: { store: BillingStore }) {
                 </div>
                 <div className="flex flex-wrap md:flex-col gap-2 md:items-end md:w-56 flex-shrink-0">
                   {!addressed && stage !== 'returned' && (
-                    <Button size="sm" variant="outline" onClick={() => giveBack(inv)}>
+                    <Button data-radian-action size="sm" variant="outline" onClick={() => giveBack(inv)}>
                       {t('reception.actions.giveBack')}
                     </Button>
                   )}
                   {addressed && !has('030') && (
-                    <Button size="sm" variant="outline" onClick={() => register(inv, '030')}>
+                    <Button data-radian-action size="sm" variant="outline" onClick={() => register(inv, '030')}>
                       {t('reception.actions.ack')}
                     </Button>
                   )}
                   {addressed && has('030') && !has('032') && stage !== 'claimed' && (
-                    <Button size="sm" variant="outline" onClick={() => register(inv, '032')}>
+                    <Button data-radian-action size="sm" variant="outline" onClick={() => register(inv, '032')}>
                       {t('reception.actions.receive')}
                     </Button>
                   )}
                   {addressed && stage === 'received' && (
                     <>
-                      <Button size="sm" onClick={() => register(inv, '033')}>
+                      <Button data-radian-action size="sm" onClick={() => register(inv, '033')}>
                         {t('reception.actions.accept')}
                       </Button>
                       <Button size="sm" variant="danger" aria-expanded={claiming === inv.id} onClick={() => setClaiming(claiming === inv.id ? null : inv.id)}>

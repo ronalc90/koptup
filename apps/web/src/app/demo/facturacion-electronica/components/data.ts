@@ -377,6 +377,8 @@ const mesDe = (ym: string) => `${MESES[Number(ym.slice(5, 7)) - 1]} ${ym.slice(0
 export function buildSampleIncoming(today: string): IncomingInvoice[] {
   const d = (bd: number) => subBusinessDays(today, bd);
   const month = (bd: number) => d(bd).slice(0, 7);
+  // Servicios que se facturan vencidos: en la primera quincena, el mes anterior; después, el mes en curso.
+  const servedMonth = (bd: number) => (Number(d(bd).slice(8, 10)) <= 15 ? addMonthsYm(month(bd), -1) : month(bd));
   return [
     {
       id: 'in-1',
@@ -384,7 +386,7 @@ export function buildSampleIncoming(today: string): IncomingInvoice[] {
       number: 'EA558210',
       issueDate: d(5),
       receivedDate: d(5),
-      concept: `Energía eléctrica — ${mesDe(addMonthsYm(month(5), -1))}`,
+      concept: `Energía eléctrica — ${mesDe(servedMonth(5))}`,
       tax: 'excluido',
       base: 1_180_000,
       buyerNit: 'self',
@@ -401,7 +403,7 @@ export function buildSampleIncoming(today: string): IncomingInvoice[] {
       number: 'AIC4471',
       issueDate: d(9),
       receivedDate: d(9),
-      concept: `Servicio de aseo de oficina — ${mesDe(addMonthsYm(month(9), -1))}`,
+      concept: `Servicio de aseo de oficina — ${mesDe(servedMonth(9))}`,
       tax: 'iva19',
       base: 920_000,
       buyerNit: 'self',
@@ -459,7 +461,7 @@ export function buildSampleIncoming(today: string): IncomingInvoice[] {
       number: 'MCE12058',
       issueDate: d(1),
       receivedDate: d(1),
-      concept: `Mensajería urbana — ${mesDe(addMonthsYm(month(1), -1))}`,
+      concept: `Mensajería urbana — ${mesDe(servedMonth(1))}`,
       tax: 'iva19',
       base: 145_000,
       buyerNit: '901512364',

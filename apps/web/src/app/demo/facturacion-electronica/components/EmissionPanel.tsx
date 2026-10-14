@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import {
@@ -41,6 +41,10 @@ export function EmissionPanel({ store }: { store: BillingStore }) {
   const [phase, setPhase] = useState<Phase | null>(null);
   const [failedAt, setFailedAt] = useState<Phase | null>(null);
   const [transmitting, setTransmitting] = useState<string | null>(null);
+  // Al terminar de emitir, el resultado reemplaza al formulario (más corto): se lleva el
+  // foco y la vista al resultado para que no quede fuera de la pantalla.
+  const resultRef = useRef<HTMLHeadingElement>(null);
+  const revealResult = useRef(false);
 
   const issuer = state.issuer;
   const docType: DocType = tab === 'contingencia' ? draft.type : tab;
@@ -112,13 +116,26 @@ export function EmissionPanel({ store }: { store: BillingStore }) {
     if (docType === 'factura') markProgress('invoice');
     if (docType === 'notaCredito') markProgress('creditNote');
     setPhase(null);
+    revealResult.current = true;
     setSuccessId(id);
   };
+
+  useEffect(() => {
+    if (!success || !revealResult.current) return;
+    revealResult.current = false;
+    const heading = resultRef.current;
+    if (!heading) return;
+    heading.focus({ preventScroll: true });
+    const r = heading.getBoundingClientRect();
+    if (r.top < 96 || r.bottom > window.innerHeight) document.getElementById('emision')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [success]);
 
   const another = () => {
     setSuccessId(null);
     setFailedAt(null);
     setDraft(() => draftForType(docType));
+    // El botón desaparece con el resultado: el foco vuelve a la pestaña activa.
+    document.getElementById(`fe-tab-${tab}`)?.focus();
   };
 
   const transmitQueue = async () => {
@@ -282,7 +299,7 @@ export function EmissionPanel({ store }: { store: BillingStore }) {
               <SignalSlashIcon className="w-10 h-10 text-amber-600 flex-shrink-0" />
             )}
             <div className="min-w-0">
-              <h3 className="text-lg font-bold text-secondary-900 dark:text-white">
+              <h3 ref={resultRef} tabIndex={-1} className="text-lg font-bold text-secondary-900 dark:text-white focus:outline-none">
                 {success.status === 'accepted'
                   ? t('success.accepted', { type: success.type, id: success.id })
                   : t('success.queued', { type: success.type, id: success.id })}
