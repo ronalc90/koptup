@@ -301,7 +301,7 @@
       },
       "notFound": {
         "title": "What if it cites a ruling that doesn't exist?",
-        "desc": "The assistant only works with the documents your firm uploads and is instructed not to use outside knowledge. If a law or ruling isn't uploaded, it replies “I couldn't find that information in the uploaded documents”. Every answer shows the exact passage so you can check it; final review stays with your lawyers."
+        "desc": "The assistant only searches the documents your firm uploads and is instructed not to use outside knowledge: if a law or ruling isn't uploaded, no passage contains it and the instruction is to reply “I couldn't find that information in the uploaded documents”. Every answer shows the exact passage so you can check it; final review stays with your lawyers."
       }
     },
     "soporte": {

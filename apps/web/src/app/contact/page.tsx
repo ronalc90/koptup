@@ -103,6 +103,8 @@ function ContactPageInner() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   /** Email con el que se envió la solicitud (lo repite el mensaje de éxito). */
   const [submittedEmail, setSubmittedEmail] = useState('');
+  /** Plan RAG que viajó con la solicitud (null si la persona cambió de servicio). */
+  const [submittedPlan, setSubmittedPlan] = useState<string | null>(null);
   const [isScheduling, setIsScheduling] = useState(false);
   const [error, setError] = useState('');
 
@@ -161,6 +163,7 @@ function ContactPageInner() {
       // La confirmación queda a la vista (dice qué pasa después) hasta que la
       // persona elige "Enviar otro mensaje".
       setSubmittedEmail(formData.email);
+      setSubmittedPlan(keepsQuote ? planLabel : null);
       setIsSubmitted(true);
     } catch (err: any) {
       // Mensaje según lo que pasó: límite de envíos, red, o el campo que el
@@ -199,10 +202,13 @@ function ContactPageInner() {
       company: '',
       service: cotizandoLabel ?? '',
       budget: '',
+      // Mismo mensaje inicial que al llegar (incluido el de demo guiada).
       message: cotizandoLabel
         ? quoteDetail
           ? t('quote.messageWithDetail', { service: cotizandoLabel, detail: quoteDetail })
-          : t('quote.message', { service: cotizandoLabel })
+          : guidedDemo
+            ? t('quote.messageGuidedDemo')
+            : t('quote.message', { service: cotizandoLabel })
         : '',
       timeline: '',
     });
@@ -399,7 +405,7 @@ function ContactPageInner() {
                         <CheckCircleIcon className="h-12 w-12 text-green-600 dark:text-green-400" />
                       </div>
                       <h3 className="text-2xl font-bold text-secondary-900 dark:text-white mb-2">
-                        {planLabel ? t('form.success.titlePlan', { plan: planLabel }) : t('form.success.title')}
+                        {submittedPlan ? t('form.success.titlePlan', { plan: submittedPlan }) : t('form.success.title')}
                       </h3>
                       <p className="text-secondary-600 dark:text-secondary-400 mb-2">
                         {t('form.success.subtitle', { email: submittedEmail })}

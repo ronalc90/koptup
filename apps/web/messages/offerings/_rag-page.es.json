@@ -301,7 +301,7 @@
       },
       "notFound": {
         "title": "¿Y si cita una sentencia que no existe?",
-        "desc": "El asistente solo trabaja con los documentos que tu firma cargue y está instruido para no usar conocimiento externo. Si la norma o la sentencia no está cargada, responde «No encontré esa información en los documentos cargados». Cada respuesta trae el fragmento exacto para que lo verifiques; la verificación final es de tus abogados."
+        "desc": "El asistente solo busca en los documentos que tu firma cargue y está instruido para no usar conocimiento externo: si la norma o la sentencia no está cargada, ningún fragmento la contiene y la instrucción es responder «No encontré esa información en los documentos cargados». Cada respuesta trae el fragmento exacto para que lo verifiques; la verificación final es de tus abogados."
       }
     },
     "soporte": {

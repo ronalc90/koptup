@@ -118,7 +118,7 @@
         },
         "time": {
           "q": "How quickly can I have my chatbot running?",
-          "a": "The pilot with your documents takes {pilotWeeks} weeks. Implementation takes {essentialWeeks} weeks on the Essential plan and {proWeeks} weeks on Professional, which adds WhatsApp and up to 3 sources."
+          "a": "The pilot with your documents takes {pilotWeeks} weeks. Implementation takes {essentialWeeks} weeks on the Essential plan and {proWeeks} weeks on Professional, which adds WhatsApp and up to 3 document origins."
         },
         "whatsapp": {
           "q": "Does the chatbot work on WhatsApp?",

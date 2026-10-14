@@ -179,7 +179,8 @@ export function RagPlanCard({ plan, showCta = true }: { plan: RagPlan; showCta?:
                   </p>
                 </>
               ) : (
-                <p className="text-xl font-bold text-secondary-900 dark:text-white">
+                // Frase completa (no un monto): tamaño de texto, no de precio.
+                <p className="text-base font-bold text-secondary-900 dark:text-white">
                   {t('price.monthlyBySla')}
                 </p>
               )}

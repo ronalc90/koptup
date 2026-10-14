@@ -1302,7 +1302,7 @@
         "tokens": "Tokens",
         "tokensHint": "Tokens de entrada y salida que reportó OpenAI. En modo extractivo no hay tokens.",
         "cost": "Costo de IA (USD)",
-        "costHint": "Lo que KopTup le paga a OpenAI por esta respuesta (estimado con el precio público del modelo). No es un cobro para ti: los planes se cobran por preguntas e incluyen este costo hasta el tope de preguntas del mes.",
+        "costHint": "Lo que KopTup le paga a OpenAI por esta respuesta (estimado con el precio público del modelo). No es un cobro para ti: la mensualidad de cada plan ya incluye la IA hasta su tope de preguntas al mes.",
         "notAvailable": "—"
       }
     },

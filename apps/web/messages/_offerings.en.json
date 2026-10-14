@@ -221,7 +221,7 @@
         },
         "time": {
           "q": "How quickly can I have my chatbot running?",
-          "a": "The pilot with your documents takes {pilotWeeks} weeks. Implementation takes {essentialWeeks} weeks on the Essential plan and {proWeeks} weeks on Professional, which adds WhatsApp and up to 3 sources."
+          "a": "The pilot with your documents takes {pilotWeeks} weeks. Implementation takes {essentialWeeks} weeks on the Essential plan and {proWeeks} weeks on Professional, which adds WhatsApp and up to 3 document origins."
         },
         "whatsapp": {
           "q": "Does the chatbot work on WhatsApp?",
@@ -649,7 +649,7 @@
       },
       "notFound": {
         "title": "What if it cites a ruling that doesn't exist?",
-        "desc": "The assistant only works with the documents your firm uploads and is instructed not to use outside knowledge. If a law or ruling isn't uploaded, it replies “I couldn't find that information in the uploaded documents”. Every answer shows the exact passage so you can check it; final review stays with your lawyers."
+        "desc": "The assistant only searches the documents your firm uploads and is instructed not to use outside knowledge: if a law or ruling isn't uploaded, no passage contains it and the instruction is to reply “I couldn't find that information in the uploaded documents”. Every answer shows the exact passage so you can check it; final review stays with your lawyers."
       }
     },
     "soporte": {
@@ -790,7 +790,7 @@
       },
       "profesional": {
         "name": "Professional",
-        "tagline": "Multiple sources, web and WhatsApp, with role-based permissions and metrics built in your project.",
+        "tagline": "Multiple document origins, web and WhatsApp, with role-based permissions and metrics built in your project.",
         "features": [
           "Up to 3 document origins (for example, manual upload, Drive and SharePoint)",
           "Up to 10,000 documents",

@@ -221,7 +221,7 @@
         },
         "time": {
           "q": "¿En cuánto tiempo tengo mi chatbot funcionando?",
-          "a": "El piloto con tus documentos toma {pilotWeeks} semanas. La implementación toma {essentialWeeks} semanas en el plan Esencial y {proWeeks} semanas en el Profesional, que agrega WhatsApp y hasta 3 fuentes."
+          "a": "El piloto con tus documentos toma {pilotWeeks} semanas. La implementación toma {essentialWeeks} semanas en el plan Esencial y {proWeeks} semanas en el Profesional, que agrega WhatsApp y hasta 3 orígenes de documentos."
         },
         "whatsapp": {
           "q": "¿El chatbot funciona en WhatsApp?",
@@ -649,7 +649,7 @@
       },
       "notFound": {
         "title": "¿Y si cita una sentencia que no existe?",
-        "desc": "El asistente solo trabaja con los documentos que tu firma cargue y está instruido para no usar conocimiento externo. Si la norma o la sentencia no está cargada, responde «No encontré esa información en los documentos cargados». Cada respuesta trae el fragmento exacto para que lo verifiques; la verificación final es de tus abogados."
+        "desc": "El asistente solo busca en los documentos que tu firma cargue y está instruido para no usar conocimiento externo: si la norma o la sentencia no está cargada, ningún fragmento la contiene y la instrucción es responder «No encontré esa información en los documentos cargados». Cada respuesta trae el fragmento exacto para que lo verifiques; la verificación final es de tus abogados."
       }
     },
     "soporte": {
@@ -790,7 +790,7 @@
       },
       "profesional": {
         "name": "Profesional",
-        "tagline": "Varias fuentes, web y WhatsApp, con permisos por rol y métricas que se construyen en tu proyecto.",
+        "tagline": "Varios orígenes de documentos, web y WhatsApp, con permisos por rol y métricas que se construyen en tu proyecto.",
         "features": [
           "Hasta 3 orígenes de documentos (por ejemplo, carga manual, Drive y SharePoint)",
           "Hasta 10.000 documentos",

@@ -62,7 +62,7 @@
       },
       "profesional": {
         "name": "Professional",
-        "tagline": "Multiple sources, web and WhatsApp, with role-based permissions and metrics built in your project.",
+        "tagline": "Multiple document origins, web and WhatsApp, with role-based permissions and metrics built in your project.",
         "features": [
           "Up to 3 document origins (for example, manual upload, Drive and SharePoint)",
           "Up to 10,000 documents",

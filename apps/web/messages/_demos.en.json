@@ -1302,7 +1302,7 @@
         "tokens": "Tokens",
         "tokensHint": "Input and output tokens reported by OpenAI. Extractive mode uses no tokens.",
         "cost": "AI cost (USD)",
-        "costHint": "What KopTup pays OpenAI for this answer (estimated with the model's public price). It is not a charge to you: plans are billed per question and include this cost up to the monthly question cap.",
+        "costHint": "What KopTup pays OpenAI for this answer (estimated with the model's public price). It is not a charge to you: each plan's monthly fee already includes AI up to its monthly question cap.",
         "notAvailable": "—"
       }
     },
