@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import {
   ArrowDownTrayIcon,
   ChatBubbleLeftRightIcon,
@@ -17,11 +17,8 @@ import {
   OWNER_IDS,
   OwnerId,
   Temperature,
-  daysSince,
   downloadFile,
   initials,
-  probabilityOf,
-  scoreOf,
   temperatureOf,
   toCsv,
 } from './crm';
@@ -62,25 +59,26 @@ export default function ContactsView({ deals, onOpen, notify }: Props) {
   const [owner, setOwner] = useState<'all' | OwnerId>('all');
   const [sort, setSort] = useState<SortId>('score');
 
-  const rows = useMemo(() => {
+  // Sin useMemo: son pocas filas y el puntaje depende de la fecha de corte (tx.ref).
+  const rows = (() => {
     const term = normalize(search.trim());
     const digits = search.replace(/\D/g, '');
     const list = deals.filter((d) => {
       if (owner !== 'all' && d.owner !== owner) return false;
-      if (temp !== 'all' && temperatureOf(scoreOf(d)) !== temp) return false;
+      if (temp !== 'all' && temperatureOf(tx.score(d)) !== temp) return false;
       if (!term) return true;
       const hay = normalize(`${d.contactName} ${d.company} ${d.email} ${d.city} ${d.nit}`);
       if (hay.includes(term)) return true;
       return digits.length >= 3 && d.nit.replace(/\D/g, '').includes(digits);
     });
     const cmp: Record<SortId, (a: Deal, b: Deal) => number> = {
-      score: (a, b) => scoreOf(b) - scoreOf(a),
+      score: (a, b) => tx.score(b) - tx.score(a),
       value: (a, b) => b.value - a.value,
       lastContact: (a, b) => (a.lastContact < b.lastContact ? 1 : a.lastContact > b.lastContact ? -1 : 0),
       name: (a, b) => a.contactName.localeCompare(b.contactName, 'es'),
     };
     return [...list].sort(cmp[sort]);
-  }, [deals, search, temp, owner, sort]);
+  })();
 
   const exportCsv = () => {
     const sep = tx.locale === 'en' ? ',' : ';';
@@ -99,8 +97,8 @@ export default function ContactsView({ deals, onOpen, notify }: Props) {
       tx.ownerName(d),
       t(`stages.${d.stage}`),
       d.value,
-      probabilityOf(d),
-      scoreOf(d),
+      tx.prob(d),
+      tx.score(d),
       d.lastContact,
       tx.nextAction(d),
     ]);
@@ -211,7 +209,7 @@ export default function ContactsView({ deals, onOpen, notify }: Props) {
               </tr>
             ) : (
               rows.map((d) => {
-                const score = scoreOf(d);
+                const score = tx.score(d);
                 const tp = temperatureOf(score);
                 const ChannelIcon = CHANNEL_ICON[d.channel];
                 return (
@@ -273,7 +271,7 @@ export default function ContactsView({ deals, onOpen, notify }: Props) {
           <p className="text-center py-12 text-sm text-secondary-500">{t('contacts.noResults')}</p>
         ) : (
           rows.map((d) => {
-            const score = scoreOf(d);
+            const score = tx.score(d);
             const tp = temperatureOf(score);
             return (
               <button
@@ -297,7 +295,7 @@ export default function ContactsView({ deals, onOpen, notify }: Props) {
                       </Badge>
                     </div>
                     <p className="text-xs text-secondary-500 mt-1 truncate">
-                      {t(`stages.${d.stage}`)} · {t('dates.ago', { days: daysSince(d.lastContact) })}
+                      {t(`stages.${d.stage}`)} · {tx.ago(d.lastContact)}
                     </p>
                   </div>
                 </div>

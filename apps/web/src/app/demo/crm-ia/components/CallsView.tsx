@@ -12,9 +12,9 @@ import {
 } from '@heroicons/react/24/outline';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import { Deal, OWNERS, initials } from './crm';
+import { Deal, OWNERS, SEED_REF_DATE, addDays, daysBetween, initials } from './crm';
 import { CALLS, CallRecord } from './data';
-import { Avatar, Note, PlanBadge, SectionHeader } from './ui';
+import { Avatar, Note, PlanBadge, SectionHeader, linkCls } from './ui';
 import { useCrmText } from './useCrmText';
 
 const SENTIMENT_META: Record<
@@ -85,11 +85,7 @@ export default function CallsView({ deals, doneActions, onToggleAction, onOpen }
                     <div className="min-w-0">
                       <p className="font-semibold text-sm text-secondary-900 dark:text-white truncate">{deal.contactName}</p>
                       <p className="text-xs text-secondary-500 truncate">{deal.company}</p>
-                      <button
-                        type="button"
-                        onClick={() => onOpen(deal.id)}
-                        className="text-xs text-primary-700 dark:text-primary-300 underline underline-offset-2 hover:no-underline"
-                      >
+                      <button type="button" onClick={() => onOpen(deal.id)} className={`text-xs ${linkCls}`}>
                         {t('calls.openProfile')}
                       </button>
                     </div>
@@ -103,7 +99,7 @@ export default function CallsView({ deals, doneActions, onToggleAction, onOpen }
                       </Badge>
                       <span className="text-xs text-secondary-600 dark:text-secondary-400 flex items-center gap-1">
                         <CalendarIcon className="h-3.5 w-3.5" aria-hidden="true" />
-                        {tx.date(call.date)}
+                        {tx.date(addDays(call.date, daysBetween(SEED_REF_DATE, tx.ref)))}
                       </span>
                       <span className="text-xs text-secondary-600 dark:text-secondary-400 flex items-center gap-1">
                         <ClockIcon className="h-3.5 w-3.5" aria-hidden="true" />
@@ -166,6 +162,7 @@ export default function CallsView({ deals, doneActions, onToggleAction, onOpen }
                         size="sm"
                         variant="outline"
                         aria-expanded={expanded}
+                        aria-controls={`crm-transcript-${call.id}`}
                         onClick={() => setOpenId(expanded ? null : call.id)}
                         className="gap-1"
                       >
@@ -175,7 +172,11 @@ export default function CallsView({ deals, doneActions, onToggleAction, onOpen }
                     </div>
 
                     {expanded && (
-                      <ol className="mt-3 space-y-2 rounded-lg bg-secondary-50 dark:bg-secondary-800/60 p-3" aria-label={t('calls.transcriptLabel')}>
+                      <ol
+                        id={`crm-transcript-${call.id}`}
+                        className="mt-3 space-y-2 rounded-lg bg-secondary-50 dark:bg-secondary-800/60 p-3"
+                        aria-label={t('calls.transcriptLabel')}
+                      >
                         {transcript.map((line, i) => {
                           const rep = call.speakers[i] === 'rep';
                           return (

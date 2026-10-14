@@ -25,22 +25,17 @@ import {
   ActivityEvent,
   Deal,
   EventType,
-  REF_DATE,
   StageId,
   addDays,
-  daysSince,
   initials,
   isOpen,
-  probabilityOf,
-  recommendationsFor,
-  scoreFactors,
-  scoreOf,
   stageIndex,
   temperatureOf,
-  timelineFor,
 } from './crm';
 import { TEMP_VARIANT } from './ContactsView';
-import { Avatar, Modal, inputCls, labelCls } from './ui';
+import DealForm, { DealFormResult } from './DealForm';
+import { Avatar, Modal, inputCls, labelCls, tabKeyDown } from './ui';
+import type { DealPatch } from './useCrmStore';
 import { CrmText, useCrmText } from './useCrmText';
 
 const EVENT_META: Record<EventType, { icon: typeof EnvelopeIcon; color: string }> = {
@@ -55,7 +50,14 @@ const EVENT_META: Record<EventType, { icon: typeof EnvelopeIcon; color: string }
   lost: { icon: XCircleIcon, color: 'text-red-700 bg-red-100 dark:bg-red-950 dark:text-red-300' },
   stage: { icon: ArrowsRightLeftIcon, color: 'text-amber-700 bg-amber-100 dark:bg-amber-950 dark:text-amber-300' },
   sequence: { icon: BoltIcon, color: 'text-yellow-700 bg-yellow-100 dark:bg-yellow-950 dark:text-yellow-300' },
+  edit: { icon: PencilSquareIcon, color: 'text-sky-700 bg-sky-100 dark:bg-sky-950 dark:text-sky-300' },
 };
+
+const PROFILE_TABS = ['history', 'deal', 'files'] as const;
+type ProfileTab = (typeof PROFILE_TABS)[number];
+
+/** Número de la cotización de ejemplo: año de la fecha de corte + id del negocio. */
+export const quoteNumber = (d: Deal, ref: string) => `COT-${ref.slice(0, 4)}-${d.id.toUpperCase()}`;
 
 const LOG_TYPES = ['note', 'call', 'whatsapp', 'email', 'meeting'] as const;
 type LogType = (typeof LOG_TYPES)[number];
@@ -79,8 +81,8 @@ async function downloadQuotePdf(tx: CrmText, d: Deal) {
   doc.setTextColor(17, 24, 39);
   line(t('data.seller'), 15, true, 7);
   line(t('pdf.sellerLine'), 9, false, 10);
-  line(t('pdf.title', { number: `COT-2026-${d.id.toUpperCase()}` }), 12, true, 8);
-  line(t('pdf.date', { date: tx.date(REF_DATE), valid: tx.date(addDays(REF_DATE, 30)) }), 10, false, 9);
+  line(t('pdf.title', { number: quoteNumber(d, tx.ref) }), 12, true, 8);
+  line(t('pdf.date', { date: tx.date(tx.ref), valid: tx.date(addDays(tx.ref, 30)) }), 10, false, 9);
   line(t('pdf.client'), 10, true);
   line(`${d.company}${d.nit ? ` · NIT ${d.nit}` : ''}`, 10);
   line(`${d.contactName}${tx.role(d) ? ` · ${tx.role(d)}` : ''} · ${d.city}`, 10, false, 9);
@@ -99,7 +101,7 @@ interface Props {
   onClose: () => void;
   onMove: (id: string, stage: StageId) => void;
   onLog: (id: string, type: EventType, text: string) => void;
-  onUpdate: (id: string, patch: { nextAction?: string }) => void;
+  onUpdate: (id: string, patch: DealPatch) => void;
   onDelete: (id: string) => void;
   onDraft: (id: string) => void;
   notify: (msg: string) => void;
@@ -108,18 +110,24 @@ interface Props {
 export default function Customer360Modal({ deal, events, onClose, onMove, onLog, onUpdate, onDelete, onDraft, notify }: Props) {
   const tx = useCrmText();
   const { t } = tx;
-  const [tab, setTab] = useState<'history' | 'deal' | 'files'>('history');
+  const [tab, setTab] = useState<ProfileTab>('history');
   const [logType, setLogType] = useState<LogType>('note');
   const [logText, setLogText] = useState('');
-  const [nextAction, setNextAction] = useState(tx.nextAction(deal));
+  const [editing, setEditing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [pdfBusy, setPdfBusy] = useState(false);
 
-  const score = scoreOf(deal);
+  /** Cambiar de pestaña descarta la edición en curso (el pie vuelve a sus botones normales). */
+  const selectTab = (id: ProfileTab) => {
+    setTab(id);
+    setEditing(false);
+  };
+
+  const score = tx.score(deal);
   const temp = temperatureOf(score);
-  const factors = scoreFactors(deal);
-  const recs = recommendationsFor(deal);
-  const timeline = timelineFor(deal, events);
+  const factors = tx.factors(deal);
+  const recs = tx.recs(deal);
+  const timeline = tx.timeline(deal, events);
   const hasQuote = stageIndex(deal.stage) >= stageIndex('proposal') && deal.stage !== 'lost';
 
   const submitLog = (e: FormEvent) => {
@@ -131,9 +139,50 @@ export default function Customer360Modal({ deal, events, onClose, onMove, onLog,
     notify(t('customer360.logged'));
   };
 
-  const saveNext = () => {
-    onUpdate(deal.id, { nextAction: nextAction.trim() });
-    notify(t('customer360.nextActionSaved'));
+  /** Guarda solo lo que cambió; el cargo, el negocio y la próxima acción de ejemplo siguen traducidos si no se tocan. */
+  const saveEdit = (v: DealFormResult) => {
+    const patch: DealPatch = {
+      company: v.company,
+      nit: v.nit,
+      contactName: v.contactName,
+      email: v.email,
+      phone: v.phone,
+      city: v.city,
+      value: v.value,
+      owner: v.owner,
+      channel: v.channel,
+      size: v.size,
+      budgetConfirmed: v.budgetConfirmed,
+      decisionMaker: v.decisionMaker,
+    };
+    if (isOpen(deal)) patch.closeDate = v.closeDate;
+    if ((v.role ?? '') !== tx.role(deal)) patch.role = v.role ?? '';
+    if (v.title !== tx.title(deal)) patch.title = v.title;
+    if (v.nextAction !== tx.nextAction(deal)) patch.nextAction = v.nextAction;
+    onUpdate(deal.id, patch);
+    setEditing(false);
+    notify(t('customer360.saved'));
+  };
+
+  const editInitial = {
+    company: deal.company,
+    contactName: deal.contactName,
+    role: tx.role(deal),
+    nit: deal.nit,
+    city: deal.city,
+    email: deal.email,
+    phone: deal.phone,
+    channel: deal.channel,
+    source: deal.source,
+    title: tx.title(deal),
+    value: String(deal.value),
+    stage: deal.stage,
+    owner: deal.owner,
+    closeDate: deal.closeDate,
+    size: deal.size,
+    budgetConfirmed: deal.budgetConfirmed,
+    decisionMaker: deal.decisionMaker,
+    nextAction: tx.nextAction(deal),
   };
 
   const pdf = async () => {
@@ -159,7 +208,7 @@ export default function Customer360Modal({ deal, events, onClose, onMove, onLog,
       ),
     },
     { label: t('customer360.value'), value: tx.moneyShort(deal.value) },
-    { label: t('customer360.probability'), value: tx.pct(probabilityOf(deal)) },
+    { label: t('customer360.probability'), value: tx.pct(tx.prob(deal)) },
     { label: t('customer360.lastContact'), value: tx.ago(deal.lastContact) },
   ];
 
@@ -186,13 +235,24 @@ export default function Customer360Modal({ deal, events, onClose, onMove, onLog,
         </p>
       }
       footer={
-        <>
-          <Button variant="outline" onClick={() => onDraft(deal.id)} className="gap-1.5">
-            <SparklesIcon className="h-4 w-4" aria-hidden="true" />
-            {t('customer360.draftMessage')}
-          </Button>
-          <Button onClick={onClose}>{t('common.close')}</Button>
-        </>
+        editing ? (
+          <>
+            <Button variant="ghost" onClick={() => setEditing(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button type="submit" form="crm-edit-deal-form">
+              {t('customer360.saveChanges')}
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button variant="outline" onClick={() => onDraft(deal.id)} className="gap-1.5">
+              <SparklesIcon className="h-4 w-4" aria-hidden="true" />
+              {t('customer360.draftMessage')}
+            </Button>
+            <Button onClick={onClose}>{t('common.close')}</Button>
+          </>
+        )
       }
     >
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
@@ -242,15 +302,23 @@ export default function Customer360Modal({ deal, events, onClose, onMove, onLog,
       </div>
 
       <div className="border-b border-secondary-200 dark:border-secondary-800 mb-4">
-        <div className="flex gap-1 sm:gap-2 overflow-x-auto" role="tablist">
-          {(['history', 'deal', 'files'] as const).map((id) => (
+        <div
+          className="flex gap-1 sm:gap-2 overflow-x-auto"
+          role="tablist"
+          aria-label={t('customer360.tabsLabel')}
+          onKeyDown={(e) => tabKeyDown(e, PROFILE_TABS, tab, selectTab)}
+        >
+          {PROFILE_TABS.map((id) => (
             <button
               key={id}
               type="button"
               role="tab"
+              id={`crm-360-tab-${id}`}
               aria-selected={tab === id}
-              onClick={() => setTab(id)}
-              className={`px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+              aria-controls="crm-360-panel"
+              tabIndex={tab === id ? 0 : -1}
+              onClick={() => selectTab(id)}
+              className={`px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap rounded-t focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
                 tab === id
                   ? 'border-primary-600 text-primary-700 dark:text-primary-300'
                   : 'border-transparent text-secondary-600 dark:text-secondary-400 hover:text-secondary-900 dark:hover:text-white'
@@ -262,6 +330,7 @@ export default function Customer360Modal({ deal, events, onClose, onMove, onLog,
         </div>
       </div>
 
+      <div id="crm-360-panel" role="tabpanel" aria-labelledby={`crm-360-tab-${tab}`}>
       {tab === 'history' && (
         <div>
           <form onSubmit={submitLog} className="rounded-xl border border-secondary-200 dark:border-secondary-800 p-3 mb-4">
@@ -292,7 +361,7 @@ export default function Customer360Modal({ deal, events, onClose, onMove, onLog,
                 {t('customer360.logSubmit')}
               </Button>
             </div>
-            <p className="text-[11px] text-secondary-500 mt-1.5">{t('customer360.logHint', { date: tx.date(REF_DATE) })}</p>
+            <p className="text-[11px] text-secondary-500 mt-1.5">{t('customer360.logHint', { date: tx.date(tx.ref) })}</p>
           </form>
           <ol className="space-y-1">
             {timeline.map((ev) => {
@@ -316,92 +385,101 @@ export default function Customer360Modal({ deal, events, onClose, onMove, onLog,
 
       {tab === 'deal' && (
         <div className="space-y-4">
-          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
-            {(
-              [
-                ['title', tx.title(deal)],
-                ['owner', tx.ownerName(deal)],
-                ['value', tx.money(deal.value)],
-                [
-                  'closeDate',
-                  isOpen(deal) && deal.closeDate < REF_DATE
-                    ? `${tx.date(deal.closeDate)} · ${t('dates.overdue', { days: daysSince(deal.closeDate) })}`
-                    : tx.date(deal.closeDate),
-                ],
-                ['created', tx.date(deal.createdAt)],
-                ['source', t(`sources.${deal.source}`)],
-                ['channel', t(`channels.${deal.channel}`)],
-                ['size', t(`sizes.${deal.size}`)],
-              ] as const
-            ).map(([k, v]) => (
-              <div key={k} className="min-w-0">
-                <dt className="text-xs text-secondary-500">{t(`customer360.dealFields.${k}`)}</dt>
-                <dd className="text-secondary-900 dark:text-white break-words">{v}</dd>
-              </div>
-            ))}
-            {deal.stage === 'lost' && deal.lostReason && (
-              <div>
-                <dt className="text-xs text-secondary-500">{t('customer360.dealFields.lostReason')}</dt>
-                <dd className="text-secondary-900 dark:text-white">{t(`lostReasons.${deal.lostReason}`)}</dd>
-              </div>
-            )}
-          </dl>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {editing ? (
             <div>
-              <label htmlFor="crm-360-stage" className={labelCls}>
-                {t('customer360.dealFields.stage')}
-              </label>
-              <select
-                id="crm-360-stage"
-                value={deal.stage}
-                onChange={(e) => onMove(deal.id, e.target.value as StageId)}
-                className={inputCls}
-              >
-                {ALL_STAGES.map((s) => (
-                  <option key={s} value={s}>
-                    {t(`stages.${s}`)}
-                  </option>
+              <p className="text-sm font-semibold text-secondary-900 dark:text-white mb-3">{t('customer360.editTitle')}</p>
+              <DealForm
+                formId="crm-edit-deal-form"
+                mode="edit"
+                initial={editInitial}
+                closeDateLocked={!isOpen(deal)}
+                onSubmit={saveEdit}
+              />
+            </div>
+          ) : (
+            <>
+              <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                {(
+                  [
+                    ['title', tx.title(deal)],
+                    ['owner', tx.ownerName(deal)],
+                    ['value', tx.money(deal.value)],
+                    [
+                      'closeDate',
+                      isOpen(deal) && deal.closeDate < tx.ref
+                        ? `${tx.date(deal.closeDate)} · ${t('dates.overdue', { days: tx.daysSince(deal.closeDate) })}`
+                        : tx.date(deal.closeDate),
+                    ],
+                    ['created', tx.date(deal.createdAt)],
+                    ['source', t(`sources.${deal.source}`)],
+                    ['channel', t(`channels.${deal.channel}`)],
+                    ['size', t(`sizes.${deal.size}`)],
+                    ['budget', t(deal.budgetConfirmed ? 'common.yes' : 'common.no')],
+                    ['decision', t(deal.decisionMaker ? 'common.yes' : 'common.no')],
+                    ['nextAction', tx.nextAction(deal) || '—'],
+                  ] as const
+                ).map(([k, v]) => (
+                  <div key={k} className="min-w-0">
+                    <dt className="text-xs text-secondary-500">
+                      {k === 'closeDate' && !isOpen(deal) ? t('newDeal.fields.closedOn') : t(`customer360.dealFields.${k}`)}
+                    </dt>
+                    <dd className="text-secondary-900 dark:text-white break-words">{v}</dd>
+                  </div>
                 ))}
-              </select>
-            </div>
-            <div>
-              <label htmlFor="crm-360-next" className={labelCls}>
-                {t('customer360.dealFields.nextAction')}
-              </label>
-              <div className="flex gap-2">
-                <input
-                  id="crm-360-next"
-                  value={nextAction}
-                  maxLength={120}
-                  onChange={(e) => setNextAction(e.target.value)}
-                  className={inputCls}
-                />
-                <Button size="sm" variant="outline" onClick={saveNext} disabled={!nextAction.trim() || nextAction.trim() === tx.nextAction(deal)}>
-                  {t('common.save')}
-                </Button>
-              </div>
-            </div>
-          </div>
+                {deal.stage === 'lost' && deal.lostReason && (
+                  <div>
+                    <dt className="text-xs text-secondary-500">{t('customer360.dealFields.lostReason')}</dt>
+                    <dd className="text-secondary-900 dark:text-white">{t(`lostReasons.${deal.lostReason}`)}</dd>
+                  </div>
+                )}
+              </dl>
 
-          <div className="pt-3 border-t border-secondary-200 dark:border-secondary-800">
-            {!confirmDelete ? (
-              <Button size="sm" variant="ghost" onClick={() => setConfirmDelete(true)} className="gap-1.5 text-red-700 dark:text-red-400">
-                <TrashIcon className="h-4 w-4" aria-hidden="true" />
-                {t('customer360.delete')}
-              </Button>
-            ) : (
-              <div className="flex flex-wrap items-center gap-2" role="alert">
-                <span className="text-sm text-secondary-800 dark:text-secondary-200">{t('customer360.deleteConfirm')}</span>
-                <Button size="sm" variant="danger" onClick={() => onDelete(deal.id)}>
-                  {t('customer360.deleteYes')}
-                </Button>
-                <Button size="sm" variant="ghost" onClick={() => setConfirmDelete(false)}>
-                  {t('common.cancel')}
-                </Button>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
+                <div>
+                  <label htmlFor="crm-360-stage" className={labelCls}>
+                    {t('customer360.dealFields.stage')}
+                  </label>
+                  <select
+                    id="crm-360-stage"
+                    value={deal.stage}
+                    onChange={(e) => onMove(deal.id, e.target.value as StageId)}
+                    className={inputCls}
+                  >
+                    {ALL_STAGES.map((s) => (
+                      <option key={s} value={s}>
+                        {t(`stages.${s}`)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <Button variant="outline" onClick={() => setEditing(true)} className="gap-1.5 w-full sm:w-auto">
+                    <PencilSquareIcon className="h-4 w-4" aria-hidden="true" />
+                    {t('customer360.edit')}
+                  </Button>
+                </div>
               </div>
-            )}
-          </div>
+
+              <div className="pt-3 border-t border-secondary-200 dark:border-secondary-800">
+                {!confirmDelete ? (
+                  <Button size="sm" variant="ghost" onClick={() => setConfirmDelete(true)} className="gap-1.5 text-red-700 dark:text-red-400">
+                    <TrashIcon className="h-4 w-4" aria-hidden="true" />
+                    {t('customer360.delete')}
+                  </Button>
+                ) : (
+                  <div className="flex flex-wrap items-center gap-2" role="alert">
+                    <span className="text-sm text-secondary-800 dark:text-secondary-200">{t('customer360.deleteConfirm')}</span>
+                    <Button size="sm" variant="danger" onClick={() => onDelete(deal.id)}>
+                      {t('customer360.deleteYes')}
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => setConfirmDelete(false)}>
+                      {t('common.cancel')}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
       )}
 
@@ -413,7 +491,7 @@ export default function Customer360Modal({ deal, events, onClose, onMove, onLog,
                 <DocumentTextIcon className="h-8 w-8 text-red-600 flex-shrink-0" aria-hidden="true" />
                 <div className="min-w-0">
                   <p className="font-medium text-secondary-900 dark:text-white break-words">
-                    {t('customer360.files.quote', { id: `COT-2026-${deal.id.toUpperCase()}` })}
+                    {t('customer360.files.quote', { id: quoteNumber(deal, tx.ref) })}
                   </p>
                   <p className="text-xs text-secondary-500">{t('customer360.files.quoteHint')}</p>
                 </div>
@@ -430,6 +508,7 @@ export default function Customer360Modal({ deal, events, onClose, onMove, onLog,
           )}
         </div>
       )}
+      </div>
     </Modal>
   );
 }

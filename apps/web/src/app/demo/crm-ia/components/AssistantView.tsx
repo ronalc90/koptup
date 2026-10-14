@@ -11,18 +11,7 @@ import {
 } from '@heroicons/react/24/outline';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import {
-  ActivityEvent,
-  Deal,
-  REF_DATE,
-  isOpen,
-  probabilityOf,
-  recommendationsFor,
-  scoreFactors,
-  scoreOf,
-  temperatureOf,
-  timelineFor,
-} from './crm';
+import { ActivityEvent, Deal, isOpen, temperatureOf } from './crm';
 import { Note, PlanBadge, SectionHeader, inputCls, labelCls } from './ui';
 import { CrmText, useCrmText } from './useCrmText';
 
@@ -36,6 +25,11 @@ const TONES: Tone[] = ['professional', 'friendly', 'direct', 'consultative'];
 const QUICK: QuickId[] = ['summary', 'nextStep', 'objection', 'callPrep'];
 
 const lowerFirst = (s: string) => (s ? s.charAt(0).toLowerCase() + s.slice(1) : s);
+
+/** Redacciones distintas por objetivo: 3 cuerpos × 2 cierres. «Otra versión» las recorre en orden. */
+const BODY_VARIANTS = ['a', 'b', 'c'] as const;
+const CTA_VARIANTS = ['a', 'b'] as const;
+export const DRAFT_VERSIONS = BODY_VARIANTS.length * CTA_VARIANTS.length;
 
 /** Objetivo sugerido según la etapa del negocio. */
 function suggestedObjective(d: Deal): Objective {
@@ -71,9 +65,10 @@ function buildDraft(
     since: tx.date(d.lastContact),
   };
   const greeting = t(`assistant.tpl.greeting.${opts.tone}`, params);
-  const body = t(`assistant.tpl.body.${opts.objective}.${opts.variant % 2 === 0 ? 'a' : 'b'}`, params);
+  const v = ((opts.variant % DRAFT_VERSIONS) + DRAFT_VERSIONS) % DRAFT_VERSIONS;
+  const body = t(`assistant.tpl.body.${opts.objective}.${BODY_VARIANTS[v % BODY_VARIANTS.length]}`, params);
   const ctx = opts.context.trim() ? t('assistant.tpl.context', { context: opts.context.trim() }) : '';
-  const cta = t(`assistant.tpl.cta.${opts.objective}`);
+  const cta = t(`assistant.tpl.cta.${opts.objective}.${CTA_VARIANTS[Math.floor(v / BODY_VARIANTS.length) % CTA_VARIANTS.length]}`);
   if (opts.channel === 'whatsapp') {
     const text = [greeting, body, ctx, cta].filter(Boolean).join(' ');
     return { channel: 'whatsapp', subject: '', body: `${text}\n\n${t('assistant.tpl.whatsappSign', params)}` };
@@ -160,13 +155,13 @@ export default function AssistantView({ deals, events, initialDealId, onSent }: 
     if (!quick) return null;
     const name = deal.contactName.split(' ')[0];
     if (quick === 'summary') {
-      const items = timelineFor(deal, events).slice(0, 4);
+      const items = tx.timeline(deal, events).slice(0, 4);
       return {
         head: t('assistant.quickOut.summaryHead', {
           name: deal.contactName,
           stage: t(`stages.${deal.stage}`),
           value: tx.moneyShort(deal.value),
-          prob: probabilityOf(deal),
+          prob: tx.prob(deal),
         }),
         lines: items.map((e) => `${tx.date(e.date)}: ${tx.eventText(e)}`),
       };
@@ -174,7 +169,7 @@ export default function AssistantView({ deals, events, initialDealId, onSent }: 
     if (quick === 'nextStep') {
       return {
         head: t('assistant.quickOut.nextStepHead', { name }),
-        lines: recommendationsFor(deal).map((r) => tx.recText(r)),
+        lines: tx.recs(deal).map((r) => tx.recText(r)),
       };
     }
     if (quick === 'objection') {
@@ -188,9 +183,9 @@ export default function AssistantView({ deals, events, initialDealId, onSent }: 
         ],
       };
     }
-    const factors = scoreFactors(deal);
+    const factors = tx.factors(deal);
     const strong = [...factors].sort((a, b) => b.points / b.max - a.points / a.max)[0];
-    const score = scoreOf(deal);
+    const score = tx.score(deal);
     const lines = [
       t('assistant.quickOut.prepScore', {
         score,
@@ -292,9 +287,14 @@ export default function AssistantView({ deals, events, initialDealId, onSent }: 
             ) : (
               <div className="rounded-xl border border-primary-200 dark:border-primary-800 bg-primary-50/40 dark:bg-primary-950/30 p-3 sm:p-4" data-testid="crm-draft">
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-                  <Badge variant="primary" size="sm">
-                    {t('assistant.draftLabel', { channel: t(`channels.${draft.channel}`) })}
-                  </Badge>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge variant="primary" size="sm">
+                      {t('assistant.draftLabel', { channel: t(`channels.${draft.channel}`) })}
+                    </Badge>
+                    <span className="text-xs text-secondary-500" aria-live="polite">
+                      {t('assistant.version', { n: (variant % DRAFT_VERSIONS) + 1, total: DRAFT_VERSIONS })}
+                    </span>
+                  </div>
                   <div className="flex flex-wrap gap-1.5">
                     <Button size="sm" variant="ghost" onClick={copy} className="gap-1.5">
                       {copyState === 'ok' ? (
@@ -342,7 +342,7 @@ export default function AssistantView({ deals, events, initialDealId, onSent }: 
                   </Button>
                 </div>
                 <p className="text-xs text-secondary-500 mt-2">
-                  {t('assistant.sendHint', { date: tx.date(REF_DATE) })}
+                  {t('assistant.sendHint', { date: tx.date(tx.ref) })}
                 </p>
               </div>
             )}

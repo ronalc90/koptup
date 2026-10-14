@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
@@ -12,10 +12,7 @@ import {
   OwnerId,
   StageId,
   isOpen,
-  probabilityOf,
-  scoreOf,
   temperatureOf,
-  weightedValue,
 } from './crm';
 import { SectionHeader, inputCls } from './ui';
 import { useCrmText } from './useCrmText';
@@ -43,6 +40,8 @@ export default function PipelineBoard({ deals, onOpen, onMove, onNew }: Props) {
   const { t } = tx;
   const [owner, setOwner] = useState<'all' | OwnerId>('all');
   const [dragId, setDragId] = useState<string | null>(null);
+  // El id también va en una ref: un arrastre rápido puede soltar antes de que React vuelva a pintar.
+  const dragRef = useRef<string | null>(null);
   const [overStage, setOverStage] = useState<StageId | null>(null);
 
   const visible = useMemo(
@@ -57,8 +56,10 @@ export default function PipelineBoard({ deals, onOpen, onMove, onNew }: Props) {
     return map;
   }, [visible]);
 
-  const drop = (stage: StageId) => {
-    if (dragId) onMove(dragId, stage);
+  const drop = (stage: StageId, fromTransfer: string) => {
+    const id = fromTransfer || dragRef.current;
+    if (id && deals.some((d) => d.id === id)) onMove(id, stage);
+    dragRef.current = null;
     setDragId(null);
     setOverStage(null);
   };
@@ -98,7 +99,7 @@ export default function PipelineBoard({ deals, onOpen, onMove, onNew }: Props) {
         {ALL_STAGES.map((stage) => {
           const list = byStage.get(stage) ?? [];
           const total = list.reduce((s, d) => s + d.value, 0);
-          const weighted = list.reduce((s, d) => s + weightedValue(d), 0);
+          const weighted = list.reduce((s, d) => s + tx.weighted(d), 0);
           const open = stage !== 'won' && stage !== 'lost';
           return (
             <section
@@ -115,7 +116,7 @@ export default function PipelineBoard({ deals, onOpen, onMove, onNew }: Props) {
               }}
               onDrop={(e) => {
                 e.preventDefault();
-                drop(stage);
+                drop(stage, e.dataTransfer.getData('text/plain'));
               }}
               className={`min-w-0 rounded-xl border border-t-4 ${STAGE_ACCENT[stage]} p-2.5 flex flex-col transition-colors ${
                 overStage === stage
@@ -147,9 +148,9 @@ export default function PipelineBoard({ deals, onOpen, onMove, onNew }: Props) {
                   </p>
                 ) : (
                   list.map((d) => {
-                    const score = scoreOf(d);
+                    const score = tx.score(d);
                     const temp = temperatureOf(score);
-                    const prob = probabilityOf(d);
+                    const prob = tx.prob(d);
                     return (
                       <article
                         key={d.id}
@@ -158,9 +159,11 @@ export default function PipelineBoard({ deals, onOpen, onMove, onNew }: Props) {
                         onDragStart={(e) => {
                           e.dataTransfer.setData('text/plain', d.id);
                           e.dataTransfer.effectAllowed = 'move';
+                          dragRef.current = d.id;
                           setDragId(d.id);
                         }}
                         onDragEnd={() => {
+                          dragRef.current = null;
                           setDragId(null);
                           setOverStage(null);
                         }}
