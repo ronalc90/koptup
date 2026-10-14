@@ -2,7 +2,7 @@
   "demoCodeReview": {
     "meta": {
       "title": "AI code review demo: pull request review",
-      "description": "Interactive demo with sample data: six pull requests from a fictitious fintech with pre-generated AI comments, security findings, suggested tests and a simulation of how they reach GitHub, GitLab, Bitbucket or Azure DevOps. Includes a rules analyzer that reviews your diff in the browser.",
+      "description": "Interactive demo with sample data: six pull requests from a fictitious fintech with AI comments written in advance, security findings, suggested tests and a simulation of how they reach GitHub, GitLab, Bitbucket or Azure DevOps. Includes a rules analyzer that reviews your diff in the browser, without AI.",
       "breadcrumbHome": "Home",
       "breadcrumbDemos": "Demos",
       "breadcrumbName": "AI code review"
@@ -10,12 +10,21 @@
     "header": {
       "title": "AI code review",
       "sampleBadge": "Sample data",
-      "subtitle": "This is what automated pull request review looks like at {company}, a fictitious fintech: summary and risk, AI comments anchored to the diff, security, suggested tests and how it all reaches your repository. The AI comments are pre-generated for this demo.",
+      "subtitle": "Automated pull request (PR) review at {company}, a fictional fintech: risk and score, AI comments on each diff line, security, suggested tests and how it all reaches your repository. The AI comments are written in advance for this demo.",
       "searchPlaceholder": "Search PRs by title, number, repository, author or file",
       "tryDiff": "Try your diff",
       "requestDemo": "Request a guided demo",
       "reset": "Reset",
-      "resetHint": "Returns the sample PRs to their initial state"
+      "resetHint": "Returns the sample PRs to their initial state and clears your diffs and progress",
+      "back": "Back to the demo catalog",
+      "sampleHint": "Company, people, pull requests and dates are made up; the AI comments are written in advance for this demo",
+      "audience": "For tech leads, CTOs and development teams: a first review within minutes on every PR, in your language and with your team rules.",
+      "start": "Where to start: follow the first steps below. PR #218 is already open with 4 AI comments.",
+      "ctaLabel": "Talk to sales",
+      "quote": "Get a quote for your team",
+      "resetConfirm": "Reset the demo? The sample PRs go back to their initial state and your diffs and first-steps progress are cleared.",
+      "resetYes": "Yes, reset",
+      "resetNo": "Cancel"
     },
     "stats": {
       "openPrs": "Open PRs",
@@ -87,7 +96,9 @@
       "userAuthor": "you",
       "userBranch": "your branch",
       "userNote": "You pasted it and it was analyzed with local rules in your browser (no AI). It is not saved: it disappears when you reload the page.",
-      "deleteUserPr": "Delete this analysis"
+      "deleteUserPr": "Delete this analysis",
+      "resetPr": "Return this PR to the start",
+      "resetPrHint": "Undoes what you did on this PR (including the merge)"
     },
     "tabs": {
       "label": "PR sections",
@@ -112,20 +123,14 @@
       "score": "Score",
       "scoreFormula": "100 minus {blocking} per blocker, {warning} per warning, {suggestion} per suggestion and {info} per pending note.",
       "files": "Files",
-      "activity": "Activity",
-      "tryTitle": "Try this",
-      "try1": "Read the comments and apply a suggestion: the diff and the score change.",
-      "try2": "See each comment anchored to its line in the diff.",
-      "try3": "See how the comment reaches GitHub, GitLab, Bitbucket or Azure DevOps (simulated).",
-      "try4": "Paste your own diff and review it with the local rules.",
-      "go": "Go"
+      "activity": "Activity"
     },
     "events": {
       "bot": "AI reviewer",
       "localBot": "Local rules",
       "opened": "{who} opened the PR",
-      "aiReview": "{who} posted its review ({detail} findings)",
-      "localReview": "Local rules analysis: {detail} findings",
+      "aiReview": "{who} posted its review ({count, plural, =0 {no findings} one {# finding} other {# findings}})",
+      "localReview": "Local rules analysis: {count, plural, =0 {no findings} one {# finding} other {# findings}}",
       "approved": "{who} approved the PR",
       "changesRequested": "{who} requested changes",
       "merged": "{who} merged the PR into main",
@@ -192,7 +197,7 @@
     },
     "diff": {
       "title": "Diff with comments",
-      "subtitle": "Each comment shows up under the line it reviews. When you apply a suggestion, the diff updates.",
+      "subtitle": "Each comment appears below the line it reviews (in \"Side by side\", below the file). Applying a suggestion updates the diff.",
       "viewLabel": "Diff view",
       "unified": "Unified",
       "split": "Side by side",
@@ -201,7 +206,9 @@
       "newFile": "New file",
       "testFile": "Added test",
       "noFile": "This PR has no files.",
-      "emptySide": "(empty)"
+      "emptySide": "(empty)",
+      "lineLabel": "Line {line}",
+      "splitComments": "{count, plural, one {# comment on this file} other {# comments on this file}}"
     },
     "security": {
       "title": "Security",
@@ -315,7 +322,7 @@
       "minutes": "{value} min",
       "instant": "instant",
       "byCategory": "Findings by category",
-      "openDone": "{open} pending · {done} handled",
+      "openDone": "{open} open · {done} addressed",
       "legendDone": "Handled",
       "legendOpen": "Pending",
       "byStatus": "PRs by status",
@@ -375,7 +382,8 @@
       "userPrCreated": "{count, plural, one {Local analysis ready: # finding.} other {Local analysis ready: # findings.}}",
       "userPrClean": "Local analysis ready: the rules found nothing.",
       "userPrDeleted": "Analysis deleted.",
-      "reset": "The demo is back to its initial state."
+      "reset": "The demo is back to its initial state.",
+      "prReset": "PR #{number} is back to its initial state."
     },
     "csv": {
       "pr": "PR",
@@ -394,11 +402,41 @@
       "score": "Score",
       "open": "Pending",
       "done": "Handled",
-      "firstReview": "First review (min)"
+      "firstReview": "First review (min)",
+      "securityFile": "code-review-pr-{number}-security.csv",
+      "metricsFile": "code-review-team-metrics.csv",
+      "sbomNote": "Sample data from the /demo/code-review-ia demo",
+      "sbomRecommend": "Upgrade {name} to {version} or later"
     },
     "footer": {
-      "sampleNote": "Sample data: {company} is a fictitious company and the PRs, people and NITs are made up. The AI comments are pre-generated for this demo; the dependency vulnerabilities cite real public advisories. Your changes to the sample PRs are saved only in this browser (use Reset to start over).",
-      "cta": "Request a guided demo"
+      "sampleNote": "Sample data: {company} is a fictitious company and the PRs, people and NITs are made up; dates are calculated from today. The AI comments are written in advance for this demo; the dependency vulnerabilities cite real public advisories. Your changes to the sample PRs are saved only in this browser (use Reset to start over)."
+    },
+    "steps": {
+      "title": "First steps",
+      "progress": "{done} of {total} done",
+      "doneSr": "(done)",
+      "pendingSr": "(pending)",
+      "allDone": "You completed the first steps. Want to see it with your team code and rules?",
+      "apply": {
+        "title": "Apply an AI suggestion",
+        "hint": "PR #218 › Comments: the diff and the score change."
+      },
+      "diff": {
+        "title": "See the comment on its line",
+        "hint": "Diff tab: each comment sits below the line it reviews."
+      },
+      "repo": {
+        "title": "See how it reaches your repository",
+        "hint": "GitHub, GitLab, Bitbucket or Azure DevOps (simulated)."
+      },
+      "merge": {
+        "title": "Approve and merge the PR",
+        "hint": "Only possible with no pending blocking findings."
+      },
+      "own": {
+        "title": "Review your own diff",
+        "hint": "Paste it and local rules review it in your browser (no AI)."
+      }
     }
   }
 }

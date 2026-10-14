@@ -9,7 +9,7 @@ import {
   type Locale, type ParsedInput, type ParseError,
 } from './analyzer';
 import { SAMPLE_DIFF } from './data';
-import { sevBadge, type T } from './tabs';
+import { sevBadge, FOCUS, type T } from './tabs';
 
 /**
  * "Prueba con tu diff": el texto se analiza en el navegador con las reglas
@@ -27,6 +27,7 @@ export default function DiffModal({
   const [text, setText] = useState('');
   const [error, setError] = useState<ParseError | null>(null);
   const areaRef = useRef<HTMLTextAreaElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const lineCount = text ? text.replace(/\s+$/, '').split(/\r?\n/).length : 0;
 
   useEffect(() => {
@@ -34,7 +35,28 @@ export default function DiffModal({
     setError(null);
     const id = window.setTimeout(() => areaRef.current?.focus(), 30);
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+      // El foco no sale de la ventana mientras está abierta.
+      if (e.key !== 'Tab' || !dialogRef.current) return;
+      const items = Array.from(
+        dialogRef.current.querySelectorAll<HTMLElement>('button:not([disabled]), textarea, summary, a[href], input, [tabindex]:not([tabindex="-1"])'),
+      ).filter((el) => el.offsetParent !== null);
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      } else if (!dialogRef.current.contains(document.activeElement)) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => {
@@ -58,13 +80,13 @@ export default function DiffModal({
 
   return (
     <div className="fixed inset-0 z-[110] flex items-start sm:items-center justify-center bg-black/70 p-3 sm:p-6 overflow-y-auto" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div role="dialog" aria-modal="true" aria-labelledby="crd-title" className="w-full max-w-3xl rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-100 shadow-2xl">
+      <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="crd-title" aria-describedby="crd-intro" className="w-full max-w-3xl rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-100 shadow-2xl">
         <div className="flex items-start justify-between gap-3 px-5 py-4 border-b border-zinc-800">
           <div>
             <h2 id="crd-title" className="text-base font-semibold">{t('modal.title')}</h2>
-            <p className="text-xs text-zinc-400 mt-1">{t('modal.intro', { max: MAX_INPUT_LINES, rules: LOCAL_RULES.length })}</p>
+            <p id="crd-intro" className="text-xs text-zinc-400 mt-1">{t('modal.intro', { max: MAX_INPUT_LINES, rules: LOCAL_RULES.length })}</p>
           </div>
-          <button type="button" onClick={onClose} aria-label={t('modal.close')} className="p-1 rounded hover:bg-zinc-800 text-zinc-400">
+          <button type="button" onClick={onClose} aria-label={t('modal.close')} className={`p-1 rounded hover:bg-zinc-800 text-zinc-400 ${FOCUS}`}>
             <XMarkIcon className="w-5 h-5" />
           </button>
         </div>
@@ -73,7 +95,7 @@ export default function DiffModal({
             <ExclamationTriangleIcon className="w-4 h-4 shrink-0 mt-0.5" />
             <span>{t('modal.warning')}</span>
           </div>
-          <label htmlFor="crd-input" className="sr-only">{t('modal.inputLabel')}</label>
+          <label htmlFor="crd-input" className="block text-xs font-medium text-zinc-300">{t('modal.inputLabel')}</label>
           <textarea
             id="crd-input"
             ref={areaRef}
@@ -82,19 +104,21 @@ export default function DiffModal({
             placeholder={t('modal.placeholder')}
             spellCheck={false}
             rows={12}
-            className="w-full font-mono text-xs bg-zinc-950 border border-zinc-700 rounded-md p-3 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-400"
+            aria-invalid={error ? true : undefined}
+            aria-describedby={error ? 'crd-error' : 'crd-lines'}
+            className="w-full font-mono text-xs bg-zinc-950 border border-zinc-700 rounded-md p-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-400 focus-visible:ring-2 focus-visible:ring-violet-400"
           />
           <div className="flex items-center justify-between gap-2 flex-wrap text-xs">
-            <span className={lineCount > MAX_INPUT_LINES ? 'text-rose-400' : 'text-zinc-500'}>
+            <span id="crd-lines" className={lineCount > MAX_INPUT_LINES ? 'text-rose-400' : 'text-zinc-400'}>
               {t('modal.lines', { count: lineCount, max: MAX_INPUT_LINES })}
             </span>
-            <Button size="sm" variant="ghost" className="!text-zinc-300" onClick={() => { setText(SAMPLE_DIFF); setError(null); }}>
+            <Button size="sm" variant="ghost" className="!text-zinc-300 hover:!bg-zinc-800 focus:!ring-offset-zinc-900" onClick={() => { setText(SAMPLE_DIFF); setError(null); }}>
               {t('modal.loadSample')}
             </Button>
           </div>
-          {error && <p role="alert" className="text-xs text-rose-400">{t(`modal.errors.${error}`, { max: MAX_INPUT_LINES })}</p>}
+          {error && <p id="crd-error" role="alert" className="text-xs text-rose-400">{t(`modal.errors.${error}`, { max: MAX_INPUT_LINES })}</p>}
           <details className="rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-xs">
-            <summary className="cursor-pointer text-zinc-300 flex items-center gap-1.5">
+            <summary className={`cursor-pointer text-zinc-300 flex items-center gap-1.5 rounded ${FOCUS}`}>
               <ShieldCheckIcon className="w-4 h-4" />{t('modal.rulesTitle', { count: LOCAL_RULES.length })}
             </summary>
             <ul className="mt-2 space-y-1.5">
@@ -109,8 +133,8 @@ export default function DiffModal({
           </details>
         </div>
         <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 px-5 py-4 border-t border-zinc-800">
-          <Button size="sm" variant="ghost" className="!text-zinc-300" onClick={onClose}>{t('modal.cancel')}</Button>
-          <Button size="sm" variant="primary" onClick={analyze}>{t('modal.analyze')}</Button>
+          <Button size="sm" variant="ghost" className="!text-zinc-300 hover:!bg-zinc-800 focus:!ring-offset-zinc-900" onClick={onClose}>{t('modal.cancel')}</Button>
+          <Button size="sm" variant="primary" className="focus:!ring-offset-zinc-900" onClick={analyze}>{t('modal.analyze')}</Button>
         </div>
       </div>
     </div>

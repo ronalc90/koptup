@@ -688,10 +688,53 @@ export function formatStamp(at: string, locale: Locale): string {
   return locale === 'en' ? `${month} ${day}, ${y}${time}` : `${day} ${month} ${y}${time}`;
 }
 
-/** Fecha local actual como "AAAA-MM-DDTHH:mm". Solo se llama desde eventos del usuario. */
+/** Colombia no cambia de hora: siempre UTC-5. */
+const BOGOTA_OFFSET_MS = -5 * 60 * 60 * 1000;
+
+/**
+ * Fecha y hora de Colombia como "AAAA-MM-DDTHH:mm", sin depender de la zona
+ * horaria del navegador. Solo se llama después de montar o desde acciones del
+ * usuario (nunca en el primer render, para no romper la hidratación).
+ */
 export function nowStamp(d: Date): string {
+  const b = new Date(d.getTime() + BOGOTA_OFFSET_MS);
   const p = (n: number) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+  return `${b.getUTCFullYear()}-${p(b.getUTCMonth() + 1)}-${p(b.getUTCDate())}T${p(b.getUTCHours())}:${p(b.getUTCMinutes())}`;
+}
+
+const dayNumber = (ymd: string): number => {
+  const [y, m, d] = ymd.slice(0, 10).split('-').map(Number);
+  return Math.floor(Date.UTC(y, m - 1, d) / 86_400_000);
+};
+
+/** Corre una fecha "AAAA-MM-DD[THH:mm]" unos días (conserva la hora). */
+export function shiftStamp(at: string, days: number): string {
+  const m = at.match(/^(\d{4})-(\d{2})-(\d{2})(T\d{2}:\d{2})?$/);
+  if (!m || days === 0) return at;
+  const d = new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3]) + days));
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `${d.getUTCFullYear()}-${p(d.getUTCMonth() + 1)}-${p(d.getUTCDate())}${m[4] ?? ''}`;
+}
+
+/**
+ * Días que se corren los datos de ejemplo para que queden en los días
+ * anteriores a hoy. Los datos están escritos como si hoy fuera `sampleToday`;
+ * se corren semanas completas para conservar el día de la semana (los PR se
+ * abren entre lunes y viernes) y el más reciente queda entre 1 y 7 días atrás.
+ */
+export function sampleShiftDays(todayYmd: string, sampleToday: string): number {
+  const diff = dayNumber(todayYmd) - dayNumber(sampleToday);
+  return Math.floor(diff / 7) * 7;
+}
+
+/** Copia del PR con todas sus fechas corridas `days` días. */
+export function shiftPr(pr: PR, days: number): PR {
+  if (days === 0) return pr;
+  return {
+    ...pr,
+    openedAt: shiftStamp(pr.openedAt, days),
+    events: pr.events.map((e) => ({ ...e, at: shiftStamp(e.at, days) })),
+  };
 }
 
 export function formatNumber(n: number, locale: Locale, decimals = 0): string {
@@ -722,6 +765,10 @@ export interface SbomInput {
   dependencies: { name: string; version: string; license: string }[];
   vulnerabilities: { id: string; name: string; version: string; severity: string; fixedIn: string; url: string }[];
   timestamp: string;
+  /** Aviso de datos de ejemplo (en el idioma de la demo). */
+  note: string;
+  /** Recomendación por vulnerabilidad (en el idioma de la demo). */
+  recommend: (name: string, fixedIn: string) => string;
 }
 
 export function buildCycloneDx(input: SbomInput): Record<string, unknown> {
@@ -732,7 +779,7 @@ export function buildCycloneDx(input: SbomInput): Record<string, unknown> {
     metadata: {
       timestamp: input.timestamp,
       component: { type: 'application', name: input.appName },
-      properties: [{ name: 'koptup:demo', value: 'Datos de ejemplo de la demo /demo/code-review-ia' }],
+      properties: [{ name: 'koptup:demo', value: input.note }],
     },
     components: input.dependencies.map((d) => ({
       type: 'library',
@@ -746,7 +793,7 @@ export function buildCycloneDx(input: SbomInput): Record<string, unknown> {
       id: v.id,
       source: { name: 'NVD', url: v.url },
       ratings: [{ severity: v.severity }],
-      recommendation: `Actualizar ${v.name} a ${v.fixedIn} o superior`,
+      recommendation: input.recommend(v.name, v.fixedIn),
       affects: [{ ref: `pkg:npm/${v.name}@${v.version}` }],
     })),
   };
