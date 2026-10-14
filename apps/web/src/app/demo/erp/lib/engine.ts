@@ -19,7 +19,7 @@ import {
   SUPPLIER_BY_ID,
   explodeBom,
 } from './catalog';
-import { addDays, diffDays, lastDayOfMonth } from './format';
+import { addDays, addMonths, diffDays, lastDayOfMonth, monthList } from './format';
 import type {
   CompanyFilter,
   CompanyId,
@@ -34,7 +34,10 @@ import type {
   WarehouseId,
 } from './types';
 
-export const OPENING_DATE = '2025-12-31';
+/** Fecha de los saldos iniciales: el día anterior al inicio de la historia. */
+export function openingDate(state: Pick<ErpState, 'startDate'>) {
+  return addDays(state.startDate, -1);
+}
 
 // ---------------- Totales de documentos ----------------
 
@@ -59,7 +62,7 @@ export function poAmounts(po: Pick<PurchaseOrder, 'lines'>) {
   return { ...t, withholding, payable: t.total - withholding };
 }
 
-/** Existencias iniciales (saldo al 31 dic 2025): 75 % del máximo de cada bodega. */
+/** Existencias iniciales (saldo al día anterior al inicio de la historia): 75 % del máximo de cada bodega. */
 export function openingStock() {
   const out: { sku: string; wh: WarehouseId; qty: number; cost: number }[] = [];
   for (const it of ITEMS) {
@@ -150,6 +153,8 @@ export function compute(state: ErpState): Computed {
   };
 
   const evs: Ev[] = [];
+  const OPENING_DATE = openingDate(state);
+  const openingNo = `SI-${OPENING_DATE.slice(0, 4)}`;
 
   // Saldos iniciales
   evs.push({
@@ -158,7 +163,7 @@ export function compute(state: ErpState): Computed {
     run: () => {
       const invByCompany: Record<string, number> = {};
       for (const o of openingStock()) {
-        const value = moveIn(OPENING_DATE, 0, o.sku, o.wh, o.qty, o.cost, 'SI-2025', 'opening');
+        const value = moveIn(OPENING_DATE, 0, o.sku, o.wh, o.qty, o.cost, openingNo, 'opening');
         sumBy(invByCompany, INVENTORY_ACCOUNT[ITEM_BY_SKU[o.sku].kind], value);
       }
       (['com', 'log'] as CompanyId[]).forEach((company) => {
@@ -172,7 +177,7 @@ export function compute(state: ErpState): Computed {
         }
         const d = lines.reduce((s, l) => s + l.debit - l.credit, 0);
         lines.push({ account: '3705', debit: d < 0 ? -d : 0, credit: d > 0 ? d : 0 });
-        push({ id: `open-${company}`, no: 'SI-2025', date: OPENING_DATE, seq: 0, company, source: 'opening', sourceId: company, desc: { key: 'opening' }, lines });
+        push({ id: `open-${company}`, no: openingNo, date: OPENING_DATE, seq: 0, company, source: 'opening', sourceId: company, desc: { key: 'opening', params: { date: OPENING_DATE } }, lines });
       });
     },
   });
@@ -462,6 +467,33 @@ export function compute(state: ErpState): Computed {
     });
   }
 
+  // Cierre del ejercicio: si la historia cruza un 31 de diciembre, las cuentas de
+  // resultado (4, 5 y 6) se cancelan contra utilidades acumuladas (3705) después
+  // de todo lo registrado ese día.
+  for (let y = Number(state.startDate.slice(0, 4)); `${y}-12-31` < state.workDate; y++) {
+    const date = `${y}-12-31`;
+    evs.push({
+      date,
+      seq: Number.MAX_SAFE_INTEGER,
+      run: () => {
+        (['com', 'log'] as CompanyId[]).forEach((company) => {
+          const byAccount: Record<string, number> = {};
+          for (const e of entries) {
+            if (e.company !== company || e.source === 'closing' || e.date < `${y}-01-01` || e.date > date) continue;
+            for (const l of e.lines) if (/^[456]/.test(l.account)) sumBy(byAccount, l.account, l.debit - l.credit);
+          }
+          const lines: EntryLine[] = Object.entries(byAccount)
+            .filter(([, v]) => Math.round(v) !== 0)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([account, v]) => ({ account, debit: v < 0 ? -v : 0, credit: v > 0 ? v : 0 }));
+          const result = lines.reduce((a, l) => a + l.debit - l.credit, 0);
+          lines.push({ account: '3705', debit: result < 0 ? -result : 0, credit: result > 0 ? result : 0 });
+          push({ id: `close-${company}-${y}`, no: `CI-${y}`, date, seq: Number.MAX_SAFE_INTEGER, company, source: 'closing', sourceId: `close-${y}`, desc: { key: 'closing', params: { year: String(y) } }, lines });
+        });
+      },
+    });
+  }
+
   evs.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : a.seq - b.seq));
   for (const ev of evs) ev.run();
 
@@ -478,20 +510,48 @@ export interface Range {
   end: string;
 }
 
-export function periodRange(p: PeriodId): Range & { prev?: Range; months: string[] } {
+export interface PeriodRange extends Range {
+  prev?: Range;
+  months: string[];
+}
+
+/** Rango de fechas de cada período, relativo a la fecha de trabajo (último día de un mes). */
+export function periodRange(p: PeriodId, workDate: string): PeriodRange {
+  const m0 = workDate.slice(0, 7);
+  const month = (ym: string): Range => ({ start: `${ym}-01`, end: lastDayOfMonth(ym) });
   switch (p) {
-    case '2026-09':
-      return { start: '2026-09-01', end: '2026-09-30', prev: { start: '2026-08-01', end: '2026-08-31' }, months: ['2026-09'] };
-    case '2026-08':
-      return { start: '2026-08-01', end: '2026-08-31', prev: { start: '2026-07-01', end: '2026-07-31' }, months: ['2026-08'] };
-    case '2026-07':
-      return { start: '2026-07-01', end: '2026-07-31', prev: { start: '2026-06-01', end: '2026-06-30' }, months: ['2026-07'] };
-    case 'q3':
-      return { start: '2026-07-01', end: '2026-09-30', prev: { start: '2026-04-01', end: '2026-06-30' }, months: ['2026-07', '2026-08', '2026-09'] };
+    case 'm0':
+    case 'm1':
+    case 'm2': {
+      const ym = addMonths(m0, -Number(p[1]));
+      return { ...month(ym), prev: month(addMonths(ym, -1)), months: [ym] };
+    }
+    case 'q': {
+      const from = addMonths(m0, -2);
+      return { start: `${from}-01`, end: workDate, prev: { start: `${addMonths(m0, -5)}-01`, end: lastDayOfMonth(addMonths(m0, -3)) }, months: monthList(from, m0) };
+    }
     case 'ytd':
-    default:
-      return { start: '2026-01-01', end: '2026-09-30', months: ['2026-01', '2026-02', '2026-03', '2026-04', '2026-05', '2026-06', '2026-07', '2026-08', '2026-09'] };
+    default: {
+      const from = `${m0.slice(0, 4)}-01`;
+      return { start: `${from}-01`, end: workDate, months: monthList(from, m0) };
+    }
   }
+}
+
+/** Parte del nombre de un archivo exportado: '2026-09' o '2026-07_2026-09'. */
+export function periodSlug(r: Pick<PeriodRange, 'months'>) {
+  const first = r.months[0];
+  const last = r.months[r.months.length - 1];
+  return first === last ? first : `${first}_${last}`;
+}
+
+/**
+ * Asientos vigentes al cierre de un período: los cierres del ejercicio que
+ * caen en la fecha de corte (o después) aún no se aplican, para que el 31 de
+ * diciembre se vea el resultado del año antes de trasladarlo.
+ */
+export function entriesAsOf(entries: Entry[], end: string) {
+  return entries.filter((e) => e.source !== 'closing' || e.date < end);
 }
 
 export function inCompany(c: CompanyId, f: CompanyFilter) {
@@ -523,7 +583,9 @@ export interface Pnl {
   net: number;
 }
 
-export function pnl(entries: Entry[], company: CompanyFilter, r: Range, taxRate: number): Pnl {
+export function pnl(allEntries: Entry[], company: CompanyFilter, r: Range, taxRate: number): Pnl {
+  // El cierre del ejercicio no es un ingreso ni un gasto: no entra al estado de resultados
+  const entries = allEntries.filter((e) => e.source !== 'closing');
   const revenue = -balance(entries, company, ['41'], r.start, r.end);
   const cogs = balance(entries, company, ['61'], r.start, r.end);
   const opex = balance(entries, company, ['51', '52'], r.start, r.end);

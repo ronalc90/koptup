@@ -4,12 +4,18 @@
  * Estado compartido de la demo: un solo reducer para todos los módulos, de modo
  * que lo que haces en Ventas se ve en Inventario, Contabilidad y Finanzas.
  * Se guarda en el navegador (localStorage) y se puede restablecer.
+ *
+ * La fecha de trabajo depende de hoy (lib/calendar.ts), así que los datos se
+ * arman en el navegador después de montar: el servidor y el primer render del
+ * navegador muestran el mismo marcador de carga (sin errores de hidratación).
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { useLocale } from 'next-intl';
-import { CUSTOMER_BY_ID, INVOICE_PREFIX, ITEM_BY_SKU, PO_LEVEL2_THRESHOLD, WORK_DATE } from './catalog';
-import { compute, docTotals, poAmounts, poOpenAt, saleOpenAt, type Computed } from './engine';
-import { addDays } from './format';
+import { useLocale, useTranslations } from 'next-intl';
+import toast from 'react-hot-toast';
+import { CUSTOMER_BY_ID, INVOICE_PREFIX, ITEM_BY_SKU, PO_LEVEL2_THRESHOLD, REFERENCE_WORK_DATE } from './catalog';
+import { currentWorkDate, historyStartFor } from './calendar';
+import { compute, docTotals, periodRange, poAmounts, poOpenAt, saleOpenAt, type Computed, type PeriodRange } from './engine';
+import { addDays, fmtMonthLong } from './format';
 import { STATE_VERSION, buildSeed, pad } from './seed';
 import type {
   BankLine,
@@ -29,16 +35,44 @@ import type {
 
 const STORAGE_KEY = 'koptup-demo-erp';
 
-let seedCache: ErpState | null = null;
-export function getSeed() {
-  if (!seedCache) seedCache = buildSeed();
-  return seedCache;
+const seedCache = new Map<string, ErpState>();
+/** Datos de ejemplo para una fecha de trabajo (se arman una sola vez por fecha). */
+export function getSeed(workDate: string) {
+  let s = seedCache.get(workDate);
+  if (!s) {
+    s = buildSeed(workDate);
+    seedCache.set(workDate, s);
+  }
+  return s;
+}
+
+/**
+ * Lee lo guardado en este navegador. La versión 3 (sin fecha de trabajo) era
+ * siempre el cierre del 30 sep 2026: se conserva si esa sigue siendo la fecha
+ * de trabajo. Si cambió el mes, lo guardado ya no aplica.
+ */
+export function restoreSaved(raw: string | null, workDate: string): { state: ErpState | null; stale: boolean } {
+  if (!raw) return { state: null, stale: false };
+  const parsed = JSON.parse(raw) as ErpState;
+  if (!parsed || !Array.isArray(parsed.sales)) return { state: null, stale: false };
+  if (parsed.v === 3 && !parsed.workDate) {
+    parsed.v = STATE_VERSION;
+    parsed.workDate = REFERENCE_WORK_DATE;
+    parsed.startDate = historyStartFor(REFERENCE_WORK_DATE);
+  }
+  if (parsed.v !== STATE_VERSION) return { state: null, stale: false };
+  if (parsed.workDate !== workDate) return { state: null, stale: true };
+  // Lo que quedó "enviando" al cerrar la página se da por respondido
+  parsed.sales = parsed.sales.map((s) => (s.dian === 'sending' ? { ...s, dian: 'accepted' } : s));
+  parsed.payroll = parsed.payroll.map((p) => (p.eStatus === 'sending' ? { ...p, eStatus: 'accepted' } : p));
+  return { state: parsed, stale: false };
 }
 
 type Action =
   | { type: 'hydrate'; state: ErpState }
   | { type: 'reset' }
   | { type: 'visit'; module: ModuleId }
+  | { type: 'seenOwnEntry' }
   | { type: 'createQuote'; company: CompanyId; customerId: string; warehouse: WarehouseId; lines: DocLine[] }
   | { type: 'toOrder'; id: string }
   | { type: 'invoice'; id: string }
@@ -67,13 +101,17 @@ function bump(state: ErpState, key: string) {
 }
 
 function reducer(state: ErpState, a: Action): ErpState {
+  // Las operaciones nuevas quedan con la fecha de trabajo (cierre del mes abierto)
+  const WORK_DATE = state.workDate;
   switch (a.type) {
     case 'hydrate':
       return a.state;
     case 'reset':
-      return getSeed();
+      return getSeed(state.workDate);
     case 'visit':
       return state.visited[a.module] ? state : { ...state, visited: { ...state.visited, [a.module]: true } };
+    case 'seenOwnEntry':
+      return state.seenOwnEntry ? state : { ...state, seenOwnEntry: true };
 
     case 'createQuote': {
       const { n, counters } = bump(state, 'COT');
@@ -224,63 +262,99 @@ interface Ctx {
   dispatch: (a: Action) => void;
   filters: Filters;
   setFilters: (f: Partial<Filters>) => void;
+  /** Fecha de trabajo: las operaciones nuevas quedan con esta fecha. */
+  workDate: string;
+  /** Fechas del período elegido en el filtro. */
+  range: PeriodRange;
   module: ModuleId;
   goTo: (m: ModuleId, search?: string, scroll?: boolean) => void;
   locale: Locale;
-  loaded: boolean;
   /** Acciones con efectos simulados (respuesta de la DIAN). */
   invoice: (id: string) => void;
   transmitPayroll: (id: string) => void;
   reset: () => void;
-  /** Muestra el período que contiene la fecha de trabajo si no está a la vista. */
+  /** Muestra el mes abierto (y lo avisa) si estabas viendo un mes anterior. */
   ensureOpenPeriod: () => boolean;
+  /** Nombre del mes abierto ('septiembre de 2026'), para los avisos. */
+  openMonthLabel: string;
 }
 
 const ErpContext = createContext<Ctx | null>(null);
 
-export function ErpProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, undefined, getSeed);
-  const [filters, setFiltersState] = useState<Filters>({ company: 'all', currency: 'COP', period: '2026-09', search: '' });
+interface Boot {
+  state: ErpState;
+  /** Había cambios guardados de un mes anterior y se descartaron. */
+  stale: boolean;
+}
+
+/**
+ * Arma los datos después de montar (dependen de la fecha de hoy) y, mientras
+ * tanto, muestra `fallback`. Así el HTML del servidor y el primer render del
+ * navegador son iguales.
+ */
+export function ErpProvider({ children, fallback }: { children: React.ReactNode; fallback?: React.ReactNode }) {
+  const [boot, setBoot] = useState<Boot | null>(null);
+  useEffect(() => {
+    const workDate = currentWorkDate(Date.now());
+    const seed = getSeed(workDate);
+    let next: Boot = { state: seed, stale: false };
+    try {
+      // Lo guardado de otro mes no se borra aquí: lo reemplaza el guardado automático
+      // (así, si el efecto corre dos veces en desarrollo, el aviso no se pierde)
+      const saved = restoreSaved(window.localStorage.getItem(STORAGE_KEY), workDate);
+      if (saved.state) next = { state: saved.state, stale: false };
+      else if (saved.stale) next = { state: seed, stale: true };
+    } catch {
+      /* sin almacenamiento o datos dañados: se usan los datos de ejemplo */
+    }
+    setBoot(next);
+  }, []);
+  if (!boot) return <>{fallback}</>;
+  return (
+    <ErpStore initial={boot.state} stale={boot.stale}>
+      {children}
+    </ErpStore>
+  );
+}
+
+function ErpStore({ initial, stale, children }: { initial: ErpState; stale: boolean; children: React.ReactNode }) {
+  const [state, dispatch] = useReducer(reducer, initial);
+  const [filters, setFiltersState] = useState<Filters>({ company: 'all', currency: 'COP', period: 'm0', search: '' });
   const [module, setModule] = useState<ModuleId>('sales');
-  const [loaded, setLoaded] = useState(false);
   const rawLocale = useLocale();
   const locale: Locale = rawLocale === 'en' ? 'en' : 'es';
+  const t = useTranslations('demoErp.topbar');
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const workDate = state.workDate;
+  const openMonthLabel = fmtMonthLong(workDate.slice(0, 7), locale);
+
+  // Si lo guardado era de un mes anterior, se avisa una vez que los datos se renovaron
+  const staleShown = useRef(false);
+  useEffect(() => {
+    if (!stale || staleShown.current) return;
+    staleShown.current = true;
+    toast(t('newMonth', { month: openMonthLabel }), { duration: 7000 });
+  }, [stale, t, openMonthLabel]);
 
   useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as ErpState;
-        if (parsed && parsed.v === STATE_VERSION && Array.isArray(parsed.sales)) {
-          // Lo que quedó "enviando" al cerrar la página se da por respondido
-          parsed.sales = parsed.sales.map((s) => (s.dian === 'sending' ? { ...s, dian: 'accepted' } : s));
-          parsed.payroll = parsed.payroll.map((p) => (p.eStatus === 'sending' ? { ...p, eStatus: 'accepted' } : p));
-          dispatch({ type: 'hydrate', state: parsed });
-        }
-      }
-    } catch {
-      /* sin almacenamiento: se usan los datos de ejemplo */
-    }
-    setLoaded(true);
     const pending = timers.current;
     return () => pending.forEach(clearTimeout);
   }, []);
 
   useEffect(() => {
-    if (!loaded) return;
     const id = setTimeout(() => {
       try {
-        if (state === getSeed()) window.localStorage.removeItem(STORAGE_KEY);
+        if (state === getSeed(state.workDate)) window.localStorage.removeItem(STORAGE_KEY);
         else window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       } catch {
         /* almacenamiento lleno o bloqueado */
       }
     }, 250);
     return () => clearTimeout(id);
-  }, [state, loaded]);
+  }, [state]);
 
   const computed = useMemo(() => compute(state), [state]);
+  const range = useMemo(() => periodRange(filters.period, workDate), [filters.period, workDate]);
 
   const setFilters = useCallback((f: Partial<Filters>) => setFiltersState((prev) => ({ ...prev, ...f })), []);
 
@@ -314,14 +388,15 @@ export function ErpProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const ensureOpenPeriod = useCallback(() => {
-    if (filters.period === '2026-09' || filters.period === 'q3' || filters.period === 'ytd') return false;
-    setFiltersState((prev) => ({ ...prev, period: '2026-09' }));
+    if (filters.period === 'm0' || filters.period === 'q' || filters.period === 'ytd') return false;
+    setFiltersState((prev) => ({ ...prev, period: 'm0' }));
+    toast(t('periodSwitched', { month: openMonthLabel }));
     return true;
-  }, [filters.period]);
+  }, [filters.period, t, openMonthLabel]);
 
   const value = useMemo<Ctx>(
-    () => ({ state, computed, dispatch, filters, setFilters, module, goTo, locale, loaded, invoice, transmitPayroll, reset, ensureOpenPeriod }),
-    [state, computed, filters, setFilters, module, goTo, locale, loaded, invoice, transmitPayroll, reset, ensureOpenPeriod],
+    () => ({ state, computed, dispatch, filters, setFilters, workDate, range, module, goTo, locale, invoice, transmitPayroll, reset, ensureOpenPeriod, openMonthLabel }),
+    [state, computed, filters, setFilters, workDate, range, module, goTo, locale, invoice, transmitPayroll, reset, ensureOpenPeriod, openMonthLabel],
   );
 
   return <ErpContext.Provider value={value}>{children}</ErpContext.Provider>;

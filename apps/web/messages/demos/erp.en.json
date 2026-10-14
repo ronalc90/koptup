@@ -4,13 +4,26 @@
       "title": "Modular ERP",
       "subtitle": "Sales, inventory across three warehouses, purchasing with approvals, production, accounting, receivables and payroll for a fictitious company. What you do in one module shows up in the others.",
       "sampleBadge": "Sample data",
-      "sampleHint": "Fictitious company and figures generated for the demo (January–September 2026). DIAN, banks and WhatsApp are simulated.",
+      "sampleHint": "Fictitious company and figures generated for the demo: they run from January to the close of last month. DIAN, banks and WhatsApp are simulated.",
       "seoTitle": "ERP demo: sales, inventory, purchasing and accounting",
       "seoDescription": "Try a modular ERP with sample data: quote, order and invoice that reduce stock and post the journal entry, purchase orders with approvals, bank reconciliation, receivables aging, payroll and production. DIAN validation is simulated.",
       "breadcrumbHome": "Home",
       "breadcrumbDemos": "Demos"
     },
+    "intro": {
+      "back": "Back to the catalog",
+      "guidedDemo": "Request a guided demo",
+      "quote": "Get a quote for your ERP",
+      "kicker": "Interactive demo · ERP for small businesses",
+      "forWhomLabel": "Who it is for:",
+      "forWhom": "managers, accountants and operations leads at small and midsize businesses who want to see how sales, inventory, purchasing, receivables and accounting connect in one system.",
+      "startLabel": "Where to start:",
+      "start": "follow the 5-step walkthrough. Step one: in Sales, turn a quote into an order and invoice it.",
+      "startCta": "Start the walkthrough"
+    },
+    "loading": "Preparing the sample data as of the close of last month…",
     "topbar": {
+      "aria": "Demo filters",
       "company": "Company",
       "companyAll": "Montevera Group (consolidated)",
       "currency": "Currency",
@@ -21,26 +34,21 @@
       "searchPlaceholder": "Invoice, customer, SKU…",
       "clearSearch": "Clear search",
       "resultsIn": "Matches in:",
-      "workDate": "Open period: September 2026 · new transactions are dated {date}",
+      "viewing": "Showing {from} to {to}",
+      "workDate": "Open period: {month} · new transactions are dated {date}",
       "trmNote": "USD converted at a fixed sample exchange rate of {trm}",
       "savedLocally": "Your changes are saved only in this browser",
       "reset": "Reset sample data",
       "resetTitle": "Reset the sample data?",
       "resetBody": "This deletes the quotes, invoices, orders, payments and other changes you made in this demo, and brings back the original data.",
       "resetConfirm": "Yes, reset",
-      "resetDone": "Done: you are back to the sample data."
+      "resetDone": "Done: you are back to the sample data.",
+      "newMonth": "A new month started: the sample data now closes in {month} and the changes you had made were cleared.",
+      "periodSwitched": "We switched the period to {month} so you can see the transaction."
     },
     "periods": {
-      "2026-09": "September 2026",
-      "2026-08": "August 2026",
-      "2026-07": "July 2026",
-      "q3": "Q3 2026",
-      "ytd": "Year 2026 (Jan–Sep)",
-      "prev_2026-09": "August 2026",
-      "prev_2026-08": "July 2026",
-      "prev_2026-07": "June 2026",
-      "prev_q3": "Q2 2026",
-      "prev_ytd": "—"
+      "q": "Last 3 months",
+      "ytd": "Year to date {year}"
     },
     "modules": {
       "aria": "ERP modules",
@@ -108,7 +116,7 @@
         },
         "ledger": {
           "module": "Accounting",
-          "text": "See the automatic entries for your invoice and the updated financial statements."
+          "text": "Open the journal and look at the automatic entry for your invoice: it is among the most recent ones, marked YOURS."
         }
       }
     },
@@ -118,7 +126,7 @@
       "baq": "Barranquilla"
     },
     "entryDesc": {
-      "opening": "Opening balances at December 31, 2025",
+      "opening": "Opening balances at {date}",
       "sale": "Sales invoice {doc} · {third}",
       "creditNote": "Credit note {doc} (return of {ref}) · {third}",
       "receipt_pse": "PSE collection for {doc} · {third}",
@@ -138,7 +146,8 @@
       "exp_unidentified": "Unidentified deposit · {month}",
       "payroll": "Payroll and contributions · {month}",
       "taxVat": "VAT payment for the two-month period ending {month}",
-      "taxWithholding": "Withholding tax payment for {month}"
+      "taxWithholding": "Withholding tax payment for {month}",
+      "closing": "Year-end close {year}: profit or loss moved to retained earnings"
     },
     "accounts": {
       "1105": "Cash",
@@ -210,7 +219,7 @@
         "subtotal": "Subtotal",
         "vat": "VAT",
         "total": "Total",
-        "open": "Balance at 2026-09-30",
+        "open": "Balance at {date}",
         "dian": "DIAN",
         "currency": "Currency"
       },
@@ -225,7 +234,6 @@
         "receivable": "Receivable"
       },
       "yours": "YOURS",
-      "periodSwitched": "We switched the period to September 2026 so you can see the transaction.",
       "toasts": {
         "ordered": "{doc} is now an order.",
         "invoiced": "Invoice {doc} issued. Simulated DIAN validation in progress…",
@@ -327,7 +335,6 @@
       "title": "Inventory by warehouse",
       "subtitle": "Stock and value at {date}. Click a SKU to see its stock card.",
       "noInventoryLog": "Montevera Logística provides storage services and has no inventory of its own. Choose “Surtidora Montevera” or the consolidated view.",
-      "periodSwitched": "We switched the period to September 2026 so you can see the transaction.",
       "toasts": {
         "poCreated": "Purchase order {doc} created for {supplier}: approve it in Purchasing.",
         "transferred": "Transfer {doc}: {qty} of {item} from {from} to {to}."
@@ -390,7 +397,7 @@
         "createPo": "Create PO for {qty}",
         "produce": "Schedule production",
         "transfer": "Transfer from Bogotá",
-        "pastPeriod": "You are viewing a closed period: actions are available in September 2026."
+        "pastPeriod": "You are viewing a closed period: actions are available in {month}."
       },
       "kardex": {
         "open": "View stock card for {sku}",
@@ -443,7 +450,7 @@
         "total": "Total",
         "withholding": "Withholding",
         "payable": "Payable",
-        "open": "Balance at 2026-09-30"
+        "open": "Balance at {date}"
       },
       "status": {
         "pending": "To approve",
@@ -490,7 +497,6 @@
         "rejected": "{doc} rejected.",
         "created": "Purchase order {doc} created. Now approve it."
       },
-      "periodSwitched": "We switched the period to September 2026 so you can see the transaction.",
       "detail": {
         "title": "Purchase order",
         "item": "Product",
@@ -597,11 +603,11 @@
         "subtitle": "Adjustment voucher: debits must equal credits.",
         "company": "Company",
         "desc": "Description",
-        "descPlaceholder": "E.g.: reclassification of September expenses",
+        "descPlaceholder": "E.g.: reclassification of {month} expenses",
         "removeLine": "Remove line",
         "addLine": "Add line",
         "sums": "Debits {debit} · Credits {credit} · Difference {diff}",
-        "note": "Recorded on Sep 30, 2026 and immediately reflected in the trial balance and financial statements.",
+        "note": "Recorded on {date} and immediately reflected in the trial balance and financial statements.",
         "save": "Post entry",
         "done": "Entry {doc} posted.",
         "errorDesc": "Enter a description.",
@@ -609,7 +615,6 @@
         "errorBoth": "Each line must have a debit or a credit, not both.",
         "errorBalance": "Debits and credits must be equal and greater than zero."
       },
-      "periodSwitched": "We switched the period to September 2026 so you can see the transaction.",
       "entry": {
         "title": "Voucher",
         "goSource": "See the document in {module}",
@@ -628,7 +633,8 @@
           "payroll": "Posted automatically when running payroll.",
           "tax": "Posted automatically when paying the tax (account balance at cut-off).",
           "prodStart": "Posted automatically when starting the production order.",
-          "prodFinish": "Posted automatically when finishing the production order."
+          "prodFinish": "Posted automatically when finishing the production order.",
+          "closing": "Year-end close: revenue, cost and expense accounts are moved to retained earnings."
         }
       },
       "trial": {
@@ -673,7 +679,6 @@
       }
     },
     "finance": {
-      "periodSwitched": "We switched the period to September 2026 so you can see the transaction.",
       "cash": {
         "title": "Cash flow",
         "subtitle": "Monthly cash and bank inflows and outflows, calculated from the entries.",
@@ -783,7 +788,7 @@
         "company": "Company account",
         "choose": "Choose CSV file",
         "sample": "Download sample CSV",
-        "format": "Dates YYYY-MM-DD or DD/MM/YYYY between January 1, 2026 and {max}. Positive amounts for inflows, negative for outflows. Separator ; or ,.",
+        "format": "Dates YYYY-MM-DD or DD/MM/YYYY between {min} and {max}. Positive amounts for inflows, negative for outflows. Separator ; or ,.",
         "preview": "{n} lines ready to import ({skipped} rows skipped for format).",
         "date": "Date",
         "desc": "Description",
@@ -872,7 +877,6 @@
     "manufacturing": {
       "title": "Production",
       "noManufacturingLog": "Montevera Logística does not produce. Choose “Surtidora Montevera” or the consolidated view.",
-      "periodSwitched": "We switched the period to September 2026 so you can see the transaction.",
       "yours": "YOURS",
       "toasts": {
         "started": "{doc} started: materials were issued from inventory.",

@@ -40,6 +40,7 @@ export function useEntryDesc() {
     if ('text' in e.desc) return e.desc.text;
     const params: Record<string, string> = { ...(e.desc.params || {}) };
     if (params.month) params.month = fmtMonth(params.month, locale, true);
+    if (params.date) params.date = fmtDate(params.date, locale);
     if (params.item && ITEM_BY_SKU[params.item]) params.item = locale === 'en' ? ITEM_BY_SKU[params.item].nameEn : ITEM_BY_SKU[params.item].name;
     return t(e.desc.key as 'sale', params);
   };
@@ -101,6 +102,9 @@ export const inputCls =
 
 export const plainSelectCls = selectCls;
 
+/** Ventanas abiertas, de la de abajo a la de arriba: Escape cierra solo la de arriba. */
+const modalStack: string[] = [];
+
 export function Modal({
   title,
   subtitle,
@@ -119,14 +123,27 @@ export function Modal({
   const t = useTranslations('demoErp.common');
   const id = useId();
   const ref = useRef<HTMLDivElement>(null);
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
   useEffect(() => {
+    // Al abrir: foco en la ventana; al cerrar: vuelve al control que la abrió
+    const opener = document.activeElement as HTMLElement | null;
+    modalStack.push(id);
+    ref.current?.focus();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape' && modalStack[modalStack.length - 1] === id) {
+        e.stopPropagation();
+        closeRef.current();
+      }
     };
     window.addEventListener('keydown', onKey);
-    ref.current?.focus();
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      const i = modalStack.lastIndexOf(id);
+      if (i >= 0) modalStack.splice(i, 1);
+      if (opener && document.contains(opener)) opener.focus();
+    };
+  }, [id]);
   return (
     <div role="dialog" aria-modal="true" aria-labelledby={id} className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
       <div
@@ -197,15 +214,43 @@ export function Th({ children, right, className = '' }: { children?: React.React
 export const theadCls = 'text-left text-xs uppercase text-secondary-500 dark:text-secondary-400 border-b border-secondary-200 dark:border-secondary-700';
 export const rowCls = 'border-b border-secondary-100 dark:border-secondary-800';
 
+/** Flechas, Inicio y Fin para moverse entre pestañas (patrón de pestañas accesibles). */
+export function tabKeyDown<T extends string>(e: React.KeyboardEvent<HTMLElement>, ids: readonly T[], current: T, select: (id: T) => void) {
+  const i = ids.indexOf(current);
+  let next = -1;
+  if (e.key === 'ArrowRight') next = (i + 1) % ids.length;
+  else if (e.key === 'ArrowLeft') next = (i - 1 + ids.length) % ids.length;
+  else if (e.key === 'Home') next = 0;
+  else if (e.key === 'End') next = ids.length - 1;
+  if (next < 0) return;
+  e.preventDefault();
+  select(ids[next]);
+  const tabs = e.currentTarget.querySelectorAll<HTMLElement>('[role="tab"]');
+  tabs[next]?.focus();
+}
+
 /** Pestañas internas de un módulo. */
-export function SubTabs<T extends string>({ value, onChange, tabs }: { value: T; onChange: (v: T) => void; tabs: { id: T; label: string }[] }) {
+export function SubTabs<T extends string>({ value, onChange, tabs, label }: { value: T; onChange: (v: T) => void; tabs: { id: T; label: string }[]; label?: string }) {
   return (
-    <div role="tablist" className="flex gap-1 bg-secondary-100 dark:bg-secondary-800 p-1 rounded-lg w-full sm:w-auto overflow-x-auto">
+    <div
+      role="tablist"
+      aria-label={label}
+      onKeyDown={(e) =>
+        tabKeyDown(
+          e,
+          tabs.map((x) => x.id),
+          value,
+          onChange,
+        )
+      }
+      className="flex gap-1 bg-secondary-100 dark:bg-secondary-800 p-1 rounded-lg w-full sm:w-auto overflow-x-auto"
+    >
       {tabs.map((tb) => (
         <button
           key={tb.id}
           role="tab"
           aria-selected={value === tb.id}
+          tabIndex={value === tb.id ? 0 : -1}
           onClick={() => onChange(tb.id)}
           className={`px-3 py-1.5 text-xs font-semibold rounded whitespace-nowrap ${value === tb.id ? 'bg-white dark:bg-secondary-700 text-primary-700 dark:text-primary-300 shadow-sm' : 'text-secondary-600 dark:text-secondary-400 hover:text-secondary-900 dark:hover:text-white'}`}
         >

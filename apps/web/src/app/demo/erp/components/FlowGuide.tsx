@@ -1,11 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { CheckCircleIcon, ChevronDownIcon, MapIcon } from '@heroicons/react/24/outline';
 import Card from '@/components/ui/Card';
 import { useErp } from '../lib/store';
 import type { ModuleId } from '../lib/types';
+
+/** Evento que dispara «Empezar el recorrido» del encabezado (que vive fuera del proveedor de datos). */
+export const START_TOUR_EVENT = 'erp-start-tour';
 
 /**
  * Recorrido de punta a punta: cada paso se marca solo cuando haces la acción
@@ -16,22 +19,31 @@ export default function FlowGuide() {
   const { state, goTo, module } = useErp();
   const [open, setOpen] = useState(true);
 
+  // «Empezar el recorrido» abre el panel (el enlace ya lleva la vista hasta aquí)
+  useEffect(() => {
+    const onStart = () => setOpen(true);
+    window.addEventListener(START_TOUR_EVENT, onStart);
+    return () => window.removeEventListener(START_TOUR_EVENT, onStart);
+  }, []);
+
   const steps: { id: string; module: ModuleId; done: boolean }[] = [
     { id: 'invoice', module: 'sales', done: state.sales.some((s) => s.user && s.status === 'invoiced') },
     { id: 'reorder', module: 'inventory', done: state.pos.some((p) => p.user && (p.origin === 'reorder' || p.origin === 'mrp')) },
     { id: 'approve', module: 'purchases', done: state.pos.some((p) => p.user && p.status === 'received') },
     { id: 'reconcile', module: 'finance', done: state.bank.some((b) => b.match?.by === 'user') },
-    { id: 'ledger', module: 'accounting', done: !!state.visited.accounting && state.sales.some((s) => s.user && s.status === 'invoiced') },
+    { id: 'ledger', module: 'accounting', done: !!state.seenOwnEntry },
   ];
   const doneCount = steps.filter((s) => s.done).length;
 
   return (
-    <Card variant="bordered" padding="none" className="overflow-hidden">
+    <Card variant="bordered" padding="none" className="overflow-hidden scroll-mt-24" id="erp-recorrido">
       <button onClick={() => setOpen((o) => !o)} aria-expanded={open} className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left hover:bg-secondary-50 dark:hover:bg-secondary-800/50">
         <span className="flex items-center gap-2 min-w-0">
-          <MapIcon className="w-5 h-5 text-primary-600 dark:text-primary-400 shrink-0" />
-          <span className="font-semibold text-sm text-secondary-900 dark:text-white">{t('title')}</span>
-          <span className="text-xs text-secondary-500 dark:text-secondary-400 truncate">{t('progress', { done: doneCount, total: steps.length })}</span>
+          <MapIcon className="w-5 h-5 text-primary-600 dark:text-primary-400 shrink-0" aria-hidden="true" />
+          <span className="flex flex-wrap items-baseline gap-x-2 min-w-0">
+            <span className="font-semibold text-sm text-secondary-900 dark:text-white">{t('title')}</span>
+            <span className="text-xs text-secondary-500 dark:text-secondary-400">{t('progress', { done: doneCount, total: steps.length })}</span>
+          </span>
         </span>
         <ChevronDownIcon className={`w-4 h-4 text-secondary-500 transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>

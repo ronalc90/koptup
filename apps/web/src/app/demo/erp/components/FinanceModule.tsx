@@ -6,9 +6,9 @@ import toast from 'react-hot-toast';
 import { ArrowDownTrayIcon, ChatBubbleLeftEllipsisIcon, DocumentArrowUpIcon } from '@heroicons/react/24/outline';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
-import { COMPANIES, CUSTOMER_BY_ID, WORK_DATE } from '../lib/catalog';
-import { AGING_BUCKETS, bucketOf, cashFlowByMonth, inCompany, payables, periodRange, receivables, saleOpenAt, type OpenItem } from '../lib/engine';
-import { addDays, csvMoney, downloadCsv, downloadText, norm, toDays } from '../lib/format';
+import { COMPANIES, CUSTOMER_BY_ID } from '../lib/catalog';
+import { AGING_BUCKETS, bucketOf, cashFlowByMonth, inCompany, payables, receivables, saleOpenAt, type OpenItem } from '../lib/engine';
+import { addDays, addMonths, csvMoney, downloadCsv, downloadText, monthList, norm, toDays } from '../lib/format';
 import { bankMatches } from '../lib/search';
 import { useErp } from '../lib/store';
 import type { BankLine, CompanyId, SaleDoc } from '../lib/types';
@@ -18,15 +18,15 @@ const BUCKET_COLORS = ['bg-emerald-500', 'bg-blue-500', 'bg-yellow-500', 'bg-ora
 
 export default function FinanceModule() {
   const t = useTranslations('demoErp.finance');
-  const { computed, filters, state } = useErp();
+  const { computed, filters, state, range: r } = useErp();
   const f = useFmt();
-  const r = periodRange(filters.period);
+  // Año corrido: sus meses. Otros períodos: los 6 meses que terminan en el período (sin salirse de la historia)
   const months = useMemo(() => {
     const endM = r.end.slice(0, 7);
-    const all = ['2026-01', '2026-02', '2026-03', '2026-04', '2026-05', '2026-06', '2026-07', '2026-08', '2026-09'];
-    const idx = all.indexOf(endM);
-    return filters.period === 'ytd' ? all : all.slice(Math.max(0, idx - 5), idx + 1);
-  }, [r.end, filters.period]);
+    if (filters.period === 'ytd') return r.months;
+    const from = addMonths(endM, -5) < state.startDate.slice(0, 7) ? state.startDate.slice(0, 7) : addMonths(endM, -5);
+    return monthList(from, endM);
+  }, [r.end, r.months, filters.period, state.startDate]);
   const flow = useMemo(() => cashFlowByMonth(computed.entries, filters.company, months), [computed, filters.company, months]);
   const maxVal = Math.max(1, ...flow.flatMap((x) => [x.inflow, x.outflow]));
   const inPeriod = flow.filter((x) => r.months.includes(x.month));
@@ -273,7 +273,7 @@ interface Suggestion {
 }
 
 function useSuggest() {
-  const { state, computed } = useErp();
+  const { workDate: WORK_DATE, state, computed } = useErp();
   return (b: BankLine): Suggestion | null => {
     if (b.match) return null;
     const d = norm(b.desc);
@@ -317,12 +317,12 @@ function useSuggest() {
 function Reconciliation() {
   const t = useTranslations('demoErp.finance');
   const tc = useTranslations('demoErp.common');
-  const { state, filters, dispatch, ensureOpenPeriod, computed } = useErp();
+  const { workDate: WORK_DATE, state, filters, dispatch, ensureOpenPeriod, computed } = useErp();
   const f = useFmt();
   const suggest = useSuggest();
   const [view, setView] = useState<'pending' | 'matched' | 'all'>('pending');
   const [importing, setImporting] = useState(false);
-  const r = periodRange(filters.period);
+  const r = useErp().range;
   const lines = useMemo(
     () =>
       state.bank
@@ -352,7 +352,7 @@ function Reconciliation() {
       dispatch({ type: 'bankExpense', lineId: b.id, kind: s.kind });
       toast.success(t(`recon.toasts.${s.kind}`));
     }
-    if (ensureOpenPeriod()) toast(t('periodSwitched'));
+    ensureOpenPeriod();
   };
 
   return (
@@ -392,7 +392,7 @@ function Reconciliation() {
 
 function BankRow({ line: b, suggestion: s, doc, onAccept }: { line: BankLine; suggestion: Suggestion | null; doc: string; onAccept: (b: BankLine, s: Suggestion, saleId?: string) => void }) {
   const t = useTranslations('demoErp.finance');
-  const { state, computed } = useErp();
+  const { workDate: WORK_DATE, state, computed } = useErp();
   const f = useFmt();
   const [alt, setAlt] = useState('');
   const candidates = useMemo(() => {
@@ -403,7 +403,7 @@ function BankRow({ line: b, suggestion: s, doc, onAccept }: { line: BankLine; su
       .filter((c) => c.open >= b.amount - 1)
       .sort((a, c) => Math.abs(a.open - b.amount) - Math.abs(c.open - b.amount))
       .slice(0, 6);
-  }, [s, b, state.sales, computed]);
+  }, [s, b, state.sales, computed, WORK_DATE]);
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-3 rounded-lg border border-secondary-200 dark:border-secondary-700">
       <div className="min-w-0 flex-1">
@@ -472,7 +472,7 @@ function parseDate(raw: string) {
 function ImportBank({ onClose }: { onClose: () => void }) {
   const t = useTranslations('demoErp.finance');
   const tc = useTranslations('demoErp.common');
-  const { state, computed, dispatch, filters, locale, ensureOpenPeriod } = useErp();
+  const { workDate: WORK_DATE, state, computed, dispatch, filters, locale, ensureOpenPeriod } = useErp();
   const [company, setCompany] = useState<CompanyId>(filters.company === 'log' ? 'log' : 'com');
   const [preview, setPreview] = useState<{ date: string; desc: string; amount: number }[] | null>(null);
   const [skipped, setSkipped] = useState(0);
@@ -509,7 +509,7 @@ function ImportBank({ onClose }: { onClose: () => void }) {
       const date = parseDate(cols[0] || '');
       const amount = parseAmount(cols[2] || '');
       const desc = (cols[1] || '').slice(0, 80);
-      if (!date || date < '2026-01-01' || date > WORK_DATE || !desc || !Number.isFinite(amount) || amount === 0) {
+      if (!date || date < state.startDate || date > WORK_DATE || !desc || !Number.isFinite(amount) || amount === 0) {
         bad++;
         return;
       }
@@ -523,7 +523,7 @@ function ImportBank({ onClose }: { onClose: () => void }) {
   const save = () => {
     if (!preview) return;
     dispatch({ type: 'importBank', company, lines: preview });
-    if (ensureOpenPeriod()) toast(t('periodSwitched'));
+    ensureOpenPeriod();
     toast.success(t('import.done', { n: preview.length }));
     onClose();
   };
@@ -575,7 +575,7 @@ function ImportBank({ onClose }: { onClose: () => void }) {
           />
         </div>
       </div>
-      <p className="text-[11px] text-secondary-500 mb-3">{t('import.format', { max: f.date(WORK_DATE) })}</p>
+      <p className="text-[11px] text-secondary-500 mb-3">{t('import.format', { min: f.date(state.startDate), max: f.date(WORK_DATE) })}</p>
       {error && <p className="text-xs text-red-600 mb-2">{error}</p>}
       {preview && (
         <>

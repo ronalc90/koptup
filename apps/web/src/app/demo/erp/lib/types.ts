@@ -4,7 +4,8 @@ export type CompanyFilter = 'all' | CompanyId;
 export type WarehouseId = 'bog' | 'med' | 'baq';
 export type ItemKind = 'merch' | 'finished' | 'raw' | 'service';
 export type CurrencyCode = 'COP' | 'USD';
-export type PeriodId = '2026-09' | '2026-08' | '2026-07' | 'q3' | 'ytd';
+/** Mes de cierre (m0), los dos meses anteriores, los últimos 3 meses y el año corrido. */
+export type PeriodId = 'm0' | 'm1' | 'm2' | 'q' | 'ytd';
 export type ModuleId = 'sales' | 'inventory' | 'purchases' | 'accounting' | 'finance' | 'hr' | 'manufacturing';
 
 // ---------------- Datos maestros ----------------
@@ -255,6 +256,10 @@ export interface ManualEntry {
 
 export interface ErpState {
   v: number;
+  /** Fecha de trabajo: último día del mes que se está cerrando (las operaciones nuevas quedan con esta fecha). */
+  workDate: string;
+  /** Primer día de la historia de ejemplo (los saldos iniciales van al día anterior). */
+  startDate: string;
   seq: number;
   counters: Record<string, number>;
   sales: SaleDoc[];
@@ -270,6 +275,8 @@ export interface ErpState {
   bank: BankLine[];
   manual: ManualEntry[];
   visited: Partial<Record<ModuleId, boolean>>;
+  /** Viste en Contabilidad el asiento de una factura que emitiste (paso 5 del recorrido). */
+  seenOwnEntry?: boolean;
 }
 
 // ---------------- Resultados calculados ----------------
@@ -315,7 +322,8 @@ export type EntrySource =
   | 'tax'
   | 'prodStart'
   | 'prodFinish'
-  | 'manual';
+  | 'manual'
+  | 'closing';
 
 export interface Entry {
   id: string;

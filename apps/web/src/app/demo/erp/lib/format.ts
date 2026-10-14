@@ -13,6 +13,14 @@ const MONTHS: Record<Locale, string[]> = {
   en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
 };
 
+const MONTHS_LONG: Record<Locale, string[]> = {
+  es: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
+  en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+};
+
+/** Nombres de los meses en mayúsculas y sin tildes, como los escribe un extracto bancario. */
+export const BANK_MONTHS = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
+
 function group(intStr: string, sep: string) {
   return intStr.replace(/\B(?=(\d{3})+(?!\d))/g, sep);
 }
@@ -89,6 +97,32 @@ export function fmtMonth(iso: string, locale: Locale, withYear = false) {
   return withYear ? `${mon} ${y}` : mon;
 }
 
+/** '2026-09' -> 'septiembre de 2026' (es) / 'September 2026' (en). */
+export function fmtMonthLong(iso: string, locale: Locale, withYear = true) {
+  const [y, m] = iso.split('-').map(Number);
+  const mon = MONTHS_LONG[locale][m - 1];
+  if (!withYear) return mon;
+  return locale === 'es' ? `${mon} de ${y}` : `${mon} ${y}`;
+}
+
+/** '2026-09' -> 'Septiembre 2026' (es) / 'September 2026' (en): rótulo corto para listas. */
+export function fmtMonthTitle(ym: string, locale: Locale) {
+  const [y, m] = ym.split('-').map(Number);
+  return capitalize(`${MONTHS_LONG[locale][m - 1]} ${y}`);
+}
+
+/** Rango de meses corto: 'jul–sep 2026' o 'nov 2026–ene 2027'. */
+export function fmtMonthRange(fromYm: string, toYm: string, locale: Locale) {
+  const sameYear = fromYm.slice(0, 4) === toYm.slice(0, 4);
+  if (fromYm === toYm) return fmtMonth(fromYm, locale, true);
+  return sameYear ? `${fmtMonth(fromYm, locale)}–${fmtMonth(toYm, locale, true)}` : `${fmtMonth(fromYm, locale, true)}–${fmtMonth(toYm, locale, true)}`;
+}
+
+/** Primera letra en mayúscula (para rótulos de listas). */
+export function capitalize(s: string) {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+}
+
 // ---------- Fechas como días civiles (sin Date) ----------
 
 /** Días desde 1970-01-01 (algoritmo de Howard Hinnant). */
@@ -127,6 +161,39 @@ export function diffDays(a: string, b: string) {
 /** 0 = domingo … 6 = sábado. */
 export function weekday(iso: string) {
   return (((toDays(iso) + 4) % 7) + 7) % 7;
+}
+
+/** Suma meses a 'AAAA-MM'. */
+export function addMonths(ym: string, n: number) {
+  const [y, m] = ym.split('-').map(Number);
+  const idx = y * 12 + (m - 1) + n;
+  return `${Math.floor(idx / 12)}-${String((idx % 12) + 1).padStart(2, '0')}`;
+}
+
+/** Meses completos entre dos fechas o meses ('2026-01' → '2026-09' = 8). */
+export function monthsBetween(from: string, to: string) {
+  const [y1, m1] = from.split('-').map(Number);
+  const [y2, m2] = to.split('-').map(Number);
+  return (y2 - y1) * 12 + (m2 - m1);
+}
+
+/** Lista de meses 'AAAA-MM' de `from` a `to`, ambos incluidos. */
+export function monthList(from: string, to: string) {
+  const out: string[] = [];
+  for (let ym = from.slice(0, 7); ym <= to.slice(0, 7); ym = addMonths(ym, 1)) out.push(ym);
+  return out;
+}
+
+/** Días hábiles (lunes a viernes) entre dos fechas, ambas incluidas. */
+export function businessDays(from: string, to: string) {
+  let n = 0;
+  for (let d = from; d <= to; d = addDays(d, 1)) if (weekday(d) >= 1 && weekday(d) <= 5) n++;
+  return n;
+}
+
+/** Fecha de hoy en Colombia (UTC−5, sin horario de verano). Solo se llama en el navegador después de montar. */
+export function todayInColombia(nowMs: number) {
+  return fromDays(Math.floor((nowMs - 5 * 3_600_000) / 86_400_000));
 }
 
 export function lastDayOfMonth(ym: string) {

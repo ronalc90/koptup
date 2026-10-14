@@ -14,7 +14,8 @@ import {
 } from '@heroicons/react/24/outline';
 import Card from '@/components/ui/Card';
 import { INCOME_TAX_RATE } from '../lib/catalog';
-import { balance, periodRange, pnl, receivables } from '../lib/engine';
+import { balance, pnl, receivables } from '../lib/engine';
+import { fmtMonthLong, fmtMonthRange } from '../lib/format';
 import { useErp } from '../lib/store';
 import type { ModuleId } from '../lib/types';
 import { useFmt } from './ui';
@@ -39,12 +40,11 @@ interface Kpi {
 
 export default function Kpis() {
   const t = useTranslations('demoErp.kpis');
-  const tp = useTranslations('demoErp.periods');
-  const { computed, state, filters, goTo } = useErp();
+  const { computed, state, filters, goTo, range } = useErp();
   const f = useFmt();
 
   const kpis = useMemo<Kpi[]>(() => {
-    const r = periodRange(filters.period);
+    const r = range;
     const co = filters.company;
     const cur = pnl(computed.entries, co, r, INCOME_TAX_RATE);
     const prev = r.prev ? pnl(computed.entries, co, r.prev, INCOME_TAX_RATE) : null;
@@ -68,9 +68,15 @@ export default function Kpis() {
     ];
     // f cambia con idioma y moneda
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [computed, state, filters.period, filters.company, filters.currency, f.locale, t]);
+  }, [computed, state, range, filters.company, filters.currency, f.locale, t]);
 
-  const compareLabel = filters.period === 'ytd' ? t('ytdNote') : t('vs', { period: tp(`prev_${filters.period}`) });
+  // Período con el que se compara: el mes anterior o los tres meses anteriores
+  const prevLabel = range.prev
+    ? range.prev.start.slice(0, 7) === range.prev.end.slice(0, 7)
+      ? fmtMonthLong(range.prev.start.slice(0, 7), f.locale)
+      : fmtMonthRange(range.prev.start.slice(0, 7), range.prev.end.slice(0, 7), f.locale)
+    : '';
+  const compareLabel = range.prev ? t('vs', { period: prevLabel }) : t('ytdNote');
 
   return (
     <section aria-label={t('aria')} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">

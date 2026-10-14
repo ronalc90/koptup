@@ -7,8 +7,8 @@ import toast from 'react-hot-toast';
 import { ArrowDownTrayIcon, EyeIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
-import { COMPANIES, CUSTOMERS, CUSTOMER_BY_ID, INVOICE_PREFIX, ITEMS, ITEM_BY_SKU, WAREHOUSES, WORK_DATE } from '../lib/catalog';
-import { docTotals, inCompany, periodRange, saleOpenAt, valuationAt, stockOf } from '../lib/engine';
+import { COMPANIES, CUSTOMERS, CUSTOMER_BY_ID, INVOICE_PREFIX, ITEMS, ITEM_BY_SKU, WAREHOUSES } from '../lib/catalog';
+import { docTotals, inCompany, periodSlug, saleOpenAt, valuationAt, stockOf } from '../lib/engine';
 import { csvMoney, diffDays, downloadCsv, fmtNit } from '../lib/format';
 import { saleListDate, saleMatches } from '../lib/search';
 import { pad } from '../lib/seed';
@@ -38,13 +38,13 @@ export function useShortages() {
 export default function SalesModule() {
   const t = useTranslations('demoErp.sales');
   const tc = useTranslations('demoErp.common');
-  const { state, computed, filters, locale } = useErp();
+  const { workDate: WORK_DATE, state, computed, filters, locale } = useErp();
   const f = useFmt();
   const [view, setView] = useState<View>('all');
   const [openId, setOpenId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [paying, setPaying] = useState<string | null>(null);
-  const r = periodRange(filters.period);
+  const r = useErp().range;
 
   const rows = useMemo(
     () =>
@@ -68,7 +68,7 @@ export default function SalesModule() {
   const sum = (xs: SaleDoc[]) => xs.reduce((a, s) => a + docTotals(s.lines).total, 0);
 
   const exportCsv = () => {
-    const head = [t('csv.doc'), t('csv.status'), t('csv.company'), t('csv.customer'), t('csv.nit'), t('csv.date'), t('csv.subtotal'), t('csv.vat'), t('csv.total'), t('csv.open'), t('csv.dian'), t('csv.currency')];
+    const head = [t('csv.doc'), t('csv.status'), t('csv.company'), t('csv.customer'), t('csv.nit'), t('csv.date'), t('csv.subtotal'), t('csv.vat'), t('csv.total'), t('csv.open', { date: WORK_DATE }), t('csv.dian'), t('csv.currency')];
     const data = rows.map((s) => {
       const tt = docTotals(s.lines);
       const c = CUSTOMER_BY_ID[s.customerId];
@@ -87,7 +87,7 @@ export default function SalesModule() {
         filters.currency,
       ];
     });
-    downloadCsv(`ventas-${filters.period}.csv`, [head, ...data], locale);
+    downloadCsv(`ventas-${periodSlug(r)}.csv`, [head, ...data], locale);
     toast.success(tc('csvDone', { n: data.length }));
   };
 
@@ -171,7 +171,7 @@ function Summary({ label, count, value, onClick }: { label: string; count: numbe
 
 export function SaleStatusBadge({ s }: { s: SaleDoc }) {
   const t = useTranslations('demoErp.sales');
-  const { computed } = useErp();
+  const { workDate: WORK_DATE, computed } = useErp();
   if (s.status === 'quote') return <Badge variant="default">{t('status.quote')}</Badge>;
   if (s.status === 'order') return <Badge variant="info">{t('status.order')}</Badge>;
   if (s.creditNote) return <Badge variant="danger">{t('status.credited', { doc: s.creditNote.no })}</Badge>;
@@ -184,14 +184,14 @@ export function SaleStatusBadge({ s }: { s: SaleDoc }) {
 
 function SaleRow({ s, onView, onPay }: { s: SaleDoc; onView: () => void; onPay: () => void }) {
   const t = useTranslations('demoErp.sales');
-  const { computed, dispatch, ensureOpenPeriod } = useErp();
+  const { workDate: WORK_DATE, computed, dispatch, ensureOpenPeriod } = useErp();
   const f = useFmt();
   const c = CUSTOMER_BY_ID[s.customerId];
   const tt = docTotals(s.lines);
   const open = saleOpenAt(s, computed, WORK_DATE);
   const toOrder = () => {
     dispatch({ type: 'toOrder', id: s.id });
-    if (ensureOpenPeriod()) toast(t('periodSwitched'));
+    ensureOpenPeriod();
     toast.success(t('toasts.ordered', { doc: s.quoteNo }));
   };
   return (
@@ -242,7 +242,7 @@ function SaleModal({ sale: s, onClose, onPay }: { sale: SaleDoc; onClose: () => 
   const t = useTranslations('demoErp.sales');
   const tc = useTranslations('demoErp.common');
   const tw = useTranslations('demoErp.warehouses');
-  const { computed, dispatch, invoice, goTo, ensureOpenPeriod, state } = useErp();
+  const { workDate: WORK_DATE, computed, dispatch, invoice, goTo, ensureOpenPeriod, state } = useErp();
   const f = useFmt();
   const shortages = useShortages();
   const [confirmCn, setConfirmCn] = useState(false);
@@ -258,18 +258,18 @@ function SaleModal({ sale: s, onClose, onPay }: { sale: SaleDoc; onClose: () => 
     const prefix = INVOICE_PREFIX[s.company];
     const n = state.counters[prefix];
     invoice(s.id);
-    if (ensureOpenPeriod()) toast(t('periodSwitched'));
+    ensureOpenPeriod();
     toast.success(t('toasts.invoiced', { doc: `${prefix}-${n}` }));
   };
   const doOrder = () => {
     dispatch({ type: 'toOrder', id: s.id });
-    if (ensureOpenPeriod()) toast(t('periodSwitched'));
+    ensureOpenPeriod();
     toast.success(t('toasts.ordered', { doc: s.quoteNo }));
   };
   const doCreditNote = () => {
     const n = state.counters.NC;
     dispatch({ type: 'creditNote', id: s.id });
-    if (ensureOpenPeriod()) toast(t('periodSwitched'));
+    ensureOpenPeriod();
     toast.success(t('toasts.credited', { doc: `NC-${pad(n)}` }));
     setConfirmCn(false);
   };
@@ -442,7 +442,7 @@ function QuoteForm({ onClose }: { onClose: () => void }) {
   const t = useTranslations('demoErp.sales');
   const tc = useTranslations('demoErp.common');
   const tw = useTranslations('demoErp.warehouses');
-  const { filters, computed, dispatch, state, ensureOpenPeriod } = useErp();
+  const { workDate: WORK_DATE, filters, computed, dispatch, state, ensureOpenPeriod } = useErp();
   const f = useFmt();
   const [company, setCompany] = useState<CompanyId>(filters.company === 'log' ? 'log' : 'com');
   const customers = CUSTOMERS.filter((c) => c.companies.includes(company));
@@ -472,7 +472,7 @@ function QuoteForm({ onClose }: { onClose: () => void }) {
     if (new Set(parsed.map((l) => l.sku)).size !== parsed.length) return setError(t('form.errorDup'));
     const n = state.counters.COT;
     dispatch({ type: 'createQuote', company, customerId, warehouse: company === 'log' ? 'bog' : warehouse, lines: parsed });
-    if (ensureOpenPeriod()) toast(t('periodSwitched'));
+    ensureOpenPeriod();
     toast.success(t('toasts.quoted', { doc: `COT-${pad(n)}` }));
     onClose();
   };
@@ -582,7 +582,7 @@ function QuoteForm({ onClose }: { onClose: () => void }) {
 function PaymentForm({ saleId, onClose }: { saleId: string; onClose: () => void }) {
   const t = useTranslations('demoErp.sales');
   const tc = useTranslations('demoErp.common');
-  const { state, computed, dispatch, ensureOpenPeriod } = useErp();
+  const { workDate: WORK_DATE, state, computed, dispatch, ensureOpenPeriod } = useErp();
   const f = useFmt();
   const s = state.sales.find((x) => x.id === saleId)!;
   const open = saleOpenAt(s, computed, WORK_DATE);
@@ -594,7 +594,7 @@ function PaymentForm({ saleId, onClose }: { saleId: string; onClose: () => void 
     if (!v || v <= 0 || v > open) return setError(t('payment.error', { max: f.cop(open) }));
     const n = state.counters.RC;
     dispatch({ type: 'receipt', saleId, amount: v, method });
-    if (ensureOpenPeriod()) toast(t('periodSwitched'));
+    ensureOpenPeriod();
     toast.success(t('toasts.paid', { doc: `RC-${pad(n)}`, inv: s.invoiceNo! }));
     onClose();
   };

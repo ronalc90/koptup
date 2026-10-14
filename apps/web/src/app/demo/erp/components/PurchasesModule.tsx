@@ -6,8 +6,8 @@ import toast from 'react-hot-toast';
 import { ArrowDownTrayIcon, CheckCircleIcon, DocumentArrowUpIcon, EyeIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
-import { ITEMS, ITEM_BY_SKU, PO_LEVEL2_THRESHOLD, PURCHASE_WITHHOLDING, SUPPLIERS, SUPPLIER_BY_ID, WAREHOUSES, WORK_DATE } from '../lib/catalog';
-import { docTotals, periodRange, poAmounts, poDueDate, poOpenAt, valuationAt } from '../lib/engine';
+import { ITEMS, ITEM_BY_SKU, PO_LEVEL2_THRESHOLD, PURCHASE_WITHHOLDING, SUPPLIERS, SUPPLIER_BY_ID, WAREHOUSES } from '../lib/catalog';
+import { docTotals, periodSlug, poAmounts, poDueDate, poOpenAt, valuationAt } from '../lib/engine';
 import { csvMoney, downloadCsv, downloadText, fmtNit } from '../lib/format';
 import { poMatches } from '../lib/search';
 import { pad } from '../lib/seed';
@@ -21,7 +21,7 @@ type View = 'pending' | 'approved' | 'received' | 'all';
 export default function PurchasesModule() {
   const t = useTranslations('demoErp.purchases');
   const tc = useTranslations('demoErp.common');
-  const { state, computed, filters, locale } = useErp();
+  const { workDate: WORK_DATE, state, computed, filters, locale } = useErp();
   const f = useFmt();
   // Si llegas desde un enlace con búsqueda (p. ej. «OC en curso»), se muestran todas las OC
   const [view, setView] = useState<View>(() => (filters.search ? 'all' : 'pending'));
@@ -29,7 +29,7 @@ export default function PurchasesModule() {
   const [receiving, setReceiving] = useState<string | null>(null);
   const [rejecting, setRejecting] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
-  const r = periodRange(filters.period);
+  const r = useErp().range;
 
   const list = useMemo(
     () =>
@@ -53,13 +53,13 @@ export default function PurchasesModule() {
   }
 
   const exportCsv = () => {
-    const head = [t('csv.doc'), t('csv.status'), t('csv.supplier'), t('csv.nit'), t('csv.date'), t('csv.warehouse'), t('csv.subtotal'), t('csv.vat'), t('csv.total'), t('csv.withholding'), t('csv.payable'), t('csv.open'), tc('currency')];
+    const head = [t('csv.doc'), t('csv.status'), t('csv.supplier'), t('csv.nit'), t('csv.date'), t('csv.warehouse'), t('csv.subtotal'), t('csv.vat'), t('csv.total'), t('csv.withholding'), t('csv.payable'), t('csv.open', { date: WORK_DATE }), tc('currency')];
     const data = list.map((p) => {
       const a = poAmounts(p);
       const s = SUPPLIER_BY_ID[p.supplierId];
       return [p.no, t(`status.${p.status}`), s.name, fmtNit(s.nit), p.date, p.warehouse, csvMoney(a.subtotal, filters.currency), csvMoney(a.vat, filters.currency), csvMoney(a.total, filters.currency), csvMoney(a.withholding, filters.currency), csvMoney(a.payable, filters.currency), csvMoney(poOpenAt(p, computed, WORK_DATE), filters.currency), filters.currency];
     });
-    downloadCsv(`compras-${filters.period}.csv`, [head, ...data], locale);
+    downloadCsv(`compras-${periodSlug(r)}.csv`, [head, ...data], locale);
     toast.success(tc('csvDone', { n: data.length }));
   };
 
@@ -123,7 +123,7 @@ export default function PurchasesModule() {
 
 function PoStatus({ po }: { po: PurchaseOrder }) {
   const t = useTranslations('demoErp.purchases');
-  const { computed } = useErp();
+  const { workDate: WORK_DATE, computed } = useErp();
   if (po.status === 'pending') return <Badge variant="warning">{t('status.pending')}</Badge>;
   if (po.status === 'approved') return <Badge variant="info">{t('status.approved')}</Badge>;
   if (po.status === 'rejected') return <Badge variant="danger">{t('status.rejected')}</Badge>;
@@ -133,7 +133,7 @@ function PoStatus({ po }: { po: PurchaseOrder }) {
 function PoCard({ po, onDetail, onReceive, onReject }: { po: PurchaseOrder; onDetail: () => void; onReceive: () => void; onReject: () => void }) {
   const t = useTranslations('demoErp.purchases');
   const tw = useTranslations('demoErp.warehouses');
-  const { computed, dispatch, ensureOpenPeriod, state } = useErp();
+  const { workDate: WORK_DATE, computed, dispatch, ensureOpenPeriod, state } = useErp();
   const f = useFmt();
   const a = poAmounts(po);
   const open = poOpenAt(po, computed, WORK_DATE);
@@ -147,13 +147,13 @@ function PoCard({ po, onDetail, onReceive, onReject }: { po: PurchaseOrder; onDe
   const firstPending = steps.findIndex((s) => !s.done);
   const approve = () => {
     dispatch({ type: 'approvePo', id: po.id, level: nextLevel });
-    if (ensureOpenPeriod()) toast(t('periodSwitched'));
+    ensureOpenPeriod();
     toast.success(t(nextLevel >= po.levels ? 'toasts.approvedFinal' : 'toasts.approvedLevel', { doc: po.no, role: t(`flow.level${nextLevel}`) }));
   };
   const pay = () => {
     const n = state.counters.CE;
     dispatch({ type: 'payPo', id: po.id });
-    if (ensureOpenPeriod()) toast(t('periodSwitched'));
+    ensureOpenPeriod();
     toast.success(t('toasts.paid', { doc: `CE-${pad(n)}`, po: po.no, amount: f.cop(open) }));
   };
   return (
@@ -305,7 +305,7 @@ function ReceiveForm({ id, onClose }: { id: string; onClose: () => void }) {
   const t = useTranslations('demoErp.purchases');
   const tc = useTranslations('demoErp.common');
   const tw = useTranslations('demoErp.warehouses');
-  const { state, dispatch, ensureOpenPeriod } = useErp();
+  const { workDate: WORK_DATE, state, dispatch, ensureOpenPeriod } = useErp();
   const f = useFmt();
   const po = state.pos.find((p) => p.id === id)!;
   const s = SUPPLIER_BY_ID[po.supplierId];
@@ -347,7 +347,7 @@ function ReceiveForm({ id, onClose }: { id: string; onClose: () => void }) {
   const save = () => {
     if (!invoiceNo.trim()) return;
     dispatch({ type: 'receivePo', id: po.id, invoiceNo: invoiceNo.trim(), source: xml ? 'xml' : 'manual' });
-    if (ensureOpenPeriod()) toast(t('periodSwitched'));
+    ensureOpenPeriod();
     toast.success(t('toasts.received', { doc: po.no, wh: tw(po.warehouse) }));
     onClose();
   };
@@ -518,7 +518,7 @@ function PoForm({ onClose }: { onClose: () => void }) {
     if (parsed.some((l) => ITEM_BY_SKU[l.sku].kind === 'raw') && warehouse !== 'bog') return setError(t('form.errorRaw'));
     const n = state.counters.OC;
     dispatch({ type: 'createPo', supplierId, warehouse, lines: parsed, origin: 'manual' });
-    if (ensureOpenPeriod()) toast(t('periodSwitched'));
+    ensureOpenPeriod();
     toast.success(t('toasts.created', { doc: `OC-${pad(n)}` }));
     onClose();
   };

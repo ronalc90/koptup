@@ -5,9 +5,12 @@
  */
 import type { Bom, Customer, Employee, Item, Supplier, WarehouseId } from './types';
 
-/** Fecha de trabajo de la demo: las operaciones nuevas se registran con esta fecha. */
-export const WORK_DATE = '2026-09-30';
-export const OPEN_MONTH = '2026-09';
+/**
+ * Fecha de trabajo con la que se generaron las primeras versiones de la demo.
+ * La fecha real de cada sesión la calcula lib/calendar.ts (cierre del mes
+ * anterior a hoy); esta se usa en las pruebas y para migrar datos guardados.
+ */
+export const REFERENCE_WORK_DATE = '2026-09-30';
 /** Monto (IVA incluido) desde el cual una OC requiere aprobación de Gerencia. */
 export const PO_LEVEL2_THRESHOLD = 20_000_000;
 /** Retención en la fuente por compras (tarifa de ejemplo). */
