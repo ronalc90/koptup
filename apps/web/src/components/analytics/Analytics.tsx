@@ -28,14 +28,18 @@ import { onCookiePreferencesChange, readCookiePreferences } from '@/lib/cookie-c
  */
 
 /**
- * Rutas con secretos en la URL: `/auth/callback#code=…` (código de un solo uso
- * del inicio de sesión con Google), `/reset-password?token=…` y
- * `/activar/<token>` (enlace de activación). Se llega a ellas con una carga
- * completa (redirección del backend o enlace del email), así que ninguna
- * etiqueta está cargada todavía; se cargan al salir hacia otra ruta si hay
- * consentimiento.
+ * Rutas sin etiquetas de medición:
+ *  - Con secretos en la URL: `/auth/callback#code=…` (código de un solo uso
+ *    del inicio de sesión con Google), `/reset-password?token=…` y
+ *    `/activar/<token>` (enlace de activación). Se llega a ellas con una carga
+ *    completa (redirección del backend o enlace del email), así que ninguna
+ *    etiqueta está cargada todavía; se cargan al salir hacia otra ruta si hay
+ *    consentimiento.
+ *  - `/embed/*`: el chat del widget dentro del sitio de un cliente. KopTup no
+ *    mide a los visitantes de sus clientes, aunque hayan aceptado cookies en
+ *    koptup.com (tampoco se muestra el banner de cookies).
  */
-export const NO_TRACKING_PATHS = ['/auth', '/reset-password', '/activar'];
+export const NO_TRACKING_PATHS = ['/auth', '/reset-password', '/activar', '/embed'];
 
 export function isNoTrackingPath(pathname: string | null): boolean {
   if (!pathname) return false;

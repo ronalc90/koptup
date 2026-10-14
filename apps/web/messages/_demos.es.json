@@ -1383,7 +1383,8 @@
         "saveRateLimited": "No pudimos guardar el bot: desde tu red se crearon muchos bots en la última hora y el servidor pausó la creación de nuevos. Intenta de nuevo más tarde (el límite se renueva cada hora).",
         "saveCapacity": "No pudimos guardar el bot: la demo llegó a su capacidad de bots en este momento. Intenta de nuevo más tarde.",
         "saveUnavailable": "No pudimos guardar el bot: el chatbot no está disponible en este momento. Intenta de nuevo en unos minutos.",
-        "saveNetwork": "No pudimos conectar con el servidor de la demo. Revisa tu conexión e inténtalo de nuevo."
+        "saveNetwork": "No pudimos conectar con el servidor de la demo. Revisa tu conexión e inténtalo de nuevo.",
+        "rateLimited": "Hiciste muchas consultas seguidas y el servidor pidió una pausa. Espera un minuto y vuelve a intentarlo."
       },
       "sections": {
         "identity": "Identidad",
@@ -1512,6 +1513,7 @@
         "empty": "Todavía no hay conversaciones guardadas. Las preguntas de la vista previa no se guardan: abre el bot con «Abrir chat» o pégalo en tu sitio y pregúntale algo.",
         "saveFirst": "Guarda el bot para ver sus conversaciones.",
         "loadFailed": "No pudimos cargar las conversaciones.",
+        "rateLimited": "Hiciste muchas consultas seguidas. Espera un minuto y vuelve a intentarlo.",
         "questions": "Preguntas",
         "withSources": "Con fuente",
         "notFound": "No encontré",
@@ -1546,6 +1548,7 @@
       "close": "Cerrar chat",
       "poweredBy": "Con tecnología de KopTup",
       "errorNetwork": "No pudimos conectar con el servidor. Inténtalo de nuevo.",
+      "errorGeneric": "No pudimos responder tu pregunta. Inténtalo de nuevo.",
       "retry": "Reintentar",
       "sourceTitle": "Fuente [{n}] · {name}",
       "hideSource": "Ocultar fuente",

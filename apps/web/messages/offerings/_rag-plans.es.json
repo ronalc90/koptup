@@ -36,7 +36,7 @@
         "name": "Esencial",
         "tagline": "Un asistente con los documentos de tu empresa en tu sitio web.",
         "features": [
-          "Una fuente (Drive, SharePoint o carga manual)",
+          "Una fuente: carga manual, o Google Drive o SharePoint con un conector que se construye en tu proyecto",
           "Hasta 1.000 documentos",
           "Widget web",
           "Respuestas con cita de la fuente"
@@ -51,13 +51,13 @@
       },
       "profesional": {
         "name": "Profesional",
-        "tagline": "Varias fuentes, web y WhatsApp, con permisos por rol y métricas.",
+        "tagline": "Varias fuentes, web y WhatsApp, con permisos por rol y métricas que se construyen en tu proyecto.",
         "features": [
           "Hasta 3 fuentes",
           "Hasta 10.000 documentos",
-          "Web y WhatsApp",
-          "Permisos por rol",
-          "Panel de métricas"
+          "Web y WhatsApp (el canal de WhatsApp se construye en tu proyecto)",
+          "Permisos por rol (se construyen en tu proyecto)",
+          "Panel de métricas (se construye en tu proyecto)"
         ],
         "monthlyIncludes": [
           "Hasta 15.000 preguntas al mes",
@@ -68,12 +68,12 @@
       },
       "empresarial": {
         "name": "Empresarial",
-        "tagline": "Para operar en tu propia infraestructura, con SSO y auditoría.",
+        "tagline": "Para operar en tu propia infraestructura, con SSO y auditoría que se construyen en tu proyecto.",
         "features": [
           "Fuentes ilimitadas",
           "Despliegue en tu nube u on-premise",
-          "SSO",
-          "Auditoría",
+          "SSO (se construye en tu proyecto)",
+          "Auditoría (se construye en tu proyecto)",
           "Código fuente incluido"
         ],
         "cta": "Cotizar Empresarial"

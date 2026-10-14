@@ -21,6 +21,8 @@
  *  | changePasswordRateLimiter        | cuenta (o IP)    | 5 cada 15 min         | CHANGE_PASSWORD_RATE_LIMIT_MAX   |
  *  | oauthExchangeRateLimiter         | IP               | 20 por minuto         | —                                |
  *  | strictRateLimiter (contacto)     | IP               | 5 por minuto          | —                                |
+ *  | chatbotRateLimiter (sin /models) | IP               | 180 por minuto        | CHATBOT_API_RATE_LIMIT_MAX       |
+ *  | chatbotQuestionRateLimiter       | IP               | 60 por minuto         | CHATBOT_RATE_LIMIT_MAX           |
  */
 import type { Request, Response } from 'express';
 import rateLimit from 'express-rate-limit';
@@ -199,10 +201,27 @@ export const uploadRateLimiter = limiter({
   message: 'Subiste demasiados archivos seguidos. Espera un minuto e intenta de nuevo.',
 });
 
+// --- Chatbot RAG -----------------------------------------------------------------
+
+/**
+ * Todo /api/chatbot salvo GET /models (lista fija, sin base de datos): 180
+ * por minuto y por IP. Abrir la demo hace varias consultas (modelos, bot,
+ * conversaciones, vista previa), así que una oficina con muchas personas
+ * detrás de la misma IP pública no recibe 429 solo por abrir la página.
+ */
 export const chatbotRateLimiter = rateLimit({
   windowMs: MINUTE,
-  // 60 peticiones por minuto por IP (1 por segundo en promedio).
-  max: parseInt(process.env.CHATBOT_RATE_LIMIT_MAX || '60', 10) || 60,
+  limit: envLimit('CHATBOT_API_RATE_LIMIT_MAX', 180),
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.method === 'GET' && /^\/models\/?$/.test(req.path),
+  handler: tooMany('Hiciste muchas consultas seguidas al chatbot. Espera un minuto e intenta de nuevo.'),
+});
+
+/** Preguntas al chat (POST /api/chatbot/bots/:botId/chat): 60 por minuto y por IP. */
+export const chatbotQuestionRateLimiter = rateLimit({
+  windowMs: MINUTE,
+  limit: envLimit('CHATBOT_RATE_LIMIT_MAX', 60),
   standardHeaders: true,
   legacyHeaders: false,
   handler: tooMany('Enviaste demasiados mensajes seguidos. Espera un momento.'),

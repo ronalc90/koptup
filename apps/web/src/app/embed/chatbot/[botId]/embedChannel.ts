@@ -49,3 +49,19 @@ export async function chatFromEmbed(
   if (!res.ok) throw new BotApiError(res.status, `HTTP ${res.status}`);
   return (await res.json()) as RemoteChatReply;
 }
+
+/** Texto de error del chat (claves de `demoChatbot.embedPage`). */
+export type EmbedErrorKey = 'errorRateLimited' | 'errorUnavailable' | 'errorNetwork' | 'errorGeneric';
+
+/**
+ * Qué decirle al visitante según la respuesta del servidor: 429 (muchas
+ * preguntas seguidas), 5xx (servidor caído o sin capacidad), sin respuesta
+ * (red) o cualquier otro error.
+ */
+export function embedErrorKey(err: unknown): EmbedErrorKey {
+  if (!(err instanceof BotApiError)) return 'errorGeneric';
+  if (err.status === 429) return 'errorRateLimited';
+  if (err.status >= 500) return 'errorUnavailable';
+  if (err.status === 0) return 'errorNetwork';
+  return 'errorGeneric';
+}

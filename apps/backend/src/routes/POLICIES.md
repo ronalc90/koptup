@@ -71,9 +71,9 @@ demuestran (401/403/200 por política) están en `src/__tests__/integration/`.
 | `/api/content` | todas | Acceso a demo `gestor-contenido` (pública por defecto) + cupo por IP y `CONTENT_MONTHLY_BUDGET_USD` |
 | `/api/linkedin-ads` | `POST /generate` | Acceso a demo `linkedin-ads` + cupo por cuenta (o por IP sin sesión) en Redis y `LINKEDIN_ADS_MONTHLY_BUDGET_USD` |
 | `/api/demo-rag` | todas | Pública con cupos por IP en Redis y `DEMO_MONTHLY_BUDGET_USD` |
-| `/api/chatbot` | `GET /models`, `POST /bots`, `GET /bots`, `GET /bots/:id`, `POST /bots/:id/chat` | Pública (lista y vista completa solo para el dueño; chat solo para bots existentes; `CHATBOT_MONTHLY_BUDGET_USD`; el chat guarda la conversación solo con `channel: 'widget'` en bots creados por usuarios, con vencimiento `CHATBOT_CONVERSATION_TTL_DAYS`; las rutas de bots responden 503 `storage_unavailable` sin MongoDB) |
+| `/api/chatbot` | `GET /models`, `POST /bots`, `GET /bots`, `GET /bots/:id`, `POST /bots/:id/chat`, `POST /sample-bots` | Pública (lista y vista completa solo para el dueño; chat solo para bots existentes, con cupo propio de preguntas por IP; `CHATBOT_MONTHLY_BUDGET_USD`; el chat guarda la conversación solo con `channel: 'widget'` en bots creados por usuarios, con vencimiento `CHATBOT_CONVERSATION_TTL_DAYS`; `sample-bots` solo acepta textos cortos y reutiliza el bot de ejemplo por huella; las rutas de bots responden 503 `storage_unavailable` sin MongoDB) |
 | | `PATCH/DELETE /bots/:id`, `docs`, `urls`, `conversations` | Dueño del bot (cabecera `X-Bot-Owner-Token`); un bot heredado sin dueño registrado solo lo administra el staff (sesión, rol de la BD) |
-| | `session`, `upload`, `message`, `info`, `config`, `messages`, `documents` (API heredada por sesión) | Pública por `sessionId`, con límites y el mismo tope de gasto del chatbot |
+| | API anterior "por sesión" (`session`, `upload`, `message`, `info`, `config`, `messages`, `documents`) | Retirada: responde 404. Al arrancar se borra lo que dejó (colección `chatbots` y `uploads/chatbot`) |
 
 ## Acceso a demos (P4, DemoGrant)
 

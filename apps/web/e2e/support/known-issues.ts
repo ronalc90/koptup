@@ -31,7 +31,7 @@ export interface KnownIssue {
   intermitente?: boolean;
 }
 
-// Intermitente: con 10 cargas seguidas por demo, automatizacion, chatbot,
+// Intermitente: con 10 cargas seguidas por demo, automatizacion,
 // facturacion-electronica y pos cargaron alguna vez sin el error (depende de
 // qué alcanza a pintarse antes de hidratar), y exigirlo hacía fallar la
 // prueba al azar.
@@ -62,8 +62,6 @@ export const KNOWN_CONSOLE_ISSUES: Record<string, KnownIssue> = {
   'gestor-documentos': ACCESS_REQUIRED,
   // pendiente pista demos: hidratación por toLocaleString() sin locale.
   automatizacion: HYDRATION_TO_LOCALE,
-  // pendiente pista demos: hidratación por toLocaleString() sin locale.
-  chatbot: HYDRATION_TO_LOCALE,
   // pendiente pista demos: hidratación por toLocaleString() sin locale.
   'facturacion-electronica': HYDRATION_TO_LOCALE,
   // pendiente pista demos: hidratación por toLocaleString() sin locale.

@@ -53,7 +53,6 @@ const startServer = async () => {
       './uploads/exports',
       './uploads/temp-images',
       './uploads/temp-processing',
-      './uploads/chatbot',
       './data/imports',
     ];
     for (const dir of uploadDirs) {
@@ -99,6 +98,15 @@ const startServer = async () => {
       await ensureChatbotMigrated();
     } catch (err: any) {
       logger.warn(`Fallo migrando el estado del chatbot a MongoDB: ${err?.message ?? err}`);
+    }
+
+    // 3e. Chatbot: borra lo que dejó la API anterior "por sesión" (colección
+    // `chatbots` y uploads/chatbot), que guardaba sin vencimiento (idempotente).
+    try {
+      const { purgeLegacySessionChatbot } = await import('./services/chatbot-legacy-cleanup.service');
+      await purgeLegacySessionChatbot();
+    } catch (err: any) {
+      logger.warn(`Fallo borrando los datos de la API heredada del chatbot: ${err?.message ?? err}`);
     }
 
     // 4. Estrategias de Passport (Google OAuth si está configurado).

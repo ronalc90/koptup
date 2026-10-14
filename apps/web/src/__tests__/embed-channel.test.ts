@@ -2,7 +2,8 @@
  * Canal del chat embebido: solo el widget real guarda historial; la vista
  * previa del Builder (el chat dentro de /demo/chatbot) envía `preview`.
  */
-import { chatFromEmbed, detectEmbedChannel } from '@/app/embed/chatbot/[botId]/embedChannel';
+import { chatFromEmbed, detectEmbedChannel, embedErrorKey } from '@/app/embed/chatbot/[botId]/embedChannel';
+import { BotApiError } from '@/app/demo/chatbot/components/builder/api';
 
 function fakeWindow(top: unknown, origin = 'https://www.koptup.com'): Window {
   const win: { location: { origin: string; pathname: string }; top?: unknown } = { location: { origin, pathname: '/embed/chatbot/kbot_x' } };
@@ -53,5 +54,19 @@ describe('chatFromEmbed', () => {
   it('un error HTTP conserva el código para la interfaz', async () => {
     global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 503, json: async () => ({}) }) as unknown as typeof fetch;
     await expect(chatFromEmbed('kbot_x', 'hola', [], 'widget')).rejects.toMatchObject({ status: 503 });
+  });
+});
+
+describe('embedErrorKey', () => {
+  it('429 → pausa por muchas preguntas; 5xx → servidor no disponible', () => {
+    expect(embedErrorKey(new BotApiError(429, 'HTTP 429'))).toBe('errorRateLimited');
+    expect(embedErrorKey(new BotApiError(503, 'HTTP 503'))).toBe('errorUnavailable');
+    expect(embedErrorKey(new BotApiError(500, 'HTTP 500'))).toBe('errorUnavailable');
+  });
+
+  it('sin respuesta del servidor → red; otro error → genérico', () => {
+    expect(embedErrorKey(new BotApiError(0, 'network'))).toBe('errorNetwork');
+    expect(embedErrorKey(new BotApiError(400, 'HTTP 400'))).toBe('errorGeneric');
+    expect(embedErrorKey(new Error('json inválido'))).toBe('errorGeneric');
   });
 });

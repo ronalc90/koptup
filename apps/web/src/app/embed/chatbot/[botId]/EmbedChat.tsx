@@ -23,7 +23,7 @@ import {
   type RemoteBotConfig,
   type RemoteChatReplySource,
 } from '@/app/demo/chatbot/components/builder/api';
-import { chatFromEmbed, detectEmbedChannel } from './embedChannel';
+import { chatFromEmbed, detectEmbedChannel, embedErrorKey, type EmbedErrorKey } from './embedChannel';
 
 interface EmbedChatProps {
   botId: string | null;
@@ -39,6 +39,8 @@ interface EmbedMessage {
   sources?: RemoteChatReplySource[];
   pending?: boolean;
   failed?: boolean;
+  /** Texto del error cuando la pregunta falló (según el estado HTTP). */
+  errorKey?: EmbedErrorKey;
   question?: string;
   welcome?: boolean;
 }
@@ -56,6 +58,7 @@ export default function EmbedChat({ botId, colorOverride, widget }: EmbedChatPro
   const [busy, setBusy] = useState(false);
   const [openSource, setOpenSource] = useState<{ msgId: string; index: number } | null>(null);
   const [attempt, setAttempt] = useState(0);
+  const [loadError, setLoadError] = useState<EmbedErrorKey>('errorNetwork');
   const idRef = useRef(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -72,7 +75,12 @@ export default function EmbedChat({ botId, colorOverride, widget }: EmbedChatPro
       })
       .catch((err) => {
         if (cancelled) return;
-        setStatus(err instanceof BotApiError && err.status === 404 ? 'notFound' : 'error');
+        if (err instanceof BotApiError && err.status === 404) {
+          setStatus('notFound');
+          return;
+        }
+        setLoadError(embedErrorKey(err));
+        setStatus('error');
       });
     return () => {
       cancelled = true;
@@ -97,7 +105,7 @@ export default function EmbedChat({ botId, colorOverride, widget }: EmbedChatPro
         .map((m) => ({ role: m.role, content: m.content }));
       let asstId = retryId;
       if (retryId) {
-        setMessages((prev) => prev.map((m) => (m.id === retryId ? { ...m, pending: true, failed: false, content: '' } : m)));
+        setMessages((prev) => prev.map((m) => (m.id === retryId ? { ...m, pending: true, failed: false, errorKey: undefined, content: '' } : m)));
       } else {
         idRef.current += 1;
         asstId = `a-${idRef.current}`;
@@ -114,8 +122,14 @@ export default function EmbedChat({ botId, colorOverride, widget }: EmbedChatPro
         setMessages((prev) =>
           prev.map((m) => (m.id === asstId ? { ...m, pending: false, content: res.reply, sources: res.sources, question: q } : m)),
         );
-      } catch {
-        setMessages((prev) => prev.map((m) => (m.id === asstId ? { ...m, pending: false, failed: true, question: q } : m)));
+      } catch (err) {
+        // El bot se borró después de abrir el chat: ya no hay a quién preguntar.
+        if (err instanceof BotApiError && err.status === 404) {
+          setStatus('notFound');
+          return;
+        }
+        const errorKey = embedErrorKey(err);
+        setMessages((prev) => prev.map((m) => (m.id === asstId ? { ...m, pending: false, failed: true, errorKey, question: q } : m)));
       } finally {
         setBusy(false);
       }
@@ -188,7 +202,7 @@ export default function EmbedChat({ botId, colorOverride, widget }: EmbedChatPro
         </div>
       ) : status === 'error' ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 text-center" role="alert">
-          <p className="text-sm text-secondary-600 dark:text-secondary-300">{t('errorNetwork')}</p>
+          <p className="text-sm text-secondary-600 dark:text-secondary-300">{t(loadError)}</p>
           <button
             type="button"
             onClick={() => setAttempt((n) => n + 1)}
@@ -216,8 +230,8 @@ export default function EmbedChat({ botId, colorOverride, widget }: EmbedChatPro
                         {t('thinking')}
                       </span>
                     ) : m.failed ? (
-                      <span className="flex flex-wrap items-center gap-2 text-red-700 dark:text-red-300">
-                        {t('errorNetwork')}
+                      <span className="flex flex-wrap items-center gap-2 text-red-700 dark:text-red-300" role="alert">
+                        {t(m.errorKey ?? 'errorNetwork')}
                         <button
                           type="button"
                           onClick={() => m.question && void send(m.question, m.id)}

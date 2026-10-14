@@ -138,7 +138,7 @@
         },
         "sources": {
           "title": "Connected to your sources",
-          "desc": "Google Drive, SharePoint or manual document upload; depending on the plan, also databases and APIs."
+          "desc": "Manual document upload and web pages; depending on the plan, connectors to Google Drive, SharePoint, databases and APIs built in your project."
         }
       }
     },
@@ -153,7 +153,7 @@
       "whatsapp": {
         "title": "WhatsApp",
         "plan": "From the Professional plan",
-        "desc": "Your customers or your team ask on WhatsApp and get the answer with its source, through the official WhatsApp Business API. The Professional plan includes web and WhatsApp."
+        "desc": "In your project we build the WhatsApp channel with the official WhatsApp Business API: your customers or team get the answer there with its source. The demo on this site works only on the web."
       },
       "metaNote": "Meta's WhatsApp messaging fees are billed separately, at cost."
     },
@@ -225,7 +225,7 @@
         },
         "whatsapp": {
           "q": "Does the chatbot work on WhatsApp?",
-          "a": "Yes. From the Professional plan, the chatbot answers on your website and on WhatsApp, through the official WhatsApp Business API. The Essential plan includes the widget for your website. Meta's WhatsApp messaging fees are billed separately, at cost."
+          "a": "Yes, from the Professional plan: in your project we build the WhatsApp channel with the official WhatsApp Business API, and the chatbot answers there and on your website. The Essential plan includes the widget for your website. The demo on this site works only on the web. Meta's WhatsApp messaging fees are billed separately, at cost."
         },
         "technology": {
           "q": "What AI technology do you use?",
@@ -243,7 +243,7 @@
     },
     "cta": {
       "title": "Want a chatbot that answers with your documents?",
-      "subtitle": "Try the free demo, no sign-up required, or book a {pilotWeeks}-week pilot with your company's documents.",
+      "subtitle": "Try the free demo: the examples need no sign-up, and to use your own document we only ask for an email. Or book a {pilotWeeks}-week pilot with your company's documents.",
       "demo": "Try it with your document",
       "pilot": "Book a pilot",
       "plans": "See plans and pricing"
@@ -434,7 +434,7 @@
         },
         "control": {
           "title": "If you need more control",
-          "desc": "The Professional plan adds role-based permissions, and the Enterprise plan is deployed in your cloud or on your own servers (on-premise), with SSO and audit logs."
+          "desc": "In the Professional plan we build role-based permissions in your project, and Enterprise is deployed on your cloud or your own servers (on-premise), with SSO and auditing also built in your project."
         },
         "demo": {
           "title": "In the public demo",
@@ -464,30 +464,30 @@
     },
     "integrations": {
       "title": "Integrations: Google Drive, SharePoint, WhatsApp, databases and APIs",
-      "subtitle": "We connect the assistant to where your documents already live and to the channels your people already use.",
+      "subtitle": "In your project we build the connection between the assistant and where your documents already live, and the channels your people already use. Today the demo works with files you upload (PDF, DOCX, TXT) and web pages.",
       "items": {
         "drive": {
           "title": "Google Drive",
-          "desc": "Use Google Drive folders as the assistant's document source."
+          "desc": "A connector built in your project to use Google Drive folders as the assistant's source."
         },
         "sharepoint": {
           "title": "SharePoint",
-          "desc": "Connect your company's SharePoint document libraries."
+          "desc": "A connector built in your project for your company's SharePoint document libraries."
         },
         "whatsapp": {
           "title": "WhatsApp",
-          "desc": "Your customers or your team ask on WhatsApp and get the answer with its source. Meta's message fees are billed separately, at cost."
+          "desc": "A channel built in your project with the official WhatsApp Business API: your customers or team ask on WhatsApp and get the answer with its source. Meta's messaging fees are billed separately, at cost."
         },
         "databases": {
           "title": "Databases",
-          "desc": "Besides documents, the assistant can look up information in your databases."
+          "desc": "In your project we connect the assistant to your databases so it can also query that information."
         },
         "apis": {
           "title": "APIs",
-          "desc": "Bring the answers into your intranet, your CRM or your apps through an API."
+          "desc": "In your project we bring the answers to your intranet, CRM or apps through an API."
         }
       },
-      "note": "The number of sources depends on the plan: one in Essential, up to three in Professional and unlimited in Enterprise. WhatsApp is included from the Professional plan."
+      "note": "The number of sources depends on the plan: one in Essential, up to three in Professional and unlimited in Enterprise. The WhatsApp channel is built in your project from the Professional plan."
     },
     "plans": {
       "title": "Plans and pricing",
@@ -514,11 +514,11 @@
         },
         "formats": {
           "q": "Which formats does it accept?",
-          "a": "PDF with text, Word (DOCX), TXT and web pages. Depending on the plan, we can also connect documents from Google Drive or SharePoint and data from databases or APIs. If your PDFs are scans (images without text), we review it with you during the pilot."
+          "a": "PDF with text, Word (DOCX), TXT and web pages. Depending on the plan, in your project we also build the connection to Google Drive or SharePoint and to databases or APIs. If your PDFs are scans (images without text), we review it with you during the pilot."
         },
         "whatsapp": {
           "q": "Does it work on WhatsApp?",
-          "a": "Yes. From the Professional plan, the assistant answers on your website and on WhatsApp, through the official WhatsApp Business API. Meta's WhatsApp message fees are billed separately, at cost."
+          "a": "Yes, from the Professional plan: in your project we build the WhatsApp channel with the official WhatsApp Business API, and the assistant answers there and on your website. The demo on this site works only on the web. Meta's WhatsApp messaging fees are billed separately, at cost."
         },
         "cost": {
           "q": "How much does it cost?",
@@ -664,7 +664,7 @@
         "name": "Essential",
         "tagline": "An assistant with your company's documents on your website.",
         "features": [
-          "One source (Drive, SharePoint or manual upload)",
+          "One source: manual upload, or Google Drive or SharePoint through a connector built in your project",
           "Up to 1,000 documents",
           "Web widget",
           "Answers that cite the source"
@@ -679,13 +679,13 @@
       },
       "profesional": {
         "name": "Professional",
-        "tagline": "Multiple sources, web and WhatsApp, with role-based permissions and metrics.",
+        "tagline": "Multiple sources, web and WhatsApp, with role-based permissions and metrics built in your project.",
         "features": [
           "Up to 3 sources",
           "Up to 10,000 documents",
-          "Web and WhatsApp",
-          "Role-based permissions",
-          "Metrics dashboard"
+          "Web and WhatsApp (the WhatsApp channel is built in your project)",
+          "Role-based permissions (built in your project)",
+          "Metrics dashboard (built in your project)"
         ],
         "monthlyIncludes": [
           "Up to 15,000 questions per month",
@@ -696,12 +696,12 @@
       },
       "empresarial": {
         "name": "Enterprise",
-        "tagline": "Runs on your own infrastructure, with SSO and auditing.",
+        "tagline": "Runs on your own infrastructure, with SSO and auditing built in your project.",
         "features": [
           "Unlimited sources",
           "Deployment on your cloud or on-premise",
-          "SSO",
-          "Auditing",
+          "SSO (built in your project)",
+          "Auditing (built in your project)",
           "Source code included"
         ],
         "cta": "Get an Enterprise quote"

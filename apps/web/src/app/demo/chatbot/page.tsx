@@ -397,21 +397,21 @@ export default function ChatbotDemoPage() {
         let started = performance.now();
         let res: RemoteChatReply;
         try {
-          res = await chatWithBot(state.botId, q, history, modelId);
+          res = await chatWithBot(state.botId, q, history, modelId, locale);
         } catch (err) {
           if (!(err instanceof BotApiError && err.status === 404)) throw err;
           // El servidor ya no tiene el bot (p. ej. lo borró por no usarse): se prepara otra vez.
           invalidateBot();
           state = await prepareBot();
           started = performance.now();
-          res = await chatWithBot(state.botId, q, history, modelId);
+          res = await chatWithBot(state.botId, q, history, modelId, locale);
         }
         if (res.sources.length === 0 && !(await botStillIndexed(state.botId))) {
           // El servidor perdió los documentos: se reindexa y se repite una vez.
           invalidateBot();
           state = await prepareBot();
           started = performance.now();
-          res = await chatWithBot(state.botId, q, history, modelId);
+          res = await chatWithBot(state.botId, q, history, modelId, locale);
         }
         const clientLatencyMs = Math.round(performance.now() - started);
         const sources: SourceChunk[] = res.sources.map((s, i) => ({
@@ -426,7 +426,8 @@ export default function ChatbotDemoPage() {
         const meta: AnswerMeta = {
           model: res.model ?? '—',
           generative,
-          providerError: !!res.error,
+          // Sin clave configurada no es una falla del proveedor: es el modo extractivo.
+          providerError: !!res.error && res.error !== 'llm_not_configured',
           backendLatencyMs: generative ? res.latencyMs : undefined,
           clientLatencyMs,
           tokens: res.tokens,
@@ -450,7 +451,7 @@ export default function ChatbotDemoPage() {
         setBusy(false);
       }
     },
-    [botStillIndexed, invalidateBot, markDemoStart, modelId, prepareBot],
+    [botStillIndexed, invalidateBot, locale, markDemoStart, modelId, prepareBot],
   );
 
   const handleSend = useCallback(() => {

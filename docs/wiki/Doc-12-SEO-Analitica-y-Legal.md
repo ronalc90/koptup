@@ -101,7 +101,7 @@ Títulos reales de las páginas principales (leídos del HTML que entrega el sit
 - El dominio canónico es **`https://www.koptup.com`** (con www). Está fijo en `apps/web/src/lib/site.ts` (`SITE_URL`) y de ahí salen la canonical, `og:url`, el JSON-LD, el sitemap y los enlaces que generan las demos.
 - `https://koptup.com/` responde con una redirección permanente (308) a `https://www.koptup.com/`.
 - Cada página de contenido declara su propia canonical (por ejemplo `https://www.koptup.com/rag/salud`); también las páginas de cuenta. La página 404 y las rutas con un token en la URL (`/activar/<token>`) no declaran canonical. `/pricing` redirige de forma permanente (308) a `/services#planes-rag`.
-- **Idiomas:** español e inglés comparten la misma URL (el idioma va en la cookie `locale`), así que no hay `hreflang`. Google ve el español, que es el idioma por defecto.
+- **Idiomas:** español e inglés comparten la misma URL (el idioma va en la cookie `locale`), así que no hay `hreflang`. Google ve el español, que es el idioma por defecto. **Decisión:** por eso el `title`, la `description` y las etiquetas `og` de cada página están en español también cuando el visitante eligió inglés (el contenido sí cambia). Traducirlos por cookie le mostraría a Google metadatos distintos para la misma URL.
 
 ### 2.3 Sitemap y robots
 
@@ -219,11 +219,11 @@ sequenceDiagram
         opt aceptó marketing y hay Partner ID
             W->>L: carga Insight Tag
         end
-        Note over W,G: En /auth, /reset-password y /activar nunca se cargan (la URL lleva tokens)
+        Note over W,G: En /auth, /reset-password y /activar (la URL lleva tokens) y en /embed (el chat en el sitio de un cliente) nunca se cargan
     end
 ```
 
-*Nada se carga antes de que la persona elija; «Rechazar» deja solo las cookies esenciales.*
+*Nada se carga antes de que la persona elija; «Rechazar» deja solo las cookies esenciales. En `/embed/*` (el chat de `widget.js` y del iframe en el sitio de un cliente) no se muestra el banner ni se carga ninguna etiqueta, aunque el visitante haya aceptado cookies en koptup.com: KopTup no mide a los visitantes de sus clientes (`NO_TRACKING_PATHS` en `components/analytics/Analytics.tsx`).*
 
 Detalles del consentimiento (`components/analytics/Analytics.tsx` y `lib/cookie-consent.ts`):
 

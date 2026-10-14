@@ -92,7 +92,11 @@ export interface RemoteChatReply {
   tokens?: { prompt?: number; completion?: number; total?: number };
   /** Costo estimado del request en USD (solo cuando hubo llamada al modelo). */
   costUSD?: number;
-  /** `llm_provider_error` si el proveedor del modelo falló (sin exponer la clave). */
+  /**
+   * Motivo del modo extractivo: `llm_not_configured` (sin clave de IA),
+   * `budget_exhausted` / `budget_unavailable` (tope de gasto) o
+   * `llm_provider_error` (el proveedor falló; sin exponer la clave).
+   */
   error?: string;
   timestamp: string;
 }
@@ -350,15 +354,21 @@ export async function deleteBotDoc(botId: string, docId: string): Promise<{ docs
   });
 }
 
+/**
+ * Pregunta al bot. `lang` (idioma de la página) elige el idioma de los textos
+ * que escribe el servidor sin modelo ("No encontré esa información…", notas
+ * del modo extractivo); sin él, el servidor usa el primer idioma del bot.
+ */
 export async function chatWithBot(
   botId: string,
   message: string,
   history: Array<{ role: string; content: string }>,
   model?: string,
+  lang?: 'es' | 'en',
 ): Promise<RemoteChatReply> {
   return jsonFetch(`${botUrl(botId)}/chat`, {
     method: 'POST',
-    body: JSON.stringify({ message, history, model }),
+    body: JSON.stringify({ message, history, model, lang }),
   });
 }
 

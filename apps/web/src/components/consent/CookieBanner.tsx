@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { CakeIcon } from '@heroicons/react/24/outline';
 import Button from '@/components/ui/Button';
 import { HAS_TRACKING_TAGS } from '@/lib/analytics';
+import { isNoTrackingPath } from '@/components/analytics/Analytics';
 import {
   ACCEPT_ALL_CHOICE,
   ESSENTIAL_ONLY_CHOICE,
@@ -24,7 +25,9 @@ const COOKIES_PATH = '/cookies';
  * deja solo las esenciales; "Configurar cookies" lleva a /cookies. En /cookies
  * no se muestra porque esa página ya tiene sus propios controles. Tampoco se
  * muestra si el build no tiene ninguna etiqueta configurada
- * (`HAS_TRACKING_TAGS`): no habría cookies opcionales que aceptar.
+ * (`HAS_TRACKING_TAGS`): no habría cookies opcionales que aceptar, ni en las
+ * rutas sin etiquetas (`NO_TRACKING_PATHS`), como el chat del widget
+ * (/embed/*) dentro del sitio de un cliente.
  */
 export default function CookieBanner() {
   const t = useTranslations('cookieBanner');
@@ -40,7 +43,7 @@ export default function CookieBanner() {
     return onCookiePreferencesChange(sync);
   }, []);
 
-  if (!HAS_TRACKING_TAGS || !needsChoice || pathname === COOKIES_PATH) return null;
+  if (!HAS_TRACKING_TAGS || !needsChoice || pathname === COOKIES_PATH || isNoTrackingPath(pathname)) return null;
 
   return (
     <div

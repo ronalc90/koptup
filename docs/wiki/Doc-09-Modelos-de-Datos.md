@@ -39,7 +39,7 @@ flowchart LR
         B["Chatbot: chatbot_bots, chatbot_bot_chunks, chatbot_turns"]:::mongo
         P["Proyectos y facturación: projects, orders, invoices, deliverables, conversations, messages, notifications"]:::mongo
         S["Salud: facturas, atenciones, glosas, cups, radicados y catálogos"]:::mongo
-        C["Chatbot anterior y documentos: chatbots, documents"]:::mongo
+        C["Gestor de documentos: documents"]:::mongo
     end
 
     subgraph REDIS["Redis: temporal"]
@@ -96,7 +96,6 @@ Cada modelo de Mongoose se guarda en una colección. Los nombres de la tabla son
 | | `Conversation`, `Message` | `conversations`, `messages` | Mensajería cliente–equipo | Portal y panel |
 | | `Notification` | `notifications` | Notificaciones del portal | `POST /api/notifications` |
 | Chatbot y documentos | `ChatbotBot`, `ChatbotBotChunks`, `ChatbotTurn` | `chatbot_bots`, `chatbot_bot_chunks`, `chatbot_turns` | Bots de «Configura el tuyo» y de ejemplo (configuración, hash del token del dueño, documentos), sus fragmentos (uno por documento) y las preguntas del widget (vencen a los 30 días) | `/api/chatbot/bots` (`services/chatbot-store.service.ts`) |
-| | `Chatbot` | `chatbots` | API anterior del chatbot "por sesión": configuración, documentos y mensajes | Vista previa del chatbot |
 | | `ChatSession`, `ChatMessage` | `chatsessions`, `chatmessages` | Chat de eco antiguo (solo desarrollo) | `/api/chat` |
 | | `Document` | `documents` | Gestor de documentos con IA (texto, resumen, palabras clave, vector) | `/api/documents` |
 | Salud: auditoría | `Factura`, `Atencion`, `Procedimiento`, `Glosa`, `SoporteDocumental`, `Tarifario`, `AuditoriaSesion`, `ReglaAuditoria`, `DocumentoConocimientoConfig` | `facturas`, `atenciones`, `procedimientos`, `glosas`, `soportes_documentales`, `tarifarios`, `auditoriasesions`, `reglas_auditoria`, `documentoconocimientoconfigs` | Demo de cuentas médicas: factura, atenciones, procedimientos, glosas, soportes y sesiones de auditoría paso a paso | `/api/auditoria`, `/api/documentos-conocimiento` |
@@ -317,25 +316,10 @@ erDiagram
 
 ```mermaid
 erDiagram
-    CHATBOT ||--o{ CHATBOT_DOCUMENT : "documents[]"
-    CHATBOT ||--o{ CHATBOT_MESSAGE : "messages[]"
     USER ||--o{ DOCUMENT : "user_id"
     CHATBOT_BOT ||--o{ BOT_DOC : "docs"
     CHATBOT_BOT ||--o{ CHATBOT_BOT_CHUNKS : "botId"
     CHATBOT_BOT ||--o{ CHATBOT_TURN : "botId"
-    CHATBOT {
-        string sessionId UK "API anterior por sesión"
-        object config "título, saludo, colores"
-    }
-    CHATBOT_DOCUMENT {
-        string originalName
-        string path "disco del servidor"
-        string content "texto extraído"
-    }
-    CHATBOT_MESSAGE {
-        string role
-        string content
-    }
     DOCUMENT {
         string user_id "id de la cuenta como texto"
         string original_filename
@@ -370,7 +354,7 @@ erDiagram
     }
 ```
 
-*Todo está en MongoDB. Los bots del constructor (`CHATBOT_BOT`) se guardaban antes en `data/chatbots/state.json`; si ese archivo existe al arrancar, se migra una vez y se borra. Solo se guardan las preguntas del widget de un bot de usuario y vencen a los 30 días (`CHATBOT_CONVERSATION_TTL_DAYS`).*
+*Todo está en MongoDB. Los bots del constructor (`CHATBOT_BOT`) se guardaban antes en `data/chatbots/state.json`; si ese archivo existe al arrancar, se migra una vez y se borra. La colección `chatbots` de la API anterior "por sesión" (retirada el 14 de octubre de 2026) se borra al arrancar, junto con `uploads/chatbot`. Solo se guardan las preguntas del widget de un bot de usuario y vencen a los 30 días (`CHATBOT_CONVERSATION_TTL_DAYS`).*
 
 ### 3.6 Salud (auditoría de cuentas médicas)
 

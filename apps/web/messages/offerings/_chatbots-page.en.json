@@ -35,7 +35,7 @@
         },
         "sources": {
           "title": "Connected to your sources",
-          "desc": "Google Drive, SharePoint or manual document upload; depending on the plan, also databases and APIs."
+          "desc": "Manual document upload and web pages; depending on the plan, connectors to Google Drive, SharePoint, databases and APIs built in your project."
         }
       }
     },
@@ -50,7 +50,7 @@
       "whatsapp": {
         "title": "WhatsApp",
         "plan": "From the Professional plan",
-        "desc": "Your customers or your team ask on WhatsApp and get the answer with its source, through the official WhatsApp Business API. The Professional plan includes web and WhatsApp."
+        "desc": "In your project we build the WhatsApp channel with the official WhatsApp Business API: your customers or team get the answer there with its source. The demo on this site works only on the web."
       },
       "metaNote": "Meta's WhatsApp messaging fees are billed separately, at cost."
     },
@@ -122,7 +122,7 @@
         },
         "whatsapp": {
           "q": "Does the chatbot work on WhatsApp?",
-          "a": "Yes. From the Professional plan, the chatbot answers on your website and on WhatsApp, through the official WhatsApp Business API. The Essential plan includes the widget for your website. Meta's WhatsApp messaging fees are billed separately, at cost."
+          "a": "Yes, from the Professional plan: in your project we build the WhatsApp channel with the official WhatsApp Business API, and the chatbot answers there and on your website. The Essential plan includes the widget for your website. The demo on this site works only on the web. Meta's WhatsApp messaging fees are billed separately, at cost."
         },
         "technology": {
           "q": "What AI technology do you use?",
@@ -140,7 +140,7 @@
     },
     "cta": {
       "title": "Want a chatbot that answers with your documents?",
-      "subtitle": "Try the free demo, no sign-up required, or book a {pilotWeeks}-week pilot with your company's documents.",
+      "subtitle": "Try the free demo: the examples need no sign-up, and to use your own document we only ask for an email. Or book a {pilotWeeks}-week pilot with your company's documents.",
       "demo": "Try it with your document",
       "pilot": "Book a pilot",
       "plans": "See plans and pricing"

@@ -117,11 +117,13 @@ test.describe('SEO: páginas de cuenta, 404, redirecciones y archivos', () => {
     // Espera a que termine la precarga de los enlaces antes de navegar otra vez
     // (si no, el navegador la corta y lo registra como error de consola).
     await page.waitForLoadState('networkidle');
-    // Un certificado emitido por la demo (lo que abre su QR) se verifica sin sesión.
+    // El enlace de un certificado (lo que abre su QR) se abre sin sesión. En la
+    // demo el registro vive en el navegador que lo emitió: en otro navegador la
+    // página muestra los datos del enlace y dice que no puede confirmarlo.
     const d = encodeCert({ c: 'CERT-E2E-0001', n: 'Persona de Prueba', t: 'Curso de prueba', h: 12, f: '2026-10-10', o: 'Academia de ejemplo' });
     await page.goto(`/demo/lms/verificar?d=${d}`);
-    await expect(page.getByText('Certificado válido')).toBeVisible();
-    await expect(page.getByText('CERT-E2E-0001')).toBeVisible();
+    await expect(page.getByText('No se puede confirmar en este navegador')).toBeVisible();
+    await expect(page.getByText('CERT-E2E-0001').first()).toBeVisible();
     await page.waitForLoadState('networkidle');
     expect(errors).toEqual([]);
   });

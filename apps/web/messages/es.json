@@ -2969,9 +2969,14 @@
     "title": "¿Te gustaría algo así para tu negocio?",
     "titleWithName": "¿Necesitas un {demoName} como este?",
     "description": "Desarrollamos software a medida adaptado a las necesidades de tu empresa. Solicita una cotización sin compromiso.",
-    "requestQuote": "Solicitar Cotización",
-    "viewPricing": "Ver Planes y Precios",
-    "requestGuidedDemo": "Solicitar demo guiada"
+    "requestQuote": "Solicitar cotización",
+    "viewPricing": "Ver planes y precios",
+    "requestGuidedDemo": "Solicitar demo guiada",
+    "rag": {
+      "title": "¿Quieres este asistente con los documentos de tu empresa?",
+      "description": "Empezamos con un piloto sobre tus propios documentos: el asistente responde con la fuente y dice cuando algo no está. Las conexiones con tus sistemas y canales se construyen en tu proyecto. Cotiza sin compromiso.",
+      "requestQuote": "Cotizar el piloto RAG"
+    }
   },
   "demoEcommerce": {
     "title": "Tienda Demo",
@@ -3830,7 +3835,7 @@
     "q2q": "¿Cuánto tiempo toma desarrollar una aplicación web?",
     "q2a": "Depende del alcance. Un MVP (versión inicial funcional) puede estar listo en 4-8 semanas. Un sistema complejo con múltiples módulos puede tomar 3-6 meses. En el análisis inicial definimos tiempos exactos.",
     "q3q": "¿KopTup puede desarrollar chatbots para WhatsApp?",
-    "q3a": "Sí. Los chatbots RAG para WhatsApp se conectan con la API oficial de WhatsApp Business (desde el plan Profesional) y usan modelos de OpenAI. Responden con los documentos de tu empresa a cualquier hora y, si no encuentran la respuesta, lo dicen. Desde {essentialFrom}, o piloto de {pilotFrom} (más IVA si aplica).",
+    "q3a": "Sí. Desde el plan Profesional, en tu proyecto construimos el canal de WhatsApp con la API oficial de WhatsApp Business; el chatbot usa modelos de OpenAI. Responden con los documentos de tu empresa a cualquier hora y, si no encuentran la respuesta, lo dicen. Desde {essentialFrom}, o piloto de {pilotFrom} (más IVA si aplica).",
     "q4q": "¿Trabajan con empresas de toda Colombia o solo de Bogotá?",
     "q4a": "Trabajamos de forma remota con empresas de cualquier ciudad: las reuniones son por videollamada y atendemos en español e inglés.",
     "q5q": "¿Ofrecen mantenimiento después de entregar el proyecto?",

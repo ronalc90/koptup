@@ -19,6 +19,7 @@ const testEnv: Record<string, string> = {
   // La API cuenta peticiones por IP; las pruebas hacen muchas desde 127.0.0.1.
   RATE_LIMIT_MAX_REQUESTS: '100000',
   CHATBOT_RATE_LIMIT_MAX: '100000',
+  CHATBOT_API_RATE_LIMIT_MAX: '100000',
   CHATBOT_CREATE_LIMIT_PER_HOUR: '100000',
   // Estado del chatbot aislado por proceso de prueba (no toca data/chatbots).
   CHATBOT_STATE_DIR: path.join(os.tmpdir(), `koptup-chatbot-test-${process.pid}-${Date.now()}`),

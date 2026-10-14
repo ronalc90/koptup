@@ -76,7 +76,13 @@ export default function ConversationsPanel({ botId, refreshKey }: ConversationsP
       .catch((err) => {
         if (cancelled) return;
         setTurns([]);
-        setError(err instanceof BotApiError && (err.status === 401 || err.status === 403) ? 'notOwner' : 'loadFailed');
+        setError(
+          err instanceof BotApiError && (err.status === 401 || err.status === 403)
+            ? 'notOwner'
+            : err instanceof BotApiError && err.status === 429
+              ? 'rateLimited'
+              : 'loadFailed',
+        );
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -124,8 +130,8 @@ export default function ConversationsPanel({ botId, refreshKey }: ConversationsP
       await clearConversations(botId);
       setTurns([]);
       toast.success(t('cleared'));
-    } catch {
-      toast.error(t('loadFailed'));
+    } catch (err) {
+      toast.error(err instanceof BotApiError && err.status === 429 ? t('rateLimited') : t('loadFailed'));
     }
   }, [botId, t]);
 
@@ -197,7 +203,7 @@ export default function ConversationsPanel({ botId, refreshKey }: ConversationsP
 
           {error ? (
             <p className="mt-3 text-xs text-red-700 dark:text-red-300" role="alert">
-              {error === 'notOwner' ? t('notOwner') : t('loadFailed')}
+              {error === 'notOwner' ? t('notOwner') : error === 'rateLimited' ? t('rateLimited') : t('loadFailed')}
             </p>
           ) : exchanges.length === 0 ? (
             <p className="mt-3 flex items-center gap-1.5 text-xs text-secondary-500 dark:text-secondary-400">

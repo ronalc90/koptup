@@ -36,7 +36,7 @@
         "name": "Essential",
         "tagline": "An assistant with your company's documents on your website.",
         "features": [
-          "One source (Drive, SharePoint or manual upload)",
+          "One source: manual upload, or Google Drive or SharePoint through a connector built in your project",
           "Up to 1,000 documents",
           "Web widget",
           "Answers that cite the source"
@@ -51,13 +51,13 @@
       },
       "profesional": {
         "name": "Professional",
-        "tagline": "Multiple sources, web and WhatsApp, with role-based permissions and metrics.",
+        "tagline": "Multiple sources, web and WhatsApp, with role-based permissions and metrics built in your project.",
         "features": [
           "Up to 3 sources",
           "Up to 10,000 documents",
-          "Web and WhatsApp",
-          "Role-based permissions",
-          "Metrics dashboard"
+          "Web and WhatsApp (the WhatsApp channel is built in your project)",
+          "Role-based permissions (built in your project)",
+          "Metrics dashboard (built in your project)"
         ],
         "monthlyIncludes": [
           "Up to 15,000 questions per month",
@@ -68,12 +68,12 @@
       },
       "empresarial": {
         "name": "Enterprise",
-        "tagline": "Runs on your own infrastructure, with SSO and auditing.",
+        "tagline": "Runs on your own infrastructure, with SSO and auditing built in your project.",
         "features": [
           "Unlimited sources",
           "Deployment on your cloud or on-premise",
-          "SSO",
-          "Auditing",
+          "SSO (built in your project)",
+          "Auditing (built in your project)",
           "Source code included"
         ],
         "cta": "Get an Enterprise quote"

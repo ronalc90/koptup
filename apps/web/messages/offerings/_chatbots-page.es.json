@@ -35,7 +35,7 @@
         },
         "sources": {
           "title": "Conectado a tus fuentes",
-          "desc": "Google Drive, SharePoint o carga manual de documentos; según el plan, también bases de datos y APIs."
+          "desc": "Carga manual de documentos y páginas web; según el plan, conectores a Google Drive, SharePoint, bases de datos y APIs que se construyen en tu proyecto."
         }
       }
     },
@@ -50,7 +50,7 @@
       "whatsapp": {
         "title": "WhatsApp",
         "plan": "Desde el plan Profesional",
-        "desc": "Tus clientes o tu equipo preguntan por WhatsApp y reciben la respuesta con su fuente, a través de la API oficial de WhatsApp Business. El plan Profesional incluye web y WhatsApp."
+        "desc": "En tu proyecto construimos el canal de WhatsApp con la API oficial de WhatsApp Business: tus clientes o tu equipo reciben allí la respuesta con su fuente. La demo de este sitio funciona solo en la web."
       },
       "metaNote": "Las tarifas de Meta por mensajes de WhatsApp se cobran aparte, al costo."
     },
@@ -122,7 +122,7 @@
         },
         "whatsapp": {
           "q": "¿El chatbot funciona en WhatsApp?",
-          "a": "Sí. Desde el plan Profesional, el chatbot responde en tu sitio web y en WhatsApp, a través de la API oficial de WhatsApp Business. El plan Esencial incluye el widget para tu sitio web. Las tarifas de Meta por mensajes de WhatsApp se cobran aparte, al costo."
+          "a": "Sí, desde el plan Profesional: en tu proyecto construimos el canal de WhatsApp con la API oficial de WhatsApp Business, y el chatbot responde allí y en tu sitio web. El plan Esencial incluye el widget para tu sitio web. La demo de este sitio funciona solo en la web. Las tarifas de Meta por mensajes de WhatsApp se cobran aparte, al costo."
         },
         "technology": {
           "q": "¿Qué tecnología de IA usan?",
@@ -140,7 +140,7 @@
     },
     "cta": {
       "title": "¿Quieres un chatbot que responda con tus documentos?",
-      "subtitle": "Prueba la demo gratis, sin registro, o agenda un piloto de {pilotWeeks} semanas con los documentos de tu empresa.",
+      "subtitle": "Prueba la demo gratis: los ejemplos no piden registro y para usar tu propio documento solo te pedimos un email. O agenda un piloto de {pilotWeeks} semanas con los documentos de tu empresa.",
       "demo": "Prueba con tu documento",
       "pilot": "Agenda un piloto",
       "plans": "Ver planes y precios"

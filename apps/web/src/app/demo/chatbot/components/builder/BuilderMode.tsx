@@ -244,6 +244,7 @@ export default function BuilderMode() {
         if (result.added.length > 0) toast.success(t('knowledge.uploaded', { count: result.added.length }));
       } catch (err) {
         if (err instanceof BotApiError && (err.status === 401 || err.status === 403)) toast.error(t('actions.notOwner'));
+        else if (err instanceof BotApiError && err.status === 429) toast.error(t('actions.rateLimited'));
         else if (err instanceof BotApiError && err.code === 'no_valid_files') toast.error(t('knowledge.noneReadable'));
         else toast.error(t('knowledge.uploadFailed'));
       } finally {
@@ -280,6 +281,7 @@ export default function BuilderMode() {
         toast.success(t('knowledge.sampleLoaded'));
       } catch (err) {
         if (err instanceof BotApiError && (err.status === 401 || err.status === 403)) toast.error(t('actions.notOwner'));
+        else if (err instanceof BotApiError && err.status === 429) toast.error(t('actions.rateLimited'));
         else toast.error(t('knowledge.uploadFailed'));
       } finally {
         setUploading(false);
@@ -310,6 +312,7 @@ export default function BuilderMode() {
         return result.added.length > 0;
       } catch (err) {
         if (err instanceof BotApiError && (err.status === 401 || err.status === 403)) toast.error(t('actions.notOwner'));
+        else if (err instanceof BotApiError && err.status === 429) toast.error(t('actions.rateLimited'));
         else if (err instanceof BotApiError && err.code === 'too_many_docs') toast.error(t('knowledge.tooManyDocs'));
         else toast.error(t('knowledge.urlFailed'));
         return false;
@@ -329,6 +332,7 @@ export default function BuilderMode() {
         toast.success(t('knowledge.removed'));
       } catch (err) {
         if (err instanceof BotApiError && (err.status === 401 || err.status === 403)) toast.error(t('actions.notOwner'));
+        else if (err instanceof BotApiError && err.status === 429) toast.error(t('actions.rateLimited'));
         else toast.error(t('knowledge.removeFailed'));
       }
     },

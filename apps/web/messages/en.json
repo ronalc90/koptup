@@ -2969,9 +2969,14 @@
     "title": "Want something like this for your business?",
     "titleWithName": "Need a {demoName} like this?",
     "description": "We develop custom software tailored to your company's needs. Request a no-obligation quote.",
-    "requestQuote": "Request Quote",
-    "viewPricing": "View Plans & Pricing",
-    "requestGuidedDemo": "Request a guided demo"
+    "requestQuote": "Request a quote",
+    "viewPricing": "View plans and pricing",
+    "requestGuidedDemo": "Request a guided demo",
+    "rag": {
+      "title": "Want this assistant with your company's documents?",
+      "description": "We start with a pilot on your own documents: the assistant answers with the source and says when something isn't there. Connections to your systems and channels are built in your project. Request a no-obligation quote.",
+      "requestQuote": "Quote the RAG pilot"
+    }
   },
   "demoEcommerce": {
     "title": "Demo Store",
@@ -3830,7 +3835,7 @@
     "q2q": "How long does it take to develop a web application?",
     "q2a": "It depends on the scope. An MVP (initial functional version) can be ready in 4-8 weeks. A complex system with multiple modules can take 3-6 months. In the initial analysis we define exact timelines.",
     "q3q": "Can KopTup develop chatbots for WhatsApp?",
-    "q3a": "Yes. RAG chatbots for WhatsApp connect to the official WhatsApp Business API (from the Professional plan) and use OpenAI models. They answer with your company's documents at any hour and, if they cannot find the answer, they say so. From {essentialFrom}, or a {pilotFrom} pilot (plus VAT where applicable).",
+    "q3a": "Yes. From the Professional plan, in your project we build the WhatsApp channel with the official WhatsApp Business API; the chatbot uses OpenAI models. They answer with your company's documents at any hour and, if they cannot find the answer, they say so. From {essentialFrom}, or a {pilotFrom} pilot (plus VAT where applicable).",
     "q4q": "Do you work with companies throughout Colombia or only in Bogotá?",
     "q4a": "We work remotely with companies in any city: meetings are by video call and we work in Spanish and English.",
     "q5q": "Do you offer maintenance after delivering the project?",

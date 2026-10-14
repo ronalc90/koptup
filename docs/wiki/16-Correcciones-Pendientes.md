@@ -27,7 +27,7 @@ flowchart LR
 | Prioridad | Qué agrupa | Puntos |
 |---|---|---|
 | **P0** | Lo que impide vender hoy o es un riesgo legal o de seguridad | 3 |
-| **P1** | Funciones que el cliente o el equipo usan y no sirven, incluidas las demos | 24 |
+| **P1** | Funciones que el cliente o el equipo usan y no sirven, incluidas las demos | 22 |
 | **P2** | Detalles del panel, de la operación y de la configuración | 23 |
 | **P3** | SEO, coherencia de textos y código que sobra | 1 |
 
@@ -62,7 +62,6 @@ flowchart LR
 
 | # | Qué pasa | Detalle |
 |---|---|---|
-| 1.15 | **"Prueba con tu documento" muestra un mensaje genérico para un documento con demasiado texto.** El backend ya lo rechaza con su propio código (`too_much_text`) y un mensaje claro; falta el texto en la pantalla de la demo | [Flujos técnicos › Hallazgos](Doc-14-3-Flujos-Tecnicos.md#hallazgos) |
 | 1.16 | **LinkedIn Ads muestra el cupo mensual agotado y la falta de Redis como un error genérico.** El backend ya responde `budget_exhausted` y `limits_unavailable` con mensajes claros; falta que la demo los use | [Flujos técnicos › Hallazgos](Doc-14-3-Flujos-Tecnicos.md#hallazgos) |
 
 ### Cuenta e inicio de sesión
@@ -88,7 +87,6 @@ flowchart LR
 | 1.25 | **Las tarjetas del catálogo de 20 demos prometen funciones que la demo no tiene** ("ML", "multi-país", integraciones, cumplimiento). Es el repaso de honestidad pendiente | [Guía de demos › Limitaciones comunes](Doc-07-Guia-de-Demos.md#limitaciones-comunes) |
 | 1.26 | **7 demos sin revisar** tienen botones que no hacen nada, no dicen que usan datos de ejemplo y mezclan textos en inglés | [Guía de demos](Doc-07-Guia-de-Demos.md) |
 | 1.27 | **El gestor documental es una demo abierta cuya API exige sesión:** un visitante ve "Error al cargar documentos" | [Guía: gestor documental](Guia-Demo-gestor-documentos.md) |
-| 1.29 | **El chatbot dice "Revisa tu conexión"** cuando lo que pasó es que se superó el límite de bots nuevos por hora y por IP | [Guía: chatbot](Guia-Demo-chatbot.md) |
 | 1.30 | **"Solicitar acceso" mal dirigido dentro de las demos de salud:** en cuentas médicas apunta a una ruta que no existe y en el motor de reglas lleva a `/contact` | [Guía: cuentas médicas](Guia-Demo-cuentas-medicas.md), [Guía: motor de reglas](Guia-Demo-sistema-experto.md) |
 | 1.31 | **"Ver Planes y Precios"** al final de las demos de otras soluciones lleva a los planes RAG | [Guía de demos › Limitaciones comunes](Doc-07-Guia-de-Demos.md#limitaciones-comunes) |
 | 1.32 | **Errores de hidratación de React** con el navegador en español en wms-logistica, automatizacion y moderacion-contenido | [Guía de demos › Limitaciones comunes](Doc-07-Guia-de-Demos.md#limitaciones-comunes) |

@@ -169,7 +169,7 @@ Estas se repiten en varias demos; el detalle de cada una está en su guía. Tamb
 | **Lo que haces vive solo en tu navegador** (`localStorage`): no se comparte con el vendedor ni entre equipos, y en algunas se pierde al recargar | Casi todas las demos con datos de ejemplo |
 | **Errores de hidratación de React** con el navegador en español, por números formateados distinto en el servidor y en el navegador | wms-logistica, automatizacion, moderacion-contenido |
 | **Botones que no hacen nada**, sin rótulo "Datos de ejemplo" o con textos en inglés | Las 7 por revisar |
-| **Límite de 30 bots nuevos por hora por IP** en el chatbot: si se supera, la demo dice "Revisa tu conexión" aunque la causa sea el límite. También afecta "Redactar con IA" del helpdesk | chatbot, helpdesk-ia |
+| **Límite de 30 bots nuevos por hora por IP:** en "Redactar con IA" del helpdesk, si se supera, la demo dice "Revisa tu conexión" aunque la causa sea el límite. El chatbot ya muestra la causa real (pausa por muchas consultas) y "Prueba el asistente" reutiliza bots de ejemplo compartidos, así que casi nunca crea uno | helpdesk-ia |
 | **Una demo abierta cuya API exige sesión:** sin iniciar sesión muestra "Error al cargar documentos" | gestor-documentos |
 | **Enlaces de "Solicitar acceso" mal dirigidos** dentro de la demo: a una ruta que no existe o a `/contact` en vez de `/solicitar-demo` | cuentas-medicas, sistema-experto |
 

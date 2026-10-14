@@ -281,11 +281,11 @@ Todas exigen sesión. Cada controlador filtra por la cuenta que llama (o permite
 
 ### 4.8 Chatbot RAG (`/api/chatbot`)
 
-Toda la ruta tiene su propio cupo: **60 peticiones por minuto por IP**. Los bots, sus documentos y el historial se guardan en MongoDB (ver [Modelos de datos](Doc-09-Modelos-de-Datos.md)); sin base de datos, las rutas `/bots…` responden `503 storage_unavailable`.
+Toda la ruta tiene su propio cupo: **180 peticiones por minuto por IP** (`GET /models` no cuenta) y las preguntas al chat, otro de **60 por minuto por IP**. Los bots, sus documentos y el historial se guardan en MongoDB (ver [Modelos de datos](Doc-09-Modelos-de-Datos.md)); sin base de datos, las rutas `/bots…` responden `503 storage_unavailable`.
 
 | Método | Ruta | Auth | Para qué | Entrada → salida |
 |---|---|---|---|---|
-| GET | `/models` | Pública | Modelos permitidos y si hay IA | → `{ available: [{ id, name, costInputUSDper1M, costOutputUSDper1M, enabled }], activeProvider }` |
+| GET | `/models` | Pública (no cuenta en el cupo por IP) | Modelos permitidos, si hay IA y si existe `POST /sample-bots` | → `{ available: [{ id, name, costInputUSDper1M, costOutputUSDper1M, enabled }], activeProvider, sharedSampleBots: true }` |
 | POST | `/bots` | Pública · 30 bots por hora por IP; máx. 20.000 bots (`CHATBOT_MAX_BOTS`) | Crear un bot. `kind: "sample"` marca un bot de ejemplo de una demo: nunca guarda conversaciones y se borra a los 30 días sin uso | `{ name?, color?, position?, avatar?, welcome?, systemPrompt?, tone?, languages?, kind? }` → `201` con el bot (incluye `kind`) y `ownerToken` (**solo esta vez**) |
 | GET | `/bots` | Pública | Bots del dueño (según `X-Bot-Owner-Token`) y bots de ejemplo | `?limit=&offset=` → lista resumida |
 | GET | `/bots/:botId` | Pública | Configuración (completa solo para el dueño; sin prompt ni documentos para el resto) | — |
@@ -293,9 +293,11 @@ Toda la ruta tiene su propio cupo: **60 peticiones por minuto por IP**. Los bots
 | POST | `/bots/:botId/docs` | Dueño del bot | Subir archivos en base64 (máx. 5 por envío, 5 MB c/u, 50 por bot) | `{ files: [{ name, mime, contentBase64 }] }` → `{ docs, added, errors }` |
 | DELETE | `/bots/:botId/docs/:docId` | Dueño del bot | Quitar un documento | — |
 | POST | `/bots/:botId/urls` | Dueño del bot | Indexar páginas web (máx. 5 por envío, 2 MB c/u) | `{ urls: [...] }` |
-| POST | `/bots/:botId/chat` | Pública (bot existente) | Preguntar. Sin IA, sin presupuesto o con error del proveedor responde en **modo extractivo** citando fragmentos. Solo con `channel: "widget"` (lo envía `/embed/chatbot` fuera de la vista previa del Builder) y en un bot de usuario se guarda la pregunta en el historial, que vence a los 30 días | `{ message (≤ 2000), history?, model?, channel? }` → `{ reply, sources, confidence, model, tokens?, costUSD?, error? }` |
+| POST | `/bots/:botId/chat` | Pública (bot existente) · 60 preguntas por minuto por IP | Preguntar. Sin IA, sin presupuesto o con error del proveedor responde en **modo extractivo** citando fragmentos, con una nota que lo explica y `error` = `llm_not_configured`, `budget_exhausted`, `budget_unavailable` o `llm_provider_error`. Los textos que escribe el servidor salen en `lang` (`es` o `en`; si no viene, el primer idioma del bot). Solo con `channel: "widget"` (lo envía `/embed/chatbot` fuera de la vista previa del Builder) y en un bot de usuario se guarda la pregunta en el historial, que vence a los 30 días | `{ message (≤ 2000), history?, model?, channel?, lang? }` → `{ reply, sources, confidence, model, tokens?, costUSD?, error? }` |
 | GET / DELETE | `/bots/:botId/conversations` | Dueño del bot | Historial (últimos 200 turnos vigentes) o borrarlo | `?limit=` |
-| POST | `/session`, `/upload`, `/message`; GET `/info/:sessionId`; PUT `/config`; DELETE `/messages/:sessionId`, `/documents/:sessionId` | Pública por `sessionId` | API anterior "por sesión". Ninguna página de la web la usa desde que se retiraron los proxies de Next y `/test` | Upload: hasta 10 archivos de 10 MB (PDF, TXT, CSV, DOCX), 10 por minuto |
+| POST | `/sample-bots` | Pública (cuenta en el límite de creación solo la primera vez) | Bot de ejemplo compartido de «Prueba el asistente»: el servidor lo identifica por la huella de su configuración y sus textos, lo crea e indexa una sola vez y lo reutiliza; no tiene dueño, no guarda conversaciones y se borra a los 30 días sin uso | `{ sampleKey, config, files: [{ name, mime (TXT/MD/CSV), contentBase64 (≤ 256 KB) }] (1 a 5) }` → `{ botId, docs, docsCount, shared: true }` |
+
+La API anterior "por sesión" (`/session`, `/upload`, `/message`, `/info`, `/config`, `/messages`, `/documents`) se retiró: responde 404 y, al arrancar, el backend borra lo que dejó (colección `chatbots` y `uploads/chatbot`).
 
 ### 4.9 Demo "Prueba con tu documento" (`/api/demo-rag`)
 
@@ -414,7 +416,8 @@ Los cupos marcados "memoria" se cuentan en el proceso del backend; los marcados 
 |---|---|---|---|---|---|
 | Todo `/api` salvo los casos de abajo | 100 | 15 min | Usuario (con token válido), sesión de refresco o IP | Memoria | `RATE_LIMIT_MAX_REQUESTS`, `RATE_LIMIT_WINDOW_MS` |
 | `GET /api/auth/me` y `GET /api/demo-access/*` | 120 | 1 min | Igual que el anterior | Memoria | `AUTH_ME_RATE_LIMIT_MAX` |
-| Todo `/api/chatbot` | 60 | 1 min | IP | Memoria | `CHATBOT_RATE_LIMIT_MAX` |
+| Todo `/api/chatbot` salvo `GET /models` | 180 | 1 min | IP | Memoria | `CHATBOT_API_RATE_LIMIT_MAX` |
+| Preguntas al chat (`POST /api/chatbot/bots/:botId/chat`) | 60 | 1 min | IP | Memoria | `CHATBOT_RATE_LIMIT_MAX` |
 | `POST /api/auth/login` | 10 · 30 | 15 min | IP y correo normalizado · IP | Memoria | `LOGIN_RATE_LIMIT_MAX`, `LOGIN_IP_RATE_LIMIT_MAX` |
 | `POST /api/auth/register` | 5 | 1 hora | IP | Memoria | `REGISTER_RATE_LIMIT_MAX` |
 | `POST /api/auth/forgot-password` | 3 · 10 | 15 min | IP y correo normalizado · IP | Memoria | `FORGOT_PASSWORD_RATE_LIMIT_MAX` |
@@ -423,7 +426,7 @@ Los cupos marcados "memoria" se cuentan en el proceso del backend; los marcados 
 | `POST /api/auth/google/exchange` | 20 | 1 min | IP | Memoria | — |
 | `POST /api/contact` | 5 | 1 min | IP | Memoria | — |
 | `POST /api/auth/activate/check` | 20 | 1 min | IP | Memoria | — |
-| Subidas de `/api/documents/upload` y `/api/chatbot/upload` | 10 | 1 min | IP | Memoria | — |
+| Subidas de `/api/documents/upload` | 10 | 1 min | IP | Memoria | — |
 | Crear bots (`POST /api/chatbot/bots`) | 30 | 1 hora | IP | Memoria | `CHATBOT_CREATE_LIMIT_PER_HOUR` |
 | `POST /api/demo-requests` (solo envíos válidos) | 5 por IP · 3 por email | 1 hora · 24 horas | IP · email normalizado (en hash) | Redis, con respaldo en memoria | `DEMO_REQUEST_LIMIT_PER_HOUR`, `DEMO_REQUEST_LIMIT_PER_EMAIL_DAY` |
 | Demo RAG: subir documento | 10 intentos · 3 documentos | 10 min · día de Colombia | IP | Memoria · Redis | — |
@@ -439,7 +442,7 @@ Detrás del proxy de Railway el servidor confía en un salto (`TRUST_PROXY_HOPS`
 
 ![Cabeceras de cupo y límites públicos de la demo RAG](images/doc/api/consola-cupos.jpg)
 
-*El chatbot informa 60 por minuto, la verificación de sesión 120 por minuto y la demo RAG publica sus límites en `/status`.*
+*La captura es anterior a la verificación final del 14 de octubre de 2026: hoy el chatbot informa 180 por minuto en sus rutas y 60 por minuto en las preguntas. La verificación de sesión informa 120 por minuto y la demo RAG publica sus límites en `/status`.*
 
 ### 6.2 Tamaños máximos
 

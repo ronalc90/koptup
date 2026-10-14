@@ -87,7 +87,7 @@
         },
         "control": {
           "title": "Si necesitas más control",
-          "desc": "El plan Profesional agrega permisos por rol, y el Empresarial se despliega en tu nube o en tus servidores (on-premise), con SSO y auditoría."
+          "desc": "En el plan Profesional construimos en tu proyecto permisos por rol, y el Empresarial se despliega en tu nube o en tus servidores (on-premise), con SSO y auditoría que también se construyen en tu proyecto."
         },
         "demo": {
           "title": "En la demo pública",
@@ -117,30 +117,30 @@
     },
     "integrations": {
       "title": "Integraciones: Google Drive, SharePoint, WhatsApp, bases de datos y APIs",
-      "subtitle": "Conectamos el asistente a donde ya están tus documentos y a los canales que ya usa tu gente.",
+      "subtitle": "Construimos en tu proyecto la conexión del asistente con el lugar donde ya están tus documentos y con los canales que ya usa tu gente. Hoy la demo trabaja con archivos que subes (PDF, DOCX, TXT) y páginas web.",
       "items": {
         "drive": {
           "title": "Google Drive",
-          "desc": "Usa carpetas de Google Drive como fuente de documentos del asistente."
+          "desc": "Conector que se construye en tu proyecto para usar carpetas de Google Drive como fuente del asistente."
         },
         "sharepoint": {
           "title": "SharePoint",
-          "desc": "Conecta las bibliotecas de documentos de SharePoint de tu empresa."
+          "desc": "Conector que se construye en tu proyecto para las bibliotecas de documentos de SharePoint de tu empresa."
         },
         "whatsapp": {
           "title": "WhatsApp",
-          "desc": "Tus clientes o tu equipo preguntan por WhatsApp y reciben la respuesta con su fuente. Las tarifas de Meta por mensajes se cobran aparte, al costo."
+          "desc": "Canal que se construye en tu proyecto con la API oficial de WhatsApp Business: tus clientes o tu equipo preguntan por WhatsApp y reciben la respuesta con su fuente. Las tarifas de Meta por mensajes se cobran aparte, al costo."
         },
         "databases": {
           "title": "Bases de datos",
-          "desc": "Además de documentos, el asistente puede consultar información de tus bases de datos."
+          "desc": "En tu proyecto conectamos el asistente a tus bases de datos para que también consulte esa información."
         },
         "apis": {
           "title": "APIs",
-          "desc": "Lleva las respuestas a tu intranet, tu CRM o tus aplicaciones a través de una API."
+          "desc": "En tu proyecto llevamos las respuestas a tu intranet, tu CRM o tus aplicaciones a través de una API."
         }
       },
-      "note": "La cantidad de fuentes depende del plan: una en Esencial, hasta tres en Profesional e ilimitadas en Empresarial. WhatsApp está incluido desde el plan Profesional."
+      "note": "La cantidad de fuentes depende del plan: una en Esencial, hasta tres en Profesional e ilimitadas en Empresarial. El canal de WhatsApp se construye en tu proyecto desde el plan Profesional."
     },
     "plans": {
       "title": "Planes y precios",
@@ -167,11 +167,11 @@
         },
         "formats": {
           "q": "¿Qué formatos acepta?",
-          "a": "PDF con texto, Word (DOCX), TXT y páginas web. También podemos conectar documentos de Google Drive o SharePoint y datos de bases de datos o APIs, según el plan. Si tus PDF son escaneos (imágenes sin texto), lo revisamos contigo en el piloto."
+          "a": "PDF con texto, Word (DOCX), TXT y páginas web. Según el plan, en tu proyecto también construimos la conexión con Google Drive o SharePoint y con bases de datos o APIs. Si tus PDF son escaneos (imágenes sin texto), lo revisamos contigo en el piloto."
         },
         "whatsapp": {
           "q": "¿Funciona en WhatsApp?",
-          "a": "Sí. Desde el plan Profesional, el asistente responde en tu sitio web y en WhatsApp, a través de la API oficial de WhatsApp Business. Las tarifas de Meta por mensajes de WhatsApp se cobran aparte, al costo."
+          "a": "Sí, desde el plan Profesional: en tu proyecto construimos el canal de WhatsApp con la API oficial de WhatsApp Business, y el asistente responde allí y en tu sitio web. La demo de este sitio funciona solo en la web. Las tarifas de Meta por mensajes de WhatsApp se cobran aparte, al costo."
         },
         "cost": {
           "q": "¿Cuánto cuesta?",

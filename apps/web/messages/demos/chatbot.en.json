@@ -300,7 +300,8 @@
         "saveRateLimited": "We couldn't save the bot: many bots were created from your network in the last hour and the server paused creating new ones. Try again later (the limit resets every hour).",
         "saveCapacity": "We couldn't save the bot: the demo has reached its bot capacity right now. Try again later.",
         "saveUnavailable": "We couldn't save the bot: the chatbot is not available right now. Try again in a few minutes.",
-        "saveNetwork": "We couldn't reach the demo server. Check your connection and try again."
+        "saveNetwork": "We couldn't reach the demo server. Check your connection and try again.",
+        "rateLimited": "You made many requests in a row and the server asked for a pause. Wait a minute and try again."
       },
       "sections": {
         "identity": "Identity",
@@ -429,6 +430,7 @@
         "empty": "No saved conversations yet. Questions asked in the preview are not saved: open the bot with “Open chat” or paste it on your site and ask it something.",
         "saveFirst": "Save the bot to see its conversations.",
         "loadFailed": "We could not load the conversations.",
+        "rateLimited": "You made many requests in a row. Wait a minute and try again.",
         "questions": "Questions",
         "withSources": "With source",
         "notFound": "Not found",
@@ -463,6 +465,7 @@
       "close": "Close chat",
       "poweredBy": "Powered by KopTup",
       "errorNetwork": "We could not reach the server. Please try again.",
+      "errorGeneric": "We couldn't answer your question. Please try again.",
       "retry": "Retry",
       "sourceTitle": "Source [{n}] · {name}",
       "hideSource": "Hide source",

@@ -1,17 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import multer from 'multer';
 import path from 'path';
 import crypto from 'crypto';
 import rateLimit from 'express-rate-limit';
-import {
-  createOrGetSession,
-  uploadDocuments,
-  sendMessage,
-  getChatbotInfo,
-  updateConfig,
-  clearMessages,
-  clearDocuments,
-} from '../controllers/chatbot.controller';
 import {
   addBotDocs,
   appendTurns,
@@ -47,45 +37,14 @@ import {
 import { getBudgetStatus, recordSpend } from '../services/ai-budget.service';
 import { extractTextFromBuffer, UnsupportedDocumentError } from '../services/document-text.service';
 import { safeFetchText, SafeFetchError } from '../services/safe-fetch.service';
-import { uploadRateLimiter } from '../middleware/rateLimiter';
+import { chatbotQuestionRateLimiter } from '../middleware/rateLimiter';
 import { logger } from '../utils/logger';
-import { AppError, asyncHandler } from '../middleware/errorHandler';
+import { asyncHandler } from '../middleware/errorHandler';
 import { isDbReady, isStaffRole, loadFreshUser, readBearer } from '../middleware/access';
 import type { AuthRequest } from '../types';
 import { errorBody, sendError } from '../utils/http-error';
 
 const router = Router();
-
-// --- API heredada "por sesión" (la usa /demo/chatbot/preview vía los proxies
-// de Next en apps/web/src/app/api/chatbot/*). Se retira en la Fase 2 del plan.
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    cb(null, 'uploads/chatbot/');
-  },
-  filename: (_req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, 'chatbot-' + uniqueSuffix + path.extname(file.originalname).toLowerCase());
-  },
-});
-
-const upload = multer({
-  storage,
-  limits: { fileSize: 10 * 1024 * 1024, files: 10 },
-  fileFilter: (_req, file, cb) => {
-    const allowedTypes = ['.pdf', '.txt', '.csv', '.docx'];
-    const ext = path.extname(file.originalname).toLowerCase();
-    if (allowedTypes.includes(ext)) cb(null, true);
-    else cb(new AppError('Tipo de archivo no permitido. Solo PDF, TXT, CSV, DOCX', 400));
-  },
-});
-
-router.post('/session', createOrGetSession);
-router.post('/upload', uploadRateLimiter, upload.array('files', 10), uploadDocuments);
-router.post('/message', sendMessage);
-router.get('/info/:sessionId', getChatbotInfo);
-router.put('/config', updateConfig);
-router.delete('/messages/:sessionId', clearMessages);
-router.delete('/documents/:sessionId', clearDocuments);
 
 // ============================================================================
 //   Builder + Playground (RAG con BM25-lite y, si hay clave y presupuesto, OpenAI)
@@ -117,8 +76,13 @@ router.delete('/documents/:sessionId', clearDocuments);
 // El cliente lo guarda y lo envía en la cabecera `X-Bot-Owner-Token` en las
 // rutas marcadas [dueño]. Se guarda solo su hash SHA-256. La cabecera acepta
 // varios tokens separados por comas (uno por bot del navegador). Un bot creado
-// antes de este control (sin hash guardado) queda asignado al primer token que
-// lo use en una ruta [dueño].
+// antes de este control (sin hash guardado) solo lo administra el equipo de
+// KopTup con una sesión de staff; nadie lo reclama con un token.
+//
+// La API anterior "por sesión" (/session, /upload, /message, /info, /config,
+// /messages, /documents) se retiró: guardaba preguntas y documentos sin
+// vencimiento. Al arrancar, services/chatbot-legacy-cleanup.service.ts borra
+// lo que dejó (colección `chatbots` y uploads/chatbot).
 
 /** Cabecera con el token del propietario del bot. */
 export const OWNER_TOKEN_HEADER = 'x-bot-owner-token';
@@ -157,9 +121,9 @@ type BotChunk = RagChunk;
 /**
  * Errores de /bots con el formato único `{ success: false, code, message }`
  * (utils/http-error.ts), más datos útiles cuando aplica (`field`, `max`).
- * Ojo: el chat responde 200 con `error` (`budget_exhausted`,
- * `llm_provider_error`) cuando contesta en modo extractivo: no es un error,
- * es el motivo del modo.
+ * Ojo: el chat responde 200 con `error` (`llm_not_configured`,
+ * `budget_exhausted`, `budget_unavailable`, `llm_provider_error`) cuando
+ * contesta en modo extractivo: no es un error, es el motivo del modo.
  */
 const BOT_NOT_FOUND_MESSAGE = 'Este bot no existe o ya fue borrado.';
 const FIELD_ERROR_MESSAGES: Record<string, string> = {
@@ -854,11 +818,61 @@ router.post(
   }),
 );
 
+/** Idioma de los textos que escribe el servidor (modo extractivo y avisos). */
+export type ReplyLang = 'es' | 'en';
+
 /**
- * Respuesta cuando los documentos no contienen la información. Es la frase
- * que promete /rag ("Cómo evitamos respuestas inventadas").
+ * Textos que escribe el propio servidor (sin modelo). `NOT_FOUND` es la frase
+ * que promete /rag ("Cómo evitamos respuestas inventadas"); la demo la
+ * reconoce en los dos idiomas (NOT_FOUND_PATTERNS de builder/api.ts).
  */
-const NOT_FOUND_REPLY = 'No encontré esa información en los documentos cargados.';
+export const REPLY_TEXT: Record<ReplyLang, {
+  notFound: string;
+  rephrase: string;
+  noDocs: string;
+  noKey: string;
+  budgetExhausted: string;
+  budgetUnavailable: string;
+  providerError: string;
+  providerErrorNoDocs: string;
+}> = {
+  es: {
+    notFound: 'No encontré esa información en los documentos cargados.',
+    rephrase: 'Prueba reformular la pregunta o subir más documentos.',
+    noDocs: 'Aún no tienes documentos cargados. Sube un archivo o agrega una URL en el Builder y vuelve a preguntarme.',
+    noKey: '(Modo extractivo: la IA no está configurada; te muestro los fragmentos de los documentos que responden tu pregunta.)',
+    budgetExhausted: '(Modo extractivo: alcanzamos el cupo mensual de IA de esta demo.)',
+    budgetUnavailable: '(Modo extractivo: la IA no está disponible en este momento.)',
+    providerError: '(Modo extractivo por un error del proveedor de IA)',
+    providerErrorNoDocs: 'No pude generar la respuesta (error del proveedor de IA) y todavía no tienes documentos cargados.',
+  },
+  en: {
+    notFound: "I couldn't find that information in the uploaded documents.",
+    rephrase: 'Try rephrasing the question or uploading more documents.',
+    noDocs: "You don't have any documents yet. Upload a file or add a URL in the Builder and ask me again.",
+    noKey: '(Extractive mode: AI is not configured; here are the passages from the documents that answer your question.)',
+    budgetExhausted: "(Extractive mode: this demo reached its monthly AI quota.)",
+    budgetUnavailable: '(Extractive mode: AI is not available right now.)',
+    providerError: '(Extractive mode due to an AI provider error)',
+    providerErrorNoDocs: "I couldn't generate the answer (AI provider error) and you don't have any documents yet.",
+  },
+};
+
+/**
+ * Idioma de los textos del servidor: `lang` del cuerpo de /chat (la demo
+ * envía el idioma de la página) o, si no viene, el primer idioma del bot.
+ * Español por defecto.
+ */
+export function replyLangFor(body: unknown, botLanguages: readonly string[] = []): ReplyLang {
+  const raw = body && typeof body === 'object' ? (body as Record<string, unknown>).lang : undefined;
+  const pick = (v: unknown): ReplyLang | null => {
+    if (typeof v !== 'string') return null;
+    const base = v.trim().toLowerCase().slice(0, 2);
+    return base === 'en' || base === 'es' ? base : null;
+  };
+  return pick(raw) ?? pick(botLanguages[0]) ?? 'es';
+}
+
 
 /**
  * Reglas de respuesta que se agregan SIEMPRE al prompt del sistema, también
@@ -868,13 +882,13 @@ const GROUNDING_RULES = [
   'Reglas obligatorias para responder:',
   '1. Responde solo con la información de los fragmentos numerados que acompañan la pregunta. No uses conocimiento externo ni inventes datos.',
   '2. Cita la fuente de cada dato con el número del fragmento entre corchetes: [1], [2], etc.',
-  `3. Si los fragmentos no contienen la respuesta, o no hay fragmentos, responde "${NOT_FOUND_REPLY}" (en inglés: "I couldn't find that information in the uploaded documents.") y, si sirve, sugiere qué documento cargar.`,
+  `3. Si los fragmentos no contienen la respuesta, o no hay fragmentos, responde "${REPLY_TEXT.es.notFound}" (en inglés: "${REPLY_TEXT.en.notFound}") y, si sirve, sugiere qué documento cargar.`,
   'Responde en el idioma de la pregunta y, en español, trata al usuario de "tú".',
 ].join('\n');
 
-function composeExtractiveReply(retrieved: Array<{ chunk: BotChunk; score: number }>): string {
+function composeExtractiveReply(retrieved: Array<{ chunk: BotChunk; score: number }>, lang: ReplyLang): string {
   if (retrieved.length === 0) {
-    return `${NOT_FOUND_REPLY} Prueba reformular la pregunta o subir más documentos.`;
+    return `${REPLY_TEXT[lang].notFound} ${REPLY_TEXT[lang].rephrase}`;
   }
   return retrieved
     .map(
@@ -918,9 +932,13 @@ function sanitizeHistory(raw: unknown): Array<{ role: string; content: string }>
  *      medido en Redis), llama al modelo elegido de la lista blanca
  *      (gpt-4o-mini por defecto) y suma el costo al gasto del mes.
  *   3. Sin clave, sin presupuesto o si el proveedor falla: modo extractivo
- *      (cita los fragmentos) y lo dice en la respuesta.
+ *      (cita los fragmentos) y lo dice en la respuesta, con `error` =
+ *      `llm_not_configured`, `budget_exhausted`, `budget_unavailable` o
+ *      `llm_provider_error`.
+ * Los textos que escribe el servidor salen en el idioma de `lang` (o el
+ * primero del bot). Cupo propio de preguntas por IP (chatbotQuestionRateLimiter).
  */
-router.post('/bots/:botId/chat', asyncHandler(async (req: Request, res: Response) => {
+router.post('/bots/:botId/chat', chatbotQuestionRateLimiter, asyncHandler(async (req: Request, res: Response) => {
   const botId = req.params.botId;
   const bot = await findBot(botId);
   if (!bot) {
@@ -953,6 +971,8 @@ router.post('/bots/:botId/chat', asyncHandler(async (req: Request, res: Response
 
   const retrieved = retrieve(message, allChunks, 5);
   const sources = retrieved.map((r, i) => formatSource(r, i));
+  const lang = replyLangFor(req.body, bot.languages);
+  const text = REPLY_TEXT[lang];
 
   async function finish(payload: {
     reply: string;
@@ -995,13 +1015,13 @@ router.post('/bots/:botId/chat', asyncHandler(async (req: Request, res: Response
     });
   }
 
-  async function extractive(note: string | null, error?: string) {
+  async function extractive(note: string, error: string) {
     const base =
       retrieved.length > 0
-        ? composeExtractiveReply(retrieved)
+        ? composeExtractiveReply(retrieved, lang)
         : allChunks.length === 0
-          ? 'Aún no tienes documentos cargados. Sube un archivo o agrega una URL en el Builder y vuelve a preguntarme.'
-          : NOT_FOUND_REPLY;
+          ? text.noDocs
+          : text.notFound;
     await finish({
       reply: note && retrieved.length > 0 ? `${note} ${base}` : base,
       confidence: retrieved.length > 0 ? 0.3 : 0,
@@ -1011,9 +1031,10 @@ router.post('/bots/:botId/chat', asyncHandler(async (req: Request, res: Response
     });
   }
 
-  // --- Sin LLM: modo extractivo puro -------------------------------------
+  // --- Sin LLM: modo extractivo, con la nota que lo explica (el widget en el
+  // sitio de un cliente no tiene otro rótulo).
   if (!process.env.OPENAI_API_KEY) {
-    await extractive(null);
+    await extractive(text.noKey, 'llm_not_configured');
     return;
   }
 
@@ -1021,9 +1042,7 @@ router.post('/bots/:botId/chat', asyncHandler(async (req: Request, res: Response
   const budget = await getBudgetStatus('chatbot');
   if (!budget.available) {
     await extractive(
-      budget.reason === 'budget_exhausted'
-        ? '(Modo extractivo: alcanzamos el cupo mensual de IA de esta demo.)'
-        : '(Modo extractivo: la IA no está disponible en este momento.)',
+      budget.reason === 'budget_exhausted' ? text.budgetExhausted : text.budgetUnavailable,
       budget.reason === 'budget_exhausted' ? 'budget_exhausted' : 'budget_unavailable',
     );
     return;
@@ -1076,10 +1095,10 @@ router.post('/bots/:botId/chat', asyncHandler(async (req: Request, res: Response
     logger.error(`[chatbot] OpenAI call failed: ${msg.slice(0, 300)}`);
     const fallbackReply =
       retrieved.length > 0
-        ? `(Modo extractivo por error del proveedor LLM) ${composeExtractiveReply(retrieved)}`
+        ? `${text.providerError} ${composeExtractiveReply(retrieved, lang)}`
         : allChunks.length === 0
-          ? 'No pude generar la respuesta (error del proveedor LLM) y todavía no tienes documentos cargados.'
-          : NOT_FOUND_REPLY;
+          ? text.providerErrorNoDocs
+          : text.notFound;
     await finish({
       reply: fallbackReply,
       confidence: retrieved.length > 0 ? 0.3 : 0,

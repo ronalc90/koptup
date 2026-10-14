@@ -8,22 +8,11 @@
  * `foundingDate` ni `numberOfEmployees`.
  */
 
-import { DEMO_COUNT } from '@/lib/demos';
-import { RAG_PLANS, formatRagCOP, formatRagUSD, getRagPlan } from '@/lib/rag-plans';
+import { RAG_PLANS } from '@/lib/rag-plans';
 import { HOME_DESCRIPTION, SITE_URL, SOCIAL_LINKS, absoluteUrl } from '@/lib/site';
 
-// Precios de los planes RAG (src/lib/rag-plans.ts) que citan el JSON-LD.
-const RAG_PILOT = getRagPlan('piloto');
-const RAG_ESSENTIAL = getRagPlan('esencial');
+// Precio más bajo de los planes RAG (src/lib/rag-plans.ts) para el JSON-LD.
 const RAG_LOWEST_COP = Math.min(...RAG_PLANS.map((p) => p.setup.cop));
-const RAG_PRICE_ANSWER = [
-  `Los sistemas RAG empiezan con un piloto de ${RAG_PILOT.weeks.max} semanas por ${formatRagCOP(RAG_PILOT.setup.cop)} (${formatRagUSD(RAG_PILOT.setup.usd)}).`,
-  `El plan Esencial cuesta ${formatRagCOP(RAG_ESSENTIAL.setup.cop)} de setup${
-    RAG_ESSENTIAL.monthly ? ` más ${formatRagCOP(RAG_ESSENTIAL.monthly.cop)} al mes` : ''
-  }; todos los precios son más IVA si aplica.`,
-  `Las demás soluciones a medida tienen precios de referencia en COP en ${absoluteUrl('/services')} y el valor final depende del alcance.`,
-  'Contáctanos para recibir una cotización sin compromiso.',
-].join(' ');
 
 interface StructuredDataProps {
   type: 'organization' | 'website' | 'service' | 'article' | 'softwareApplication' | 'localBusiness';
@@ -128,10 +117,10 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
       'Respuestas basadas en los documentos de tu empresa',
       'Cita la fuente de cada respuesta',
       'Dice "no encontré esa información" cuando la respuesta no está en tus documentos',
-      'Fuentes: Google Drive, SharePoint o carga manual',
-      'Widget web y WhatsApp',
-      'Permisos por rol y panel de métricas',
-      'Despliegue en la nube del cliente u on-premise',
+      'Fuentes: carga manual de documentos y páginas web; conectores a Google Drive o SharePoint que se construyen en cada proyecto',
+      'Widget web; canal de WhatsApp que se construye en cada proyecto (plan Profesional)',
+      'Permisos por rol y panel de métricas que se construyen en cada proyecto (plan Profesional)',
+      'Despliegue en la nube del cliente u on-premise (plan Empresarial)',
     ],
   });
 
@@ -157,7 +146,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
       '@type': 'OpeningHoursSpecification',
       dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
       opens: '08:00',
-      closes: '18:00',
+      closes: '17:00',
     },
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
@@ -231,7 +220,7 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
         '@type': 'OpeningHoursSpecification',
         dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
         opens: '08:00',
-        closes: '18:00',
+        closes: '17:00',
       },
     ],
     sameAs: Object.values(SOCIAL_LINKS),
@@ -264,63 +253,6 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
-  );
-}
-
-// Export FAQ Schema for pages that need it
-export function FAQStructuredData() {
-  const getFAQSchema = () => ({
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: [
-      {
-        '@type': 'Question',
-        name: '¿Qué tipo de software desarrolla KopTup?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Desarrollamos software a medida para empresas: e-commerce, chatbots con IA, dashboards ejecutivos, sistemas de gestión documental, plataformas de reservas, CMS, aplicaciones móviles y soluciones personalizadas según las necesidades de cada negocio.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: '¿Puedo probar el software antes de contratar?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: `Sí. En ${absoluteUrl('/demo')} hay ${DEMO_COUNT} demos navegables del tipo de soluciones que construimos. Algunas usan IA real, como el chatbot RAG; la mayoría funcionan con datos de ejemplo, y cada demo indica qué es real y qué es de ejemplo.`,
-        },
-      },
-      {
-        '@type': 'Question',
-        name: '¿Cuánto cuesta desarrollar software a medida con KopTup?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: RAG_PRICE_ANSWER,
-        },
-      },
-      {
-        '@type': 'Question',
-        name: '¿Qué tecnologías utilizan?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Este sitio y sus demos están hechos con Next.js, React, TypeScript, Node.js, MongoDB y la API de OpenAI. En cada proyecto definimos contigo el stack al cotizar.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: '¿Ofrecen soporte después del desarrollo?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Sí. La mensualidad de los planes RAG incluye soporte (de lunes a viernes en el plan Esencial y prioritario en el Profesional). En los proyectos a medida, el soporte después de la entrega queda definido en el contrato.',
-        },
-      },
-    ],
-  });
-
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(getFAQSchema()) }}
     />
   );
 }

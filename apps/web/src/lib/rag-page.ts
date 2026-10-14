@@ -11,7 +11,7 @@
  * `rag-plans.ts` (`getRagFaqValues`), para que nunca contradigan la tabla de
  * planes.
  */
-import { RAG_EXTRA_QUESTION_PRICE, formatRagCOP, formatRagUSD, getRagPlan } from './rag-plans';
+import { RAG_EXTRA_QUESTION_PRICE, formatRagCOP, formatRagUSD, getRagPlan, ragPlanContactHref } from './rag-plans';
 
 /** Ruta de la página principal de sistemas RAG. */
 export const RAG_PATH = '/rag';
@@ -35,8 +35,12 @@ export function demoRequestPath(slug: string): string {
   return `/solicitar-demo?demos=${encodeURIComponent(slug)}`;
 }
 
-/** Destino de "Agenda un piloto". */
-export const RAG_PILOT_CONTACT_PATH = '/contact';
+/**
+ * Destino de "Agenda un piloto": /contact con el servicio y el plan piloto ya
+ * elegidos (el lead llega con `cotizacion.plan` y generate_lead con plan_id),
+ * igual que en /chatbots-ia.
+ */
+export const RAG_PILOT_CONTACT_PATH = ragPlanContactHref('piloto');
 
 /**
  * Demo de auditoría de cuentas médicas, presentada como "Sistema experto para

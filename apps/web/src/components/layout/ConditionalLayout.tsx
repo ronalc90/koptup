@@ -8,8 +8,14 @@ export default function ConditionalLayout({ children }: { children: React.ReactN
   const pathname = usePathname();
 
   // Rutas que no deben mostrar Navbar y Footer: el portal y el panel tienen
-  // su propio encabezado (DashboardLayout y AdminLayout).
-  const hasOwnLayout = pathname?.startsWith('/dashboard') || pathname === '/admin' || pathname?.startsWith('/admin/');
+  // su propio encabezado (DashboardLayout y AdminLayout), y /embed/* se
+  // muestra dentro de un iframe en el sitio de un cliente (solo el chat).
+  const hasOwnLayout =
+    pathname?.startsWith('/dashboard') ||
+    pathname === '/admin' ||
+    pathname?.startsWith('/admin/') ||
+    pathname === '/embed' ||
+    pathname?.startsWith('/embed/');
 
   if (hasOwnLayout) {
     return <>{children}</>;

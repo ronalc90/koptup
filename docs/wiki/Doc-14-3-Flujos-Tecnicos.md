@@ -494,7 +494,7 @@ Fuente en el código: `apps/backend/src/routes/chatbot.routes.ts` (`requireOwner
 
 ## 3. Chatbot RAG
 
-Es la demo `/demo/chatbot` en sus modos «Prueba el asistente» (empresas ficticias con sus documentos) y «Configura el tuyo» (bot propio y widget). Al elegir una empresa de ejemplo, el navegador crea un bot real en el backend y le sube los textos; desde ahí todo es el mismo pipeline. La guía de uso está en [Guía de la demo del chatbot](Guia-Demo-chatbot.md).
+Es la demo `/demo/chatbot` en sus modos «Prueba el asistente» (empresas ficticias con sus documentos) y «Configura el tuyo» (bot propio y widget). Al elegir una empresa de ejemplo, el navegador pide el bot compartido de esa empresa (`POST /api/chatbot/sample-bots`); el servidor lo crea una sola vez por huella de contenido y lo reutiliza para los siguientes visitantes. Desde ahí todo es el mismo pipeline. La guía de uso está en [Guía de la demo del chatbot](Guia-Demo-chatbot.md).
 
 ### 3.1 Ingesta y fragmentación de documentos
 
@@ -571,7 +571,7 @@ flowchart TD
     classDef externo fill:#fdf4ff,stroke:#c026d3,color:#0f172a
 
     Q["Pregunta en Prueba el asistente,<br/>la vista previa o el widget<br/>POST /api/chatbot/bots/id/chat"]:::visitante
-    RL{"¿Dentro de 60 peticiones<br/>por minuto por IP?"}:::decision
+    RL{"¿Dentro de 60 preguntas por minuto por IP<br/>y 180 consultas al chatbot por minuto?"}:::decision
     E429["429 rate_limited<br/>mensaje en español"]:::error
     Q1{"¿Existe el bot?"}:::decision
     E404["404 bot_not_found"]:::error
@@ -586,7 +586,7 @@ flowchart TD
     AI["OpenAI Chat Completions<br/>temperatura 0,3, máx. 800 tokens, 30 s"]:::externo
     OK{"¿Respondió bien?"}:::decision
     SP["Suma el costo al gasto del mes<br/>tokens por el precio del modelo"]:::sistema
-    EX["Modo extractivo<br/>cita los fragmentos [1] a [n] recortados a 280 caracteres<br/>o «No encontré esa información»"]:::sistema
+    EX["Modo extractivo con nota «la IA no está configurada»<br/>cita los fragmentos [1] a [n] recortados a 280 caracteres<br/>o «No encontré esa información»<br/>textos en español o inglés según lang o el idioma del bot"]:::sistema
     FB["Modo extractivo con aviso<br/>cupo del mes agotado, IA no disponible<br/>o error del proveedor"]:::error
     HQ{"¿Llega del widget de un bot de usuario?<br/>channel widget, no es bot de ejemplo"}:::decision
     LOG["Guarda pregunta y respuesta en MongoDB<br/>vencen a los 30 días, últimos 200 turnos"]:::sistema
@@ -613,7 +613,7 @@ flowchart TD
 
 ![Diagrama: Pipeline de una pregunta](images/doc/flujos/Doc-14-3-Flujos-Tecnicos-9.png)
 
-Así el chatbot evita inventar: el modelo solo ve los cinco fragmentos más parecidos a la pregunta y las reglas le obligan a citarlos o a decir que no encontró la información. Sin clave de OpenAI, sin presupuesto o si el proveedor falla, la demo no se cae: responde en modo extractivo con los fragmentos y su cita. La confianza que muestra es fija según el camino (0,85 con modelo y fragmentos, 0,5 con modelo sin fragmentos, 0,3 extractivo con fragmentos y 0 sin ellos), no una medida del modelo.
+Así el chatbot evita inventar: el modelo solo ve los cinco fragmentos más parecidos a la pregunta y las reglas le obligan a citarlos o a decir que no encontró la información. Sin clave de OpenAI, sin presupuesto o si el proveedor falla, la demo no se cae: responde en modo extractivo con los fragmentos y su cita, precedidos de una nota que explica el motivo (también en el widget de un cliente). Los textos que escribe el servidor sin modelo salen en español o inglés según `lang` (la demo envía el idioma de la página) o el primer idioma del bot. La confianza que muestra es fija según el camino (0,85 con modelo y fragmentos, 0,5 con modelo sin fragmentos, 0,3 extractivo con fragmentos y 0 sin ellos), no una medida del modelo.
 
 Fuente en el código: `apps/backend/src/routes/chatbot.routes.ts` (`POST /bots/:botId/chat`, `GROUNDING_RULES`, `composeExtractiveReply`, `sanitizeHistory`), `apps/backend/src/services/rag-pipeline.ts` (`retrieve`, `callOpenAI`, `estimateCostUSD`, `OPENAI_MODELS`), `apps/backend/src/services/ai-budget.service.ts`, `apps/backend/src/middleware/rateLimiter.ts` (`chatbotRateLimiter`).
 
@@ -1543,7 +1543,7 @@ Fuente en el código: `apps/backend/src/services/privacy.service.ts` (`findPerso
 Cosas del código que no cuadran, dibujadas tal como son. No repiten las de [Flujos de negocio](Doc-14-1-Flujos-de-Negocio.md#hallazgos) ni las de [Flujos de administración](Doc-14-2-Flujos-de-Administracion-y-Operacion.md#hallazgos).
 
 1. **Las rutas que solo usan `authenticate` aplican los cambios de cuenta al vencer el token.** Documentos, pedidos, mensajes, notificaciones, proyectos, facturas y entregables aceptan el token tal cual: un cambio de rol o una cuenta borrada se aplica en esas rutas cuando vence el token de acceso (15 min), mientras que las rutas con `requireRole` y las excepciones «dueño o staff» (`isStaffSession`) leen la base en cada petición. (diagrama 2.1, `apps/backend/src/routes/POLICIES.md`).
-2. **Las demos todavía leen sus mensajes de error a su manera.** El backend ya responde siempre `{ success: false, code, message }` con códigos propios (por ejemplo `budget_exhausted` y `limits_unavailable` en LinkedIn, `too_much_text` en «Prueba con tu documento»), pero dos pantallas de demos aún no los usan: LinkedIn solo distingue un 503 cuando el mensaje contiene «configur», así que el cupo agotado y Redis caído se ven como «el servidor no pudo completar la solicitud»; y «Prueba con tu documento» muestra el mensaje genérico para `too_much_text` porque su lista de textos no tiene esa clave. (diagramas 4.1 y 5.1, `generarConIA` en `apps/web/src/app/demo/linkedin-ads/components/PostGenerator.tsx` y `apps/web/src/app/demo/chatbot/components/upload/messages.ts`).
+2. **LinkedIn Ads todavía lee sus mensajes de error a su manera.** El backend ya responde siempre `{ success: false, code, message }` con códigos propios (por ejemplo `budget_exhausted` y `limits_unavailable`), pero la demo solo distingue un 503 cuando el mensaje contiene «configur», así que el cupo agotado y Redis caído se ven como «el servidor no pudo completar la solicitud». («Prueba con tu documento» ya muestra su propio texto para `too_much_text`.) (diagrama 4.1, `generarConIA` en `apps/web/src/app/demo/linkedin-ads/components/PostGenerator.tsx`).
 
 ## Páginas relacionadas
 

@@ -268,7 +268,8 @@ El dominio canónico del sitio está fijo en `src/lib/site.ts`: no hay variable 
 | `RATE_LIMIT_WINDOW_MS` | Opcional | `900000` (15 min) | Ventana del límite general de la API |
 | `RATE_LIMIT_MAX_REQUESTS` | Opcional | `100` | Peticiones por ventana, por cuenta (con sesión) o por IP |
 | `AUTH_ME_RATE_LIMIT_MAX` | Opcional | `120` por minuto | Cupo de `GET /api/auth/me` y `GET /api/demo-access/<slug>`, que la web consulta en cada navegación protegida |
-| `CHATBOT_RATE_LIMIT_MAX` | Opcional | `60` por minuto | Peticiones por IP a `/api/chatbot` |
+| `CHATBOT_RATE_LIMIT_MAX` | Opcional | `60` por minuto | Preguntas por IP al chat de los bots (`POST /api/chatbot/bots/:id/chat`) |
+| `CHATBOT_API_RATE_LIMIT_MAX` | Opcional | `180` por minuto | Resto de peticiones por IP a `/api/chatbot` (`GET /models` no cuenta) |
 | `CHATBOT_CREATE_LIMIT_PER_HOUR` | Opcional | `30` | Bots nuevos por IP cada hora en «Configura el tuyo» |
 | `LOGIN_RATE_LIMIT_MAX`, `LOGIN_IP_RATE_LIMIT_MAX` | Opcional | `10` y `30` cada 15 min | Intentos de inicio de sesión por IP y correo, y por IP |
 | `REGISTER_RATE_LIMIT_MAX` | Opcional | `5` por hora | Registros por IP |
