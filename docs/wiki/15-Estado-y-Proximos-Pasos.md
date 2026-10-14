@@ -45,25 +45,25 @@ Se trabajó en dos pistas en paralelo. Cada paso tiene un implementador y un rev
 | Privacidad y Ley 1581: Admin › Privacidad (exportar y suprimir los datos de una persona), plazo de conservación, autorización en el formulario de contacto, chatbot guardado en MongoDB, política de privacidad, cookies y términos reescritos | ✅ Revisado y con commit |
 | Sitio público: embudo RAG, SEO, contenido verificable e inglés completo | ✅ Revisado y con commit |
 | Operación: variables, monitoreo programado, CI de seguridad, errores uniformes y código sin uso eliminado | ✅ Revisado y con commit |
-| Portal del cliente y panel (facturas, entregables, pedidos, mensajes, usuarios, bitácora, sesiones) | 🟡 A medias, en un commit `wip` sin revisar |
-| **Producto RAG (chatbot) verificado de punta a punta:** demo en sus 3 modos, "Prueba con tu documento", widget insertable, backend (bots en MongoDB, cupos, idioma), landings `/rag`, planes con textos verdaderos y pruebas (Jest backend 349/349, web 800/800, e2e del RAG en verde) | ✅ Revisado y con commit (14 de octubre) |
+| Portal del cliente y panel (facturas, entregables, pedidos, mensajes, usuarios, bitácora, sesiones) | ⏪ Revertido; pendiente de rehacer (el avance queda en el historial, commit `df42e67`). Para publicar solo se corrigió «Nuevo pedido», que ahora envía el pedido a la API configurada |
+| **Producto RAG (chatbot) verificado de punta a punta:** demo en sus 3 modos, "Prueba con tu documento", widget insertable, backend (bots en MongoDB, cupos, idioma), landings `/rag`, planes con textos verdaderos y pruebas (Jest backend 313/313, web 773/773 y la suite e2e completa, 212 pruebas, en verde dos veces seguidas contra las builds de producción) | ✅ Revisado y con commit (14 de octubre) |
 | Las 28 demos funcionales, honestas y claras (implementación) | ✅ Las 28 con commit |
-| Revisión adversarial de cada demo | 🟡 9 terminadas (chatbot, hrms, crm-ia, lms, erp, facturacion-electronica, pos, delivery, voice-ai); 3 a medias en un commit `wip` (loyalty, gestor-contenido, dashboard-ejecutivo); 16 pendientes |
+| Revisión adversarial de cada demo | 🟡 9 terminadas (chatbot, hrms, crm-ia, lms, erp, facturacion-electronica, pos, delivery, voice-ai). La de loyalty, gestor-contenido y dashboard-ejecutivo se revirtió (commit `2a15395`) y queda pendiente, igual que las otras 16 |
+| Flujo de compra (backend de la fase P7) | 🔒 Incluido pero apagado: `COMMERCE_ENABLED=false` por defecto. Sus rutas responden 404, su job no corre y ningún formulario ni acceso escribe leads ([Operación y despliegue › 4.3](Doc-11-Operacion-y-Despliegue.md#43-backend-railway)) |
 | Build del backend en Railway | ✅ Arreglado (`apps/backend/railway.json` instala lo necesario para compilar); mientras llega a `main`, el comando va configurado a mano en Railway |
 
-Los commits marcados `wip` y "NO FUSIONAR" no deben ir a `main` hasta que pasen su revisión.
+El historial de la rama trae los commits marcados `wip` y "NO FUSIONAR" (`ae60766`, `a897181`, `02fe0fa`, `df42e67` y `e2f8099`), pero su contenido ya no queda a medias en el código: las demos que traían se terminaron y revisaron en commits posteriores, el portal y el panel (`14658b7`) y la revisión a medias de 3 demos (`2a15395`) se revirtieron, y el flujo de compra quedó apagado con `COMMERCE_ENABLED`.
 
 ## Qué falta (martes)
 
-1. **Terminar y revisar el portal del cliente y el panel** (commit `wip` del 10 de octubre).
-2. **Flujo de compra** (fases P7–P9): pipeline de leads, "Solicitar propuesta", propuestas con página pública para aceptarlas, anticipo (enlace de pago, transferencia o Wompi con claves) y conversión a proyecto y cliente. El backend tiene avance sin revisar en el commit `wip` del 8 de octubre.
+1. **Rehacer y revisar el portal del cliente y el panel** (el avance revertido está en el commit `df42e67` del 10 de octubre).
+2. **Flujo de compra** (fases P7–P9): pipeline de leads, "Solicitar propuesta", propuestas con página pública para aceptarlas, anticipo (enlace de pago, transferencia o Wompi con claves) y conversión a proyecto y cliente. El backend está incluido pero apagado (`COMMERCE_ENABLED=false` por defecto: sus rutas responden 404); falta revisarlo, hacer el frontend (P8) y sus pruebas de punta a punta (P9) antes de encenderlo.
 3. **Demos:** terminar la revisión adversarial de 19 demos (telemedicina, helpdesk-ia, cuentas-medicas, sistema-experto, linkedin-ads, ecommerce, loyalty, gestor-contenido, dashboard-ejecutivo, control-proyectos, scraping, code-review-ia, sistema-reservas, saas-boilerplate, firma-electronica, wms-logistica, gestor-documentos, automatizacion, moderacion-contenido); catálogo honesto (tarjetas del hub, páginas de producto y un solo nombre por demo); sonda final en las 28.
-4. **Pendientes reportados por las fases:** permisos de la configuración del sistema experto para prospectos con acceso; achicar la lista de errores de hidratación conocidos. (Las cifras del README, el `docker-compose.yml` roto y el error de `/api/expert/generar-excel` sin procedimientos ya están corregidos en la rama de trabajo.)
+4. **Pendientes reportados por las fases:** ninguno abierto. (Los permisos de la configuración del sistema experto, la lista de errores de hidratación conocidos —hoy vacía—, las cifras del README, el `docker-compose.yml` roto y el error de `/api/expert/generar-excel` sin procedimientos ya están corregidos en la rama de trabajo.)
 5. **Repaso de honestidad en todo el sitio:** quedan los textos del catálogo de "Otras soluciones a medida" (modalidad SaaS solo donde haya base real). `/about`, `/bienvenido-producthunt`, `/desarrollo-web-colombia`, las landings, el pie, el JSON-LD y `llms.txt` ya solo dicen lo que se puede comprobar; los datos que debe aportar el dueño están en [Páginas públicas › Limitaciones conocidas](Doc-03-Paginas-Publicas.md#16-limitaciones-conocidas).
 6. **Diseño y animaciones:** investigación de motion design, sistema de movimiento, animación protagonista que explique RAG, microinteracciones, easter eggs (paleta Ctrl+K, código Konami, mensaje en consola, 404 ingeniosa) y revisión adversarial con video y medición de fluidez.
 7. **Correcciones pendientes:** al documentar el sitio y dibujar sus diagramas contra el código y al recorrer las 28 demos aparecieron más de 200 puntos. Sin repetir y sin contar los detalles de cada demo, los que quedan están ordenados de P0 a P3 en [Correcciones pendientes](16-Correcciones-Pendientes.md) (la página lleva el conteo al día). Los más urgentes, además de volver a levantar el backend, son estos:
-   - no se pueden crear facturas, entregables ni conversaciones;
-   - "Nuevo pedido" apunta a una dirección local.
+   - no se pueden crear facturas, entregables ni conversaciones.
 8. Crítico de completitud, verificación final completa, actualización de la wiki, PR y merge.
 
 ## Acciones del dueño

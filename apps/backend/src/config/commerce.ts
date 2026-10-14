@@ -7,6 +7,22 @@
  */
 
 // ---------------------------------------------------------------------------
+//   Interruptor del flujo de compra
+// ---------------------------------------------------------------------------
+
+/**
+ * El flujo de compra (pipeline de leads, propuestas, anticipo y pagos) sigue
+ * en desarrollo, así que está apagado salvo `COMMERCE_ENABLED=true`. Apagado:
+ * sus rutas no se montan (responden 404), su job no corre, la migración del
+ * arranque no toca los contactos y ningún formulario ni acceso escribe Leads.
+ * Se lee en cada llamada (no al cargar el módulo) para poder cambiarlo en las
+ * pruebas.
+ */
+export function isCommerceEnabled(): boolean {
+  return process.env.COMMERCE_ENABLED === 'true';
+}
+
+// ---------------------------------------------------------------------------
 //   Leads
 // ---------------------------------------------------------------------------
 

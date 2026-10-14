@@ -25,6 +25,7 @@ import {
   TEAM_ROLES,
   canManagePrivateDemos,
 } from '../config/demos';
+import { isCommerceEnabled } from '../config/commerce';
 import { normalizeEmailLikeAuth } from '../utils/email-address';
 import { type CatalogEntry, getCatalogMap } from './demo-catalog.service';
 import { daysLeft, effectiveGrantState, usableGrantFilter } from './demo-access.service';
@@ -636,18 +637,21 @@ export async function createDirectGrants(body: z.infer<typeof DirectGrantSchema>
     actor,
     requestId: null,
   });
-  // Pipeline comercial: lead ligado a la cuenta y en etapa `demo`.
-  const { onDemoAccessGranted } = await import('./leads.service');
-  await onDemoAccessGranted({
-    email,
-    nombre: granted.user.name,
-    empresa: body.empresa,
-    telefono: body.telefono,
-    userId: granted.user.id,
-    demos,
-    source: 'invitacion',
-    actor,
-  });
+  // Pipeline comercial (solo con COMMERCE_ENABLED=true): lead ligado a la
+  // cuenta y en etapa `demo`.
+  if (isCommerceEnabled()) {
+    const { onDemoAccessGranted } = await import('./leads.service');
+    await onDemoAccessGranted({
+      email,
+      nombre: granted.user.name,
+      empresa: body.empresa,
+      telefono: body.telefono,
+      userId: granted.user.id,
+      demos,
+      source: 'invitacion',
+      actor,
+    });
+  }
 
   await recordAudit({
     actor,

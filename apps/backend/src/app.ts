@@ -56,6 +56,7 @@ import { adminSettingsRouter } from './routes/admin-settings.routes';
 import { adminPrivacyRouter } from './routes/admin-privacy.routes';
 import { meCommerceRouter, paymentsRouter, publicProposalsRouter } from './routes/proposals-public.routes';
 import { setDemoAccessResolver } from './middleware/access';
+import { isCommerceEnabled } from './config/commerce';
 import { demoGrantResolver } from './services/demo-access.service';
 
 /** Orígenes de producción siempre permitidos. */
@@ -198,7 +199,7 @@ export function createApp(): Express {
   app.use('/api/admin/audit-log', adminAuditLogRouter);
   // Flujo de compra (pipeline de leads, propuestas, anticipo y pagos): sigue en
   // desarrollo y sin revisar, así que solo se monta con COMMERCE_ENABLED=true.
-  const commerceEnabled = process.env.COMMERCE_ENABLED === 'true';
+  const commerceEnabled = isCommerceEnabled();
   // Pipeline comercial, propuestas y configuración comercial (wiki 05 §8, §9
   // y §21): también antes de /api/admin, porque `sales` los usa.
   if (commerceEnabled) {

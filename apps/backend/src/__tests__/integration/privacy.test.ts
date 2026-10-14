@@ -1,6 +1,10 @@
 /**
  * Admin › Privacidad (Ley 1581): buscar por email todo lo que el sistema
  * guarda de una persona, exportarlo y suprimirlo. Solo rol admin.
+ *
+ * Corre con el flujo de compra activo (COMMERCE_ENABLED=true) para cubrir
+ * también los Leads y su línea de tiempo; apagado no se escriben (ver
+ * commerce-flag.test.ts).
  */
 import request from 'supertest';
 import type { Express } from 'express';
@@ -22,7 +26,10 @@ describeDb('Admin › Privacidad: derechos del titular (integración)', () => {
   const WRITTEN = `Titular.Prueba.${stamp}+alias@Gmail.com`;
   const NORMALIZED = `titularprueba${stamp}@gmail.com`;
 
+  const prevCommerce = process.env.COMMERCE_ENABLED;
+
   beforeAll(async () => {
+    process.env.COMMERCE_ENABLED = 'true';
     await connectTestDb('privacy');
     const { createApp } = await import('../../app');
     app = createApp();
@@ -68,6 +75,8 @@ describeDb('Admin › Privacidad: derechos del titular (integración)', () => {
   });
 
   afterAll(async () => {
+    if (prevCommerce === undefined) delete process.env.COMMERCE_ENABLED;
+    else process.env.COMMERCE_ENABLED = prevCommerce;
     if (REDIS_OK) {
       const { getRedisClient } = await import('../../config/redis');
       const redis = await getRedisClient().catch(() => null);

@@ -1,8 +1,20 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { fetchSessionUser } from '@/hooks/useSessionUser';
-import { apiRequest, hasSessionCookie, type DemoAccessDecision } from '@/lib/demo-system';
+import { ApiError, apiRequest, hasSessionCookie, type DemoAccessDecision } from '@/lib/demo-system';
+
+type Sesion = { status: 'ok'; user: { role: string } } | { status: 'unauthenticated' } | { status: 'unavailable' };
+
+/** Rol vigente según GET /api/auth/me: 401 = sin sesión; otra falla = desconocido. */
+async function fetchSessionUser(): Promise<Sesion> {
+  if (!hasSessionCookie()) return { status: 'unauthenticated' };
+  try {
+    const user = await apiRequest<{ role?: string }>('/auth/me');
+    return user?.role ? { status: 'ok', user: { role: user.role } } : { status: 'unavailable' };
+  } catch (err) {
+    return err instanceof ApiError && err.status === 401 ? { status: 'unauthenticated' } : { status: 'unavailable' };
+  }
+}
 
 /**
  * Roles que el backend deja guardar la configuración del motor

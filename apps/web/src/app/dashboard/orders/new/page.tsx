@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { api } from '@/lib/api';
+import { authFetch } from '@/lib/auth-token';
+import { API_BASE } from '@/lib/backend-url';
 import Button from '@/components/ui/Button';
 import Card, { CardContent } from '@/components/ui/Card';
 import {
@@ -108,21 +109,20 @@ export default function NewOrderPage() {
         formData.append('attachments', file);
       });
 
-      const response = await fetch('http://localhost:3001/api/orders', {
+      // Backend configurado (NEXT_PUBLIC_API_URL) con la sesión: authFetch
+      // agrega el token y lo renueva si venció.
+      const response = await authFetch(`${API_BASE}/orders`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${document.cookie.split('accessToken=')[1]?.split(';')[0]}`,
-        },
         body: formData,
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
         throw new Error(data.message || 'Error al crear el pedido');
       }
 
-      setSuccess('Pedido creado exitosamente. Recibirás una notificación cuando sea aprobado.');
+      setSuccess('Pedido creado. Puedes seguir su estado en Mis pedidos.');
       setTimeout(() => {
         router.push('/dashboard/orders');
       }, 2000);
@@ -371,8 +371,8 @@ export default function NewOrderPage() {
               {/* Nota informativa */}
               <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
                 <p className="text-sm text-blue-800 dark:text-blue-200">
-                  💡 <strong>Nota:</strong> El administrador recibirá una notificación de tu pedido y lo revisará.
-                  Recibirás una confirmación una vez que sea aprobado. Puedes hacer seguimiento en la sección de conversaciones.
+                  💡 <strong>Nota:</strong> El equipo de KopTup revisará tu pedido desde su panel. Puedes seguir su estado
+                  en Mis pedidos.
                 </p>
               </div>
             </form>

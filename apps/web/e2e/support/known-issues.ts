@@ -31,63 +31,26 @@ export interface KnownIssue {
   intermitente?: boolean;
 }
 
-// Intermitente: con 10 cargas seguidas por demo, automatizacion,
-// facturacion-electronica y pos cargaron alguna vez sin el error (depende de
-// qué alcanza a pintarse antes de hidratar), y exigirlo hacía fallar la
-// prueba al azar.
-const HYDRATION_TO_LOCALE: KnownIssue = {
-  motivo:
-    'hidratación (#418/#423/#425) con el navegador en es-CO: la página formatea números o fechas con toLocaleString() sin locale y el servidor no pinta lo mismo que el navegador',
-  patron: HYDRATION_ERROR,
-  intermitente: true,
-};
-
-// Demos públicas cuyas APIs exigen sesión desde P3 (autorización en el
-// servidor): un visitante anónimo recibe 401 del backend hasta que la demo
-// pida iniciar sesión (pista demos). Las demos que requieren acceso o
-// invitación (erp, cuentas-medicas, sistema-experto…) ya no llegan a cargar
-// sin acceso: el middleware muestra /demo-acceso (ver demo-access.spec.ts).
-const ACCESS_REQUIRED: KnownIssue = {
-  motivo:
-    'la API de la demo exige sesión o acceso (P3); falta la pantalla de acceso (P4) / pedir inicio de sesión (pista demos), así que el anónimo ve 401 en consola',
-  patron: /status of 40[13]|Error al cargar|Error al obtener|Error fetching/i,
-  // Las llamadas salen en un efecto tras hidratar: según el tiempo de carga
-  // pueden quedar fuera de la espera de la prueba.
-  intermitente: true,
-};
-
-export const KNOWN_CONSOLE_ISSUES: Record<string, KnownIssue> = {
-  // pendiente pista demos: con 401 mostrar «inicia sesión» (useDocuments expone
-  // `requiresLogin`) o un corpus de muestra, en lugar del error genérico.
-  'gestor-documentos': ACCESS_REQUIRED,
-  // pendiente pista demos: hidratación por toLocaleString() sin locale.
-  automatizacion: HYDRATION_TO_LOCALE,
-  // pendiente pista demos: hidratación por toLocaleString() sin locale.
-  'facturacion-electronica': HYDRATION_TO_LOCALE,
-  // pendiente pista demos: hidratación por toLocaleString() sin locale.
-  'helpdesk-ia': HYDRATION_TO_LOCALE,
-  // pendiente pista demos: hidratación por toLocaleString() sin locale.
-  lms: HYDRATION_TO_LOCALE,
-  // pendiente pista demos: hidratación por toLocaleString() sin locale.
-  loyalty: HYDRATION_TO_LOCALE,
-  // pendiente pista demos: hidratación por toLocaleString() sin locale.
-  'moderacion-contenido': HYDRATION_TO_LOCALE,
-  // pendiente pista demos: hidratación por toLocaleString() sin locale.
-  pos: HYDRATION_TO_LOCALE,
-  // pendiente pista demos: hidratación por toLocaleString() sin locale.
-  scraping: HYDRATION_TO_LOCALE,
-  // pendiente pista demos: hidratación por toLocaleString() sin locale.
-  'wms-logistica': HYDRATION_TO_LOCALE,
-};
+/**
+ * Hoy no hay ninguno. Las entradas de hidratación (automatizacion,
+ * facturacion-electronica, helpdesk-ia, lms, loyalty, moderacion-contenido,
+ * pos, scraping y wms-logistica) y la de gestor-documentos (401 sin sesión)
+ * se borraron el 14 de octubre de 2026: con E2E_INCLUDE_KNOWN_ISSUES=1 y
+ * --repeat-each=5 (10 cargas por demo en es-CO, escritorio y móvil, build de
+ * producción) ninguna registró errores, y gestor-documentos sin sesión ya
+ * muestra sus datos de ejemplo sin llamar a la API.
+ *
+ * Para agregar uno: `slug: { motivo, patron, intermitente? }`, con el motivo
+ * del bug real de la demo (nunca de la prueba).
+ */
+export const KNOWN_CONSOLE_ISSUES: Record<string, KnownIssue> = {};
 
 /**
  * Textos de error visibles conocidos (misma regla que KNOWN_CONSOLE_ISSUES:
- * cada entrada es un pendiente real y la lista solo se achica).
+ * cada entrada es un pendiente real y la lista solo se achica). Hoy no hay
+ * ninguno.
  */
-export const KNOWN_VISIBLE_ISSUES: Record<string, { motivo: string; textos: string[] }> = {
-  // pendiente pista demos: pedir inicio de sesión antes de cargar documentos.
-  'gestor-documentos': { motivo: ACCESS_REQUIRED.motivo, textos: ['Error al cargar'] },
-};
+export const KNOWN_VISIBLE_ISSUES: Record<string, { motivo: string; textos: string[] }> = {};
 
 export const STRICT = Boolean(process.env.E2E_INCLUDE_KNOWN_ISSUES);
 

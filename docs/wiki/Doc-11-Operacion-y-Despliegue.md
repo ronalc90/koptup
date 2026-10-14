@@ -314,6 +314,12 @@ Un tope con un valor inválido o negativo deja esa función en 0, es decir, apag
 | `RETENTION_JOB_ENABLED` | Opcional | `true` | Job diario de conservación (anonimiza lo vencido y borra los bots del chatbot sin uso), con candado en Redis. `false` lo apaga en esa instancia |
 | `RETENTION_JOB_INTERVAL_MS` | Opcional | `86400000` (1 día; mínimo `60000`) | Cada cuánto corre el job de conservación |
 
+**Flujo de compra (en desarrollo)**
+
+| Variable | ¿Obligatoria? | Por defecto | Qué hace |
+|---|---|---|---|
+| `COMMERCE_ENABLED` | **No la definas en Railway** (o déjala en `false`) | `false` | Enciende el flujo de compra, que todavía no está terminado ni revisado: pipeline de leads, propuestas, portal comercial y pagos. Apagado (lo normal): sus rutas (`/api/admin/leads`, `/api/admin/proposals`, `/api/admin/settings`, `/api/proposals/public`, las de propuestas en `/api/me` y `/api/payments`) responden 404, el job de vencimiento de propuestas no corre, el arranque no liga los contactos a leads y ningún formulario ni acceso a demos escribe leads. Las variables `PROPOSALS_JOB_*` y `WOMPI_*` solo tienen efecto con este interruptor en `true` |
+
 **Correo y WhatsApp**
 
 | Variable | ¿Obligatoria? | Por defecto | Qué hace |

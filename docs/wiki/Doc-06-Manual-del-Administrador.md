@@ -162,7 +162,7 @@ Nadie se vuelve admin desde la web pública. Hay tres caminos, y los tres exigen
 
 Detalles que conviene saber:
 
-- `ADMIN_EMAIL` también es el correo que recibe los avisos internos de solicitudes, contactos y propuestas (si el servidor tiene correo configurado). Sin ella, esos avisos no salen por correo.
+- `ADMIN_EMAIL` también es el correo que recibe los avisos internos de solicitudes, contactos y propuestas (las propuestas, solo con `COMMERCE_ENABLED=true`), si el servidor tiene correo configurado. Sin ella, esos avisos no salen por correo.
 - Si a la cuenta de `ADMIN_EMAIL` le quitas el rol desde el panel, el siguiente arranque no se lo devuelve mientras exista otro admin.
 - Un admin no puede quitarse a sí mismo el rol desde el panel (evita quedarse sin administradores).
 - Las credenciales nunca se escriben en esta wiki ni en el código. Las variables del servidor se explican en [Operación y despliegue](Doc-11-Operacion-y-Despliegue.md).
@@ -447,7 +447,7 @@ stateDiagram-v2
 2. Estado **Revocado**.
 3. **Motivo** que escribiste.
 
-Un acceso revocado no se puede extender ni reactivar: si quieres volver a dar esa demo, usa **Conceder acceso**. Si la persona tenía la demo abierta, la página que ya cargó sigue funcionando hasta que la recarga o navega.
+Un acceso revocado no se puede extender ni reactivar: si quieres volver a dar esa demo, usa **Conceder acceso**. Si la persona tenía la demo abierta, la página revisa el acceso cada 60 s y al volver a la pestaña: al notar la revocación recarga y le muestra la pantalla de acceso.
 
 ### 5.5 Generar un enlace de activación nuevo
 

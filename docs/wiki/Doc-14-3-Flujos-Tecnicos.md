@@ -1327,7 +1327,7 @@ flowchart TD
     AP["7. createApp: middleware y rutas<br/>diagrama 6.1"]:::sistema
     L["8. Abre el puerto PORT, 3001 por defecto<br/>tiempos de espera de 15 min para PDF grandes"]:::sistema
     J{"¿NODE_ENV test o<br/>DEMO_GRANTS_JOB_ENABLED=false?"}:::decision
-    J1["9. Inicia los jobs con candado en Redis:<br/>accesos y recordatorios, propuestas<br/>y conservación de datos, diagrama 8.4"]:::sistema
+    J1["9. Inicia los jobs con candado en Redis:<br/>accesos y recordatorios, conservación de datos<br/>y, solo con COMMERCE_ENABLED=true, propuestas<br/>diagrama 8.4"]:::sistema
     J0["Sin job en esta instancia"]:::sistema
     RD["Redis no se conecta al arrancar<br/>se conecta en la primera consulta"]:::sistema
     SG["SIGTERM o SIGINT: detiene el job,<br/>cierra el servidor y exit 0"]:::sistema

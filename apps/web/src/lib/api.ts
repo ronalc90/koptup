@@ -289,21 +289,6 @@ class ApiClient {
     return response.data;
   }
 
-  // Chat endpoints
-  async sendChatMessage(sessionId: string, message: string, documentIds?: string[]) {
-    const response = await this.client.post('/api/chat/message', {
-      sessionId,
-      message,
-      documentIds,
-    });
-    return response.data;
-  }
-
-  async createChatSession() {
-    const response = await this.client.post('/api/chat/session');
-    return response.data;
-  }
-
   // Contact form
   async submitContactForm(data: ContactFormData) {
     const response = await this.client.post('/api/contact', data);

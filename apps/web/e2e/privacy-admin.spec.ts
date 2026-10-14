@@ -35,7 +35,9 @@ test.describe('Admin › Privacidad', () => {
     const result = page.getByTestId('privacy-result');
     await expect(result).toContainText(`Datos de ${email}`);
     await expect(result.locator('[data-category="contactos"]')).toBeVisible();
-    await expect(result.locator('[data-category="leads"]')).toBeVisible();
+    // Con el flujo de compra apagado (COMMERCE_ENABLED sin definir, como en CI
+    // y en producción) el contacto no crea un Lead.
+    await expect(result.locator('[data-category="leads"]')).toHaveCount(0);
     await result.locator('[data-category="contactos"] summary').click();
     await expect(result.locator('[data-category="contactos"] pre')).toContainText('Titular E2E');
 

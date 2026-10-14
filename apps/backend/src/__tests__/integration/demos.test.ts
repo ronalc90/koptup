@@ -816,7 +816,7 @@ describeDb('sistema de demos (integración)', () => {
 
     const all = await request(app).get('/api/admin/demo-grants').query({ q: email }).set(bearer(sales));
     expect(all.status).toBe(200);
-    expect(all.body.data.conteos).toEqual({ todos: 4, activo: 2, por_vencer: 1, expirado: 1, revocado: 1 });
+    expect(all.body.data.conteos).toEqual({ todos: 4, activo: 2, por_vencer: 1, expirado: 1, revocado: 1, convertido: 0 });
     const soon = await request(app).get('/api/admin/demo-grants').query({ q: email, estado: 'por_vencer' }).set(bearer(manager));
     expect(soon.status).toBe(200);
     expect(soon.body.data.items.map((g: { id: string }) => g.id)).toEqual([lms]);

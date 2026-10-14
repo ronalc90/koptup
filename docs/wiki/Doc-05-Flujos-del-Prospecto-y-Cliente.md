@@ -383,7 +383,7 @@ stateDiagram-v2
 
 *GIF: el acceso a "Voz con IA" está activo, el equipo lo revoca en Admin › Accesos a demos, la tarjeta pasa a "Retirada" y la demo muestra "Acceso retirado".*
 
-> **Si la demo ya estaba abierta** cuando vence o se revoca el acceso, la página cargada sigue funcionando hasta que la persona recargue o navegue a otra página; ahí el servidor la corta. Las demos con servidor propio (cuentas médicas, sistema experto, LinkedIn Ads) además rechazan la siguiente operación.
+> **Si la demo ya estaba abierta** cuando vence o se revoca el acceso, la página revisa el acceso cada 60 s y cada vez que la persona vuelve a la pestaña; al notar que lo perdió, recarga y el servidor muestra la pantalla de acceso. Las demos con servidor propio (cuentas médicas, sistema experto, LinkedIn Ads) además rechazan la siguiente operación.
 
 Cómo extender, revocar o generar un enlace nuevo desde el panel: [Manual del administrador](Doc-06-Manual-del-Administrador.md).
 
@@ -488,7 +488,7 @@ Igual que para el prospecto ([sección 5](#5-mis-demos-dashboarddemos)). Si el e
 
 *Lista de pedidos del cliente (el pedido ORD-0001 se creó por la API para el ejemplo).*
 
-1. **Nuevo pedido** (ver el problema abajo).
+1. **Nuevo pedido** (ver abajo).
 2. **Buscar** por nombre o número de pedido.
 3. **Filtro por estado:** Todos, Pendiente, En proceso, Enviado, Completado, Cancelado.
 4. **Tarjeta del pedido:** nombre, estado, descripción, número, fecha, artículos y monto (en dólares).
@@ -501,11 +501,11 @@ Igual que para el prospecto ([sección 5](#5-mis-demos-dashboarddemos)). Si el e
 
 1. **Estado** (hoy aparece en inglés: `pending`). 2. **Ítems** con cantidad y valor. 3. **Historial** del pedido. 4. **Ver facturación** (lleva a Facturación). 5. **Cancelar pedido**: lo cancela de inmediato, sin pedir confirmación, y solo mientras el pedido está pendiente de revisión. Cuando el equipo ya lo revisó o lo está trabajando, el botón aparece deshabilitado con el aviso "escríbenos por Mensajes si necesitas cambiarlo o cancelarlo". El estado del pedido lo cambia solo el equipo. Esta página no muestra el menú lateral; se vuelve con "Volver al listado".
 
-![Nuevo pedido con error](images/doc/prospecto-cliente/pedido-nuevo-error.jpg)
+![Nuevo pedido enviado](images/doc/prospecto-cliente/pedido-nuevo.jpg)
 
-*(1) Al crear un pedido desde `/dashboard/orders/new` aparece "Failed to fetch": hoy el formulario no logra enviar el pedido.*
+*(1) Pedido creado desde `/dashboard/orders/new`: el aviso confirma el envío y, a los 2 segundos, la página vuelve a Mis pedidos, donde aparece como "Pendiente".*
 
-El formulario pide nombre, descripción breve, descripción detallada, archivos adjuntos (hasta 10, de 20 MB) e ítems con cantidad y precio unitario en USD. **Hoy no funciona** (ver [Limitaciones](#12-limitaciones-conocidas)), así que en la práctica un cliente no puede crear pedidos desde la web.
+El formulario pide nombre, descripción breve, descripción detallada, archivos adjuntos (hasta 10, de 20 MB) e ítems con cantidad y precio unitario en USD. Lo envía a la API con la sesión del cliente; el pedido queda en estado pendiente con sus adjuntos y el equipo lo ve en Admin › Pedidos. Si el envío falla, el formulario muestra el error y no se pierde lo escrito.
 
 ### 9.4 Proyectos (`/dashboard/projects`)
 
@@ -668,11 +668,11 @@ Comportamiento actual de `main`, comprobado en el entorno de capturas:
 
 1. **Sin correo configurado no llega nada:** ni acuses, ni enlaces de activación, ni recordatorios, ni enlaces de recuperación. El equipo debe enviar el enlace de activación a mano (el panel siempre lo muestra). `/forgot-password` dice "Correo enviado" aunque no se envíe nada.
 2. **Una sesión renovable por cuenta:** iniciar sesión en otro navegador o dispositivo hace que el anterior pida iniciar sesión otra vez en menos de 15 minutos.
-3. **Demo abierta cuando vence o se revoca el acceso:** la página ya cargada sigue funcionando hasta recargar o navegar.
+3. **Demo abierta cuando vence o se revoca el acceso:** la página revisa el acceso cada 60 s y al volver a la pestaña; si el acceso se perdió (venció, se revocó o la demo se desactivó), recarga y muestra la pantalla de acceso. Entre una revisión y otra, la demo ya cargada puede seguir funcionando hasta un minuto.
 4. **Cambio de prospecto a cliente:** el servidor aplica el rol nuevo enseguida, pero el menú lateral del portal se actualiza solo después de cerrar sesión y volver a entrar. El selector de rol de Admin › Usuarios no ofrece "Cliente" ni "Prospecto" (se usa "Usuario", que funciona igual que cliente).
 5. **Inicio de sesión:** "Continuar con GitHub" no hace nada; "Recordarme" no cambia la duración de la sesión; "Continuar con Google" depende de que el servidor tenga Google configurado (si no, el navegador muestra un mensaje técnico del servidor).
 6. **Panel del cliente:** todo es de ejemplo y no depende de la cuenta (la vista "Plan SaaS" incluso usa "Acá").
-7. **Pedidos:** el formulario "Nuevo pedido" no logra enviar ("Failed to fetch"); el detalle no tiene menú lateral, muestra el estado en inglés y "Cancelar pedido" no pide confirmación.
+7. **Pedidos:** el formulario "Nuevo pedido" pide al cliente el precio unitario de cada ítem, en dólares; el detalle no tiene menú lateral, muestra el estado en inglés y "Cancelar pedido" no pide confirmación.
 8. **Proyectos, entregables, facturas, mensajes y notificaciones:** ninguna pantalla los crea hoy; las facturas tampoco se pueden generar desde el panel por un error del servidor, y la conversación automática de cada pedido no se crea. Para un cliente real, esas secciones están vacías.
 9. **Datos de ejemplo disfrazados:** Entregables y Facturación muestran registros inventados si la API falla, sin avisar que no son reales; cuando están vacías no muestran un mensaje de "no hay".
 10. **Pagos:** no hay pago en línea de facturas. "Cómo pagar" muestra los datos de transferencia que configure el equipo, y el equipo registra el pago; el cobro en línea está en desarrollo.

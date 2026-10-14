@@ -2,8 +2,9 @@
  * Formulario de /contact con una cotización (POST /api/contact, campo
  * `quote`): el plan RAG, o el nivel y la modalidad de "Cotizar este tier",
  * quedan guardados como identificadores en `Contact.cotizacion`, y el nombre
- * legible (que arma la web) en `service` y en los intereses del lead. El
- * plazo ("¿Cuándo quieres empezar?") se guarda en `Contact.plazo`.
+ * legible (que arma la web) en `service`. El plazo ("¿Cuándo quieres
+ * empezar?") se guarda en `Contact.plazo`. Los intereses del Lead solo se
+ * escriben con el flujo de compra activo (ver commerce-flag.test.ts).
  */
 import request from 'supertest';
 import type { Express } from 'express';
@@ -54,9 +55,6 @@ describeDbRedis('contacto con cotización (integración)', () => {
     const contact = await mongoose.connection.collection('contacts').findOne({ email });
     expect(contact?.service).toBe('CRM con IA — Nivel Profesional · Suscripción SaaS mensual');
     expect(contact?.cotizacion).toEqual({ servicio: 'crm-ia', nivel: 'profesional', modalidad: 'saas' });
-
-    const lead = await mongoose.connection.collection('leads').findOne({ email });
-    expect(lead?.intereses).toContain('CRM con IA — Nivel Profesional · Suscripción SaaS mensual');
   });
 
   it('guarda el plan RAG', async () => {

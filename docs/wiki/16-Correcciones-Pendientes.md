@@ -27,8 +27,8 @@ flowchart LR
 | Prioridad | Qué agrupa | Puntos |
 |---|---|---|
 | **P0** | Lo que impide vender hoy o es un riesgo legal o de seguridad | 3 |
-| **P1** | Funciones que el cliente o el equipo usan y no sirven, incluidas las demos | 22 |
-| **P2** | Detalles del panel, de la operación y de la configuración | 23 |
+| **P1** | Funciones que el cliente o el equipo usan y no sirven, incluidas las demos | 19 |
+| **P2** | Detalles del panel, de la operación y de la configuración | 22 |
 | **P3** | SEO, coherencia de textos y código que sobra | 1 |
 
 ---
@@ -51,7 +51,6 @@ flowchart LR
 |---|---|---|
 | 1.1 | **No se pueden crear facturas, entregables ni conversaciones:** los cuatro modelos generan su número después de validarlo y todo guardado falla con error 500 | [API › Limitaciones](Doc-08-API.md#11-limitaciones-conocidas), [Modelos de datos](Doc-09-Modelos-de-Datos.md) |
 | 1.2 | Aunque se arregle, **las facturas y los entregables quedan a nombre de quien los crea** (el equipo) y no del cliente, así que el cliente no los vería | [API](Doc-08-API.md#11-limitaciones-conocidas) |
-| 1.3 | **"Nuevo pedido" llama a una dirección local fija** (`localhost:3001`) en vez de a la API configurada: falla en producción | [Flujos del prospecto y cliente](Doc-05-Flujos-del-Prospecto-y-Cliente.md) |
 | 1.4 | **La conversación automática de cada pedido nunca se crea,** y responder desde el detalle de conversación del panel usa una ruta sin el prefijo `/api` | [Manual del administrador](Doc-06-Manual-del-Administrador.md) |
 | 1.5 | **"Descargar" factura no hace nada:** la lista usa el número como id y el servicio no genera un PDF | [Manual del administrador](Doc-06-Manual-del-Administrador.md) |
 | 1.6 | **Entregables y Facturación muestran datos inventados como si fueran reales** cuando la API falla, y no tienen estado vacío | [Flujos del prospecto y cliente](Doc-05-Flujos-del-Prospecto-y-Cliente.md) |
@@ -86,10 +85,8 @@ flowchart LR
 |---|---|---|
 | 1.25 | **Las tarjetas del catálogo de 20 demos prometen funciones que la demo no tiene** ("ML", "multi-país", integraciones, cumplimiento). Es el repaso de honestidad pendiente | [Guía de demos › Limitaciones comunes](Doc-07-Guia-de-Demos.md#limitaciones-comunes) |
 | 1.26 | **7 demos sin revisar** tienen botones que no hacen nada, no dicen que usan datos de ejemplo y mezclan textos en inglés | [Guía de demos](Doc-07-Guia-de-Demos.md) |
-| 1.27 | **El gestor documental es una demo abierta cuya API exige sesión:** un visitante ve "Error al cargar documentos" | [Guía: gestor documental](Guia-Demo-gestor-documentos.md) |
 | 1.30 | **"Solicitar acceso" mal dirigido dentro de las demos de salud:** en cuentas médicas apunta a una ruta que no existe y en el motor de reglas lleva a `/contact` | [Guía: cuentas médicas](Guia-Demo-cuentas-medicas.md), [Guía: motor de reglas](Guia-Demo-sistema-experto.md) |
 | 1.31 | **"Ver Planes y Precios"** al final de las demos de otras soluciones lleva a los planes RAG | [Guía de demos › Limitaciones comunes](Doc-07-Guia-de-Demos.md#limitaciones-comunes) |
-| 1.32 | **Errores de hidratación de React** con el navegador en español en wms-logistica, automatizacion y moderacion-contenido | [Guía de demos › Limitaciones comunes](Doc-07-Guia-de-Demos.md#limitaciones-comunes) |
 | 1.34 | **La nota de "Simular ticket entrante" del helpdesk dice que el mensaje no sale del navegador,** pero "Redactar con IA" lo envía al servidor | [Guía: helpdesk](Guia-Demo-helpdesk-ia.md) |
 
 ---
@@ -116,7 +113,6 @@ flowchart LR
 | 2.14 | **El panel no permite volver una solicitud a "pendiente",** aunque la API lo acepta | [Flujos de negocio › Hallazgos](Doc-14-1-Flujos-de-Negocio.md#hallazgos) |
 | 2.15 | **Una solicitud que se fusiona con otra abierta no avisa a nadie** ni registra lead | [Flujos de negocio › Hallazgos](Doc-14-1-Flujos-de-Negocio.md#hallazgos) |
 | 2.16 | **Cambiar el modo de una demo tarda hasta 60 s** en aplicarse, por la caché del filtro de la web | [Manual del administrador](Doc-06-Manual-del-Administrador.md) |
-| 2.17 | **Si un acceso vence o se revoca con la demo abierta,** las demos que funcionan solo en el navegador siguen hasta recargar | [Flujos del prospecto y cliente](Doc-05-Flujos-del-Prospecto-y-Cliente.md) |
 | 2.18 | **"Pedir más tiempo"** prellena nombre y correo, pero no la empresa | [Flujos del prospecto y cliente](Doc-05-Flujos-del-Prospecto-y-Cliente.md) |
 | 2.19 | **`/reset-password` muestra el mismo mensaje** para enlace usado, reemplazado o vencido | [Flujos de negocio › Hallazgos](Doc-14-1-Flujos-de-Negocio.md#hallazgos) |
 | 2.20 | **El portal puede perder la ruta de regreso** al mandar al login | [Flujos de negocio › Hallazgos](Doc-14-1-Flujos-de-Negocio.md#hallazgos) |

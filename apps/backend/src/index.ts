@@ -82,12 +82,19 @@ const startServer = async () => {
     }
 
     // 3c. Pipeline comercial: liga al pipeline los contactos anteriores
-    // (idempotente; no cambia sus datos).
-    try {
-      const { migrateContactsToLeads } = await import('./services/leads.service');
-      await migrateContactsToLeads();
-    } catch (err: any) {
-      logger.warn(`Fallo migrando contactos al pipeline de leads: ${err?.message ?? err}`);
+    // (idempotente; no cambia sus datos). Solo con el flujo de compra activo
+    // (COMMERCE_ENABLED=true): apagado no crea Leads ni toca los contactos.
+    const { isCommerceEnabled } = await import('./config/commerce');
+    const commerceEnabled = isCommerceEnabled();
+    if (commerceEnabled) {
+      try {
+        const { migrateContactsToLeads } = await import('./services/leads.service');
+        await migrateContactsToLeads();
+      } catch (err: any) {
+        logger.warn(`Fallo migrando contactos al pipeline de leads: ${err?.message ?? err}`);
+      }
+    } else {
+      logger.info('Flujo de compra apagado (COMMERCE_ENABLED distinto de true): sin pipeline de leads, propuestas ni pagos.');
     }
 
     // 3d. Chatbot: si quedó el archivo heredado data/chatbots/state.json, lo
@@ -130,7 +137,6 @@ const startServer = async () => {
     startDemoGrantsJob();
     // Job de vencimiento de propuestas (candado en Redis): solo con el flujo de
     // compra activo (COMMERCE_ENABLED=true; sigue en desarrollo).
-    const commerceEnabled = process.env.COMMERCE_ENABLED === 'true';
     const { startProposalsExpiryJob, stopProposalsExpiryJob } = await import('./jobs/proposals-expiry.job');
     if (commerceEnabled) startProposalsExpiryJob();
     // Plazo de conservación de datos personales (candado en Redis, una vez al día).
