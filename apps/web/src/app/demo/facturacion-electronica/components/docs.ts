@@ -3,7 +3,6 @@
 import {
   ENVIRONMENT_TEST,
   FIRST_NUMBER,
-  RESOLUTION,
   SOFTWARE_PIN_SAMPLE,
   TECH_KEY_SAMPLE,
   type BillingDoc,
@@ -11,8 +10,8 @@ import {
   type IncomingInvoice,
   type Issuer,
   type RadianCode,
+  type Resolution,
 } from './data';
-import { DEMO_TODAY } from './data';
 import { addBusinessDays, amount2, businessDaysUntil, computeTotals, TAX_RATE, type Totals } from './fiscal';
 
 export const docTotals = (doc: Pick<BillingDoc, 'lines' | 'client'>): Totals => computeTotals(doc.lines, doc.client);
@@ -119,25 +118,37 @@ export function qrText(doc: BillingDoc, issuer: Issuer): string {
 
 // ---------- RADIAN ----------
 
-export type IncomingStage = 'new' | 'acknowledged' | 'received' | 'accepted' | 'tacit' | 'claimed';
+export type IncomingStage = 'new' | 'acknowledged' | 'received' | 'accepted' | 'tacit' | 'claimed' | 'returned';
 
-export function incomingStage(inv: IncomingInvoice): IncomingStage {
+/** ¿La factura del proveedor está dirigida al NIT del emisor de la demo? */
+export const isAddressedTo = (inv: IncomingInvoice, issuerNit: string) => inv.buyerNit === 'self' || inv.buyerNit === issuerNit;
+
+/** Plazo para aceptar o reclamar: 3 días hábiles después del evento 032. */
+export function claimDeadline(inv: IncomingInvoice, today: string): { deadline: string; daysLeft: number; passed: boolean } | null {
+  const recibo = inv.events.find((e) => e.code === '032');
+  if (!recibo) return null;
+  const deadline = addBusinessDays(recibo.date, 3);
+  return { deadline, daysLeft: businessDaysUntil(today, deadline), passed: today > deadline };
+}
+
+/**
+ * Estado de una factura de proveedor. La aceptación tácita no la registra el comprador:
+ * opera sola cuando pasan 3 días hábiles desde el recibo del bien o servicio (032) sin
+ * aceptación expresa ni reclamo, y el evento 034 lo registra el proveedor.
+ */
+export function incomingStage(inv: IncomingInvoice, today: string): IncomingStage {
   const has = (c: RadianCode) => inv.events.some((e) => e.code === c);
+  if (inv.returnedDate) return 'returned';
   if (has('031')) return 'claimed';
   if (has('033')) return 'accepted';
   if (has('034')) return 'tacit';
-  if (has('032')) return 'received';
+  if (has('032')) return claimDeadline(inv, today)?.passed ? 'tacit' : 'received';
   if (has('030')) return 'acknowledged';
   return 'new';
 }
 
-/** Plazo para aceptar o reclamar: 3 días hábiles después del evento 032. */
-export function claimDeadline(inv: IncomingInvoice): { deadline: string; daysLeft: number } | null {
-  const recibo = inv.events.find((e) => e.code === '032');
-  if (!recibo) return null;
-  const deadline = addBusinessDays(recibo.date, 3);
-  return { deadline, daysLeft: businessDaysUntil(DEMO_TODAY, deadline) };
-}
+/** Por gestionar: sin aceptación, reclamo ni devolución. */
+export const isPendingStage = (s: IncomingStage) => s === 'new' || s === 'acknowledged' || s === 'received';
 
 export const incomingIva = (inv: IncomingInvoice) => Math.round(inv.base * TAX_RATE[inv.tax]);
 export const incomingTotal = (inv: IncomingInvoice) => inv.base + incomingIva(inv);
@@ -183,7 +194,7 @@ const ROOT: Record<DocType, { root: string; ns: string; lineTag: string; qtyTag:
 const PAYMENT_CODE = { efectivo: '10', transferencia: '47', tarjeta: '48' } as const;
 const ID_SCHEME = { NIT: '31', CC: '13', CF: '13' } as const;
 
-export function buildXml(doc: BillingDoc, issuer: Issuer, ref: BillingDoc | undefined): string {
+export function buildXml(doc: BillingDoc, issuer: Issuer, ref: BillingDoc | undefined, resolution: Resolution): string {
   const r = ROOT[doc.type];
   const t = docTotals(doc);
   const money = (n: number) => `currencyID="COP">${amount2(n)}`;
@@ -250,7 +261,7 @@ export function buildXml(doc: BillingDoc, issuer: Issuer, ref: BillingDoc | unde
     '  <cbc:DocumentCurrencyCode>COP</cbc:DocumentCurrencyCode>',
     `  <cbc:LineCountNumeric>${doc.lines.length}</cbc:LineCountNumeric>`,
     doc.type === 'factura'
-      ? `  <!-- Resolución de numeración de ejemplo ${RESOLUTION.number} del ${RESOLUTION.date}, rango ${doc.prefix}${RESOLUTION.from} a ${doc.prefix}${RESOLUTION.to} -->`
+      ? `  <!-- Resolución de numeración de ejemplo ${resolution.number} del ${resolution.date}, rango ${doc.prefix}${resolution.from} a ${doc.prefix}${resolution.to} -->`
       : '',
     isNote && ref
       ? [
@@ -331,10 +342,4 @@ export function formatDate(iso: string, monthsShort: string[]): string {
   const [y, m, d] = iso.split('-').map(Number);
   if (!y || !m || !d) return iso;
   return `${d} ${monthsShort[m - 1]} ${y}`;
-}
-
-/** Hora actual de Colombia (UTC−5) en formato HH:MM:SS, solo para acciones del usuario. */
-export function colombiaNow(): { time: string } {
-  const now = new Date(Date.now() - 5 * 3600000);
-  return { time: now.toISOString().slice(11, 19) };
 }

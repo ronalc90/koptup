@@ -10,28 +10,39 @@
     "common": {
       "cancel": "Cancel",
       "close": "Close",
-      "monthsShort": "Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec"
+      "monthsShort": "Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec",
+      "monthsLong": "January,February,March,April,May,June,July,August,September,October,November,December",
+      "monthYear": "{month} {year}"
     },
     "header": {
-      "back": "Back to demos",
+      "back": "Back to the catalog",
+      "guidedDemo": "Request a guided demo",
+      "quote": "Get a quote",
       "sampleBadge": "Sample data",
       "simBadge": "Simulation: nothing is sent to the DIAN",
       "reset": "Reset data",
       "resetConfirm": "Discard your changes and go back to the sample data?",
       "resetYes": "Yes, reset",
       "resetDone": "Sample data restored",
-      "storageFull": "Your browser has no room to save your changes (a very large logo?). The demo still works, but it won't remember them after a reload."
+      "storageFull": "Your browser has no room to save your changes (a very large logo?). The demo still works, but it won't remember them after a reload.",
+      "loading": "Preparing the sample data with today's date…",
+      "monthChanged": "We updated the sample data to {to}: what you had done in {from} was discarded. Your custom issuer was kept."
     },
     "hero": {
       "kicker": "E-invoicing simulator · Colombia",
       "title": "DIAN e-invoicing from your own system",
       "subtitle": "Issue invoices, credit and debit notes and POS equivalent documents; download the PDF with its QR code and the XML; answer your suppliers' invoices with RADIAN events and export the period ledgers.",
+      "forWhomLabel": "Who it is for:",
+      "forWhom": "companies that invoice from their own system (online store, ERP, point of sale or health software) and their accounting team.",
+      "startLabel": "Where to start:",
+      "start": "follow the 5 steps in “Try the flow in 3 minutes”. Step one: issue an invoice to NIT 901234517-9.",
+      "startCta": "Start the walkthrough",
       "simNote": "Everything runs in your browser with fictitious companies and figures. Signing, transmission and DIAN validation are simulated, and your changes are stored only on this device.",
-      "dateNote": "Simulation date: {date}."
+      "dateNote": "The sample data uses today's date in Colombia ({date})."
     },
     "metrics": {
       "label": "Simulation indicators",
-      "issued": "Issued in October",
+      "issued": "Issued in {month}",
       "issuedHint": "Invoices, notes and POS this month",
       "issuedQueued": "{n} in the contingency queue",
       "acceptance": "DIAN acceptance (simulated)",
@@ -47,13 +58,17 @@
       "title": "Try the flow in 3 minutes",
       "subtitle": "Each step checks itself off when you do it. Tap a step to jump to its section.",
       "done": "{done} of {total}",
+      "next": "Next step",
+      "doneStep": "Step completed",
       "steps": {
         "invoice": "Issue an invoice with a valid NIT (try 901234517-9)",
         "download": "Download a document's PDF with QR code or its XML",
         "creditNote": "Issue a credit note against an invoice",
         "radian": "Register a RADIAN event on a supplier invoice",
         "export": "Export a tax ledger as CSV or PDF"
-      }
+      },
+      "finished": "You completed the walkthrough! Want to see it with your company's data and system?",
+      "finishedCta": "Request a guided demo"
     },
     "docTypes": {
       "factura": "Electronic sales invoice",
@@ -110,7 +125,7 @@
         "contingencia": "Contingency"
       },
       "dianDownBanner": "Contingency mode on: the (simulated) DIAN is not responding. Whatever you issue is queued and transmitted when you restore the service in the Contingency tab.",
-      "resolution": "Sample numbering resolution {number} dated {date} · prefix {prefix} from {from} to {to} · next: {next} · {left} numbers left.",
+      "resolution": "Sample numbering resolution {number} dated {date} · prefix {prefix} from {from} to {to} · next: {next} · {n, plural, one {1 number left} other {{left} numbers left}}.",
       "nextNumber": "Next number: {next}.",
       "emit": {
         "factura": "Issue invoice",
@@ -163,7 +178,8 @@
         "unitPrice": "Unit price (before VAT)",
         "tax": "VAT",
         "rete": "Income tax withholding",
-        "base": "Base"
+        "base": "Base",
+        "taxAmount": "VAT"
       },
       "paymentForm": "Payment terms",
       "paymentForms": {
@@ -258,13 +274,14 @@
       "transmitPending": "Transmit pending ({n})",
       "restored": "Service restored (simulated)",
       "queueTitle": "Contingency queue",
+      "queueCount": "{n, plural, one {# document in the queue} other {# documents in the queue}}",
       "queueEmpty": "No queued documents. Turn on the simulation and issue an invoice to see it here.",
       "transmitting": "Transmitting…",
-      "done": "{n} documents transmitted and accepted (simulated)"
+      "done": "{n, plural, one {# document transmitted and accepted (simulated)} other {# documents transmitted and accepted (simulated)}}"
     },
     "success": {
-      "accepted": "{doc} accepted by the DIAN (simulated)",
-      "queued": "{doc} in the contingency queue",
+      "accepted": "{type, select, factura {Invoice {id} accepted by the DIAN (simulated)} notaCredito {Credit note {id} accepted by the DIAN (simulated)} notaDebito {Debit note {id} accepted by the DIAN (simulated)} other {POS document {id} accepted by the DIAN (simulated)}}",
+      "queued": "{type, select, factura {Invoice {id} in the contingency queue} notaCredito {Credit note {id} in the contingency queue} notaDebito {Debit note {id} in the contingency queue} other {POS document {id} in the contingency queue}}",
       "acceptedSub": "PDF and XML delivered to {email} (simulated).",
       "acceptedNoEmail": "Hand it to the buyer printed or through the channel you prefer.",
       "queuedSub": "You can already hand it to the customer; it will be transmitted when you restore the service in the Contingency tab.",
@@ -285,7 +302,7 @@
       "buyer": "Buyer",
       "noBuyer": "Complete the buyer details",
       "noLines": "No lines",
-      "more": "+ {n} more lines",
+      "more": "{n, plural, one {+ 1 more line} other {+ # more lines}}",
       "qrPending": "Generated when issuing",
       "qrPendingShort": "QR on issue",
       "qrAlt": "QR code of document {id}",
@@ -343,6 +360,7 @@
     },
     "documents": {
       "title": "Issued documents",
+      "file": "documents",
       "subtitle": "Search, filter and sort. Open each document to see its history, download the PDF with QR code and the XML, send it or issue a note against it.",
       "search": "Search by number, customer or NIT…",
       "filters": {
@@ -360,14 +378,19 @@
       },
       "count": "{n} of {total} documents",
       "export": "Export CSV",
-      "exportDone": "CSV downloaded with {n} documents",
+      "exportDone": "{n, plural, one {CSV downloaded with 1 document} other {CSV downloaded with # documents}}",
       "empty": "No documents match those filters.",
       "actionsCol": "Actions",
       "actions": {
         "view": "View",
         "credit": "Credit note",
         "debit": "Debit note",
-        "fix": "Fix and resend"
+        "fix": "Fix and resend",
+        "viewAria": "View {id}",
+        "pdfAria": "Download the PDF of {id}",
+        "xmlAria": "Download the XML of {id}",
+        "creditAria": "Issue a credit note against {id}",
+        "debitAria": "Issue a debit note against {id}"
       },
       "refLabel": "Ref. {id}",
       "cufePending": "Computing the CUFE… try again in a moment.",
@@ -422,7 +445,7 @@
       "stats": {
         "pending": "To handle",
         "accepted": "Accepted",
-        "claimed": "Claimed"
+        "claimed": "Claimed or returned"
       },
       "invoice": "Invoice {number}",
       "dates": "Issued on {issued} · received on {received}",
@@ -440,7 +463,8 @@
         "received": "Goods or service received",
         "accepted": "Accepted",
         "tacit": "Tacit acceptance",
-        "claimed": "Claimed"
+        "claimed": "Claimed",
+        "returned": "Returned to supplier"
       },
       "events": {
         "030": "Acknowledgment of receipt",
@@ -453,7 +477,8 @@
         "ack": "Acknowledge receipt (030)",
         "receive": "Goods or service received (032)",
         "accept": "Accept (033)",
-        "claim": "Claim (031)"
+        "claim": "Claim (031)",
+        "giveBack": "Notify the supplier (simulated)"
       },
       "claimReason": "Claim reason",
       "claimReasons": {
@@ -464,22 +489,20 @@
       },
       "claimConfirm": "Register claim",
       "deadline": "Deadline to accept or claim: {date} ({n, plural, one {# business day left} other {# business days left}}; if you don't answer, tacit acceptance applies).",
-      "deadlinePassed": "The deadline passed with no claim: tacit acceptance applies.",
-      "suggestClaim": "This invoice is not addressed to your NIT: the right move is to claim it with reason 01.",
+      "deadlineToday": "The deadline to accept or claim ends today ({date}); if you do not respond, tacit acceptance applies.",
+      "tacitNote": "Three business days passed since the goods or service were received with no acceptance or claim: the deadline ended on {date} and tacit acceptance (034) applied; the supplier registers it.",
+      "notAddressedHelp": "This invoice is not addressed to your NIT, so you cannot register RADIAN events on it. Let the supplier know so they cancel it with a credit note and issue it to the right NIT.",
       "closed": "Handling closed",
       "eventDone": "Event {code} ({name}) registered for {number} (simulated)",
+      "returnDone": "Notice registered: {supplier} must cancel invoice {number} with a credit note (simulated)",
+      "returnedNote": "You notified the supplier on {date} (simulated): it is left out of the purchase ledger.",
       "note": "Simulated: in your project the events are registered with the DIAN through the technology provider, and invoices arrive in the reception mailbox."
     },
     "reports": {
       "title": "Ledgers and reports",
       "subtitle": "Computed from the documents in this simulation. Download them as CSV (opens in Excel) or PDF.",
       "period": "Period",
-      "periods": {
-        "2026-08": "August 2026",
-        "2026-09": "September 2026",
-        "2026-10": "October 2026",
-        "all": "August to October 2026"
-      },
+      "periodAll": "All months ({from} to {to})",
       "books": {
         "sales": "Sales ledger",
         "purchases": "Purchase ledger",
@@ -490,11 +513,12 @@
         "sales": "sales-ledger",
         "purchases": "purchase-ledger",
         "vat": "vat-summary",
-        "withholding": "withholdings"
+        "withholding": "withholdings",
+        "allSuffix": "{from}-to-{to}"
       },
       "notes": {
         "sales": "Invoices, POS documents and debit notes add up; credit notes subtract. Rejected documents are excluded.",
-        "purchases": "Supplier invoices in the period; claimed ones are excluded.",
+        "purchases": "Supplier invoices in the period; claimed invoices and those returned to the supplier are excluded.",
         "vat": "Estimated summary to review with your accountant; it does not replace the tax return.",
         "withholding": "Withholdings your customers would apply according to the reference rates."
       },
@@ -526,7 +550,7 @@
         "balance": "Estimated VAT balance"
       },
       "csv": "CSV (Excel)",
-      "rows": "{n} records",
+      "rows": "{n, plural, one {1 record} other {# records}}",
       "empty": "No activity in the period.",
       "totalRow": "Total",
       "downloaded": "{file} downloaded",

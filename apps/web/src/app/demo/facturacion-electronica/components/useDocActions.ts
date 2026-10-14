@@ -5,7 +5,7 @@
 import { useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
-import { RESOLUTION, type BillingDoc } from './data';
+import type { BillingDoc } from './data';
 import { buildXml, downloadBlob, downloadText, formatDate, qrText } from './docs';
 import { formatNit, TAX_CATEGORIES, type TaxCategory } from './fiscal';
 import { makeDocPdf } from './pdf';
@@ -15,7 +15,7 @@ import { useMonths } from './ui';
 export function useDocActions(store: BillingStore) {
   const t = useTranslations('demoBilling');
   const months = useMonths();
-  const { state, markProgress } = store;
+  const { state, resolution, markProgress } = store;
 
   const idLabel = useCallback(
     (doc: BillingDoc) =>
@@ -70,12 +70,12 @@ export function useDocActions(store: BillingStore) {
           resolution:
             doc.type === 'factura'
               ? t('pdf.resolution', {
-                  number: RESOLUTION.number,
-                  date: fmt(RESOLUTION.date),
+                  number: resolution.number,
+                  date: fmt(resolution.date),
                   prefix: doc.prefix,
-                  from: RESOLUTION.from,
-                  to: RESOLUTION.to,
-                  validTo: fmt(RESOLUTION.validTo),
+                  from: resolution.from,
+                  to: resolution.to,
+                  validTo: fmt(resolution.validTo),
                 })
               : undefined,
           cufeLabel: doc.type === 'factura' ? t('success.cufeLabel') : t('success.cudeLabel'),
@@ -90,7 +90,7 @@ export function useDocActions(store: BillingStore) {
         toast.error(t('documents.downloadError'));
       }
     },
-    [idLabel, markProgress, months, state.docs, state.issuer, t],
+    [idLabel, markProgress, months, resolution, state.docs, state.issuer, t],
   );
 
   const downloadXml = useCallback(
@@ -100,11 +100,11 @@ export function useDocActions(store: BillingStore) {
         return;
       }
       const ref = doc.refId ? state.docs.find((d) => d.id === doc.refId) : undefined;
-      downloadText(`${doc.id}.xml`, buildXml(doc, state.issuer, ref), 'application/xml');
+      downloadText(`${doc.id}.xml`, buildXml(doc, state.issuer, ref, resolution), 'application/xml');
       markProgress('download');
       toast.success(t('documents.downloaded', { file: `${doc.id}.xml` }));
     },
-    [markProgress, state.docs, state.issuer, t],
+    [markProgress, resolution, state.docs, state.issuer, t],
   );
 
   return { downloadPdf, downloadXml, idLabel };

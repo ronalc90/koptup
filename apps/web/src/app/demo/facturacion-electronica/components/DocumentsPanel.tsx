@@ -6,10 +6,10 @@ import toast from 'react-hot-toast';
 import { ArrowDownTrayIcon, DocumentDuplicateIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { DEMO_TODAY, DOC_TYPES, type BillingDoc, type DocStatus, type DocType, type HistoryEntry } from './data';
-import { colombiaNow, cufeInput, docTotals, downloadText, formatDate, invoiceBalance, notesFor, qrText, toCsv } from './docs';
-import { checkNit, formatCOP, formatNit, isEmail, sha384Hex, TAX_CATEGORIES } from './fiscal';
-import { Field, inputCls, Modal, QrSvg, SectionTitle, StatusBadge, useMonths } from './ui';
+import { DOC_TYPES, type BillingDoc, type DocStatus, type DocType, type HistoryEntry } from './data';
+import { cufeInput, docTotals, downloadText, formatDate, invoiceBalance, notesFor, qrText, toCsv } from './docs';
+import { checkNit, colombiaNow, formatCOP, formatNit, isEmail, sha384Hex, TAX_CATEGORIES } from './fiscal';
+import { Field, focusRing, inputCls, Modal, QrSvg, SectionTitle, StatusBadge, useMonths } from './ui';
 import type { BillingStore } from './useBillingStore';
 import { useDocActions } from './useDocActions';
 
@@ -55,7 +55,7 @@ export function DocumentsPanel({ store, onStartNote }: { store: BillingStore; on
         return [d.issueDate, d.id, t(`docTypesShort.${d.type}`), d.client.name, d.client.idType === 'NIT' ? `${d.client.idNumber}-${d.client.dv}` : d.client.idNumber, tt.subtotal, tt.iva, tt.total, t(`status.${d.status}`), d.refId || '', d.cufe];
       }),
     ]);
-    downloadText(`documentos-${DEMO_TODAY}.csv`, csv, 'text/csv');
+    downloadText(`${t('documents.file')}-${colombiaNow().date}.csv`, csv, 'text/csv');
     toast.success(t('documents.exportDone', { n: rows.length }));
   };
 
@@ -63,27 +63,27 @@ export function DocumentsPanel({ store, onStartNote }: { store: BillingStore; on
     const isInvoice = d.type === 'factura' && d.status !== 'rejected';
     return (
       <>
-        <button type="button" className="text-primary-600 hover:underline" onClick={() => setDetailId(d.id)}>
+        <button type="button" className={'rounded text-primary-600 hover:underline ' + focusRing} onClick={() => setDetailId(d.id)} aria-label={t('documents.actions.viewAria', { id: d.id })}>
           {t('documents.actions.view')}
         </button>
-        <button type="button" className="text-secondary-700 dark:text-secondary-200 hover:underline" onClick={() => downloadPdf(d)}>
+        <button type="button" className={'rounded text-secondary-700 dark:text-secondary-200 hover:underline ' + focusRing} onClick={() => downloadPdf(d)} aria-label={t('documents.actions.pdfAria', { id: d.id })}>
           PDF
         </button>
-        <button type="button" className="text-secondary-700 dark:text-secondary-200 hover:underline" onClick={() => downloadXml(d)}>
+        <button type="button" className={'rounded text-secondary-700 dark:text-secondary-200 hover:underline ' + focusRing} onClick={() => downloadXml(d)} aria-label={t('documents.actions.xmlAria', { id: d.id })}>
           XML
         </button>
         {isInvoice && (
-          <button type="button" className="text-secondary-700 dark:text-secondary-200 hover:underline" onClick={() => onStartNote('notaCredito', d.id)}>
+          <button type="button" className={'rounded text-secondary-700 dark:text-secondary-200 hover:underline ' + focusRing} onClick={() => onStartNote('notaCredito', d.id)} aria-label={t('documents.actions.creditAria', { id: d.id })}>
             {t('documents.actions.credit')}
           </button>
         )}
         {isInvoice && (
-          <button type="button" className="text-secondary-700 dark:text-secondary-200 hover:underline" onClick={() => onStartNote('notaDebito', d.id)}>
+          <button type="button" className={'rounded text-secondary-700 dark:text-secondary-200 hover:underline ' + focusRing} onClick={() => onStartNote('notaDebito', d.id)} aria-label={t('documents.actions.debitAria', { id: d.id })}>
             {t('documents.actions.debit')}
           </button>
         )}
         {d.status === 'rejected' && (
-          <button type="button" className="text-red-600 font-medium hover:underline" onClick={() => setFixId(d.id)}>
+          <button type="button" className={'rounded text-red-600 font-medium hover:underline ' + focusRing} onClick={() => setFixId(d.id)}>
             {t('documents.actions.fix')}
           </button>
         )}
@@ -95,7 +95,7 @@ export function DocumentsPanel({ store, onStartNote }: { store: BillingStore; on
   const detail = store.detailId ? state.docs.find((d) => d.id === store.detailId) : undefined;
 
   return (
-    <Card variant="bordered" padding="md" id="documentos">
+    <Card variant="bordered" padding="md" id="documentos" className="scroll-mt-24">
       <SectionTitle
         icon={<DocumentDuplicateIcon className="w-5 h-5" />}
         title={t('documents.title')}
@@ -110,11 +110,15 @@ export function DocumentsPanel({ store, onStartNote }: { store: BillingStore; on
         <div className="relative sm:col-span-2 lg:col-span-1">
           <MagnifyingGlassIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-secondary-400" />
           <input
+            type="search"
             className={inputCls + ' pl-9'}
             aria-label={t('documents.search')}
             placeholder={t('documents.search')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape' && query) setQuery('');
+            }}
           />
         </div>
         <select aria-label={t('documents.filters.type')} className={inputCls} value={type} onChange={(e) => setType(e.target.value as DocType | 'all')}>
@@ -274,9 +278,9 @@ function DocDetailModal({
       toast.error(t(channel === 'email' ? 'detail.badEmail' : 'detail.badPhone'));
       return;
     }
-    const { time } = colombiaNow();
+    const { date, time } = colombiaNow();
     const detail = channel === 'email' ? target.trim() : `WhatsApp ${target.trim()}`;
-    updateDoc(doc.id, (d) => ({ ...d, history: [...d.history, { date: DEMO_TODAY, time: time.slice(0, 5), key: 'sent', detail }] }));
+    updateDoc(doc.id, (d) => ({ ...d, history: [...d.history, { date, time: time.slice(0, 5), key: 'sent', detail }] }));
     toast.success(t('detail.sent', { to: detail }));
   };
 
@@ -474,8 +478,8 @@ function FixModal({ doc, store, onClose }: { doc: BillingDoc; store: BillingStor
     const fixed: BillingDoc = { ...doc, client: { ...doc.client, idNumber: chk.digits, dv: chk.dv }, rejection: undefined };
     const cufe = await sha384Hex(cufeInput(fixed, store.state.issuer));
     await new Promise((r) => setTimeout(r, 700));
-    const { time } = colombiaNow();
-    const h = (key: HistoryEntry['key'], detail?: string): HistoryEntry => ({ date: DEMO_TODAY, time: time.slice(0, 5), key, detail });
+    const { date, time } = colombiaNow();
+    const h = (key: HistoryEntry['key'], detail?: string): HistoryEntry => ({ date, time: time.slice(0, 5), key, detail });
     store.updateDoc(doc.id, () => ({
       ...fixed,
       cufe,

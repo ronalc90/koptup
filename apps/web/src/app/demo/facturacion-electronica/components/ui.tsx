@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import Badge from '@/components/ui/Badge';
@@ -75,15 +75,41 @@ export function Modal({
 }) {
   const t = useTranslations('demoBilling');
   const panel = useRef<HTMLDivElement>(null);
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
   useEffect(() => {
     if (!open) return;
+    // Al cerrar, el foco vuelve al control que abrió la ventana.
+    const opener = document.activeElement as HTMLElement | null;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        closeRef.current();
+        return;
+      }
+      // Tab no sale de la ventana mientras está abierta.
+      if (e.key !== 'Tab' || !panel.current) return;
+      const focusables = Array.from(
+        panel.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'),
+      ).filter((el) => el.offsetParent !== null || el === document.activeElement);
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && (document.activeElement === first || document.activeElement === panel.current)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     window.addEventListener('keydown', onKey);
     panel.current?.focus();
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      if (opener && document.contains(opener)) opener.focus();
+    };
+  }, [open]);
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-[120] flex items-start sm:items-center justify-center p-3 sm:p-6 bg-black/50" onClick={onClose}>
@@ -105,7 +131,7 @@ export function Modal({
             type="button"
             onClick={onClose}
             aria-label={t('common.close')}
-            className="p-1 rounded-md text-secondary-500 hover:bg-secondary-100 dark:hover:bg-secondary-800"
+            className={'p-1 rounded-md text-secondary-500 hover:bg-secondary-100 dark:hover:bg-secondary-800 ' + focusRing}
           >
             <XMarkIcon className="w-5 h-5" />
           </button>
@@ -150,4 +176,39 @@ export function Pill({ ok, children }: { ok: boolean; children: ReactNode }) {
 export function useMonths() {
   const t = useTranslations('demoBilling');
   return useMemo(() => t('common.monthsShort').split(','), [t]);
+}
+
+/** "2026-10" → "octubre de 2026" (o "Octubre de 2026" para títulos y listas). */
+export function useMonthLabel() {
+  const t = useTranslations('demoBilling');
+  const long = useMemo(() => t('common.monthsLong').split(','), [t]);
+  return useCallback(
+    (ym: string, capitalize = false) => {
+      const name = long[Number(ym.slice(5, 7)) - 1] || ym;
+      return t('common.monthYear', { month: capitalize ? name.charAt(0).toUpperCase() + name.slice(1) : name, year: ym.slice(0, 4) });
+    },
+    [long, t],
+  );
+}
+
+/** Anillo de foco visible para botones propios de la demo. */
+export const focusRing =
+  'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-secondary-900';
+
+/**
+ * Teclado de un grupo de pestañas (role="tablist"): flechas, Inicio y Fin cambian de
+ * pestaña y mueven el foco, como pide el patrón de pestañas de WAI-ARIA.
+ */
+export function onTabsKeyDown<K extends string>(e: ReactKeyboardEvent<HTMLElement>, keys: readonly K[], current: K, select: (k: K) => void) {
+  const idx = keys.indexOf(current);
+  let next = -1;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (idx + 1) % keys.length;
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (idx - 1 + keys.length) % keys.length;
+  else if (e.key === 'Home') next = 0;
+  else if (e.key === 'End') next = keys.length - 1;
+  if (next < 0) return;
+  e.preventDefault();
+  select(keys[next]);
+  const tabs = e.currentTarget.querySelectorAll<HTMLElement>('[role="tab"]');
+  tabs[next]?.focus();
 }

@@ -10,28 +10,39 @@
     "common": {
       "cancel": "Cancelar",
       "close": "Cerrar",
-      "monthsShort": "ene,feb,mar,abr,may,jun,jul,ago,sep,oct,nov,dic"
+      "monthsShort": "ene,feb,mar,abr,may,jun,jul,ago,sep,oct,nov,dic",
+      "monthsLong": "enero,febrero,marzo,abril,mayo,junio,julio,agosto,septiembre,octubre,noviembre,diciembre",
+      "monthYear": "{month} de {year}"
     },
     "header": {
-      "back": "Volver a demos",
+      "back": "Volver al catálogo",
+      "guidedDemo": "Solicitar demo guiada",
+      "quote": "Cotizar",
       "sampleBadge": "Datos de ejemplo",
       "simBadge": "Simulación: nada se envía a la DIAN",
       "reset": "Restablecer datos",
       "resetConfirm": "¿Borrar tus cambios y volver a los datos de ejemplo?",
       "resetYes": "Sí, restablecer",
       "resetDone": "Datos de ejemplo restablecidos",
-      "storageFull": "Tu navegador no tiene espacio para guardar los cambios (¿un logo muy pesado?). La demo sigue funcionando, pero no los recordará al recargar."
+      "storageFull": "Tu navegador no tiene espacio para guardar los cambios (¿un logo muy pesado?). La demo sigue funcionando, pero no los recordará al recargar.",
+      "loading": "Preparando los datos de ejemplo con la fecha de hoy…",
+      "monthChanged": "Actualizamos los datos de ejemplo a {to}: lo que habías hecho en {from} se descartó. Tu emisor personalizado se conservó."
     },
     "hero": {
       "kicker": "Simulador de facturación electrónica · Colombia",
       "title": "Facturación electrónica DIAN desde tu propio sistema",
       "subtitle": "Emite facturas, notas crédito y débito y documento equivalente POS; descarga el PDF con QR y el XML; responde las facturas de tus proveedores con eventos RADIAN y exporta los libros del período.",
+      "forWhomLabel": "Para quién:",
+      "forWhom": "empresas que facturan desde su propio sistema (tienda en línea, ERP, punto de venta o software de salud) y su equipo contable.",
+      "startLabel": "Por dónde empezar:",
+      "start": "sigue los 5 pasos de «Prueba el flujo en 3 minutos». El primero: emite una factura con el NIT 901234517-9.",
+      "startCta": "Empezar el recorrido",
       "simNote": "Todo corre en tu navegador con empresas y cifras ficticias. La firma, la transmisión y la validación de la DIAN están simuladas, y tus cambios se guardan solo en este equipo.",
-      "dateNote": "Fecha de la simulación: {date}."
+      "dateNote": "Los datos de ejemplo usan la fecha de hoy en Colombia ({date})."
     },
     "metrics": {
       "label": "Indicadores de la simulación",
-      "issued": "Emitidos en octubre",
+      "issued": "Emitidos en {month}",
       "issuedHint": "Facturas, notas y POS del mes",
       "issuedQueued": "{n} en cola de contingencia",
       "acceptance": "Aceptación DIAN (simulada)",
@@ -47,13 +58,17 @@
       "title": "Prueba el flujo en 3 minutos",
       "subtitle": "Cada paso se marca solo cuando lo haces. Toca un paso para ir a su sección.",
       "done": "{done} de {total}",
+      "next": "Siguiente paso",
+      "doneStep": "Paso completado",
       "steps": {
         "invoice": "Emite una factura con un NIT válido (prueba 901234517-9)",
         "download": "Descarga el PDF con QR o el XML de un documento",
         "creditNote": "Emite una nota crédito sobre una factura",
         "radian": "Registra un evento RADIAN en una factura de proveedor",
         "export": "Exporta un libro fiscal en CSV o PDF"
-      }
+      },
+      "finished": "¡Completaste el recorrido! ¿Quieres verlo con los datos y el sistema de tu empresa?",
+      "finishedCta": "Solicitar demo guiada"
     },
     "docTypes": {
       "factura": "Factura electrónica de venta",
@@ -110,7 +125,7 @@
         "contingencia": "Contingencia"
       },
       "dianDownBanner": "Modo contingencia activo: la DIAN (simulada) no responde. Lo que emitas queda en cola y se transmite cuando restablezcas el servicio en la pestaña Contingencia.",
-      "resolution": "Resolución de numeración de ejemplo {number} del {date} · prefijo {prefix} del {from} al {to} · siguiente: {next} · quedan {left} números.",
+      "resolution": "Resolución de numeración de ejemplo {number} del {date} · prefijo {prefix} del {from} al {to} · siguiente: {next} · {n, plural, one {queda 1 número} other {quedan {left} números}}.",
       "nextNumber": "Siguiente número: {next}.",
       "emit": {
         "factura": "Emitir factura",
@@ -163,7 +178,8 @@
         "unitPrice": "Valor unitario (sin IVA)",
         "tax": "IVA",
         "rete": "Retención en la fuente",
-        "base": "Base"
+        "base": "Base",
+        "taxAmount": "IVA"
       },
       "paymentForm": "Forma de pago",
       "paymentForms": {
@@ -258,13 +274,14 @@
       "transmitPending": "Transmitir pendientes ({n})",
       "restored": "Servicio restablecido (simulado)",
       "queueTitle": "Cola de contingencia",
+      "queueCount": "{n, plural, one {# documento en cola} other {# documentos en cola}}",
       "queueEmpty": "No hay documentos en cola. Activa la simulación y emite una factura para verla aquí.",
       "transmitting": "Transmitiendo…",
-      "done": "{n} documentos transmitidos y aceptados (simulado)"
+      "done": "{n, plural, one {# documento transmitido y aceptado (simulado)} other {# documentos transmitidos y aceptados (simulado)}}"
     },
     "success": {
-      "accepted": "{doc} aceptado por la DIAN (simulado)",
-      "queued": "{doc} en cola de contingencia",
+      "accepted": "{type, select, factura {Factura {id} aceptada por la DIAN (simulado)} notaCredito {Nota crédito {id} aceptada por la DIAN (simulado)} notaDebito {Nota débito {id} aceptada por la DIAN (simulado)} other {Documento POS {id} aceptado por la DIAN (simulado)}}",
+      "queued": "{type, select, factura {Factura {id} en cola de contingencia} notaCredito {Nota crédito {id} en cola de contingencia} notaDebito {Nota débito {id} en cola de contingencia} other {Documento POS {id} en cola de contingencia}}",
       "acceptedSub": "PDF y XML entregados a {email} (simulado).",
       "acceptedNoEmail": "Entrégalo al comprador impreso o por el canal que prefieras.",
       "queuedSub": "Ya puedes entregarlo al cliente; se transmitirá cuando restablezcas el servicio en la pestaña Contingencia.",
@@ -285,7 +302,7 @@
       "buyer": "Adquirente",
       "noBuyer": "Completa los datos del adquirente",
       "noLines": "Sin líneas",
-      "more": "+ {n} líneas más",
+      "more": "{n, plural, one {+ 1 línea más} other {+ # líneas más}}",
       "qrPending": "Se genera al emitir",
       "qrPendingShort": "QR al emitir",
       "qrAlt": "Código QR del documento {id}",
@@ -343,6 +360,7 @@
     },
     "documents": {
       "title": "Documentos emitidos",
+      "file": "documentos",
       "subtitle": "Busca, filtra y ordena. Abre cada documento para ver su historial, descargar el PDF con QR y el XML, enviarlo o emitirle una nota.",
       "search": "Buscar por número, cliente o NIT…",
       "filters": {
@@ -360,14 +378,19 @@
       },
       "count": "{n} de {total} documentos",
       "export": "Exportar CSV",
-      "exportDone": "CSV descargado con {n} documentos",
+      "exportDone": "{n, plural, one {CSV descargado con 1 documento} other {CSV descargado con # documentos}}",
       "empty": "No hay documentos con esos filtros.",
       "actionsCol": "Acciones",
       "actions": {
         "view": "Ver",
         "credit": "Nota crédito",
         "debit": "Nota débito",
-        "fix": "Corregir y reenviar"
+        "fix": "Corregir y reenviar",
+        "viewAria": "Ver {id}",
+        "pdfAria": "Descargar el PDF de {id}",
+        "xmlAria": "Descargar el XML de {id}",
+        "creditAria": "Emitir una nota crédito sobre {id}",
+        "debitAria": "Emitir una nota débito sobre {id}"
       },
       "refLabel": "Ref. {id}",
       "cufePending": "Calculando el CUFE… intenta de nuevo en un momento.",
@@ -422,7 +445,7 @@
       "stats": {
         "pending": "Por gestionar",
         "accepted": "Aceptadas",
-        "claimed": "Reclamadas"
+        "claimed": "Reclamadas o devueltas"
       },
       "invoice": "Factura {number}",
       "dates": "Emitida el {issued} · recibida el {received}",
@@ -440,7 +463,8 @@
         "received": "Bien o servicio recibido",
         "accepted": "Aceptada",
         "tacit": "Aceptación tácita",
-        "claimed": "Reclamada"
+        "claimed": "Reclamada",
+        "returned": "Devuelta al proveedor"
       },
       "events": {
         "030": "Acuse de recibo",
@@ -453,7 +477,8 @@
         "ack": "Acuse de recibo (030)",
         "receive": "Recibo del bien o servicio (032)",
         "accept": "Aceptar (033)",
-        "claim": "Reclamar (031)"
+        "claim": "Reclamar (031)",
+        "giveBack": "Avisar al proveedor (simulado)"
       },
       "claimReason": "Motivo del reclamo",
       "claimReasons": {
@@ -464,22 +489,20 @@
       },
       "claimConfirm": "Registrar reclamo",
       "deadline": "Plazo para aceptar o reclamar: {date} ({n, plural, one {queda # día hábil} other {quedan # días hábiles}}; si no respondes, opera la aceptación tácita).",
-      "deadlinePassed": "Venció el plazo sin reclamo: opera la aceptación tácita.",
-      "suggestClaim": "Esta factura no está dirigida a tu NIT: lo indicado es reclamarla con el motivo 01.",
+      "deadlineToday": "Hoy ({date}) vence el plazo para aceptar o reclamar; si no respondes, opera la aceptación tácita.",
+      "tacitNote": "Pasaron 3 días hábiles desde el recibo del bien o servicio sin aceptación ni reclamo: el plazo venció el {date} y operó la aceptación tácita (034), que registra el proveedor.",
+      "notAddressedHelp": "Esta factura no está dirigida a tu NIT, así que no puedes registrarle eventos RADIAN. Avísale al proveedor para que la anule con una nota crédito y la emita al NIT correcto.",
       "closed": "Gestión cerrada",
       "eventDone": "Evento {code} ({name}) registrado para {number} (simulado)",
+      "returnDone": "Aviso registrado: {supplier} debe anular la factura {number} con una nota crédito (simulado)",
+      "returnedNote": "Le avisaste al proveedor el {date} (simulado): no entra al libro de compras.",
       "note": "Simulado: en tu proyecto los eventos se registran ante la DIAN a través del proveedor tecnológico, y las facturas llegan al buzón de correo de recepción."
     },
     "reports": {
       "title": "Libros y reportes",
       "subtitle": "Se calculan con los documentos de esta simulación. Descárgalos en CSV (se abre en Excel) o en PDF.",
       "period": "Período",
-      "periods": {
-        "2026-08": "Agosto 2026",
-        "2026-09": "Septiembre 2026",
-        "2026-10": "Octubre 2026",
-        "all": "Agosto a octubre 2026"
-      },
+      "periodAll": "Todos los meses ({from} a {to})",
       "books": {
         "sales": "Libro de ventas",
         "purchases": "Libro de compras",
@@ -490,11 +513,12 @@
         "sales": "libro-ventas",
         "purchases": "libro-compras",
         "vat": "resumen-iva",
-        "withholding": "retenciones"
+        "withholding": "retenciones",
+        "allSuffix": "{from}-a-{to}"
       },
       "notes": {
         "sales": "Facturas, POS y notas débito suman; las notas crédito restan. No incluye documentos rechazados.",
-        "purchases": "Facturas de proveedores del período; no incluye las reclamadas.",
+        "purchases": "Facturas de proveedores del período; no incluye las reclamadas ni las devueltas al proveedor.",
         "vat": "Resumen estimado para revisar con tu contador; no reemplaza la declaración.",
         "withholding": "Retenciones que te practicarían tus clientes según las tarifas de referencia."
       },
@@ -526,7 +550,7 @@
         "balance": "Saldo estimado de IVA"
       },
       "csv": "CSV (Excel)",
-      "rows": "{n} registros",
+      "rows": "{n, plural, one {1 registro} other {# registros}}",
       "empty": "Sin movimientos en el período.",
       "totalRow": "Total",
       "downloaded": "{file} descargado",
@@ -535,18 +559,18 @@
     "api": {
       "title": "API para conectar tu sistema",
       "badge": "Diseño de referencia",
-      "subtitle": "Así se integra tu e-commerce, ERP o POS: tu sistema envía la venta y recibe el estado por webhook. Esta API se construye en tu proyecto; no es un servicio público disponible hoy.",
+      "subtitle": "Así se integra tu tienda en línea, ERP o punto de venta: tu sistema envía la venta y recibe el estado con un aviso automático (webhook). Esta API se construye en tu proyecto; no es un servicio público disponible hoy.",
       "tabs": {
         "request": "Solicitud",
         "response": "Respuesta",
-        "webhook": "Webhook"
+        "webhook": "Aviso (webhook)"
       },
       "live": "La solicitud se arma con lo que tienes en el formulario de emisión.",
       "copy": "Copiar",
       "copied": "Copiado al portapapeles",
       "copyError": "Tu navegador no permitió copiar. Selecciona el texto y cópialo.",
-      "endpoints": "Endpoints",
-      "webhooks": "Eventos de webhook",
+      "endpoints": "Rutas de la API",
+      "webhooks": "Avisos automáticos (webhooks)",
       "endpointDesc": {
         "invoices": "Emitir factura de venta",
         "creditNotes": "Emitir nota crédito",
@@ -582,7 +606,7 @@
         },
         "integration": {
           "title": "Integración con tu sistema",
-          "text": "Tu e-commerce, ERP, POS o software de salud emite por API, y el PDF y el XML le llegan a tu cliente por correo o WhatsApp."
+          "text": "Tu tienda en línea, ERP, punto de venta o software de salud emite por API, y el PDF y el XML le llegan a tu cliente por correo o WhatsApp."
         },
         "storage": {
           "title": "Conservación",

@@ -2,11 +2,14 @@
 // Empresas, NIT, correos (dominio .example) y cifras son ficticios. El DV de cada NIT
 // se calcula con el algoritmo de la DIAN para que la validación de la demo sea coherente.
 
-import { nitDv, type ReteConcept, type TaxCategory } from './fiscal';
+import { addDays, addMonthsYm, nitDv, subBusinessDays, type ReteConcept, type TaxCategory } from './fiscal';
 
-/** Fecha fija de la simulación: evita depender del reloj y mantiene coherentes los plazos. */
-export const DEMO_TODAY = '2026-10-08';
-export const DEMO_PERIODS = ['2026-08', '2026-09', '2026-10'] as const;
+/*
+ * Fechas: la simulación trabaja con la fecha de HOY en Colombia (se calcula en el navegador
+ * después de montar la página). Los documentos y las facturas de proveedores de ejemplo se
+ * ubican en días hábiles anteriores a esa fecha, así que siempre son coherentes con el día
+ * en que alguien abre la demo.
+ */
 
 export type DocType = 'factura' | 'notaCredito' | 'notaDebito' | 'pos';
 export const DOC_TYPES: DocType[] = ['factura', 'notaCredito', 'notaDebito', 'pos'];
@@ -124,6 +127,8 @@ export interface IncomingInvoice {
   buyerNit: 'self' | string;
   cufe: string;
   events: RadianEvent[];
+  /** Dirigida a otro NIT: fecha en que se le avisó al proveedor (no es un evento RADIAN). */
+  returnedDate?: string;
 }
 
 export interface Resolution {
@@ -134,14 +139,15 @@ export interface Resolution {
   validTo: string;
 }
 
-/** Resolución de numeración de ejemplo (en tu proyecto se usa la que te autoriza la DIAN). */
-export const RESOLUTION: Resolution = {
-  number: '18764000000001',
-  date: '2026-01-15',
-  from: 1001,
-  to: 5000,
-  validTo: '2027-01-15',
-};
+/**
+ * Resolución de numeración de ejemplo (en tu proyecto se usa la que te autoriza la DIAN).
+ * Sus fechas se calculan a partir del día en que se armaron los datos de ejemplo: se expidió
+ * el 15 del mes que va nueve meses atrás y vence un año después (siempre vigente en la demo).
+ */
+export function resolutionFor(anchor: string): Resolution {
+  const date = `${addMonthsYm(anchor.slice(0, 7), -9)}-15`;
+  return { number: '18764000000001', date, from: 1001, to: 5000, validTo: `${Number(date.slice(0, 4)) + 1}${date.slice(4)}` };
+}
 
 export const PREFIXES: Record<DocType, string> = { factura: 'FE', notaCredito: 'NC', notaDebito: 'ND', pos: 'POS' };
 export const FIRST_NUMBER: Record<DocType, number> = { factura: 1001, notaCredito: 101, notaDebito: 51, pos: 2001 };
@@ -256,7 +262,8 @@ function stdHistory(date: string, time: string, email: string, status: DocStatus
 interface SampleSpec {
   type: DocType;
   number: number;
-  date: string;
+  /** Días hábiles antes de hoy en que se emitió. */
+  bd: number;
   time: string;
   client: Party;
   items: [string, number][];
@@ -268,9 +275,10 @@ interface SampleSpec {
   customLines?: DocLine[];
 }
 
-function sampleDoc(s: SampleSpec): BillingDoc {
+function sampleDoc(s: SampleSpec, today: string): BillingDoc {
   const prefix = PREFIXES[s.type];
   const id = `${prefix}${s.number}`;
+  const date = subBusinessDays(today, s.bd);
   const [paymentForm, paymentMethod] = s.payment || ['credito', 'transferencia'];
   const status = s.status || 'accepted';
   return {
@@ -278,26 +286,21 @@ function sampleDoc(s: SampleSpec): BillingDoc {
     type: s.type,
     prefix,
     number: s.number,
-    issueDate: s.date,
+    issueDate: date,
     issueTime: `${s.time}-05:00`,
     client: s.client,
     lines: s.customLines || s.items.map(([itemId, qty], i) => line(id, i + 1, itemId, qty)),
     paymentForm,
     paymentMethod,
-    dueDate: paymentForm === 'credito' ? addDaysIso(s.date, 30) : undefined,
+    dueDate: paymentForm === 'credito' ? addDays(date, 30) : undefined,
     status,
     cufe: '',
     refId: s.refId,
     concept: s.concept,
     note: s.note,
     rejection: status === 'rejected' ? 'badDv' : undefined,
-    history: stdHistory(s.date, s.time, s.client.email, status),
+    history: stdHistory(date, s.time, s.client.email, status),
   };
-}
-
-function addDaysIso(iso: string, days: number): string {
-  const [y, m, d] = iso.split('-').map(Number);
-  return new Date(Date.UTC(y, m - 1, d) + days * 86400000).toISOString().slice(0, 10);
 }
 
 const [C1, C2, C3, C4, C5] = SAMPLE_CLIENTS;
@@ -305,20 +308,24 @@ const [C1, C2, C3, C4, C5] = SAMPLE_CLIENTS;
 /** Cliente con el DV mal digitado: la DIAN (simulada) rechazó la factura FE1013. */
 const C5_BAD_DV: Party = { ...C5, dv: C5.dv === '7' ? '8' : '7' };
 
-export function buildSampleDocs(): BillingDoc[] {
-  const docs: BillingDoc[] = [
-    sampleDoc({ type: 'factura', number: 1001, date: '2026-08-04', time: '09:12:30', client: C1, items: [['lic', 1], ['sop', 6]], payment: ['contado', 'transferencia'] }),
-    sampleDoc({ type: 'factura', number: 1002, date: '2026-08-11', time: '10:40:02', client: C2, items: [['lic', 1], ['cap', 8]] }),
-    sampleDoc({ type: 'factura', number: 1003, date: '2026-08-19', time: '15:05:47', client: C3, items: [['dev', 40]] }),
-    sampleDoc({ type: 'factura', number: 1004, date: '2026-08-27', time: '11:22:10', client: C4, items: [['lic', 1], ['hos', 1]], payment: ['contado', 'transferencia'] }),
-    sampleDoc({ type: 'factura', number: 1005, date: '2026-09-03', time: '09:01:55', client: C1, items: [['lic', 1], ['sop', 4]] }),
-    sampleDoc({ type: 'factura', number: 1006, date: '2026-09-09', time: '14:30:18', client: C5, items: [['sop', 12], ['cap', 4]] }),
-    sampleDoc({ type: 'factura', number: 1007, date: '2026-09-15', time: '16:48:09', client: C2, items: [['lic', 1], ['hos', 1]] }),
-    sampleDoc({ type: 'factura', number: 1008, date: '2026-09-22', time: '08:55:41', client: C3, items: [['dev', 24]] }),
-    sampleDoc({
+/**
+ * Historial de ejemplo de unos dos meses (46 días hábiles) que termina el día hábil
+ * anterior a `today`: 13 facturas, una nota débito, una nota crédito y un POS.
+ */
+export function buildSampleDocs(today: string): BillingDoc[] {
+  const specs: SampleSpec[] = [
+    { type: 'factura', number: 1001, bd: 46, time: '09:12:30', client: C1, items: [['lic', 1], ['sop', 6]], payment: ['contado', 'transferencia'] },
+    { type: 'factura', number: 1002, bd: 41, time: '10:40:02', client: C2, items: [['lic', 1], ['cap', 8]] },
+    { type: 'factura', number: 1003, bd: 36, time: '15:05:47', client: C3, items: [['dev', 40]] },
+    { type: 'factura', number: 1004, bd: 30, time: '11:22:10', client: C4, items: [['lic', 1], ['hos', 1]], payment: ['contado', 'transferencia'] },
+    { type: 'factura', number: 1005, bd: 25, time: '09:01:55', client: C1, items: [['lic', 1], ['sop', 4]] },
+    { type: 'factura', number: 1006, bd: 21, time: '14:30:18', client: C5, items: [['sop', 12], ['cap', 4]] },
+    { type: 'factura', number: 1007, bd: 17, time: '16:48:09', client: C2, items: [['lic', 1], ['hos', 1]] },
+    { type: 'factura', number: 1008, bd: 12, time: '08:55:41', client: C3, items: [['dev', 24]] },
+    {
       type: 'notaDebito',
       number: 51,
-      date: '2026-09-28',
+      bd: 8,
       time: '10:10:10',
       client: C3,
       items: [],
@@ -328,14 +335,14 @@ export function buildSampleDocs(): BillingDoc[] {
       customLines: [
         { id: 'ND51-l1', description: 'Intereses de mora sobre FE1003', qty: 1, unitPrice: 96_000, tax: 'excluido', rete: 'none' },
       ],
-    }),
-    sampleDoc({ type: 'factura', number: 1009, date: '2026-09-30', time: '17:20:33', client: C4, items: [['cap', 12]] }),
-    sampleDoc({ type: 'factura', number: 1010, date: '2026-10-01', time: '09:30:00', client: C1, items: [['lic', 1], ['sop', 10], ['cap', 4]] }),
-    sampleDoc({ type: 'factura', number: 1011, date: '2026-10-02', time: '10:05:12', client: C2, items: [['lic', 1], ['dev', 10]] }),
-    sampleDoc({
+    },
+    { type: 'factura', number: 1009, bd: 6, time: '17:20:33', client: C4, items: [['cap', 12]] },
+    { type: 'factura', number: 1010, bd: 5, time: '09:30:00', client: C1, items: [['lic', 1], ['sop', 10], ['cap', 4]] },
+    { type: 'factura', number: 1011, bd: 4, time: '10:05:12', client: C2, items: [['lic', 1], ['dev', 10]] },
+    {
       type: 'notaCredito',
       number: 101,
-      date: '2026-10-05',
+      bd: 3,
       time: '11:15:42',
       client: C4,
       items: [],
@@ -345,71 +352,100 @@ export function buildSampleDocs(): BillingDoc[] {
       customLines: [
         { id: 'NC101-l1', description: 'Capacitación a usuarios (hora)', qty: 3, unitPrice: 150_000, tax: 'iva19', rete: 'servicios', srcLineId: 'FE1009-l1' },
       ],
-    }),
-    sampleDoc({ type: 'factura', number: 1012, date: '2026-10-06', time: '15:40:27', client: C3, items: [['hos', 1], ['sop', 5]] }),
-    sampleDoc({ type: 'factura', number: 1013, date: '2026-10-07', time: '09:48:03', client: C5_BAD_DV, items: [['sop', 8]], status: 'rejected' }),
-    sampleDoc({ type: 'pos', number: 2001, date: '2026-10-07', time: '18:02:11', client: CONSUMIDOR_FINAL, items: [['tal', 1]], payment: ['contado', 'efectivo'] }),
+    },
+    { type: 'factura', number: 1012, bd: 2, time: '15:40:27', client: C3, items: [['hos', 1], ['sop', 5]] },
+    { type: 'factura', number: 1013, bd: 1, time: '09:48:03', client: C5_BAD_DV, items: [['sop', 8]], status: 'rejected' },
+    { type: 'pos', number: 2001, bd: 1, time: '18:02:11', client: CONSUMIDOR_FINAL, items: [['tal', 1]], payment: ['contado', 'efectivo'] },
   ];
   // Más recientes primero.
-  return docs.sort((a, b) => (b.issueDate + b.issueTime).localeCompare(a.issueDate + a.issueTime));
+  return specs
+    .map((spec) => sampleDoc(spec, today))
+    .sort((a, b) => (b.issueDate + b.issueTime).localeCompare(a.issueDate + a.issueTime));
 }
 
 const supplier = (n: string, name: string, city: string) => ({ name, ...nit(n), city });
 
-export function buildSampleIncoming(): IncomingInvoice[] {
+/** Meses en español para los conceptos de las facturas de proveedores (son datos del documento). */
+const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const mesDe = (ym: string) => `${MESES[Number(ym.slice(5, 7)) - 1]} ${ym.slice(0, 4)}`;
+
+/**
+ * Facturas de proveedores de ejemplo con sus eventos RADIAN. Las fechas van en días hábiles
+ * antes de `today`: el arriendo tiene el recibo del bien o servicio de hace 2 días hábiles
+ * (le queda 1 día para aceptar o reclamar) y el aseo superó el plazo (aceptación tácita).
+ */
+export function buildSampleIncoming(today: string): IncomingInvoice[] {
+  const d = (bd: number) => subBusinessDays(today, bd);
+  const month = (bd: number) => d(bd).slice(0, 7);
   return [
     {
       id: 'in-1',
       supplier: supplier('900612784', 'Energía del Altiplano S.A. E.S.P.', 'Tunja'),
       number: 'EA558210',
-      issueDate: '2026-10-01',
-      receivedDate: '2026-10-01',
-      concept: 'Energía eléctrica — septiembre 2026',
+      issueDate: d(5),
+      receivedDate: d(5),
+      concept: `Energía eléctrica — ${mesDe(addMonthsYm(month(5), -1))}`,
       tax: 'excluido',
       base: 1_180_000,
       buyerNit: 'self',
       cufe: '',
       events: [
-        { code: '030', date: '2026-10-01' },
-        { code: '032', date: '2026-10-02' },
-        { code: '033', date: '2026-10-05' },
+        { code: '030', date: d(5) },
+        { code: '032', date: d(4) },
+        { code: '033', date: d(3) },
+      ],
+    },
+    {
+      id: 'in-6',
+      supplier: supplier('901287345', 'Aseo Integral Los Cerezos S.A.S.', 'Bogotá D.C.'),
+      number: 'AIC4471',
+      issueDate: d(9),
+      receivedDate: d(9),
+      concept: `Servicio de aseo de oficina — ${mesDe(addMonthsYm(month(9), -1))}`,
+      tax: 'iva19',
+      base: 920_000,
+      buyerNit: 'self',
+      cufe: '',
+      events: [
+        { code: '030', date: d(9) },
+        { code: '032', date: d(8) },
       ],
     },
     {
       id: 'in-2',
       supplier: supplier('901398265', 'Conectar Fibra Andina S.A.S.', 'Bogotá D.C.'),
       number: 'CFA90412',
-      issueDate: '2026-10-05',
-      receivedDate: '2026-10-05',
-      concept: 'Internet empresarial 300 Mbps — octubre 2026',
+      issueDate: d(3),
+      receivedDate: d(3),
+      concept: `Internet empresarial 300 Mbps — ${mesDe(month(3))}`,
       tax: 'iva19',
       base: 389_900,
       buyerNit: 'self',
       cufe: '',
-      events: [{ code: '030', date: '2026-10-05' }],
+      events: [{ code: '030', date: d(3) }],
     },
     {
       id: 'in-3',
       supplier: supplier('900951357', 'Inmobiliaria Torreverde S.A.S.', 'Bogotá D.C.'),
       number: 'TV3317',
-      issueDate: '2026-10-02',
-      receivedDate: '2026-10-02',
-      concept: 'Arrendamiento de oficina — octubre 2026',
+      issueDate: d(4),
+      receivedDate: d(4),
+      concept: `Arrendamiento de oficina — ${mesDe(month(4))}`,
       tax: 'iva19',
       base: 6_500_000,
       buyerNit: 'self',
       cufe: '',
       events: [
-        { code: '030', date: '2026-10-02' },
-        { code: '032', date: '2026-10-06' },
+        { code: '030', date: d(4) },
+        { code: '032', date: d(2) },
       ],
     },
     {
       id: 'in-4',
       supplier: supplier('901620483', 'Papelería Guayacán S.A.S.', 'Bogotá D.C.'),
       number: 'PG77120',
-      issueDate: '2026-10-07',
-      receivedDate: '2026-10-07',
+      issueDate: d(1),
+      receivedDate: d(1),
       concept: 'Útiles de oficina',
       tax: 'iva19',
       base: 284_000,
@@ -421,9 +457,9 @@ export function buildSampleIncoming(): IncomingInvoice[] {
       id: 'in-5',
       supplier: supplier('900534219', 'Mensajería Cumbre Express S.A.S.', 'Bogotá D.C.'),
       number: 'MCE12058',
-      issueDate: '2026-10-07',
-      receivedDate: '2026-10-07',
-      concept: 'Mensajería urbana — septiembre 2026',
+      issueDate: d(1),
+      receivedDate: d(1),
+      concept: `Mensajería urbana — ${mesDe(addMonthsYm(month(1), -1))}`,
       tax: 'iva19',
       base: 145_000,
       buyerNit: '901512364',

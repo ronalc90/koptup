@@ -6,11 +6,11 @@ import toast from 'react-hot-toast';
 import { ArrowDownTrayIcon, DocumentChartBarIcon } from '@heroicons/react/24/outline';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { DEMO_PERIODS, type BillingDoc, type IncomingInvoice } from './data';
+import type { BillingDoc, IncomingInvoice } from './data';
 import { docTotals, downloadBlob, downloadText, formatDate, incomingIva, incomingStage, incomingTotal, isIssued, toCsv } from './docs';
 import { formatCOP } from './fiscal';
 import { makeBookPdf } from './pdf';
-import { inputCls, SectionTitle, useMonths } from './ui';
+import { focusRing, inputCls, onTabsKeyDown, SectionTitle, useMonthLabel, useMonths } from './ui';
 import type { BillingStore } from './useBillingStore';
 
 type Book = 'sales' | 'purchases' | 'vat' | 'withholding';
@@ -27,11 +27,25 @@ interface Table {
   total?: (string | number)[];
 }
 
+/** Meses con movimientos (documentos o compras) más el mes en curso, del más reciente al más antiguo. */
+export function periodsOf(docs: BillingDoc[], incoming: IncomingInvoice[], today: string): string[] {
+  const set = new Set<string>([today.slice(0, 7)]);
+  docs.forEach((d) => set.add(d.issueDate.slice(0, 7)));
+  incoming.forEach((i) => set.add(i.issueDate.slice(0, 7)));
+  return Array.from(set).sort().reverse();
+}
+
 export function ReportsPanel({ store }: { store: BillingStore }) {
   const t = useTranslations('demoBilling');
   const months = useMonths();
-  const { state, markProgress } = store;
-  const [period, setPeriod] = useState<string>('2026-10');
+  const monthLabel = useMonthLabel();
+  const { state, today, markProgress } = store;
+  const periods = useMemo(() => periodsOf(state.docs, state.incoming, today), [state.docs, state.incoming, today]);
+  // Arranca en el mes en curso; si aún no tiene documentos (primeros días del mes), en el anterior.
+  const [period, setPeriod] = useState<string>(() => {
+    const current = today.slice(0, 7);
+    return state.docs.some((d) => isIssued(d) && d.issueDate.startsWith(current)) ? current : periods[1] || current;
+  });
   const [book, setBook] = useState<Book>('sales');
 
   const docs = useMemo(
@@ -39,15 +53,22 @@ export function ReportsPanel({ store }: { store: BillingStore }) {
     [state.docs, period],
   );
   const purchases = useMemo(
-    () => state.incoming.filter((i) => incomingStage(i) !== 'claimed' && (period === 'all' || i.issueDate.startsWith(period))),
-    [state.incoming, period],
+    () =>
+      state.incoming.filter((i) => {
+        const stage = incomingStage(i, today);
+        return stage !== 'claimed' && stage !== 'returned' && (period === 'all' || i.issueDate.startsWith(period));
+      }),
+    [state.incoming, period, today],
   );
 
-  const table: Table = useMemo(() => buildTable(book, docs, purchases, t), [book, docs, purchases, t]);
-  const periodLabel = period === 'all' ? t('reports.periods.all') : t(`reports.periods.${period}`);
+  const table: Table = useMemo(() => buildTable(book, docs, purchases, t, today), [book, docs, purchases, t, today]);
+  const oldest = periods[periods.length - 1];
+  const newest = periods[0];
+  const periodLabel =
+    period === 'all' ? t('reports.periodAll', { from: monthLabel(oldest), to: monthLabel(newest) }) : monthLabel(period, true);
   const fmtCell = (v: string | number, i: number) => (table.money[i] && typeof v === 'number' ? formatCOP(v) : String(v));
   const bookName = t(`reports.books.${book}`);
-  const fileBase = `${t(`reports.files.${book}`)}-${period === 'all' ? '2026' : period}`;
+  const fileBase = `${t(`reports.files.${book}`)}-${period === 'all' ? t('reports.files.allSuffix', { from: oldest, to: newest }) : period}`;
 
   const exportCsv = () => {
     downloadText(`${fileBase}.csv`, toCsv([table.head, ...table.raw, ...(table.total ? [table.total] : [])]), 'text/csv');
@@ -76,7 +97,7 @@ export function ReportsPanel({ store }: { store: BillingStore }) {
   };
 
   return (
-    <Card variant="bordered" padding="md" id="reportes">
+    <Card variant="bordered" padding="md" id="reportes" className="scroll-mt-24">
       <SectionTitle icon={<DocumentChartBarIcon className="w-5 h-5" />} title={t('reports.title')} subtitle={t('reports.subtitle')} />
       <div className="flex flex-col md:flex-row md:items-end gap-3 mb-3">
         <div>
@@ -84,24 +105,29 @@ export function ReportsPanel({ store }: { store: BillingStore }) {
             {t('reports.period')}
           </label>
           <select id="fe-period" className={inputCls + ' md:w-48'} value={period} onChange={(e) => setPeriod(e.target.value)}>
-            {DEMO_PERIODS.map((p) => (
+            {periods.map((p) => (
               <option key={p} value={p}>
-                {t(`reports.periods.${p}`)}
+                {monthLabel(p, true)}
               </option>
             ))}
-            <option value="all">{t('reports.periods.all')}</option>
+            <option value="all">{t('reports.periodAll', { from: monthLabel(oldest), to: monthLabel(newest) })}</option>
           </select>
         </div>
-        <div role="tablist" aria-label={t('reports.title')} className="flex flex-wrap gap-2 flex-1">
+        <div role="tablist" aria-label={t('reports.title')} className="flex flex-wrap gap-2 flex-1" onKeyDown={(e) => onTabsKeyDown(e, BOOKS, book, setBook)}>
           {BOOKS.map((b) => (
             <button
               key={b}
+              id={`fe-book-${b}`}
               type="button"
               role="tab"
               aria-selected={book === b}
+              aria-controls="fe-book-panel"
+              tabIndex={book === b ? 0 : -1}
               onClick={() => setBook(b)}
               className={
                 'px-3 py-1.5 rounded-lg text-sm transition ' +
+                focusRing +
+                ' ' +
                 (book === b
                   ? 'bg-primary-600 text-white'
                   : 'bg-secondary-100 dark:bg-secondary-800 text-secondary-700 dark:text-secondary-200 hover:bg-secondary-200 dark:hover:bg-secondary-700')
@@ -120,10 +146,11 @@ export function ReportsPanel({ store }: { store: BillingStore }) {
           </Button>
         </div>
       </div>
+      <div id="fe-book-panel" role="tabpanel" aria-labelledby={`fe-book-${book}`}>
       <p className="text-xs text-secondary-500 mb-2">
         {t('reports.rows', { n: table.raw.length })} · {t(`reports.notes.${book}`)}
       </p>
-      <div className="overflow-x-auto max-h-96 overflow-y-auto rounded-lg border border-secondary-200 dark:border-secondary-700">
+      <div className="overflow-x-auto max-h-96 overflow-y-auto rounded-lg border border-secondary-200 dark:border-secondary-700" tabIndex={0} role="region" aria-label={`${bookName} · ${periodLabel}`}>
         <table className="w-full min-w-[640px] text-xs">
           <thead className="sticky top-0 bg-secondary-100 dark:bg-secondary-800 text-secondary-600 dark:text-secondary-300">
             <tr>
@@ -165,13 +192,14 @@ export function ReportsPanel({ store }: { store: BillingStore }) {
           )}
         </table>
       </div>
+      </div>
     </Card>
   );
 }
 
 type T = (key: string, values?: Record<string, string | number>) => string;
 
-function buildTable(book: Book, docs: BillingDoc[], purchases: IncomingInvoice[], t: T): Table {
+function buildTable(book: Book, docs: BillingDoc[], purchases: IncomingInvoice[], t: T, today: string): Table {
   const c = (k: string) => t(`reports.cols.${k}`);
   const nit = (d: BillingDoc) => (d.client.idType === 'NIT' ? `${d.client.idNumber}-${d.client.dv}` : d.client.idNumber);
   const sorted = docs.slice().sort((a, b) => (a.issueDate + a.issueTime).localeCompare(b.issueDate + b.issueTime));
@@ -196,7 +224,7 @@ function buildTable(book: Book, docs: BillingDoc[], purchases: IncomingInvoice[]
     const raw = purchases
       .slice()
       .sort((a, b) => a.issueDate.localeCompare(b.issueDate))
-      .map((i) => [i.issueDate, i.supplier.name, `${i.supplier.nit}-${i.supplier.dv}`, i.number, i.concept, i.base, incomingIva(i), incomingTotal(i), t(`reception.stage.${incomingStage(i)}`)]);
+      .map((i) => [i.issueDate, i.supplier.name, `${i.supplier.nit}-${i.supplier.dv}`, i.number, i.concept, i.base, incomingIva(i), incomingTotal(i), t(`reception.stage.${incomingStage(i, today)}`)]);
     const sum = (k: number) => raw.reduce((a, r) => a + (r[k] as number), 0);
     return {
       head: [c('date'), c('supplier'), c('nit'), c('doc'), c('concept'), c('base'), c('iva'), c('total'), c('status')],

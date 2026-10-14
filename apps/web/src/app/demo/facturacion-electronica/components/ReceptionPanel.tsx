@@ -7,9 +7,9 @@ import { InboxArrowDownIcon } from '@heroicons/react/24/outline';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import { CLAIM_REASONS, DEMO_TODAY, type ClaimReason, type IncomingInvoice, type RadianCode } from './data';
-import { claimDeadline, formatDate, incomingIva, incomingStage, incomingTotal, type IncomingStage } from './docs';
-import { formatCOP, formatNit, nitDv } from './fiscal';
+import { CLAIM_REASONS, type ClaimReason, type IncomingInvoice, type RadianCode } from './data';
+import { claimDeadline, formatDate, incomingIva, incomingStage, incomingTotal, isAddressedTo, isPendingStage, type IncomingStage } from './docs';
+import { colombiaNow, formatCOP, formatNit, nitDv } from './fiscal';
 import { inputCls, Pill, SectionTitle, useMonths } from './ui';
 import type { BillingStore } from './useBillingStore';
 
@@ -20,28 +20,34 @@ const STAGE_VARIANT: Record<IncomingStage, 'default' | 'info' | 'warning' | 'suc
   accepted: 'success',
   tacit: 'success',
   claimed: 'danger',
+  returned: 'default',
 };
 
 export function ReceptionPanel({ store }: { store: BillingStore }) {
   const t = useTranslations('demoBilling');
   const months = useMonths();
-  const { state, addRadianEvent } = store;
+  const { state, today, addRadianEvent, returnIncoming } = store;
   const [claiming, setClaiming] = useState<string | null>(null);
   const [reason, setReason] = useState<ClaimReason>('01');
 
-  const stages = state.incoming.map(incomingStage);
-  const pending = stages.filter((s) => s === 'new' || s === 'acknowledged' || s === 'received').length;
+  const stages = state.incoming.map((i) => incomingStage(i, today));
+  const pending = stages.filter(isPendingStage).length;
   const accepted = stages.filter((s) => s === 'accepted' || s === 'tacit').length;
-  const claimed = stages.filter((s) => s === 'claimed').length;
+  const closedOther = stages.filter((s) => s === 'claimed' || s === 'returned').length;
 
   const register = (inv: IncomingInvoice, code: RadianCode, why?: ClaimReason) => {
-    addRadianEvent(inv.id, { code, date: DEMO_TODAY, reason: why });
+    addRadianEvent(inv.id, { code, date: colombiaNow().date, reason: why });
     toast.success(t('reception.eventDone', { code, name: t(`reception.events.${code}`), number: inv.number }));
     setClaiming(null);
   };
 
+  const giveBack = (inv: IncomingInvoice) => {
+    returnIncoming(inv.id, colombiaNow().date);
+    toast.success(t('reception.returnDone', { number: inv.number, supplier: inv.supplier.name }));
+  };
+
   return (
-    <Card variant="bordered" padding="md" id="recepcion">
+    <Card variant="bordered" padding="md" id="recepcion" className="scroll-mt-24">
       <SectionTitle
         icon={<InboxArrowDownIcon className="w-5 h-5" />}
         title={t('reception.title')}
@@ -51,7 +57,7 @@ export function ReceptionPanel({ store }: { store: BillingStore }) {
         {[
           { label: t('reception.stats.pending'), value: pending, cls: 'text-amber-600 dark:text-amber-400' },
           { label: t('reception.stats.accepted'), value: accepted, cls: 'text-green-600 dark:text-green-400' },
-          { label: t('reception.stats.claimed'), value: claimed, cls: 'text-red-600 dark:text-red-400' },
+          { label: t('reception.stats.claimed'), value: closedOther, cls: 'text-red-600 dark:text-red-400' },
         ].map((s) => (
           <div key={s.label} className="rounded-lg p-3 bg-secondary-50 dark:bg-secondary-800/50 border border-secondary-200 dark:border-secondary-700">
             <p className="text-xs text-secondary-500 dark:text-secondary-400">{s.label}</p>
@@ -62,11 +68,11 @@ export function ReceptionPanel({ store }: { store: BillingStore }) {
       <div className="space-y-3">
         {state.incoming.map((inv, idx) => {
           const stage = stages[idx];
-          const addressed = inv.buyerNit === 'self' || inv.buyerNit === state.issuer.nit;
+          const addressed = isAddressedTo(inv, state.issuer.nit);
           const nitOk = nitDv(inv.supplier.nit) === inv.supplier.dv;
           const cufeOk = /^[0-9a-f]{96}$/.test(inv.cufe);
           const duplicate = state.incoming.some((o) => o.id !== inv.id && o.number === inv.number && o.supplier.nit === inv.supplier.nit);
-          const deadline = claimDeadline(inv);
+          const deadline = claimDeadline(inv, today);
           const has = (c: RadianCode) => inv.events.some((e) => e.code === c);
           return (
             <div key={inv.id} className="rounded-lg border border-secondary-200 dark:border-secondary-700 p-3">
@@ -108,34 +114,47 @@ export function ReceptionPanel({ store }: { store: BillingStore }) {
                     <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">
                       {deadline.daysLeft > 0
                         ? t('reception.deadline', { date: formatDate(deadline.deadline, months), n: deadline.daysLeft })
-                        : t('reception.deadlinePassed')}
+                        : t('reception.deadlineToday', { date: formatDate(deadline.deadline, months) })}
                     </p>
                   )}
-                  {!addressed && stage !== 'claimed' && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{t('reception.suggestClaim')}</p>}
+                  {stage === 'tacit' && deadline && !has('034') && (
+                    <p className="mt-1 text-xs text-green-700 dark:text-green-300">
+                      {t('reception.tacitNote', { date: formatDate(deadline.deadline, months) })}
+                    </p>
+                  )}
+                  {!addressed && stage !== 'returned' && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{t('reception.notAddressedHelp')}</p>}
+                  {stage === 'returned' && inv.returnedDate && (
+                    <p className="mt-1 text-xs text-secondary-600 dark:text-secondary-300">{t('reception.returnedNote', { date: formatDate(inv.returnedDate, months) })}</p>
+                  )}
                   {inv.cufe && <p className="mt-1 text-[10px] font-mono text-secondary-400 break-all">CUFE {inv.cufe}</p>}
                 </div>
                 <div className="flex flex-wrap md:flex-col gap-2 md:items-end md:w-56 flex-shrink-0">
-                  {!has('030') && (
+                  {!addressed && stage !== 'returned' && (
+                    <Button size="sm" variant="outline" onClick={() => giveBack(inv)}>
+                      {t('reception.actions.giveBack')}
+                    </Button>
+                  )}
+                  {addressed && !has('030') && (
                     <Button size="sm" variant="outline" onClick={() => register(inv, '030')}>
                       {t('reception.actions.ack')}
                     </Button>
                   )}
-                  {has('030') && !has('032') && stage !== 'claimed' && (
+                  {addressed && has('030') && !has('032') && stage !== 'claimed' && (
                     <Button size="sm" variant="outline" onClick={() => register(inv, '032')}>
                       {t('reception.actions.receive')}
                     </Button>
                   )}
-                  {stage === 'received' && (
+                  {addressed && stage === 'received' && (
                     <>
-                      <Button size="sm" onClick={() => register(inv, '033')} disabled={!addressed}>
+                      <Button size="sm" onClick={() => register(inv, '033')}>
                         {t('reception.actions.accept')}
                       </Button>
-                      <Button size="sm" variant="danger" onClick={() => setClaiming(claiming === inv.id ? null : inv.id)}>
+                      <Button size="sm" variant="danger" aria-expanded={claiming === inv.id} onClick={() => setClaiming(claiming === inv.id ? null : inv.id)}>
                         {t('reception.actions.claim')}
                       </Button>
                     </>
                   )}
-                  {(stage === 'accepted' || stage === 'tacit' || stage === 'claimed') && (
+                  {(stage === 'accepted' || stage === 'tacit' || stage === 'claimed' || stage === 'returned') && (
                     <p className="text-xs text-secondary-500 md:text-right">{t('reception.closed')}</p>
                   )}
                 </div>
