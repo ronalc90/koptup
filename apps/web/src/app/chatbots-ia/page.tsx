@@ -51,7 +51,7 @@ export default function ChatbotsIAPage() {
   const values = getChatbotsPageValues(locale);
   const tRag = useTranslations('ragPlans');
   const pilotHref = ragPlanContactHref('piloto');
-  // Los CTA "Agenda un piloto" llevan al plan Piloto RAG: cuentan como plan_click.
+  // Los CTA "Cotizar el piloto" llevan al plan Piloto RAG: cuentan como plan_click.
   const trackPilotClick = () =>
     trackPlanClick({
       plan_name: tRag('plans.piloto.name'),

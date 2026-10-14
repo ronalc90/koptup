@@ -231,7 +231,7 @@ function OfferingCard({ offering, globalModality, currency, onOpen }: OfferingCa
               <p className="text-[11px] text-secondary-500 dark:text-secondary-400">
                 {tp('card.fromPrice')}
               </p>
-              <p className="text-xl font-bold text-secondary-900 dark:text-white">
+              <p className="text-lg font-bold text-secondary-900 dark:text-white whitespace-nowrap">
                 {formatMoney(setupCOP, currency)}
               </p>
               <p className="text-[11px] text-secondary-500 dark:text-secondary-400">
@@ -239,7 +239,7 @@ function OfferingCard({ offering, globalModality, currency, onOpen }: OfferingCa
               </p>
             </div>
             <div className="text-right">
-              <p className="text-xl font-bold text-secondary-900 dark:text-white">
+              <p className="text-lg font-bold text-secondary-900 dark:text-white whitespace-nowrap">
                 {recurringCOP > 0 ? formatMoney(recurringCOP, currency) : '—'}
               </p>
               <p className="text-[11px] text-secondary-500 dark:text-secondary-400">
@@ -616,6 +616,8 @@ export default function OfferingsCatalog() {
     <div id="otras-soluciones" className="scroll-mt-16 md:scroll-mt-20">
       {/* Encabezado */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
+        {/* Separa los planes RAG (arriba) de estos otros productos */}
+        <p className="mb-2 text-sm font-semibold text-primary-700 dark:text-primary-300">{tp('section.eyebrow')}</p>
         <h2 className="text-3xl md:text-4xl font-bold text-secondary-900 dark:text-white">
           {tp('section.title')}
         </h2>

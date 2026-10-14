@@ -3,15 +3,20 @@
     "badge": "Sistemas RAG",
     "title": "Planes y precios de sistemas RAG",
     "subtitle": "IA que responde con los documentos de tu empresa y cita la fuente. Empieza con un piloto de 2 semanas con tus propios documentos.",
-    "taxNote": "Precios en COP y USD, más IVA si aplica.",
+    "taxNote": "Precios en COP y USD, más IVA si aplica. Debajo de cada precio ves el total en COP con IVA.",
     "price": {
       "oneTime": "Pago único",
-      "setup": "Setup",
-      "setupFrom": "Setup desde",
+      "setup": "Implementación (pago único)",
+      "setupFrom": "Implementación desde (pago único)",
       "monthly": "Mensualidad",
       "perMonth": "/mes",
-      "monthlyBySla": "Según SLA",
-      "tax": "Más IVA si aplica"
+      "monthlyBySla": "Según el nivel de servicio (SLA) que acordemos",
+      "tax": "Más IVA si aplica",
+      "withVat": "Con IVA del 19 %: {cop}",
+      "withVatFrom": "Con IVA del 19 %: desde {cop}",
+      "withVatMonthly": "Con IVA del 19 %: {cop} al mes",
+      "firstYearLabel": "Primer año:",
+      "firstYear": "{cop} más IVA (implementación + 12 mensualidades)"
     },
     "duration": {
       "pilot": "{weeks} semanas",
@@ -24,55 +29,61 @@
         "name": "Piloto RAG",
         "tagline": "Valida la IA con tus propios documentos antes de implementarla.",
         "features": [
-          "Una fuente de documentos",
+          "Un origen de documentos (por ejemplo, los archivos que nos entregas)",
           "Hasta 100 documentos",
           "Interfaz web con respuestas citadas",
-          "Informe de precisión con 50 preguntas de prueba"
+          "Informe de precisión con 50 preguntas de prueba: cuántas respondió bien, con qué fuente y en cuántas dijo «no encontré»"
         ],
-        "note": "Si contratas un plan en los siguientes 30 días, te descontamos del setup el 100% de lo que pagaste por el piloto.",
-        "cta": "Agenda tu piloto"
+        "note": "Si contratas un plan en los 30 días siguientes, lo que pagaste por el piloto se descuenta completo de la implementación: el piloto no te suma costo.",
+        "cta": "Cotizar el piloto",
+        "needs": [
+          "Hasta 100 documentos de un solo origen.",
+          "50 preguntas reales de tu equipo, cada una con la respuesta que esperas.",
+          "Una persona de tu equipo que revise las respuestas con nosotros."
+        ]
       },
       "esencial": {
         "name": "Esencial",
         "tagline": "Un asistente con los documentos de tu empresa en tu sitio web.",
         "features": [
-          "Una fuente: carga manual, o Google Drive o SharePoint con un conector que se construye en tu proyecto",
+          "Un origen de documentos: carga manual, o Google Drive o SharePoint con un conector que se construye en tu proyecto",
           "Hasta 1.000 documentos",
-          "Widget web",
-          "Respuestas con cita de la fuente"
+          "Chat en tu sitio web",
+          "Respuestas con cita del documento"
         ],
         "monthlyIncludes": [
-          "Hosting",
+          "Alojamiento en nuestros servidores",
           "IA hasta 3.000 preguntas al mes",
           "Actualización de documentos",
-          "Soporte Lun–Vie"
+          "Soporte de lunes a viernes"
         ],
-        "cta": "Elegir Esencial"
+        "cta": "Solicitar el Esencial",
+        "accessNote": "El chat de tu sitio responde a cualquiera que visite la página donde lo pones: úsalo con documentos que puedan ser públicos. Si tus documentos son internos o confidenciales, dilo al cotizar: el control de acceso (permisos por rol) se construye en tu proyecto desde el plan Profesional."
       },
       "profesional": {
         "name": "Profesional",
         "tagline": "Varias fuentes, web y WhatsApp, con permisos por rol y métricas que se construyen en tu proyecto.",
         "features": [
-          "Hasta 3 fuentes",
+          "Hasta 3 orígenes de documentos (por ejemplo, carga manual, Drive y SharePoint)",
           "Hasta 10.000 documentos",
           "Web y WhatsApp (el canal de WhatsApp se construye en tu proyecto)",
           "Permisos por rol (se construyen en tu proyecto)",
           "Panel de métricas (se construye en tu proyecto)"
         ],
         "monthlyIncludes": [
-          "Hasta 15.000 preguntas al mes",
+          "IA hasta 15.000 preguntas al mes",
           "Soporte prioritario",
           "Revisión mensual de calidad"
         ],
-        "cta": "Elegir Profesional"
+        "cta": "Solicitar el Profesional"
       },
       "empresarial": {
         "name": "Empresarial",
-        "tagline": "Para operar en tu propia infraestructura, con SSO y auditoría que se construyen en tu proyecto.",
+        "tagline": "Para operar en tu propia infraestructura, con inicio de sesión corporativo y auditoría que se construyen en tu proyecto.",
         "features": [
-          "Fuentes ilimitadas",
-          "Despliegue en tu nube u on-premise",
-          "SSO (se construye en tu proyecto)",
+          "Orígenes de documentos ilimitados",
+          "Despliegue en tu nube o en tus propios servidores (on-premise)",
+          "Inicio de sesión con las cuentas de tu empresa (SSO, se construye en tu proyecto)",
           "Auditoría (se construye en tu proyecto)",
           "Código fuente incluido"
         ],
@@ -81,9 +92,12 @@
     },
     "notes": {
       "title": "Ten en cuenta",
-      "tax": "Los precios en COP y en USD no incluyen IVA: se suma si aplica.",
+      "tax": "Los precios en COP y en USD no incluyen IVA. Debajo de cada precio ves el total en COP con el IVA general del 19 %; en la propuesta te confirmamos si tu caso lo lleva.",
       "extraQuestion": "Cada pregunta adicional sobre el tope mensual de tu plan cuesta {cop} / {usd}.",
+      "questionsExample": "¿Cuántas preguntas necesitas? Un ejemplo: 30 personas × 5 preguntas al día × 20 días hábiles = 3.000 preguntas al mes.",
       "whatsapp": "Las tarifas de Meta por mensajes de WhatsApp se cobran aparte, al costo."
-    }
+    },
+    "needsTitle": "Qué necesitamos de ti",
+    "ctaNote": "Los botones te llevan a un formulario corto. Te respondemos en menos de 24 horas hábiles para agendar una llamada de 30 minutos. Todavía no pagas nada."
   }
 }

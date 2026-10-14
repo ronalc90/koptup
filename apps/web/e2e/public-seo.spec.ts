@@ -152,14 +152,61 @@ test.describe('Embudo RAG', () => {
     }
   });
 
-  test('/rag/salud pide la demo de cuentas médicas "con invitación" en vez de abrirla', async ({ page }) => {
+  test('/rag/salud pide la demo del sistema experto (otro producto, con invitación) en vez de abrirla', async ({ page }) => {
     await page.goto('/rag/salud');
-    const link = page.getByRole('link', { name: /con invitación/ });
+    const link = page.getByRole('link', { name: 'Pedir la demo del sistema experto' });
     await expect(link).toHaveAttribute('href', '/solicitar-demo?demos=cuentas-medicas');
     await expect(page.getByText('Solo por invitación').first()).toBeVisible();
+    // Un solo aviso de invitación (la insignia), no tres.
+    await expect(page.getByText(/con invitación/)).toHaveCount(0);
     await link.click();
     await expect(page).toHaveURL(/\/solicitar-demo\?demos=cuentas-medicas$/);
     await expect(page.getByText(/Sistema experto para salud/).first()).toBeVisible();
+  });
+
+  test('cada landing por sector muestra arriba la demo de su sector, el piloto y su precio', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    const cases = [
+      { path: '/rag/salud', demo: 'Probar la demo con una IPS de ejemplo', empresa: 'salud' },
+      { path: '/rag/legal', demo: 'Probar la demo con una firma de ejemplo', empresa: 'legal' },
+      { path: '/rag/soporte', demo: 'Probar la demo con una tienda de ejemplo', empresa: 'tienda' },
+    ];
+    for (const { path, demo, empresa } of cases) {
+      await page.goto(path);
+      const hero = page.locator('section').first();
+      await expect(hero.getByRole('link', { name: demo }), path).toHaveAttribute('href', `/demo/chatbot?empresa=${empresa}`);
+      await expect(hero.getByRole('link', { name: 'Cotizar el piloto' }), path).toHaveAttribute('href', '/contact?service=sistema-rag&plan=piloto');
+      await expect(hero.getByText(/COP 3\.900\.000 \(USD 1\.200\), pago único, más IVA si aplica/), path).toBeVisible();
+      await expect(page.getByText('Qué necesitamos de ti').or(page.getByText('Nos entregas documentos y preguntas')).first(), path).toBeVisible();
+    }
+    // La demo abre con la empresa del sector ya elegida.
+    await page.goto('/demo/chatbot?empresa=legal');
+    await expect(page.getByRole('combobox', { name: 'Empresa de ejemplo' })).toHaveValue('legal');
+    await expect(page.getByText(/soy el asistente interno de Firma Ejemplo Abogados/)).toBeVisible();
+    await page.waitForLoadState('networkidle');
+    expect(errors).toEqual([]);
+  });
+
+  test('los planes dicen el total con IVA, el primer año y qué pasa al pulsar el botón', async ({ page }) => {
+    await page.goto('/services#planes-rag');
+    const plans = page.locator('#planes-rag');
+    await expect(plans.getByText('Con IVA del 19 %: COP 4.641.000')).toBeVisible();
+    await expect(plans.getByText(/COP 27\.780\.000 más IVA \(implementación \+ 12 mensualidades\)/)).toBeVisible();
+    await expect(plans.getByText('Qué necesitamos de ti')).toBeVisible();
+    await expect(plans.getByText(/Todavía no pagas nada/)).toBeVisible();
+    await expect(plans.getByRole('link', { name: 'Cotizar el piloto' })).toHaveAttribute('href', '/contact?service=sistema-rag&plan=piloto');
+    await expect(plans.getByRole('link', { name: 'Solicitar el Esencial' })).toHaveAttribute('href', '/contact?service=sistema-rag&plan=esencial');
+  });
+
+  test('/contact con un plan RAG: encabezado del plan, precio, qué pasa después y sin presupuesto', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/contact?service=sistema-rag&plan=piloto');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Cotiza el plan Piloto RAG');
+    await expect(page.locator('[data-quote-price]')).toHaveText('COP 3.900.000, pago único · 2 semanas · más IVA si aplica');
+    await expect(page.getByText('Qué pasa después')).toBeVisible();
+    await expect(page.locator('#budget')).toHaveCount(0);
+    await page.waitForLoadState('networkidle');
+    expect(errors).toEqual([]);
   });
 
   test('"Cotizar este tier" llega a /contact con nombres legibles y presupuesto en COP', async ({ page }) => {

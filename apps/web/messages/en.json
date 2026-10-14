@@ -18,7 +18,7 @@
   "hero": {
     "badge": "RAG systems for businesses",
     "title": "AI that answers with your company's documents",
-    "subtitle": "RAG systems with cited answers from your manuals, contracts and policies. Pilot with your documents in 2 weeks.",
+    "subtitle": "Cited answers from your manuals, contracts and policies: the AI searches your documents and shows you where each fact comes from. Pilot with your documents in 2 weeks.",
     "cta1": "Try the demo",
     "cta2": "View plans"
   },
@@ -80,24 +80,31 @@
         "category": "Services"
       },
       "whyTitle": "Why choose KopTup for your project?",
+      "band": {
+        "sectorsTitle": "Where would you use it?",
+        "pilot": "{pilotWeeks}-week pilot with your documents: {pilotPrice}, plus VAT if applicable.",
+        "plansLink": "See plans and pricing",
+        "data": "Your documents don't train the AI, and every answer cites its source.",
+        "dataLink": "How we handle your data"
+      },
       "benefit1Title": "Tailored Solutions",
       "benefit1Desc": "Custom development adapted to the specific needs of your industry and business model.",
-      "benefit2Title": "Cutting-Edge Technology",
-      "benefit2Desc": "React, Next.js, TypeScript, artificial intelligence and modern development best practices.",
+      "benefit2Title": "Published prices",
+      "benefit2Desc": "RAG plans are priced in COP and USD, and you start with a 2-week pilot with your documents before signing up.",
       "benefit3Title": "Ongoing Support",
       "benefit3Desc": "Updates, maintenance and technical support to ensure your solution evolves with your business."
     }
   },
   "services": {
-    "title": "Technology Services",
-    "subtitle": "End-to-end solutions to grow your business",
+    "title": "We also build custom software",
+    "subtitle": "If you need something other than an assistant with your documents, we build that too.",
     "ecommerce": {
       "title": "Custom E-commerce",
       "description": "Online stores optimized with payments, inventory and great UX"
     },
     "chatbots": {
-      "title": "Chatbots & AI",
-      "description": "Automate sales and support with intelligent assistants"
+      "title": "AI assistants",
+      "description": "They answer from your company's documents and cite the source"
     },
     "integrations": {
       "title": "API Integrations",
@@ -819,7 +826,7 @@
     "subtitle": "We build custom software and RAG systems, with demos you can try right now, before hiring us.",
     "subtitle2": "AI chatbots, online stores, dashboards and more. Team in Bogotá, Colombia.",
     "pricesTitle": "Published prices",
-    "pricesBody": "{weeks}-week RAG pilot for {price} ({usd}), plus VAT where applicable.",
+    "pricesBody": "{weeks}-week RAG pilot for {price} ({usd}), plus VAT if applicable.",
     "offerEnded": "The Product Hunt launch offer (15% off) has ended.",
     "ctaDemos": "Try the demos →",
     "ctaQuote": "Request a quote",
@@ -976,7 +983,7 @@
     "login": "Sign in",
     "dashboard": "Dashboard",
     "requestDemo": "Request a demo",
-    "wantThis": "I want this",
+    "wantThis": "See pricing",
     "myAccount": "My account",
     "customer": "Customer",
     "myDemos": "My demos",
@@ -2106,7 +2113,9 @@
     "badge": "Contact",
     "hero": {
       "title": "Let's Talk About Your Project",
-      "subtitle": "Ready to turn your vision into reality. Schedule a free consultation"
+      "subtitle": "Tell us about your case and we'll reply within 24 business hours, Monday to Friday.",
+      "quoteTitle": "Get a quote for the {plan} plan",
+      "quoteSubtitle": "Fill in the short form and we'll reply within 24 business hours to schedule a 30-minute call. You don't pay anything yet."
     },
     "form": {
       "title": "Send Us a Message",
@@ -2156,7 +2165,10 @@
       },
       "success": {
         "title": "Message sent!",
-        "subtitle": "Thanks for contacting us. We'll respond soon.",
+        "titlePlan": "Done! We received your request for the {plan} plan",
+        "subtitle": "We'll email {email} within 24 business hours (Monday to Friday) to schedule a 30-minute call.",
+        "noAutoEmail": "We don't send an automatic confirmation email: if you don't hear from us, write to ronald@koptup.com.",
+        "another": "Send another message",
         "nextStep": "While we get back to you, you can try our RAG assistant in the demo.",
         "nextStepCta": "Try the demo"
       }
@@ -2164,7 +2176,7 @@
     "services": {
       "rag": "RAG system",
       "ecommerce": "E-Commerce",
-      "chatbot": "AI Chatbot",
+      "chatbot": "Other kind of chatbot",
       "webDev": "Web Development",
       "mobileDev": "Mobile Development",
       "apiIntegrations": "API Integrations",
@@ -2179,6 +2191,20 @@
       "tier": "{tier} tier",
       "message": "Hi, I would like a quote for {service}.",
       "messageWithDetail": "Hi, I would like a quote for {service} ({detail}).",
+      "messageGuidedDemo": "Hi, I would like a guided demo of the RAG assistant with my case.",
+      "priceOnce": "{price}, one-time",
+      "priceMonthly": "Implementation {setup} + {monthly} per month",
+      "priceFrom": "Implementation from {setup} + monthly fee based on the service level",
+      "vat": "plus VAT if applicable",
+      "messageHelpRag": "It helps to tell us: how many documents you have, where they live (folders, Drive, SharePoint), who would use the assistant and whether there is confidential information.",
+      "nextSteps": {
+        "title": "What happens next",
+        "call": "We email you within 24 business hours to schedule a 30-minute call.",
+        "scope": "On the call we understand your case and agree on the scope.",
+        "pilot": "For the pilot you send us up to 100 documents from a single origin and 50 real questions with the answer you expect; in 2 weeks you get the assistant with your documents and the accuracy report.",
+        "plan": "We send you a proposal with the scope, the total price and the timeline.",
+        "noPayment": "Sending this form doesn't commit you: you don't pay anything yet."
+      },
       "legacyServices": {
         "agente-ia-ventas": "AI sales agent",
         "desarrollo-web": "Custom web development",
@@ -2205,16 +2231,16 @@
       },
       "hours": {
         "title": "Hours",
-        "value": "Mon - Fri: 8am - 6pm"
+        "value": "Monday to Friday, 8:00 a.m. to 6:00 p.m. (Colombia time)"
       }
     },
     "social": {
       "title": "Follow Us on Social Media"
     },
     "schedule": {
-      "title": "Schedule a Call",
-      "subtitle": "Schedule a free 30-minute consultation",
-      "button": "Schedule now",
+      "title": "Request a call by email",
+      "subtitle": "Your email app opens with a ready-made message to ronald@koptup.com; we reply with times for a free 30-minute call.",
+      "button": "Open my email",
       "opening": "Opening...",
       "emailSubject": "Call Scheduling Request - KopTup",
       "emailBody": "Hello KopTup team,\n\nI would like to schedule a call to discuss my technology needs.\n\nPlease confirm availability so we can set up a meeting.\n\nBest regards"
@@ -2357,7 +2383,7 @@
     "rag": {
       "title": "Want this assistant with your company's documents?",
       "description": "We start with a pilot on your own documents: the assistant answers with the source and says when something isn't there. Connections to your systems and channels are built in your project. Request a no-obligation quote.",
-      "requestQuote": "Quote the RAG pilot"
+      "requestQuote": "Get a pilot quote"
     }
   },
   "demoEcommerce": {
@@ -3148,7 +3174,7 @@
     "sv1t": "Custom Web Applications",
     "sv1d": "Enterprise systems, management portals, CRMs, ERPs and any web application your business needs. Modern stack with React and Node.js.",
     "sv2t": "AI-Powered Chatbots",
-    "sv2d": "RAG chatbots for WhatsApp and your website that answer with your company's documents, cite the source and are available at any hour. From {essentialFrom}, or a {pilotFrom} pilot (plus VAT where applicable).",
+    "sv2d": "RAG chatbots for WhatsApp and your website that answer with your company's documents, cite the source and are available at any hour. From {essentialFrom}, or a {pilotFrom} pilot (plus VAT if applicable).",
     "sv3t": "E-commerce Stores",
     "sv3d": "Online stores with shopping cart, inventory management and integration with the payment gateway you choose.",
     "sv4t": "Mobile Applications",
@@ -3179,11 +3205,11 @@
     "techSubtitle": "The first ones are what this site uses; the rest we define with you when quoting.",
     "faqTitle": "Frequently Asked Questions",
     "q1q": "How much does it cost to hire a software development company in Colombia?",
-    "q1a": "We publish our prices at www.koptup.com/services, in COP with a USD reference (plus VAT where applicable). RAG systems start with a {pilotFrom} pilot, and our other custom solutions are priced per plan according to scope. We offer a free, no-commitment quote to evaluate your specific case.",
+    "q1a": "We publish our prices at www.koptup.com/services, in COP with a USD reference (plus VAT if applicable). RAG systems start with a {pilotFrom} pilot, and our other custom solutions are priced per plan according to scope. We offer a free, no-commitment quote to evaluate your specific case.",
     "q2q": "How long does it take to develop a web application?",
     "q2a": "It depends on the scope. An MVP (initial functional version) can be ready in 4-8 weeks. A complex system with multiple modules can take 3-6 months. In the initial analysis we define exact timelines.",
     "q3q": "Can KopTup develop chatbots for WhatsApp?",
-    "q3a": "Yes. From the Professional plan, in your project we build the WhatsApp channel with the official WhatsApp Business API; the chatbot uses OpenAI models. They answer with your company's documents at any hour and, if they cannot find the answer, they say so. From {essentialFrom}, or a {pilotFrom} pilot (plus VAT where applicable).",
+    "q3a": "Yes. From the Professional plan, in your project we build the WhatsApp channel with the official WhatsApp Business API; the chatbot uses OpenAI models. They answer with your company's documents at any hour and, if they cannot find the answer, they say so. From {essentialFrom}, or a {pilotFrom} pilot (plus VAT if applicable).",
     "q4q": "Do you work with companies throughout Colombia or only in Bogotá?",
     "q4a": "We work remotely with companies in any city: meetings are by video call and we work in Spanish and English.",
     "q5q": "Do you offer maintenance after delivering the project?",

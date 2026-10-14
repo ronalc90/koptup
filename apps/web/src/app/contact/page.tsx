@@ -7,6 +7,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 import { track, trackWhatsappClick } from '@/lib/analytics';
 import { parseContactQuote, quotePayload, offeringNameKey } from '@/lib/contact-quote';
+import { formatRagCOP, getRagPlan } from '@/lib/rag-plans';
 import { SOCIAL_LINKS } from '@/lib/site';
 import Button from '@/components/ui/Button';
 import Card, { CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
@@ -63,6 +64,25 @@ function ContactPageInner() {
           ]
         : [];
   const quoteDetail = quoteDetails.join(' · ');
+  // Plan RAG elegido: precio y duración en la tarjeta "Estás cotizando".
+  const ragPlan = quote?.kind === 'rag' && quote.plan ? getRagPlan(quote.plan) : null;
+  const ragPlanPrice = !ragPlan
+    ? null
+    : ragPlan.monthlyMode === 'none'
+      ? t('quote.priceOnce', { price: formatRagCOP(ragPlan.setup.cop, locale) })
+      : ragPlan.monthlyMode === 'fixed' && ragPlan.monthly
+        ? t('quote.priceMonthly', {
+            setup: formatRagCOP(ragPlan.setup.cop, locale),
+            monthly: formatRagCOP(ragPlan.monthly.cop, locale),
+          })
+        : t('quote.priceFrom', { setup: formatRagCOP(ragPlan.setup.cop, locale) });
+  const ragPlanDuration = !ragPlan
+    ? null
+    : ragPlan.monthlyMode === 'none'
+      ? tRag('duration.pilot', { weeks: ragPlan.weeks.max })
+      : tRag('duration.implementation', { min: ragPlan.weeks.min, max: ragPlan.weeks.max });
+  // "Solicitar demo guiada" de la demo RAG llega con ?motivo=demo-guiada.
+  const guidedDemo = quote?.kind === 'rag' && !quote.plan && searchParams?.get('motivo') === 'demo-guiada';
 
   const [formData, setFormData] = useState({
     name: '',
@@ -81,6 +101,8 @@ function ContactPageInner() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  /** Email con el que se envió la solicitud (lo repite el mensaje de éxito). */
+  const [submittedEmail, setSubmittedEmail] = useState('');
   const [isScheduling, setIsScheduling] = useState(false);
   const [error, setError] = useState('');
 
@@ -94,7 +116,9 @@ function ContactPageInner() {
           ? prev.message
           : quoteDetail
             ? t('quote.messageWithDetail', { service: cotizandoLabel, detail: quoteDetail })
-            : t('quote.message', { service: cotizandoLabel }),
+            : guidedDemo
+              ? t('quote.messageGuidedDemo')
+              : t('quote.message', { service: cotizandoLabel }),
       }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -134,23 +158,10 @@ function ContactPageInner() {
         plan_id: quote?.kind === 'rag' && quote.plan ? quote.plan : undefined,
       });
 
+      // La confirmación queda a la vista (dice qué pasa después) hasta que la
+      // persona elige "Enviar otro mensaje".
+      setSubmittedEmail(formData.email);
       setIsSubmitted(true);
-
-      // Reset form después de 6 segundos (más tiempo para que el usuario vea el CTA)
-      setTimeout(() => {
-        setIsSubmitted(false);
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          company: '',
-          service: '',
-          budget: '',
-          message: '',
-          timeline: '',
-        });
-        setConsent(false);
-      }, 6000);
     } catch (err: any) {
       // Mensaje según lo que pasó: límite de envíos, red, o el campo que el
       // servidor rechazó (en español se muestra su texto; en inglés, el propio).
@@ -175,6 +186,26 @@ function ContactPageInner() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  /** "Enviar otro mensaje": vuelve al formulario vacío (con la cotización de la URL, si la hay). */
+  const handleSendAnother = () => {
+    setIsSubmitted(false);
+    setConsent(false);
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      company: '',
+      service: cotizandoLabel ?? '',
+      budget: '',
+      message: cotizandoLabel
+        ? quoteDetail
+          ? t('quote.messageWithDetail', { service: cotizandoLabel, detail: quoteDetail })
+          : t('quote.message', { service: cotizandoLabel })
+        : '',
+      timeline: '',
+    });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -285,16 +316,17 @@ function ContactPageInner() {
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-primary-600 to-primary-800 text-white">
         <div className="absolute inset-0 bg-grid-pattern opacity-10" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
+        <div className={`relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${planLabel ? 'py-12 md:py-20' : 'py-20 md:py-32'}`}>
           <div className="text-center max-w-4xl mx-auto">
             <Badge variant="outline" size="lg" className="mb-6 border-white/30 text-white">
               {t('badge')}
             </Badge>
+            {/* Con un plan RAG elegido, el encabezado habla de ese plan (no del hero genérico). */}
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-              {t('hero.title')}
+              {planLabel ? t('hero.quoteTitle', { plan: planLabel }) : t('hero.title')}
             </h1>
             <p className="text-xl md:text-2xl mb-10 text-primary-100">
-              {t('hero.subtitle')}
+              {planLabel ? t('hero.quoteSubtitle') : t('hero.subtitle')}
             </p>
           </div>
         </div>
@@ -312,7 +344,7 @@ function ContactPageInner() {
                   variant="bordered"
                   className="mb-6 border-primary-300 dark:border-primary-700 bg-gradient-to-r from-primary-50 to-white dark:from-primary-950 dark:to-secondary-950"
                 >
-                  <CardContent className="p-5 flex items-center gap-4 flex-wrap">
+                  <CardContent className="p-5 flex items-start gap-4">
                     <div className="w-10 h-10 rounded-lg bg-primary-600 flex items-center justify-center flex-shrink-0">
                       <SparklesIcon className="h-5 w-5 text-white" />
                     </div>
@@ -328,11 +360,30 @@ function ContactPageInner() {
                           </span>
                         )}
                       </p>
+                      {ragPlanPrice ? (
+                        <p className="mt-1 text-sm text-secondary-700 dark:text-secondary-300" data-quote-price>
+                          {ragPlanPrice} · {ragPlanDuration} · {t('quote.vat')}
+                        </p>
+                      ) : null}
+                      {/* Debajo del texto (no al lado): en el celular el nombre del plan no se parte palabra por palabra. */}
+                      <Badge variant="primary" size="sm" className="mt-2">{t('quote.prefilled')}</Badge>
                     </div>
-                    <Badge variant="primary" size="sm">{t('quote.prefilled')}</Badge>
                   </CardContent>
                 </Card>
               )}
+
+              {/* Qué pasa después de enviar (planes RAG) */}
+              {quote?.kind === 'rag' && !isSubmitted ? (
+                <div className="mb-6 rounded-xl border border-secondary-200 dark:border-secondary-800 bg-secondary-50 dark:bg-secondary-900 p-5">
+                  <h2 className="text-sm font-bold text-secondary-900 dark:text-white">{t('quote.nextSteps.title')}</h2>
+                  <ol className="mt-3 space-y-2 text-sm text-secondary-700 dark:text-secondary-300 list-decimal pl-5">
+                    <li>{t('quote.nextSteps.call')}</li>
+                    <li>{t('quote.nextSteps.scope')}</li>
+                    <li>{quote.plan && quote.plan !== 'piloto' ? t('quote.nextSteps.plan') : t('quote.nextSteps.pilot')}</li>
+                  </ol>
+                  <p className="mt-3 text-sm font-medium text-secondary-800 dark:text-secondary-200">{t('quote.nextSteps.noPayment')}</p>
+                </div>
+              ) : null}
 
               <Card variant="bordered" className="shadow-xl">
                 <CardHeader>
@@ -348,10 +399,13 @@ function ContactPageInner() {
                         <CheckCircleIcon className="h-12 w-12 text-green-600 dark:text-green-400" />
                       </div>
                       <h3 className="text-2xl font-bold text-secondary-900 dark:text-white mb-2">
-                        {t('form.success.title')}
+                        {planLabel ? t('form.success.titlePlan', { plan: planLabel }) : t('form.success.title')}
                       </h3>
-                      <p className="text-secondary-600 dark:text-secondary-400 mb-6">
-                        {t('form.success.subtitle')}
+                      <p className="text-secondary-600 dark:text-secondary-400 mb-2">
+                        {t('form.success.subtitle', { email: submittedEmail })}
+                      </p>
+                      <p className="text-sm text-secondary-500 dark:text-secondary-400 mb-6 max-w-md mx-auto">
+                        {t('form.success.noAutoEmail')}
                       </p>
                       {/* Siguiente paso mientras el equipo responde. (Antes invitaba a
                           "hacer seguimiento desde tu dashboard", pero el portal no
@@ -364,6 +418,13 @@ function ContactPageInner() {
                           <Link href="/demo/chatbot">{t('form.success.nextStepCta')}</Link>
                         </Button>
                       </div>
+                      <button
+                        type="button"
+                        onClick={handleSendAnother}
+                        className="mt-6 text-sm font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 hover:underline"
+                      >
+                        {t('form.success.another')}
+                      </button>
                     </div>
                   ) : (
                     <form onSubmit={handleSubmit} className="space-y-6">
@@ -468,6 +529,8 @@ function ContactPageInner() {
                           {fieldError('quote')}
                         </div>
 
+                        {/* Con un plan RAG elegido el precio ya está publicado: no se pide presupuesto. */}
+                        {!ragPlan ? (
                         <div>
                           <label htmlFor="budget" className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
                             {t('form.budget')}
@@ -488,6 +551,7 @@ function ContactPageInner() {
                           </select>
                           {fieldError('budget')}
                         </div>
+                        ) : null}
                       </div>
 
                       {/* Plazo: se guarda con el contacto (Contact.plazo). */}
@@ -526,7 +590,13 @@ function ContactPageInner() {
                           className="w-full px-4 py-3 rounded-lg border border-secondary-300 dark:border-secondary-700 bg-white dark:bg-secondary-900 text-secondary-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                           placeholder={t('form.messagePlaceholder')}
                           {...invalidProps('message')}
+                          {...(quote?.kind === 'rag' && !fieldErrors.message ? { 'aria-describedby': 'message-help' } : {})}
                         />
+                        {quote?.kind === 'rag' ? (
+                          <p id="message-help" className="mt-1 text-xs text-secondary-500 dark:text-secondary-400">
+                            {t('quote.messageHelpRag')}
+                          </p>
+                        ) : null}
                         {fieldError('message')}
                       </div>
 

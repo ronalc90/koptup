@@ -14,6 +14,7 @@ import type { KbErrorReason } from './errors';
 import { splitParagraphs, type SampleCompany, type SampleDocument } from './sampleKnowledge';
 import InfoIcon from './ui/InfoIcon';
 import { RAG_PLANS_PATH, ragPlanContactHref } from '@/lib/rag-plans';
+import { RAG_GUIDED_DEMO_PATH } from '@/lib/rag-page';
 
 /**
  * Estado del bot de la empresa en el servidor:
@@ -183,7 +184,7 @@ export default function Sidebar({
           <p className="mt-0.5 text-[10.5px] leading-snug text-secondary-600 dark:text-secondary-300">{t('included.ctaBody')}</p>
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
             <Link
-              href="/solicitar-demo?demos=chatbot"
+              href={RAG_GUIDED_DEMO_PATH}
               className="inline-flex items-center gap-1 rounded-md bg-primary-600 px-2.5 py-1 text-[11px] font-semibold text-white shadow-sm transition hover:bg-primary-700"
             >
               {t('included.ctaButton')}

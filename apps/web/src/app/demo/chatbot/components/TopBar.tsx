@@ -155,12 +155,15 @@ export default function TopBar({
             <h1 className="text-[15px] font-bold leading-tight tracking-tight text-secondary-900 dark:text-white">
               {t('pageTitle')}
             </h1>
-            <Tooltip content={t('sampleDataTooltip')} side="bottom">
-              <span className="inline-flex items-center gap-1 rounded-full bg-secondary-100 px-2 py-0.5 text-[10px] font-semibold text-secondary-600 ring-1 ring-secondary-200 dark:bg-secondary-800 dark:text-secondary-300 dark:ring-secondary-700">
-                <BeakerIcon className="h-3 w-3" aria-hidden="true" />
-                {t('sampleDataBadge')}
-              </span>
-            </Tooltip>
+            {/* Solo en "Prueba el asistente": con tu documento o tu bot, los datos son tuyos. */}
+            {showPlaygroundControls ? (
+              <Tooltip content={t('sampleDataTooltip')} side="bottom">
+                <span className="inline-flex items-center gap-1 rounded-full bg-secondary-100 px-2 py-0.5 text-[10px] font-semibold text-secondary-600 ring-1 ring-secondary-200 dark:bg-secondary-800 dark:text-secondary-300 dark:ring-secondary-700">
+                  <BeakerIcon className="h-3 w-3" aria-hidden="true" />
+                  {t('sampleDataBadge')}
+                </span>
+              </Tooltip>
+            ) : null}
             <button
               type="button"
               onClick={onShowTour}
@@ -210,8 +213,9 @@ export default function TopBar({
               </label>
             </Tooltip>
 
+            {/* En el celular se oculta: el recomendado queda elegido y la conversación sube. */}
             <Tooltip content={t('topBar.modelTooltip')} side="bottom">
-              <label className={fieldClass}>
+              <label className={`${fieldClass} !hidden sm:!inline-flex`}>
                 <CpuChipIcon className="h-3.5 w-3.5 shrink-0 text-secondary-500" aria-hidden="true" />
                 <span className="hidden text-[10px] uppercase tracking-wide text-secondary-500 dark:text-secondary-400 xl:inline">
                   {t('topBar.model')}

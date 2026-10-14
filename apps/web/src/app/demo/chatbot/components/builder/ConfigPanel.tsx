@@ -11,7 +11,7 @@
 
 import { useCallback, useRef, useState, type FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
-import { ArrowUpTrayIcon, DocumentIcon, GlobeAltIcon, TrashIcon, SparklesIcon } from '@heroicons/react/24/outline';
+import { ArrowUpTrayIcon, DocumentIcon, ExclamationTriangleIcon, GlobeAltIcon, TrashIcon, SparklesIcon } from '@heroicons/react/24/outline';
 
 import type { RemoteBotDoc } from './api';
 import type { BuilderToneKey, BuilderWidgetConfig, WidgetCornerPosition } from './widgetConfig';
@@ -232,6 +232,17 @@ export default function ConfigPanel({
         <legend className="text-[11px] font-semibold uppercase tracking-widest text-secondary-500 dark:text-secondary-400">
           {t('sections.knowledge')}
         </legend>
+
+        {/* Mismo aviso que «Prueba con tu documento», con lo que cambia aquí: los documentos se quedan y el chat es público. */}
+        <div
+          role="note"
+          className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] leading-snug text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-100"
+        >
+          <ExclamationTriangleIcon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+          <p>
+            <span className="font-semibold">{t('confidential.title')}.</span> {t('confidential.body')}
+          </p>
+        </div>
 
         <div
           onDragOver={(e) => e.preventDefault()}

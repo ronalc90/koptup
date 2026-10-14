@@ -2,6 +2,7 @@
 
 import { useCallback, useId, useState, type DragEvent, type FormEvent } from 'react';
 import Link from 'next/link';
+import { RAG_GUIDED_DEMO_PATH } from '@/lib/rag-page';
 import { useTranslations } from 'next-intl';
 import {
   ArrowPathIcon,
@@ -246,7 +247,7 @@ export default function UploadForm({ limits, notice, onUploaded, onUnavailable, 
         </button>
         {error === 'daily_limit' ? (
           <Link
-            href="/solicitar-demo?demos=chatbot"
+            href={RAG_GUIDED_DEMO_PATH}
             className="text-xs font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
           >
             {t('cta.schedule')}

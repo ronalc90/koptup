@@ -83,7 +83,7 @@
         },
         "cost": {
           "q": "How much does it cost to implement artificial intelligence in my company?",
-          "a": "It depends on the solution and the scope. RAG systems have published prices: a {pilotWeeks}-week pilot for {pilotPrice} and the Essential plan with a {essentialSetup} implementation plus {essentialMonthly} per month, plus VAT where applicable. Other solutions are quoted for your case; you'll find reference prices on the services page."
+          "a": "It depends on the solution and the scope. RAG systems have published prices: a {pilotWeeks}-week pilot for {pilotPrice} and the Essential plan with a {essentialSetup} implementation plus {essentialMonthly} per month, plus VAT if applicable. Other solutions are quoted for your case; you'll find reference prices on the services page."
         },
         "howTo": {
           "q": "How do I implement artificial intelligence in my business in Colombia?",

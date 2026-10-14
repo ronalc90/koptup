@@ -55,6 +55,9 @@ test.describe('/contact', () => {
     expect(sent.status()).toBe(200);
     expect(sent.request().postDataJSON()).toMatchObject({ name: 'Carlos Contacto', email, service, message, timeline: '1m', consentimiento: true, website: '' });
     await expect(page.getByText('¡Mensaje enviado!')).toBeVisible();
+    // Dice cuándo y a qué correo responden, y que no llega una confirmación automática.
+    await expect(page.getByText(`Te escribimos a ${email} en menos de 24 horas hábiles`, { exact: false })).toBeVisible();
+    await expect(page.getByText(/No enviamos un correo automático de confirmación/)).toBeVisible();
     // El siguiente paso que ofrece existe (la demo), sin prometer un seguimiento que el portal no tiene.
     await expect(page.getByRole('link', { name: 'Probar la demo' })).toHaveAttribute('href', '/demo/chatbot');
     await expect(page.getByText(/seguimiento .*dashboard/i)).toHaveCount(0);

@@ -5,8 +5,8 @@
       "title": "Chatbots RAG para WhatsApp y web",
       "subtitle": "Un chatbot que responde a tus clientes y a tu equipo con los documentos de tu empresa —manuales, políticas, catálogos, preguntas frecuentes— y cita la fuente de cada respuesta. En tu sitio web y en WhatsApp.",
       "ctaDemo": "Prueba con tu documento",
-      "ctaPilot": "Agenda un piloto",
-      "price": "Desde {essentialFrom}, o piloto de {pilotFrom}. Más IVA si aplica.",
+      "ctaPilot": "Cotizar el piloto",
+      "price": "Piloto: {pilotFrom}, pago único. Planes desde {essentialFrom} de implementación + {essentialMonthlyFrom} al mes. Más IVA si aplica.",
       "ragLink": "Cómo funciona un chatbot con los documentos de tu empresa"
     },
     "benefits": {
@@ -26,8 +26,8 @@
           "desc": "No hay que reentrenar ningún modelo: el chatbot consulta tus documentos en cada pregunta, así que responde con la versión que tengas cargada."
         },
         "notFound": {
-          "title": "No inventa respuestas",
-          "desc": "Si la respuesta no está en tus documentos, dice «no encontré esa información» en lugar de adivinar."
+          "title": "Instruido para no inventar",
+          "desc": "Si la respuesta no está en tus documentos, dice «no encontré esa información» en lugar de adivinar. Cada dato trae su cita para que lo verifiques."
         },
         "anyHour": {
           "title": "Responde a cualquier hora",
@@ -93,7 +93,7 @@
       "steps": {
         "pilot": {
           "title": "1. Piloto ({pilotWeeks} semanas)",
-          "desc": "Cargamos hasta 100 documentos de una fuente, pruebas el chatbot en una interfaz web con citas y recibes un informe de precisión con 50 preguntas de prueba."
+          "desc": "Nos entregas hasta 100 documentos de un solo origen y 50 preguntas reales con la respuesta que esperas; pruebas el chatbot en una interfaz web con citas y recibes el informe de precisión."
         },
         "implementation": {
           "title": "2. Implementación",
@@ -105,7 +105,7 @@
         },
         "updates": {
           "title": "4. Actualización y soporte",
-          "desc": "Cuando agregas o cambias documentos, el chatbot se actualiza. En el plan Esencial, la mensualidad incluye hosting, actualización de documentos y soporte Lun–Vie."
+          "desc": "Cuando agregas o cambias documentos, el chatbot se actualiza. En el plan Esencial, la mensualidad incluye alojamiento, actualización de documentos y soporte de lunes a viernes."
         }
       }
     },
@@ -114,7 +114,7 @@
       "items": {
         "cost": {
           "q": "¿Cuánto cuesta un chatbot RAG?",
-          "a": "Desde {essentialFrom}, o piloto de {pilotFrom}. En detalle: el piloto de {pilotWeeks} semanas cuesta {pilotPrice}; el plan Esencial (sitio web), {essentialSetup} de setup más {essentialMonthly} al mes, y el Profesional (sitio web y WhatsApp), {proSetup} de setup más {proMonthly} al mes. Todos los precios son más IVA si aplica, y las tarifas de Meta por mensajes de WhatsApp se cobran aparte, al costo."
+          "a": "El piloto de {pilotWeeks} semanas cuesta {pilotPrice}, pago único. El plan Esencial (sitio web) cuesta {essentialSetup} de implementación más {essentialMonthly} al mes, y el Profesional (sitio web y WhatsApp), {proSetup} de implementación más {proMonthly} al mes. Todos los precios son más IVA si aplica, y las tarifas de Meta por mensajes de WhatsApp se cobran aparte, al costo. El detalle, con el total con IVA y el costo del primer año, está en los planes."
         },
         "time": {
           "q": "¿En cuánto tiempo tengo mi chatbot funcionando?",
@@ -140,9 +140,9 @@
     },
     "cta": {
       "title": "¿Quieres un chatbot que responda con tus documentos?",
-      "subtitle": "Prueba la demo gratis: los ejemplos no piden registro y para usar tu propio documento solo te pedimos un email. O agenda un piloto de {pilotWeeks} semanas con los documentos de tu empresa.",
+      "subtitle": "Prueba la demo gratis: los ejemplos no piden registro y para usar tu propio documento solo te pedimos un email. O cotiza un piloto de {pilotWeeks} semanas con los documentos de tu empresa.",
       "demo": "Prueba con tu documento",
-      "pilot": "Agenda un piloto",
+      "pilot": "Cotizar el piloto",
       "plans": "Ver planes y precios"
     }
   }

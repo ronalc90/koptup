@@ -4,7 +4,7 @@
  * Demo RAG (producto principal de KopTup) — /demo/chatbot.
  *
  * Tres modos:
- *  - "Prueba el asistente" (Playground): tres empresas FICTICIAS con sus
+ *  - "Prueba el asistente" (Playground): cuatro empresas FICTICIAS con sus
  *    documentos (`components/sampleKnowledge.ts`). Con la primera pregunta,
  *    el navegador pide al backend el bot de ejemplo compartido de esa empresa
  *    (`POST /api/chatbot/sample-bots`: lo crea e indexa la primera vez y lo
@@ -69,6 +69,7 @@ import {
   findSampleDocument,
   getSampleCompanies,
   getSampleCompany,
+  isSampleCompanyKey,
   type SampleCompany,
   type SampleCompanyKey,
   type SampleDocument,
@@ -171,15 +172,25 @@ export default function ChatbotDemoPage() {
   }, []);
   const markUploadQuestion = useCallback(() => markDemoStart('upload'), [markDemoStart]);
 
-  // Modo inicial desde la URL (?mode=upload|builder), solo en el cliente.
+  // Modo inicial desde la URL (?mode=upload|builder) y empresa de ejemplo
+  // (?empresa=salud|tienda|legal|rrhh, la usan las landings por sector), solo
+  // en el cliente.
   useEffect(() => {
     try {
-      const fromUrl = new URLSearchParams(window.location.search).get('mode');
+      const params = new URLSearchParams(window.location.search);
+      const fromUrl = params.get('mode');
       if (fromUrl && (MODES as readonly string[]).includes(fromUrl)) setMode(fromUrl as ChatbotMode);
+      const empresa = params.get('empresa');
+      if (isSampleCompanyKey(empresa) && empresa !== 'rrhh') {
+        setCompanyKey(empresa);
+        setMessages([welcomeMessage(getSampleCompany(empresa, locale))]);
+      }
     } catch {
       /* URL no disponible */
     }
     setModeResolved(true);
+    // Solo al montar: después la empresa la cambia el selector.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const changeMode = useCallback((next: ChatbotMode) => {
@@ -189,6 +200,7 @@ export default function ChatbotDemoPage() {
       if (next === 'playground') url.searchParams.delete('mode');
       else url.searchParams.set('mode', next);
       if (next !== 'builder') url.searchParams.delete('botId');
+      if (next !== 'playground') url.searchParams.delete('empresa');
       window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}`);
     } catch {
       /* sin History API: el modo igual cambia */
@@ -329,6 +341,15 @@ export default function ChatbotDemoPage() {
     (key: SampleCompanyKey) => {
       if (key === companyKey) return;
       setCompanyKey(key);
+      // La URL sigue a la empresa elegida (?empresa=), para compartirla o recargar.
+      try {
+        const url = new URL(window.location.href);
+        if (key === 'rrhh') url.searchParams.delete('empresa');
+        else url.searchParams.set('empresa', key);
+        window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}`);
+      } catch {
+        /* sin History API: la empresa igual cambia */
+      }
       // Se copian YA las respuestas de la empresa anterior: el actualizador de
       // setArchived corre en el siguiente render, cuando messagesRef ya apunta a
       // la bienvenida de la nueva empresa (las métricas perdían esas respuestas).

@@ -2,7 +2,9 @@
  * Planes de sistemas RAG de KopTup: fuente única de precios y datos.
  *
  * Los precios son fijos en COP y en USD (no se convierten con TRM) y se
- * muestran "más IVA si aplica". Los textos visibles (nombres, alcance, notas)
+ * muestran "más IVA si aplica", con el total en COP con el IVA general
+ * (`withRagVat`) y el costo del primer año (`ragFirstYearCop`) calculados aquí
+ * mismo, para que nunca se desfasen. Los textos visibles (nombres, alcance, notas)
  * viven en `messages/offerings/_rag-plans.{es,en}.json`, namespace `ragPlans`,
  * con una entrada por plan en `ragPlans.plans.<id>`.
  *
@@ -94,6 +96,27 @@ export const RAG_PLANS: readonly RagPlan[] = [
 
 /** Precio de cada pregunta adicional sobre el tope mensual del plan. */
 export const RAG_EXTRA_QUESTION_PRICE: RagPrice = { cop: 250, usd: 0.08 };
+
+/**
+ * Tarifa general del IVA en Colombia (19 %). Solo se usa para mostrar, junto
+ * a cada precio en COP, cuánto queda "con IVA, si aplica": los precios de los
+ * planes siguen siendo sin IVA y la propuesta confirma si el caso lo lleva.
+ */
+export const RAG_VAT_RATE = 0.19;
+
+/** Valor en COP con el IVA general sumado (redondeado al peso). */
+export function withRagVat(cop: number): number {
+  return Math.round(cop * (1 + RAG_VAT_RATE));
+}
+
+/**
+ * Costo del primer año en COP, sin IVA: el pago inicial más 12 mensualidades.
+ * `null` si el plan no tiene mensualidad fija (Piloto y Empresarial).
+ */
+export function ragFirstYearCop(plan: RagPlan): number | null {
+  if (plan.monthlyMode !== 'fixed' || !plan.monthly) return null;
+  return plan.setup.cop + plan.monthly.cop * 12;
+}
 
 /** Ancla de la sección de planes en /services (`/services#planes-rag`). */
 export const RAG_PLANS_ANCHOR = 'planes-rag';

@@ -1085,7 +1085,7 @@
   "demoChatbot": {
     "pageTitle": "Demo RAG: IA que responde con documentos",
     "pageSubtitle": "Para empresas que quieren un asistente que responda con sus propios documentos (políticas, manuales, contratos). Busca en ellos, responde con IA y cita la fuente; si la respuesta no está, te lo dice.",
-    "sampleDataBadge": "Datos de ejemplo",
+    "sampleDataBadge": "Empresas de ejemplo",
     "sampleDataTooltip": "Las empresas y sus documentos son ficticios. Las respuestas sí las genera el servidor real de la demo.",
     "modes": {
       "ariaLabel": "Modos de la demo",
@@ -1099,8 +1099,8 @@
     "topBar": {
       "company": "Empresa de ejemplo",
       "companyTooltip": "Cambia la base de conocimiento: cada empresa ficticia tiene sus propios documentos y preguntas sugeridas.",
-      "model": "Modelo",
-      "modelTooltip": "Modelo de OpenAI que redacta la respuesta con los fragmentos encontrados. El servidor solo acepta estos tres.",
+      "model": "Modelo de IA",
+      "modelTooltip": "Modelo de OpenAI que redacta la respuesta con los fragmentos encontrados. Puedes dejar el recomendado; el servidor solo acepta estos tres.",
       "askSample": "Pregunta de ejemplo",
       "askSampleTooltip": "Envía la siguiente pregunta sugerida de la empresa elegida.",
       "device": {
@@ -1167,7 +1167,7 @@
           ]
         },
         "chunking": {
-          "title": "Fragmentación",
+          "title": "División en fragmentos",
           "summary": "Cada documento se parte por párrafos.",
           "items": [
             "Los párrafos de hasta unos 800 caracteres quedan como un fragmento.",
@@ -1220,8 +1220,8 @@
       },
       "ctaTitle": "¿Lo quieres con los documentos de tu empresa?",
       "ctaBody": "Te mostramos la demo con tu caso en una sesión guiada y te proponemos el plan que encaja.",
-      "ctaButton": "Solicitar demo guiada",
-      "ctaQuote": "Cotizar el Piloto RAG"
+      "ctaButton": "Pedir una demo guiada",
+      "ctaQuote": "Cotizar el piloto"
     },
     "chat": {
       "title": "Conversación",
@@ -1232,7 +1232,7 @@
       "assistant": "Asistente RAG",
       "thinking": "Buscando en los documentos…",
       "preparing": "Indexando los documentos de la empresa…",
-      "sources": "Fuentes",
+      "sources": "Fragmentos consultados ({count})",
       "suggested": "Preguntas sugeridas",
       "outOfScopeTag": "no está en los documentos",
       "emptyTitle": "Prueba una pregunta",
@@ -1259,22 +1259,24 @@
       "errorCapacity": "No pudimos preparar el asistente: la demo llegó a su capacidad de asistentes en este momento. Intenta de nuevo más tarde o prueba con tu documento.",
       "errorUnavailable": "El chatbot no está disponible en este momento. Intenta de nuevo en unos minutos.",
       "useUpload": "Probar con tu documento",
-      "privacyNote": "Las preguntas de este modo no se guardan: el servidor las usa para buscar en los documentos y, con la IA activa, las envía con los fragmentos encontrados a OpenAI para redactar la respuesta."
+      "privacyNote": "Las preguntas de este modo no se guardan: el servidor las usa para buscar en los documentos y, con la IA activa, las envía con los fragmentos encontrados a OpenAI para redactar la respuesta.",
+      "cited": "citado",
+      "citedHint": "Los marcados como «citado» son los que la respuesta usa con [n]; los demás los encontró la búsqueda, pero la respuesta no se basó en ellos."
     },
     "pipeline": {
       "title": "Cómo se respondió",
-      "subtitle": "Los pasos que ejecutó el servidor para la última respuesta, con los datos que devolvió.",
+      "subtitle": "Para equipos técnicos: los pasos internos de la última respuesta. No necesitas mirarlos para usar el asistente.",
       "toggle": "Cómo se respondió",
       "idle": "Haz una pregunta para ver los pasos.",
       "running": "Esperando la respuesta del servidor…",
       "steps": {
         "chunking": {
-          "title": "1. Fragmentación",
+          "title": "1. División en fragmentos",
           "detail": "{docs, plural, one {# documento partido} other {# documentos partidos}} por párrafos al indexar"
         },
         "search": {
-          "title": "2. Búsqueda BM25 (top 5)",
-          "detail": "{count, plural, one {# fragmento encontrado} other {# fragmentos encontrados}} · mejor puntaje {score}",
+          "title": "2. Búsqueda por palabras (BM25)",
+          "detail": "{count, plural, one {# fragmento encontrado} other {# fragmentos encontrados}} (máximo 5) · mejor coincidencia {score}",
           "none": "Ningún fragmento coincide con las palabras de la pregunta"
         },
         "prompt": {
@@ -1299,8 +1301,8 @@
         "latencyHint": "Medido en tu navegador: desde que envías la pregunta hasta que llega la respuesta.",
         "tokens": "Tokens",
         "tokensHint": "Tokens de entrada y salida que reportó OpenAI. En modo extractivo no hay tokens.",
-        "cost": "Costo (USD)",
-        "costHint": "Estimación del servidor en USD con el precio público del modelo.",
+        "cost": "Costo de IA (USD)",
+        "costHint": "Lo que KopTup le paga a OpenAI por esta respuesta (estimado con el precio público del modelo). No es un cobro para ti: los planes se cobran por preguntas e incluyen este costo hasta el tope de preguntas del mes.",
         "notAvailable": "—"
       }
     },
@@ -1312,7 +1314,7 @@
       "notFound": "No encontré",
       "avgLatency": "Tiempo medio",
       "tokens": "Tokens",
-      "cost": "Costo (USD)",
+      "cost": "Costo de IA (USD)",
       "feedback": "Útil / a mejorar",
       "summary": "{count, plural, one {# pregunta} other {# preguntas}} · {withSources} con fuente"
     },
@@ -1321,7 +1323,7 @@
       "subtitle": "El texto exacto que el servidor encontró y entregó al modelo.",
       "document": "Documento",
       "position": "Cita",
-      "score": "Puntaje BM25",
+      "score": "Coincidencia de palabras (BM25)",
       "scoreHint": "Qué tanto coinciden las palabras de la pregunta con este fragmento (más alto = más relevante).",
       "openDocument": "Ver documento completo",
       "close": "Cerrar"
@@ -1338,9 +1340,9 @@
       "next": "Siguiente",
       "done": "Empezar",
       "step1Title": "Elige una empresa de ejemplo",
-      "step1Body": "Arriba cambias entre tres empresas ficticias (recursos humanos, tienda en línea y salud). Cada una tiene sus propios documentos.",
+      "step1Body": "Arriba cambias entre cuatro empresas ficticias (recursos humanos, tienda en línea, salud y una firma de abogados). Cada una tiene sus propios documentos.",
       "step2Title": "Haz una pregunta sugerida",
-      "step2Body": "Con tu primera pregunta, el servidor indexa esos documentos, busca en ellos y responde con citas [1], [2]… a la fuente.",
+      "step2Body": "Con tu primera pregunta, el asistente lee esos documentos, busca en ellos y te responde con citas [1], [2]… a la fuente.",
       "step3Title": "Abre la fuente",
       "step3Body": "Haz clic en una cita para ver el fragmento exacto y el documento completo de donde salió. En «Cómo se respondió» ves los pasos que hizo el servidor.",
       "step4Title": "Pregunta algo que no esté",
@@ -1350,7 +1352,7 @@
     },
     "builder": {
       "title": "Configura tu asistente",
-      "subtitle": "Crea tu bot, súbele tus documentos, pruébalo aquí y llévalo a tu sitio con el código para insertar.",
+      "subtitle": "Para equipos técnicos: arma un bot de prueba, súbele documentos y llévalo a tu sitio con el código. En un proyecto, esta configuración la hacemos nosotros.",
       "configTitle": "Configuración",
       "myBots": {
         "label": "Mis bots",
@@ -1529,12 +1531,16 @@
       "cta": {
         "text": "¿Lo quieres con los documentos y el sitio de tu empresa?",
         "plans": "Ver planes RAG",
-        "quotePilot": "Cotizar el Piloto RAG"
+        "quotePilot": "Cotizar el piloto"
       },
       "readOnly": {
         "title": "Este bot es de otro navegador.",
         "body": "Puedes probarlo en la vista previa, pero solo su dueño (el navegador que lo creó) puede editarlo y ver sus documentos y conversaciones.",
         "createOwn": "Crear mi propio bot"
+      },
+      "confidential": {
+        "title": "No subas información confidencial",
+        "body": "Los documentos de tu bot quedan en el servidor de la demo hasta que los quitas o eliminas el bot (o tras 12 meses sin uso), y cualquiera con el enlace del chat o que visite la página donde pegues el widget puede hacerle preguntas."
       }
     },
     "embedPage": {
@@ -1565,7 +1571,7 @@
         "title": "No subas información confidencial en la demo",
         "body": "Usa un documento público o de prueba. Lo procesamos solo en memoria y se borra automáticamente en 1 hora; los fragmentos que responden cada pregunta se envían a OpenAI para redactar la respuesta."
       },
-      "limits": "PDF, DOCX o TXT · máximo {maxMb} MB y {maxPages} páginas · {maxQuestions} preguntas por documento · {maxDocs} documentos al día",
+      "limits": "PDF, DOCX o TXT · máximo {maxMb} MB y {maxPages} páginas · {maxQuestions} preguntas por documento · {maxDocs} documentos al día por red",
       "form": {
         "fileLabel": "Tu documento",
         "fileCta": "Elige un archivo",
@@ -1582,12 +1588,12 @@
       },
       "unavailable": {
         "title": "La prueba con tu documento no está disponible en este momento",
-        "body": "Puedes seguir usando la demo con el documento de ejemplo, sin registro, o agendar una demo con nosotros para verla con tu caso.",
+        "body": "Puedes seguir usando la demo con el documento de ejemplo, sin registro, o pedir una demo guiada para verla con tu caso.",
         "budgetTitle": "Alcanzamos el cupo de pruebas de este mes",
-        "budgetBody": "La subida de documentos está desactivada por ahora. Agenda una demo con nosotros o usa la demo con el documento de ejemplo, sin registro."
+        "budgetBody": "La subida de documentos está desactivada por ahora. Pide una demo guiada o usa la demo con el documento de ejemplo, sin registro."
       },
       "cta": {
-        "schedule": "Agenda una demo con nosotros",
+        "schedule": "Pide una demo guiada",
         "sample": "Usar la demo con el documento de ejemplo",
         "plans": "Ver planes RAG"
       },
@@ -1629,12 +1635,12 @@
         "missing_file": "Elige un documento para subir.",
         "invalid_email": "Escribe un email válido.",
         "consent_required": "Para subir el documento debes autorizar el tratamiento de tus datos personales.",
-        "daily_limit": "Llegaste al límite de {maxDocs} documentos por día. Vuelve mañana o agenda una demo con nosotros.",
+        "daily_limit": "Desde tu red ya se usaron los {maxDocs} documentos de hoy (el límite es por red, no por persona). Vuelve mañana o pide una demo guiada.",
         "question_limit": "Llegaste al límite de {maxQuestions} preguntas para este documento.",
         "invalid_question": "Escribe una pregunta de máximo {maxChars} caracteres.",
         "rate_limited": "Estás enviando muchas solicitudes. Espera unos minutos y vuelve a intentarlo.",
         "document_not_found": "Tu documento ya no está disponible: se borra 1 hora después de subirlo. Súbelo de nuevo para seguir probando.",
-        "budget_exhausted": "Alcanzamos el cupo de pruebas de este mes. Agenda una demo con nosotros.",
+        "budget_exhausted": "Alcanzamos el cupo de pruebas de este mes. Pide una demo guiada.",
         "demo_disabled": "La prueba con tu documento no está disponible en este momento.",
         "capacity": "La demo tiene mucha demanda en este momento. Intenta de nuevo en unos minutos.",
         "llm_error": "No pudimos generar la respuesta. Intenta de nuevo; esta pregunta no se descontó.",

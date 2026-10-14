@@ -128,13 +128,14 @@ export const TRM_REFERENCIA = 3300;
 
 export type DisplayCurrency = 'COP' | 'USD';
 
+/**
+ * "COP 6.900.000": con la moneda escrita, como los planes RAG (no "$", que se
+ * confunde con USD). El espacio es de no separación para que la cifra no se
+ * parta en dos líneas.
+ */
 export function formatCOP(value: number): string {
   if (value === 0) return 'Personalizado';
-  return new Intl.NumberFormat('es-CO', {
-    style: 'currency',
-    currency: 'COP',
-    maximumFractionDigits: 0,
-  }).format(value);
+  return `COP\u00a0${new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 }).format(value)}`;
 }
 
 /** Convierte COP a USD con `TRM_REFERENCIA`, redondeado a decenas. */
@@ -145,11 +146,7 @@ export function copToUsd(cop: number): number {
 
 export function formatUSD(usd: number): string {
   if (usd === 0) return 'Custom';
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  }).format(usd);
+  return `USD\u00a0${new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(usd)}`;
 }
 
 export function formatMoney(amountCOP: number, currency: DisplayCurrency): string {

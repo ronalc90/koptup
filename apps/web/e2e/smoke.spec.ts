@@ -9,7 +9,7 @@ import { collectBrowserErrors } from './support/browser-errors';
  * ni excepciones sin capturar.
  *
  * `/services#planes-rag` es el destino de los botones de planes del sitio
- * (por ejemplo, "Quiero esto" del navbar): además se verifica que el ancla
+ * (por ejemplo, "Ver precios" del navbar): además se verifica que el ancla
  * exista, quede a la vista y muestre los planes con su botón de cotizar.
  */
 const PAGES: Array<{ path: string; title: string; anchor?: string }> = [

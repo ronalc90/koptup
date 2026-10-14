@@ -17,8 +17,9 @@
  * pestaña se recarga (el contenido vive en la memoria del backend, 1 hora).
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { RAG_GUIDED_DEMO_PATH } from '@/lib/rag-page';
 import { useTranslations } from 'next-intl';
 import {
   ArrowPathIcon,
@@ -77,6 +78,16 @@ export default function UploadDemo({ onUseSample, onQuestion }: UploadDemoProps)
   const [view, setView] = useState<View>({ kind: 'loading' });
   const [limits, setLimits] = useState<DemoLimits>(DEFAULT_DEMO_LIMITS);
   const [notice, setNotice] = useState<string | null>(null);
+  // Tras subir un documento, la vista baja a la cabecera del chat (nombre,
+  // "Preguntas: 0/10", aviso de borrado y "Listo, ya leí…"): el formulario
+  // era más alto y el scroll se quedaba en una zona vacía.
+  const chatRef = useRef<HTMLDivElement>(null);
+  const scrollToChatRef = useRef(false);
+  useEffect(() => {
+    if (view.kind !== 'chat' || !scrollToChatRef.current) return;
+    scrollToChatRef.current = false;
+    chatRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  }, [view]);
 
   useEffect(() => {
     let cancelled = false;
@@ -110,6 +121,7 @@ export default function UploadDemo({ onUseSample, onQuestion }: UploadDemoProps)
     saveDocId(doc.docId);
     trackDemoUpload({ fileType: doc.kind, pages: doc.pages });
     setNotice(null);
+    scrollToChatRef.current = true;
     setView({ kind: 'chat', doc });
   }, []);
 
@@ -130,8 +142,12 @@ export default function UploadDemo({ onUseSample, onQuestion }: UploadDemoProps)
   if (view.kind === 'chat') {
     return (
       // Altura acotada (celular y escritorio): el contador y la caja de preguntas
-      // quedan siempre a la vista y solo se desplaza la conversación.
-      <div className="flex h-[80svh] min-h-[420px] flex-col overflow-hidden md:h-[calc(100vh-17rem)] md:min-h-[480px]">
+      // quedan siempre a la vista y solo se desplaza la conversación. Al subir el
+      // documento la página baja hasta aquí (ver el efecto de `chatRef`).
+      <div
+        ref={chatRef}
+        className="flex h-[80svh] min-h-[420px] scroll-mt-20 flex-col overflow-hidden md:h-[calc(100vh-17rem)] md:min-h-[480px]"
+      >
         <DocumentChat
           key={view.doc.docId}
           doc={view.doc}
@@ -210,7 +226,7 @@ export default function UploadDemo({ onUseSample, onQuestion }: UploadDemoProps)
   );
 }
 
-/** Demo apagada o sin presupuesto: aviso + "Agenda una demo con nosotros" → /solicitar-demo (demo guiada). */
+/** Demo apagada o sin presupuesto: aviso + "Pide una demo guiada" → /contact con el mensaje de demo guiada. */
 function UnavailableCard({ reason, onUseSample }: { reason: DemoDisabledReason; onUseSample: () => void }) {
   const t = useTranslations('demoChatbot.uploadDemo');
   const budget = reason === 'budget_exhausted';
@@ -229,7 +245,7 @@ function UnavailableCard({ reason, onUseSample }: { reason: DemoDisabledReason; 
       </div>
       <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
         <Link
-          href="/solicitar-demo?demos=chatbot"
+          href={RAG_GUIDED_DEMO_PATH}
           className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700"
         >
           <CalendarDaysIcon className="h-4 w-4" aria-hidden="true" />

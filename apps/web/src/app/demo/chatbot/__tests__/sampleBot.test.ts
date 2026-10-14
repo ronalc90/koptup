@@ -104,7 +104,7 @@ describe('bots de ejemplo', () => {
     expect(state).toEqual({ botId: 'kbot_shared', docsCount: 3, shared: true });
     const req = calls.find((c) => c.path.endsWith('/sample-bots'));
     expect(req?.body).toMatchObject({ sampleKey: sampleKeyFor(getSampleCompany('salud', 'es'), 'es') });
-    expect((req?.body as { files: unknown[] }).files).toHaveLength(3);
+    expect((req?.body as { files: unknown[] }).files).toHaveLength(getSampleCompany('salud', 'es').docs.length);
     expect(calls.some((c) => c.method === 'POST' && c.path.endsWith('/bots'))).toBe(false);
   });
 

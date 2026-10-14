@@ -18,7 +18,7 @@
   "hero": {
     "badge": "Sistemas RAG para empresas",
     "title": "IA que responde con los documentos de tu empresa",
-    "subtitle": "Sistemas RAG con respuestas citadas sobre tus manuales, contratos y políticas. Piloto con tus documentos en 2 semanas.",
+    "subtitle": "Respuestas citadas sobre tus manuales, contratos y políticas: la IA busca en tus documentos y te muestra de dónde sacó cada dato. Piloto con tus documentos en 2 semanas.",
     "cta1": "Probar la demo",
     "cta2": "Ver planes"
   },
@@ -80,24 +80,31 @@
         "category": "Servicios"
       },
       "whyTitle": "¿Por qué elegir KopTup para tu proyecto?",
+      "band": {
+        "sectorsTitle": "¿En qué área lo usarías?",
+        "pilot": "Piloto de {pilotWeeks} semanas con tus documentos: {pilotPrice}, más IVA si aplica.",
+        "plansLink": "Ver planes y precios",
+        "data": "Tus documentos no entrenan la IA y cada respuesta cita la fuente.",
+        "dataLink": "Cómo tratamos tus datos"
+      },
       "benefit1Title": "Soluciones a Medida",
       "benefit1Desc": "Desarrollo personalizado adaptado a las necesidades específicas de tu industria y modelo de negocio.",
-      "benefit2Title": "Tecnología de Vanguardia",
-      "benefit2Desc": "React, Next.js, TypeScript, inteligencia artificial y las mejores prácticas del desarrollo moderno.",
+      "benefit2Title": "Precios publicados",
+      "benefit2Desc": "Los planes RAG tienen precio en COP y USD, y empiezas con un piloto de 2 semanas con tus documentos antes de contratar.",
       "benefit3Title": "Soporte Continuo",
       "benefit3Desc": "Actualizaciones, mantenimiento y soporte técnico para garantizar que tu solución evolucione con tu negocio."
     }
   },
   "services": {
-    "title": "Servicios Tecnológicos",
-    "subtitle": "Soluciones integrales para impulsar tu negocio",
+    "title": "Además, desarrollamos software a medida",
+    "subtitle": "Si necesitas algo distinto a un asistente con tus documentos, también lo construimos.",
     "ecommerce": {
       "title": "E-commerce Personalizado",
       "description": "Tiendas online optimizadas con pagos, inventario y excelente UX"
     },
     "chatbots": {
-      "title": "Chatbots & IA",
-      "description": "Automatiza ventas y soporte con asistentes inteligentes"
+      "title": "Asistentes con IA",
+      "description": "Responden con los documentos de tu empresa y citan la fuente"
     },
     "integrations": {
       "title": "Integraciones API",
@@ -976,7 +983,7 @@
     "login": "Iniciar sesión",
     "dashboard": "Panel",
     "requestDemo": "Solicitar demo",
-    "wantThis": "Quiero esto",
+    "wantThis": "Ver precios",
     "myAccount": "Mi cuenta",
     "customer": "Cliente",
     "myDemos": "Mis demos",
@@ -2106,7 +2113,9 @@
     "badge": "Contacto",
     "hero": {
       "title": "Hablemos de tu proyecto",
-      "subtitle": "Listos para convertir tu visión en realidad. Agenda una consulta gratuita"
+      "subtitle": "Cuéntanos tu caso y te respondemos en menos de 24 horas hábiles, de lunes a viernes.",
+      "quoteTitle": "Cotiza el plan {plan}",
+      "quoteSubtitle": "Llena el formulario corto y te respondemos en menos de 24 horas hábiles para agendar una llamada de 30 minutos. Todavía no pagas nada."
     },
     "form": {
       "title": "Envíanos un Mensaje",
@@ -2156,7 +2165,10 @@
       },
       "success": {
         "title": "¡Mensaje enviado!",
-        "subtitle": "Gracias por contactarnos. Te responderemos pronto.",
+        "titlePlan": "¡Listo! Recibimos tu solicitud del plan {plan}",
+        "subtitle": "Te escribimos a {email} en menos de 24 horas hábiles (lunes a viernes) para agendar una llamada de 30 minutos.",
+        "noAutoEmail": "No enviamos un correo automático de confirmación: si no te llega nuestra respuesta, escríbenos a ronald@koptup.com.",
+        "another": "Enviar otro mensaje",
         "nextStep": "Mientras te respondemos, puedes probar nuestro asistente RAG en la demo.",
         "nextStepCta": "Probar la demo"
       }
@@ -2164,7 +2176,7 @@
     "services": {
       "rag": "Sistema RAG",
       "ecommerce": "E-Commerce",
-      "chatbot": "Chatbot con IA",
+      "chatbot": "Otro tipo de chatbot",
       "webDev": "Desarrollo Web",
       "mobileDev": "Desarrollo Móvil",
       "apiIntegrations": "Integraciones API",
@@ -2179,6 +2191,20 @@
       "tier": "Nivel {tier}",
       "message": "Hola, me interesa cotizar {service}.",
       "messageWithDetail": "Hola, me interesa cotizar {service} ({detail}).",
+      "messageGuidedDemo": "Hola, quiero ver una demo guiada del asistente RAG con mi caso.",
+      "priceOnce": "{price}, pago único",
+      "priceMonthly": "Implementación {setup} + {monthly} al mes",
+      "priceFrom": "Implementación desde {setup} + mensualidad según el nivel de servicio",
+      "vat": "más IVA si aplica",
+      "messageHelpRag": "Te sirve contarnos: cuántos documentos tienes, dónde están (carpetas, Drive, SharePoint), quién usaría el asistente y si hay información confidencial.",
+      "nextSteps": {
+        "title": "Qué pasa después",
+        "call": "Te escribimos en menos de 24 horas hábiles para agendar una llamada de 30 minutos.",
+        "scope": "En la llamada entendemos tu caso y definimos el alcance.",
+        "pilot": "En el piloto nos entregas hasta 100 documentos de un solo origen y 50 preguntas reales con la respuesta que esperas; en 2 semanas tienes el asistente con tus documentos y el informe de precisión.",
+        "plan": "Te enviamos una propuesta con el alcance, el valor total y los tiempos.",
+        "noPayment": "Enviar este formulario no te compromete: todavía no pagas nada."
+      },
       "legacyServices": {
         "agente-ia-ventas": "Agente de ventas con IA",
         "desarrollo-web": "Desarrollo web a medida",
@@ -2205,16 +2231,16 @@
       },
       "hours": {
         "title": "Horario",
-        "value": "Lun - Vie: 8am - 6pm"
+        "value": "Lunes a viernes, 8:00 a. m. a 6:00 p. m. (hora de Colombia)"
       }
     },
     "social": {
       "title": "Síguenos en redes"
     },
     "schedule": {
-      "title": "Agendar Llamada",
-      "subtitle": "Agenda una consulta gratuita de 30 minutos",
-      "button": "Agendar ahora",
+      "title": "Pide una llamada por correo",
+      "subtitle": "Se abre tu correo con un mensaje listo para ronald@koptup.com; te respondemos con horarios para una llamada gratuita de 30 minutos.",
+      "button": "Abrir mi correo",
       "opening": "Abriendo...",
       "emailSubject": "Solicitud de Agendamiento de Llamada - KopTup",
       "emailBody": "Hola equipo de KopTup,\n\nMe gustaría agendar una llamada para discutir mis necesidades tecnológicas.\n\nPor favor, confirmen disponibilidad y agendemos una reunión.\n\nSaludos cordiales"
@@ -2357,7 +2383,7 @@
     "rag": {
       "title": "¿Quieres este asistente con los documentos de tu empresa?",
       "description": "Empezamos con un piloto sobre tus propios documentos: el asistente responde con la fuente y dice cuando algo no está. Las conexiones con tus sistemas y canales se construyen en tu proyecto. Cotiza sin compromiso.",
-      "requestQuote": "Cotizar el piloto RAG"
+      "requestQuote": "Cotizar el piloto"
     }
   },
   "demoEcommerce": {

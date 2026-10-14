@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import Button from '@/components/ui/Button';
 import { isKnownDemoSlug } from '@/lib/demo-access-defaults';
 import { ragPlanContactHref } from '@/lib/rag-plans';
+import { RAG_GUIDED_DEMO_PATH } from '@/lib/rag-page';
 
 interface DemoCTAProps {
   demoName?: string;
@@ -17,15 +18,21 @@ const RAG_DEMO_SLUG = 'chatbot';
 /**
  * Cierre de cada demo (lo pinta app/demo/layout.tsx). "Solicitar demo guiada"
  * abre /solicitar-demo con la demo actual ya elegida (?demos=<slug>). En la
- * demo RAG (/demo/chatbot) el texto y "Cotizar el piloto RAG" llevan a
- * /contact con el servicio y el plan piloto ya elegidos.
+ * demo RAG (/demo/chatbot), que es abierta, "Solicitar demo guiada" abre
+ * /contact con el mensaje de demo guiada ya escrito (no el formulario de
+ * acceso a demos) y "Cotizar el piloto" lleva a /contact con el servicio y el
+ * plan piloto ya elegidos.
  */
 export default function DemoCTA({ demoName }: DemoCTAProps) {
   const t = useTranslations('demoCTA');
   const pathname = usePathname();
   const slug = pathname?.split('/')[2] ?? '';
-  const requestHref = isKnownDemoSlug(slug) ? `/solicitar-demo?demos=${encodeURIComponent(slug)}` : '/solicitar-demo';
   const rag = slug === RAG_DEMO_SLUG;
+  const requestHref = rag
+    ? RAG_GUIDED_DEMO_PATH
+    : isKnownDemoSlug(slug)
+      ? `/solicitar-demo?demos=${encodeURIComponent(slug)}`
+      : '/solicitar-demo';
 
   return (
     <section className="bg-gradient-to-r from-primary-600 to-primary-800 dark:from-primary-800 dark:to-primary-950">

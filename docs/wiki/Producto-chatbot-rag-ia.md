@@ -56,7 +56,7 @@ Estado al 14 de octubre de 2026. El reposicionamiento RAG (home, `/rag`, landing
 |---|---|---|
 | Posicionamiento | Home, `/rag`, landings por sector, "RAG" en el menú y en el footer (ya en `main`) | `src/components/home/HomeContent.tsx`, `src/app/rag/` |
 | Precio | **Planes RAG** en `/services#planes-rag` y en `/rag`. Lo que no existe todavía en el código (conectores de Google Drive y SharePoint, canal de WhatsApp, permisos por rol, panel de métricas, SSO y auditoría) se presenta como **"se construye en tu proyecto"** en las tarjetas, en `/rag`, en `/chatbots-ia`, en el JSON-LD y en `llms.txt` | `messages/offerings/_rag-plans.*.json`, `_rag-page.*.json`, `_chatbots-page.*.json`, `src/components/seo/StructuredData.tsx`, `public/llms.txt` |
-| Demo | Tres modos: **Prueba el asistente** (tres empresas ficticias colombianas, bot de ejemplo compartido por huella de contenido), **Prueba con tu documento** (PDF, DOCX o TXT propio) y **Configura el tuyo** (bot propio con widget real). El cierre de la página ofrece «Cotizar el piloto RAG» con el plan ya elegido | `apps/web/src/app/demo/chatbot/`, [Guía de la demo](Guia-Demo-chatbot.md) |
+| Demo | Tres modos: **Prueba el asistente** (cuatro empresas ficticias colombianas —RR. HH., tienda, IPS y firma de abogados—, bot de ejemplo compartido por huella de contenido; cada landing por sector la abre con su empresa con `?empresa=`), **Prueba con tu documento** (PDF, DOCX o TXT propio) y **Configura el tuyo** (bot propio con widget real). El cierre de la página ofrece «Cotizar el piloto» con el plan ya elegido y «Solicitar demo guiada», que abre el contacto con el mensaje de demo guiada | `apps/web/src/app/demo/chatbot/`, [Guía de la demo](Guia-Demo-chatbot.md) |
 | Real o maqueta | **Real:** búsqueda BM25, modelo de OpenAI con clave y presupuesto, citas, fragmentos y "Cómo se respondió" con los datos de cada respuesta. Sin clave o sin presupuesto, **modo extractivo** con una nota que lo explica. Las métricas de la sesión se calculan en el navegador con las respuestas reales | `routes/chatbot.routes.ts` (`POST /bots/:botId/chat`), `components/StatsWidget.tsx` |
 | Respuestas con fuente | Reglas fijas que se agregan siempre al prompt (solo fragmentos, citas [1], [2]… y "No encontré esa información…"). Los textos que escribe el servidor sin modelo salen en español o inglés según `lang` (o el primer idioma del bot) | `GROUNDING_RULES`, `REPLY_TEXT` y `replyLangFor` en `chatbot.routes.ts` |
 | Backend | Bots, documentos, fragmentos y conversaciones en MongoDB (`chatbot_bots`, `chatbot_bot_chunks`, `chatbot_turns`); las conversaciones del widget vencen a los 30 días (índice TTL); el archivo heredado `data/chatbots/state.json` se migra una vez y se borra. Propiedad por token del navegador, tope de gasto mensual (`CHATBOT_MONTHLY_BUDGET_USD`) y cupos por IP: 180 consultas por minuto (sin contar `GET /models`), 60 preguntas por minuto y 30 bots nuevos por hora | `services/chatbot-store.service.ts`, `middleware/rateLimiter.ts` |
@@ -122,7 +122,7 @@ flowchart TD
   C -->|"evento demo_start"| D{"¿Quiere probar con su documento?"}
   D -->|"Si"| E["Prueba con tu documento: email y autorización Ley 1581"]
   E -->|"evento demo_upload y lead demo-rag"| F["10 preguntas con cita, documento borrado a la hora"]
-  D -->|"No"| G["Ver planes o Agenda un piloto"]
+  D -->|"No"| G["Ver planes o Cotizar el piloto"]
   F --> G
   G -->|"evento plan_click o generate_lead"| H["Llamada de 30 min con comercial"]
   H --> I["Piloto RAG: 2 semanas, COP 3.900.000 / USD 1.200"]
@@ -135,10 +135,10 @@ flowchart TD
 
 | Paso | Qué ve el visitante | Qué hace KopTup | Dónde vive |
 |---|---|---|---|
-| 1. Landing | `/rag` explica qué es RAG, casos por sector, cómo funciona, seguridad, cómo evita respuestas inventadas, integraciones, planes y FAQ. Las landings por sector son cortas: H1, 3 casos, enlace a `/rag` y CTA | Pauta en Google y LinkedIn hacia `/rag` o la landing del sector | `src/app/rag/`, `src/components/rag/` (rama) |
+| 1. Landing | `/rag` explica qué es RAG, casos por sector, cómo funciona, seguridad, cómo evita respuestas inventadas, integraciones, planes y FAQ, con un índice de anclas bajo el H1. Cada landing por sector abre con la demo de su sector, «Cotizar el piloto» y el precio del piloto; después trae casos de uso, un ejemplo ilustrativo con un documento ficticio de la demo, sus datos y qué pasa si la respuesta no está, cómo empieza el piloto y el CTA | Pauta en Google y LinkedIn hacia `/rag` o la landing del sector | `src/app/rag/`, `src/components/rag/` (rama) |
 | 2. Demo pública | `/demo/chatbot` con un documento de ejemplo. No pide registro | Cupo por visitante y tope mensual de gasto | `apps/web/src/app/demo/chatbot/` |
 | 3. "Prueba con tu documento" | Sube un PDF, DOCX o TXT y pregunta sobre él. Solo da su email y marca la autorización de datos | El email entra como **lead con origen `demo-rag`** por el mismo canal del formulario de contacto (en la rama, `services/lead.service.ts` guarda un `Contact` con `source = demo-rag` y avisa por email y WhatsApp; con el sistema de demos, un `Lead` con canal `demo_rag` en **Admin › Leads**). El comercial lo contacta en 1 día hábil | Etapa 6: hecho en la rama `rag-reposicionamiento` (pendiente de merge), API `/api/demo-rag` |
-| 4. Agenda un piloto | Botones "Agenda un piloto" de `/rag`, las landings por sector, `/chatbots-ia`, la tabla de planes y el cierre de la demo («Cotizar el piloto RAG»): van a `/contact?service=sistema-rag&plan=piloto`, con el plan prellenado | Llamada de 30 min, alcance y orden de servicio | `/contact` |
+| 4. Cotizar el piloto | Botones «Cotizar el piloto» de `/rag`, las landings por sector, `/chatbots-ia`, la tabla de planes y la demo: van a `/contact?service=sistema-rag&plan=piloto`. El formulario llega con el encabezado «Cotiza el plan Piloto RAG», el precio y la duración, «Qué pasa después» (llamada de 30 minutos, alcance, qué entrega el cliente) y sin el campo de presupuesto. Al enviar, la confirmación repite el email y dice que no llega un correo automático | Llamada de 30 min, alcance y orden de servicio | `/contact` |
 | 5. Piloto RAG | Su propio asistente con una fuente y hasta 100 documentos, interfaz web con citas | Informe de precisión con 50 preguntas | Kit del Piloto (tarea 10) |
 | 6. Plan | Propuesta del plan Esencial, Profesional o Empresarial con el crédito del Piloto | Implementación y operación mensual | [Panel de administración](05-Panel-de-Administracion.md) (propuestas, Fase 3) |
 
@@ -156,14 +156,14 @@ Este producto no usa la plantilla `/productos/<slug>`: su landing es **`/rag`**,
 
 | Ruta | Qué es | Estado |
 |---|---|---|
-| `/rag` | Página principal del producto. Title "Sistemas RAG para empresas en Colombia \| KopTup". 9 secciones en este orden: qué es RAG (para un gerente), casos por sector, cómo funciona (documentos → índice → búsqueda → respuesta con cita), seguridad y privacidad (lo que el código hace hoy), cómo evitamos respuestas inventadas, integraciones, planes y precios, FAQ con `FAQPage` y CTA "Prueba con tu documento" / "Agenda un piloto". JSON-LD `Service` con cada plan como `Offer` | Hecha en la rama |
-| `/rag/salud` | H1, 3 casos (protocolos clínicos, normativa del sector, auditoría de cuentas médicas), enlace a `/rag` y CTA. Enlaza la demo de cuentas médicas, que se presenta como **"Sistema experto para salud"** porque su código no usa búsqueda vectorial ([Demo cuentas médicas](Demo-cuentas-medicas.md)) | Hecha en la rama (incluye la nueva etiqueta de cuentas médicas) |
-| `/rag/legal` | H1, 3 casos (contratos, conceptos jurídicos internos, normativa), enlace a `/rag` y CTA | Hecha en la rama |
-| `/rag/soporte` | H1, 3 casos (manuales, políticas, base de conocimiento para agentes), enlace a `/rag` y CTA | Hecha en la rama |
-| `/chatbots-ia` | Reescrita como "Chatbots RAG para WhatsApp y web": "Desde COP 9.900.000, o piloto de COP 3.900.000", "Se actualiza cuando agregas o cambias documentos", tiempos alineados con los planes, sin cifras sin respaldo | Hecha en la rama |
+| `/rag` | Página principal del producto. Title "Sistemas RAG para empresas en Colombia \| KopTup". 9 secciones en este orden: qué es RAG (para un gerente), casos por sector, cómo funciona (documentos → índice → búsqueda → respuesta con cita), seguridad y privacidad (lo que el código hace hoy), cómo evitamos respuestas inventadas, integraciones, planes y precios, FAQ con `FAQPage` (10 preguntas, incluidas «¿Entiende sinónimos?» y «¿Qué tengo que entregar para el piloto?») y CTA «Prueba con tu documento» / «Cotizar el piloto». H1 «Sistemas RAG: IA que responde con los documentos de tu empresa», precio del piloto bajo los botones e índice de anclas (sector, cómo funciona, tus datos, precios, preguntas). JSON-LD `Service` con cada plan como `Offer` | Hecha |
+| `/rag/salud` | H1 «IA que responde con tus protocolos, normas y contratos con EPS, citando la fuente», botones «Probar la demo con una IPS de ejemplo» (`?empresa=salud`) y «Cotizar el piloto» con el precio; 3 casos (protocolos clínicos, normativa del sector, consulta para auditoría de cuentas médicas: «el asistente responde preguntas; no revisa las facturas»), ejemplo de glosas citado del «Manual de cuentas médicas (ejemplo)» de la demo, bloque de datos de pacientes y, aparte, el **«Sistema experto para salud»** como otro producto (su código no usa búsqueda vectorial; [Demo cuentas médicas](Demo-cuentas-medicas.md)) con un solo aviso de invitación | Hecha |
+| `/rag/legal` | H1 para firmas y áreas legales, botón «Probar la demo con una firma de ejemplo» (`?empresa=legal`), 3 casos (contratos, conceptos jurídicos internos, normativa y jurisprudencia), bloque «¿Y si cita una sentencia que no existe?» y confidencialidad | Hecha |
+| `/rag/soporte` | H1, botón «Probar la demo con una tienda de ejemplo» (`?empresa=tienda`), 3 casos (manuales, políticas, base de conocimiento para agentes), ejemplo de garantías y aviso de que el chat del sitio es público | Hecha |
+| `/chatbots-ia` | Reescrita como "Chatbots RAG para WhatsApp y web": «Piloto: COP 3.900.000, pago único. Planes desde COP 9.900.000 de implementación + COP 1.490.000 al mes», «Instruido para no inventar», tiempos alineados con los planes, sin cifras sin respaldo | Hecha |
 | `/soluciones-ia` | RAG pasa a ser la primera solución, con enlace a `/rag`; sin cifras sin respaldo | Hecha en la rama |
-| `/services#planes-rag` | Los 4 planes arriba de todo; el catálogo queda debajo como "Otras soluciones a medida" | Hecha en la rama |
-| Inicio | H1 "IA que responde con los documentos de tu empresa", botones "Probar la demo" y "Ver planes", el chatbot RAG como primera demo destacada | Hecha en la rama |
+| `/services#planes-rag` | Los 4 planes arriba de todo, con el total en COP con IVA del 19 %, el costo del primer año, «Qué necesitamos de ti» en el piloto, el aviso de que el chat del Esencial es público y «Todavía no pagas nada» bajo los botones; el catálogo queda debajo como «Otras soluciones a medida», separado («¿Buscas algo distinto a un asistente que responde con tus documentos?») y con precios en «COP» | Hecha |
+| Inicio | H1 "IA que responde con los documentos de tu empresa", botones "Probar la demo" y "Ver planes", franja bajo el hero con los sectores (salud, legal, soporte), el precio del piloto y «Cómo tratamos tus datos»; el chatbot RAG como primera demo destacada; los servicios generales bajo «Además, desarrollamos software a medida» | Hecha |
 | `/productos/chatbot-rag-ia` | No se crea: redirige con 301 a `/rag` cuando existan las landings de producto ([Landing de producto](Seccion-Landing-de-Producto.md)) | Fase 1 |
 
 **Palabras clave** (una intención por URL, ver [Landings SEO](Seccion-Landings-SEO.md)):
@@ -171,7 +171,7 @@ Este producto no usa la plantilla `/productos/<slug>`: su landing es **`/rag`**,
 - Técnicas: "RAG", "retrieval augmented generation", "base de conocimiento con IA" → `/rag`.
 - De problema: "chatbot con los documentos de la empresa" → `/chatbots-ia`; "buscar en contratos con IA" → `/rag/legal`; "asistente IA para manuales internos" → `/rag/soporte`.
 
-![/rag en la rama rag-reposicionamiento: H1 "Sistemas RAG para empresas en Colombia", botones "Prueba con tu documento" y "Agenda un piloto", y el inicio de "¿Qué es RAG?"](images/despues/rag-pagina-rag.jpg)
+![/rag: H1 "Sistemas RAG: IA que responde con los documentos de tu empresa", botones "Prueba con tu documento" y "Cotizar el piloto", el precio del piloto y el índice de la página (sector, cómo funciona, tus datos, precios, preguntas)](images/despues/rag-pagina-rag.jpg)
 
 *`/rag` en un build de la rama `rag-reposicionamiento` terminada (pendiente de merge; aún no está en producción). Más capturas en la galería "Después" de [Reposicionamiento RAG](13-Reposicionamiento-RAG.md).*
 
@@ -211,7 +211,7 @@ flowchart LR
   B --> C["3. Abre la fuente citada"]
   C --> D["4. Pregunta fuera de alcance: responde No encontré esa información"]
   D --> E["5. Prueba con tu documento"]
-  E --> F["CTA: Agenda un piloto"]
+  E --> F["CTA: Cotizar el piloto"]
 ```
 > [Ver diagrama como imagen](images/diagramas/Producto-chatbot-rag-ia-2.png)
 
@@ -220,17 +220,17 @@ flowchart LR
 | Parte de la demo | Acceso | Límites |
 |---|---|---|
 | Playground con documento de ejemplo | `publico`: sin registro, indexable | Cupo por visitante y tope mensual de gasto de la demo |
-| **"Prueba con tu documento"** | `publico` con **email + autorización Ley 1581** (sin cuenta) | PDF, DOCX o TXT de hasta 5 MB y 30 páginas; 10 preguntas por documento; 3 documentos por IP al día; documento y fragmentos borrados a la hora |
+| **"Prueba con tu documento"** | `publico` con **email + autorización Ley 1581** (sin cuenta) | PDF, DOCX o TXT de hasta 5 MB y 30 páginas; 10 preguntas por documento; 3 documentos por red (IP) al día, y la demo lo dice así; documento y fragmentos borrados a la hora |
 | Builder ("Configura el tuyo": marca, documentos, URLs, código para insertar) | Vista previa pública; guardar un bot propio exige un acceso (`DemoGrant`) | Cupo ampliado del grant (Fase 2) |
-| Demo guiada | Por "Agenda un piloto" o por el formulario "Solicitar demo" cuando exista | Sesión con un comercial |
+| Demo guiada | «Pedir una demo guiada» de la demo abre `/contact?service=sistema-rag&motivo=demo-guiada` con el mensaje ya escrito | Sesión con un comercial |
 
 #### "Prueba con tu documento" (etapa 6: hecho en la rama rag-reposicionamiento, pendiente de merge)
 
 - **Qué pide:** solo el email y una casilla **sin marcar** de autorización de tratamiento de datos (Ley 1581 de 2012) con enlace a `/privacy`. Nada más.
 - **Lead:** el email se envía como lead con origen **`demo-rag`** por el mismo canal del formulario de contacto. Llega al equipo como hoy llegan los contactos (email y WhatsApp internos).
-- **Límites:** 10 preguntas por documento y 3 documentos por IP al día. El cupo diario y el contador de gasto usan el Redis que ya tiene el proyecto (`REDIS_URL`). La función solo se enciende con `DEMO_UPLOAD_ENABLED=true`, Redis y `OPENAI_API_KEY`; si falta algo, queda apagada y muestra "Agenda una demo con nosotros".
+- **Límites:** 10 preguntas por documento y 3 documentos por IP al día. El cupo diario y el contador de gasto usan el Redis que ya tiene el proyecto (`REDIS_URL`). La función solo se enciende con `DEMO_UPLOAD_ENABLED=true`, Redis y `OPENAI_API_KEY`; si falta algo, queda apagada y muestra «Pide una demo guiada».
 - **Borrado:** el documento y su índice viven solo en la memoria del servidor y se borran a la hora (TTL de 1 hora). Nada queda en almacenamiento permanente.
-- **Tope de gasto:** `DEMO_MONTHLY_BUDGET_USD` (por defecto 50). Al alcanzarlo, la subida se desactiva y aparece "Agenda una demo con nosotros" → `/solicitar-demo?demos=chatbot`.
+- **Tope de gasto:** `DEMO_MONTHLY_BUDGET_USD` (por defecto 50). Al alcanzarlo, la subida se desactiva y aparece «Pide una demo guiada» → `/contact?service=sistema-rag&motivo=demo-guiada`.
 - **Citas:** cada respuesta cita la página o el fragmento del documento.
 - **Aviso visible:** "No subas información confidencial en la demo".
 - **Eventos:** `demo_upload` al subir el documento y `demo_start` en la primera pregunta (con consentimiento de cookies).
@@ -303,7 +303,8 @@ Fuente única en el código de la rama: `apps/web/src/lib/rag-plans.ts` (montos)
 
 **Condiciones:**
 
-- **IVA:** los precios en COP y en USD se publican **más IVA si aplica**. La clasificación tributaria de cada concepto la define el contador ([Comercial, marketing y legal](11-Comercial-Marketing-y-Legal.md)).
+- **IVA:** los precios en COP y en USD se publican **más IVA si aplica**. Debajo de cada precio en COP la tabla muestra el total con el IVA general del 19 % (`withRagVat` en `rag-plans.ts`) y la nota dice que la propuesta confirma si el caso lo lleva. La clasificación tributaria de cada concepto la define el contador ([Comercial, marketing y legal](11-Comercial-Marketing-y-Legal.md)): **el dueño debe confirmar que el 19 % es la tarifa que aplica**.
+- **Primer año:** Esencial COP 27.780.000 y Profesional COP 60.780.000, más IVA (implementación + 12 mensualidades; `ragFirstYearCop`).
 - **USD fijos:** los planes RAG no se convierten con TRM. El resto del catálogo ("Otras soluciones a medida") calcula su USD con una sola constante, `TRM_REFERENCIA = 3300`.
 - **Pregunta adicional sobre el tope del plan:** COP 250 / USD 0,08.
 - **WhatsApp:** las tarifas de Meta por mensajes se cobran aparte, **al costo**.
@@ -316,15 +317,18 @@ Fuente única en el código de la rama: `apps/web/src/lib/rag-plans.ts` (montos)
 2. **Definir "fuente" y "documento":** una fuente es una carpeta de Drive, un sitio de SharePoint o la carga manual; un documento es un archivo, con un tamaño máximo por archivo.
 3. **Precisar "soporte prioritario"** (tiempo de primera respuesta) frente al soporte Lun–Vie de Esencial.
 4. **Empresarial:** publicar qué incluye el SLA base (disponibilidad, horario, tiempos de respuesta) aunque el precio sea a convenir.
-5. **Publicar las condiciones del Piloto** (alcance, qué entrega el cliente, cómo se calcula el informe y el crédito) en `/terms#piloto`.
+5. **Publicar las condiciones del Piloto** (alcance, qué entrega el cliente, cómo se calcula el informe y el crédito) en `/terms#piloto`. Lo que entrega el cliente (hasta 100 documentos de un origen, 50 preguntas con su respuesta esperada y una persona que valide) ya se dice en la tarjeta del Piloto, en la FAQ de `/rag`, en las landings por sector y en `/contact`.
+6. **Confirmar si la mensualidad del Profesional incluye alojamiento y actualización de documentos** como la del Esencial; si es así, decir «Todo lo de la mensualidad del Esencial, más:» en su tarjeta.
+7. **Definir quién accede a la interfaz del Piloto** (¿con usuario y contraseña?, ¿cuántos usuarios?) y qué pasa con los documentos y el asistente si no se contrata después de las 2 semanas.
 
 ---
 
 ## Seguridad y privacidad
 
-Lo que `/rag` dice en la rama (y debe seguir siendo cierto):
+Lo que `/rag` dice (y debe seguir siendo cierto):
 
-- Los documentos se procesan, fragmentan e indexan en el servidor de KopTup; las preguntas y respuestas quedan registradas allí.
+- Los documentos se procesan, fragmentan e indexan en el servidor de KopTup, alojado en Railway con una base MongoDB; las preguntas y respuestas quedan registradas allí. Estos proveedores, igual que OpenAI, pueden procesar los datos fuera de Colombia, principalmente en Estados Unidos (lo mismo que dice `/privacy`).
+- Aun en el plan Empresarial (en la nube o los servidores del cliente), cada respuesta se redacta con la API de OpenAI: la pregunta y los fragmentos relevantes salen hacia OpenAI. Las landings de salud, legal y soporte resumen esto en su bloque de datos y enlazan a `/rag#seguridad`; la de salud recomienda empezar con documentos sin datos de pacientes.
 - El proveedor de IA es **OpenAI** vía API, con **GPT-4o mini** por defecto. La clave del proveedor vive solo en el servidor.
 - A OpenAI se envía lo necesario para cada respuesta: la pregunta, los fragmentos más relevantes (no el documento completo), las instrucciones del asistente y los últimos mensajes.
 - Según la política vigente de la API de OpenAI, por defecto los datos enviados por API no se usan para entrenar modelos, y pueden conservarse hasta 30 días para detectar abusos. Si la política cambia, se actualiza la FAQ de `/rag`.

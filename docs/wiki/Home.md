@@ -179,7 +179,7 @@ Al **8 de octubre de 2026**:
 | Landings `/productos/<slug>` | Especificadas (plantilla, contenido por producto y mockup); sin construir | [Landing de producto](Seccion-Landing-de-Producto.md) |
 | Decisiones del dueño | Abiertas: mantenimiento de la compra, pasarelas y cobro en USD, publicación de casos y otras | [Comercial, marketing y legal](11-Comercial-Marketing-y-Legal.md), sección 17 |
 
-![/rag: H1 "Sistemas RAG para empresas en Colombia", botones "Prueba con tu documento" y "Agenda un piloto" y el inicio de "¿Qué es RAG?"](images/despues/rag-pagina-rag.jpg)
+![/rag: H1 "Sistemas RAG: IA que responde con los documentos de tu empresa", botones "Prueba con tu documento" y "Cotizar el piloto", el precio del piloto y el índice de la página (sector, cómo funciona, tus datos, precios, preguntas)](images/despues/rag-pagina-rag.jpg)
 
 *`/rag`, hoy en `main`. Más capturas en la galería "Después" de [Reposicionamiento RAG](13-Reposicionamiento-RAG.md).*
 

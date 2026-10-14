@@ -95,7 +95,7 @@ Capturas reales de un build de la rama `rag-reposicionamiento` en su estado fina
 
 *Inicio completo: el texto usa el conteo real de 26 demos y pone el chatbot RAG y el "Sistema experto para salud" como primeras tarjetas.*
 
-![Después: /rag con el H1 "Sistemas RAG para empresas en Colombia", botones "Prueba con tu documento" y "Agenda un piloto" y el inicio de "¿Qué es RAG?"](images/despues/rag-pagina-rag.jpg)
+![Después: /rag: H1 "Sistemas RAG: IA que responde con los documentos de tu empresa", botones "Prueba con tu documento" y "Cotizar el piloto", el precio del piloto y el índice de la página (sector, cómo funciona, tus datos, precios, preguntas)](images/despues/rag-pagina-rag.jpg)
 
 *`/rag`: H1 "Sistemas RAG para empresas en Colombia", con "Prueba con tu documento" y "Agenda un piloto" como CTA.*
 

@@ -108,8 +108,8 @@
       "title": "Chatbots RAG para WhatsApp y web",
       "subtitle": "Un chatbot que responde a tus clientes y a tu equipo con los documentos de tu empresa —manuales, políticas, catálogos, preguntas frecuentes— y cita la fuente de cada respuesta. En tu sitio web y en WhatsApp.",
       "ctaDemo": "Prueba con tu documento",
-      "ctaPilot": "Agenda un piloto",
-      "price": "Desde {essentialFrom}, o piloto de {pilotFrom}. Más IVA si aplica.",
+      "ctaPilot": "Cotizar el piloto",
+      "price": "Piloto: {pilotFrom}, pago único. Planes desde {essentialFrom} de implementación + {essentialMonthlyFrom} al mes. Más IVA si aplica.",
       "ragLink": "Cómo funciona un chatbot con los documentos de tu empresa"
     },
     "benefits": {
@@ -129,8 +129,8 @@
           "desc": "No hay que reentrenar ningún modelo: el chatbot consulta tus documentos en cada pregunta, así que responde con la versión que tengas cargada."
         },
         "notFound": {
-          "title": "No inventa respuestas",
-          "desc": "Si la respuesta no está en tus documentos, dice «no encontré esa información» en lugar de adivinar."
+          "title": "Instruido para no inventar",
+          "desc": "Si la respuesta no está en tus documentos, dice «no encontré esa información» en lugar de adivinar. Cada dato trae su cita para que lo verifiques."
         },
         "anyHour": {
           "title": "Responde a cualquier hora",
@@ -196,7 +196,7 @@
       "steps": {
         "pilot": {
           "title": "1. Piloto ({pilotWeeks} semanas)",
-          "desc": "Cargamos hasta 100 documentos de una fuente, pruebas el chatbot en una interfaz web con citas y recibes un informe de precisión con 50 preguntas de prueba."
+          "desc": "Nos entregas hasta 100 documentos de un solo origen y 50 preguntas reales con la respuesta que esperas; pruebas el chatbot en una interfaz web con citas y recibes el informe de precisión."
         },
         "implementation": {
           "title": "2. Implementación",
@@ -208,7 +208,7 @@
         },
         "updates": {
           "title": "4. Actualización y soporte",
-          "desc": "Cuando agregas o cambias documentos, el chatbot se actualiza. En el plan Esencial, la mensualidad incluye hosting, actualización de documentos y soporte Lun–Vie."
+          "desc": "Cuando agregas o cambias documentos, el chatbot se actualiza. En el plan Esencial, la mensualidad incluye alojamiento, actualización de documentos y soporte de lunes a viernes."
         }
       }
     },
@@ -217,7 +217,7 @@
       "items": {
         "cost": {
           "q": "¿Cuánto cuesta un chatbot RAG?",
-          "a": "Desde {essentialFrom}, o piloto de {pilotFrom}. En detalle: el piloto de {pilotWeeks} semanas cuesta {pilotPrice}; el plan Esencial (sitio web), {essentialSetup} de setup más {essentialMonthly} al mes, y el Profesional (sitio web y WhatsApp), {proSetup} de setup más {proMonthly} al mes. Todos los precios son más IVA si aplica, y las tarifas de Meta por mensajes de WhatsApp se cobran aparte, al costo."
+          "a": "El piloto de {pilotWeeks} semanas cuesta {pilotPrice}, pago único. El plan Esencial (sitio web) cuesta {essentialSetup} de implementación más {essentialMonthly} al mes, y el Profesional (sitio web y WhatsApp), {proSetup} de implementación más {proMonthly} al mes. Todos los precios son más IVA si aplica, y las tarifas de Meta por mensajes de WhatsApp se cobran aparte, al costo. El detalle, con el total con IVA y el costo del primer año, está en los planes."
         },
         "time": {
           "q": "¿En cuánto tiempo tengo mi chatbot funcionando?",
@@ -243,16 +243,17 @@
     },
     "cta": {
       "title": "¿Quieres un chatbot que responda con tus documentos?",
-      "subtitle": "Prueba la demo gratis: los ejemplos no piden registro y para usar tu propio documento solo te pedimos un email. O agenda un piloto de {pilotWeeks} semanas con los documentos de tu empresa.",
+      "subtitle": "Prueba la demo gratis: los ejemplos no piden registro y para usar tu propio documento solo te pedimos un email. O cotiza un piloto de {pilotWeeks} semanas con los documentos de tu empresa.",
       "demo": "Prueba con tu documento",
-      "pilot": "Agenda un piloto",
+      "pilot": "Cotizar el piloto",
       "plans": "Ver planes y precios"
     }
   },
   "offeringsCatalog": {
     "section": {
+      "eyebrow": "¿Buscas algo distinto a un asistente que responde con tus documentos?",
       "title": "Otras soluciones a medida",
-      "subtitle": "Elige cómo quieres trabajar con nosotros: compra el software (te entregamos el código) o suscríbete al SaaS mensual (lo hospedamos nosotros)."
+      "subtitle": "Los planes de arriba son los del asistente RAG. Lo que sigue son otros productos, con precios propios: compra el software (te entregamos el código) o suscríbete al SaaS mensual (lo hospedamos nosotros)."
     },
     "search": "Buscar...",
     "modality": {
@@ -272,7 +273,7 @@
       "label": "Moneda",
       "cop": "COP",
       "usd": "USD",
-      "trmReference": "Precios fijados en COP. El valor en USD es una referencia calculada con una TRM de {value} por dólar."
+      "trmReference": "Los precios de estas soluciones se fijan en COP; el valor en USD es una referencia calculada con una TRM de {value} por dólar. (Los planes RAG de arriba tienen precio fijo en COP y en USD.)"
     },
     "card": {
       "viewMore": "Ver más detalles",
@@ -308,7 +309,7 @@
     },
     "banner": {
       "title": "Cómo escalamos",
-      "body": "Equipo basado en Colombia que opera Lun–Vie 8AM–5PM. Si tu proyecto debe cumplir normas como ISO 27001, SOC 2 o HIPAA, lo diseñamos con esos requisitos; la certificación formal la tramita tu empresa. Si necesitas un alcance mayor al Enterprise, cotizamos personalizado en 48h hábiles."
+      "body": "Equipo basado en Colombia que atiende de lunes a viernes, de 8:00 a. m. a 6:00 p. m. (hora de Colombia). Si tu proyecto debe cumplir normas como ISO 27001, SOC 2 o HIPAA, lo diseñamos con esos requisitos; la certificación formal la tramita tu empresa. Si necesitas un alcance mayor al del nivel más alto, cotizamos personalizado en 48 horas hábiles."
     },
     "supportSLA": {
       "email-24h": "Email horario laboral · 24h hábiles",
@@ -349,11 +350,19 @@
   "ragPage": {
     "hero": {
       "badge": "Base de conocimiento con IA",
-      "title": "Sistemas RAG para empresas en Colombia",
+      "title": "Sistemas RAG: IA que responde con los documentos de tu empresa",
       "subtitle": "Un sistema RAG es una IA que, antes de responder, busca en los documentos de tu empresa —manuales, contratos, políticas— y te contesta con lo que encontró, citando la fuente.",
       "ctaDemo": "Prueba con tu documento",
-      "ctaPilot": "Agenda un piloto",
-      "pilotNote": "Piloto con tus documentos en {pilotWeeks} semanas."
+      "ctaPilot": "Cotizar el piloto",
+      "pilotNote": "Piloto de {pilotWeeks} semanas con tus documentos: {pilotPrice}, pago único, más IVA si aplica.",
+      "nav": "En esta página",
+      "navItems": {
+        "casos": "Para tu sector",
+        "como-funciona": "Cómo funciona",
+        "seguridad": "Tus datos",
+        "planes-rag": "Precios",
+        "preguntas-frecuentes": "Preguntas"
+      }
     },
     "intro": {
       "title": "¿Qué es RAG? Una base de conocimiento con IA, en palabras simples",
@@ -394,7 +403,7 @@
         },
         "search": {
           "title": "Búsqueda",
-          "desc": "Con cada pregunta, el sistema recupera los fragmentos más relevantes (el «retrieval»). En la demo, la búsqueda es léxica, tipo BM25, y toma los 5 mejores."
+          "desc": "Con cada pregunta, el sistema recupera los fragmentos más relevantes (el «retrieval»). En la demo, la búsqueda es por palabras (BM25): encuentra los fragmentos que comparten palabras con tu pregunta y toma los 5 mejores."
         },
         "answer": {
           "title": "Respuesta con cita",
@@ -418,7 +427,7 @@
       "items": {
         "storage": {
           "title": "Dónde se guardan tus documentos",
-          "desc": "En el servidor de KopTup. Allí extraemos el texto, lo dividimos en fragmentos y construimos el índice de búsqueda. Las preguntas y respuestas también quedan registradas en ese servidor."
+          "desc": "En el servidor de KopTup, alojado en Railway, con una base de datos MongoDB. Allí extraemos el texto, lo dividimos en fragmentos y construimos el índice de búsqueda; las preguntas y respuestas también quedan registradas allí. Estos proveedores, igual que OpenAI, pueden procesar los datos fuera de Colombia, principalmente en Estados Unidos (lo detalla la política de privacidad)."
         },
         "provider": {
           "title": "Qué proveedor de IA usamos",
@@ -434,7 +443,7 @@
         },
         "control": {
           "title": "Si necesitas más control",
-          "desc": "En el plan Profesional construimos en tu proyecto permisos por rol, y el Empresarial se despliega en tu nube o en tus servidores (on-premise), con SSO y auditoría que también se construyen en tu proyecto."
+          "desc": "En el plan Profesional construimos en tu proyecto permisos por rol, y el Empresarial se despliega en tu nube o en tus propios servidores (on-premise), con inicio de sesión corporativo (SSO) y auditoría que también se construyen en tu proyecto. En todos los planes, cada respuesta se redacta con la API de OpenAI: la pregunta y los fragmentos relevantes salen hacia OpenAI."
         },
         "demo": {
           "title": "En la demo pública",
@@ -448,8 +457,8 @@
       "subtitle": "Una IA que inventa respuestas es peor que no tener IA. Por eso el sistema sigue tres reglas.",
       "rules": {
         "onlyDocs": {
-          "title": "Responde solo con lo que está en tus documentos",
-          "desc": "El modelo recibe los fragmentos encontrados en tus documentos y la instrucción de basarse en ellos, no en lo que «sabe» de internet."
+          "title": "Instruido para responder solo con tus documentos",
+          "desc": "El modelo recibe los fragmentos encontrados en tus documentos y la instrucción de basarse en ellos, no en lo que «sabe» de internet. Por eso cada respuesta trae su cita: para que la verifiques."
         },
         "cites": {
           "title": "Cita la fuente",
@@ -487,7 +496,7 @@
           "desc": "En tu proyecto llevamos las respuestas a tu intranet, tu CRM o tus aplicaciones a través de una API."
         }
       },
-      "note": "La cantidad de fuentes depende del plan: una en Esencial, hasta tres en Profesional e ilimitadas en Empresarial. El canal de WhatsApp se construye en tu proyecto desde el plan Profesional."
+      "note": "La cantidad de orígenes de documentos depende del plan: uno en Esencial, hasta tres en Profesional e ilimitados en Empresarial. El canal de WhatsApp se construye en tu proyecto desde el plan Profesional."
     },
     "plans": {
       "title": "Planes y precios",
@@ -512,6 +521,14 @@
           "q": "¿Qué pasa si la respuesta no está en mis documentos?",
           "a": "El asistente te dice «no encontré esa información» en lugar de inventar una respuesta. Esas preguntas sirven para detectar qué documentos faltan: cuando los cargas, el asistente ya puede responderlas."
         },
+        "synonyms": {
+          "q": "¿Entiende sinónimos?",
+          "a": "La búsqueda de la demo es por palabras: si preguntas con palabras que no están en el documento (por ejemplo, «término» cuando el contrato dice «plazo»), puede responder «no encontré». En el piloto lo medimos con tus 50 preguntas reales, escritas con el vocabulario de tu equipo, y te mostramos en el informe cuáles no encontró."
+        },
+        "pilotInput": {
+          "q": "¿Qué tengo que entregar para el piloto?",
+          "a": "Hasta 100 documentos de un solo origen, 50 preguntas reales de tu equipo con la respuesta que esperas y una persona que revise las respuestas con nosotros. Empezamos con una llamada de 30 minutos y en {pilotWeeks} semanas tienes el asistente con tus documentos y el informe de precisión: cuántas respondió bien, con qué fuente y en cuántas dijo «no encontré»."
+        },
         "formats": {
           "q": "¿Qué formatos acepta?",
           "a": "PDF con texto, Word (DOCX), TXT y páginas web. Según el plan, en tu proyecto también construimos la conexión con Google Drive o SharePoint y con bases de datos o APIs. Si tus PDF son escaneos (imágenes sin texto), lo revisamos contigo en el piloto."
@@ -522,7 +539,7 @@
         },
         "cost": {
           "q": "¿Cuánto cuesta?",
-          "a": "El piloto de {pilotWeeks} semanas cuesta {pilotPrice}. El plan Esencial cuesta {essentialSetup} de setup más {essentialMonthly} al mes; el Profesional, {proSetup} de setup más {proMonthly} al mes, y el Empresarial, desde {enterpriseSetup}, con mensualidad según SLA. Todos los precios son más IVA si aplica."
+          "a": "El piloto de {pilotWeeks} semanas cuesta {pilotPrice}, pago único (con IVA del 19 %: {pilotPriceVat}); si contratas un plan en los 30 días siguientes, se descuenta completo de la implementación. El plan Esencial cuesta {essentialSetup} de implementación más {essentialMonthly} al mes (primer año: {essentialFirstYear}); el Profesional, {proSetup} de implementación más {proMonthly} al mes (primer año: {proFirstYear}), y el Empresarial, desde {enterpriseSetup}, con mensualidad según el nivel de servicio que acordemos. Todos los precios son más IVA si aplica; en la propuesta te confirmamos si tu caso lo lleva."
         },
         "time": {
           "q": "¿Cuánto tarda?",
@@ -532,18 +549,13 @@
     },
     "cta": {
       "title": "Prueba RAG con tu propio documento",
-      "subtitle": "Haz preguntas en la demo y mira cómo responde con la fuente citada. Cuando quieras probarlo con los documentos de tu empresa, agenda un piloto de {pilotWeeks} semanas.",
+      "subtitle": "Haz preguntas en la demo y mira cómo responde con la fuente citada. Cuando quieras probarlo con los documentos de tu empresa, cotiza un piloto de {pilotWeeks} semanas.",
       "demo": "Prueba con tu documento",
-      "pilot": "Agenda un piloto"
+      "pilot": "Cotizar el piloto"
     }
   },
   "ragSectors": {
     "casesTitle": "Casos de uso",
-    "demoGateNote": {
-      "privado": "Esta demo se abre solo con invitación: el enlace te lleva al formulario para pedirla y el equipo te contacta.",
-      "solicitud": "Esta demo requiere un acceso aprobado: el enlace te lleva al formulario para pedirlo.",
-      "publico": "Esta demo no está disponible por ahora: el enlace te lleva al formulario para pedirla y el equipo te responde."
-    },
     "ragLink": {
       "title": "¿Cómo funciona un sistema RAG?",
       "desc": "Conoce cómo la IA busca en tus documentos y cita la fuente, qué pasa con tus datos, las integraciones, los planes y las preguntas frecuentes.",
@@ -551,15 +563,15 @@
     },
     "cta": {
       "title": "Pruébalo con tus documentos",
-      "subtitle": "Haz preguntas en la demo y mira cómo responde con la fuente citada, o agenda un piloto de {pilotWeeks} semanas con los documentos de tu equipo.",
+      "subtitle": "Sube un documento de prueba a la demo y mira cómo responde con la fuente citada, o cotiza un piloto de {pilotWeeks} semanas con los documentos de tu equipo.",
       "demo": "Prueba con tu documento",
-      "pilot": "Agenda un piloto"
+      "pilot": "Cotizar el piloto"
     },
     "salud": {
       "name": "Salud",
-      "badge": "RAG para salud",
-      "title": "RAG para salud: protocolos clínicos, normativa y auditoría de cuentas médicas",
-      "subtitle": "Una base de conocimiento con IA para clínicas, IPS y EPS: tu equipo pregunta y recibe la respuesta con la cita del protocolo, la norma o el documento de donde sale.",
+      "badge": "Sistemas RAG para salud",
+      "title": "IA que responde con tus protocolos, normas y contratos con EPS, citando la fuente",
+      "subtitle": "Un asistente para clínicas, IPS y EPS: tu equipo pregunta en lenguaje natural y recibe la respuesta con el fragmento del protocolo, la norma o el contrato de donde sale. A esto se le llama un sistema RAG.",
       "cardDesc": "Protocolos clínicos, normativa del sector y auditoría de cuentas médicas, con la fuente citada.",
       "cardLink": "Ver RAG para salud",
       "cases": [
@@ -569,23 +581,43 @@
         },
         {
           "title": "Normativa del sector",
-          "desc": "Resoluciones, circulares y manuales de la normativa de salud en una sola base de consulta, con la norma y el fragmento que respaldan cada respuesta."
+          "desc": "Las resoluciones, circulares y manuales de la normativa de salud que tú cargues, en una sola base de consulta, con la norma y el fragmento que respaldan cada respuesta."
         },
         {
-          "title": "Auditoría de cuentas médicas",
-          "desc": "Los auditores consultan tarifarios, contratos y reglas de glosas mientras revisan una factura, con la fuente a la vista."
+          "title": "Consulta para auditoría de cuentas médicas",
+          "desc": "Tus auditores le preguntan al asistente qué dice el contrato, el tarifario o el manual de glosas mientras revisan una factura, y ven la cláusula citada. El asistente responde preguntas; no revisa las facturas por sí solo."
         }
       ],
-      "demoLink": "Ver la demo «Sistema experto para salud»: auditoría de cuentas médicas con reglas e IA",
-      "demoInviteLink": "Pedir la demo «Sistema experto para salud» (con invitación): auditoría de cuentas médicas con reglas e IA",
-      "demoRequestLink": "Solicitar acceso a la demo «Sistema experto para salud»: auditoría de cuentas médicas con reglas e IA",
-      "disclaimer": "La IA apoya a tu equipo con información citada; las decisiones clínicas y de auditoría siguen en manos de tus profesionales."
+      "disclaimer": "La IA apoya a tu equipo con información citada; las decisiones clínicas y de auditoría siguen en manos de tus profesionales.",
+      "heroDemo": "Probar la demo con una IPS de ejemplo",
+      "demoNote": "En la demo, la IPS de ejemplo responde preguntas de pacientes (exámenes, citas y derechos) y del área de cuentas médicas (radicación y glosas) con documentos ficticios. Para probar con un manual o un contrato tuyo, usa «Prueba con tu documento», sin datos de pacientes.",
+      "example": {
+        "question": "¿Cuál es el plazo interno para responder una glosa?",
+        "answer": "10 días hábiles siguientes a su recepción [1].",
+        "sourceName": "[1] Manual de cuentas médicas (ejemplo).txt",
+        "sourceQuote": "«El equipo de cuentas médicas responde cada glosa dentro de los 10 días hábiles siguientes a su recepción…»"
+      },
+      "data": {
+        "title": "Tus datos y los de tus pacientes",
+        "desc": "Para empezar te recomendamos documentos sin datos de pacientes: protocolos, normativa, contratos y tarifarios. Si quieres consultar documentos con datos de pacientes, lo revisamos contigo antes del piloto. Los documentos quedan en el servidor de KopTup y, para redactar cada respuesta, la pregunta y los fragmentos relevantes se envían a OpenAI; estos proveedores pueden procesar los datos fuera de Colombia, principalmente en Estados Unidos."
+      },
+      "notFound": {
+        "title": "Si la respuesta no está en tus documentos",
+        "desc": "El asistente responde «No encontré esa información en los documentos cargados» en lugar de adivinar. Está instruido para no usar conocimiento externo, y cada respuesta trae su cita para que tu equipo la verifique."
+      },
+      "related": {
+        "title": "¿Necesitas que un sistema revise las facturas?",
+        "desc": "Eso es otro producto: el Sistema experto para salud, que aplica reglas de auditoría con un tarifario de ejemplo, señala posibles glosas y usa IA para extraer los datos de las facturas. No es el asistente de esta página y se cotiza aparte.",
+        "cta": "Ver la demo del sistema experto",
+        "ctaInvite": "Pedir la demo del sistema experto",
+        "ctaRequest": "Solicitar acceso a la demo del sistema experto"
+      }
     },
     "legal": {
       "name": "Legal",
-      "badge": "RAG legal",
-      "title": "Buscar en contratos con IA: RAG para áreas legales",
-      "subtitle": "Pregunta en lenguaje natural por tus contratos, conceptos jurídicos internos y normativa, y recibe la respuesta con la cláusula o el documento de donde sale.",
+      "badge": "Sistemas RAG legales",
+      "title": "IA para firmas y áreas legales: pregúntale a tus contratos y recibe la cláusula citada",
+      "subtitle": "Tu equipo pregunta en lenguaje natural por contratos, conceptos jurídicos internos, normas y sentencias que la firma cargue, y recibe la respuesta con la cláusula o el fragmento de donde sale. A esto se le llama un sistema RAG.",
       "cardDesc": "Buscar en contratos con IA, conceptos jurídicos internos y normativa, con la cláusula citada.",
       "cardLink": "Ver RAG legal",
       "cases": [
@@ -598,17 +630,33 @@
           "desc": "Reutiliza los conceptos y memorandos que ya elaboró tu equipo: el asistente los encuentra y te muestra el documento original."
         },
         {
-          "title": "Normativa",
-          "desc": "Consulta las leyes, decretos y reglamentos que aplican a tu empresa y recibe la respuesta con el fragmento de la norma que la respalda."
+          "title": "Normativa y jurisprudencia",
+          "desc": "Las leyes, decretos y sentencias que tu equipo ya tiene y cargue, con el fragmento que respalda cada respuesta. Si una sentencia no está cargada, el asistente no la cita: te dice que no la encontró."
         }
       ],
-      "disclaimer": "El asistente agiliza la búsqueda; la interpretación jurídica sigue en manos de tus abogados."
+      "disclaimer": "El asistente agiliza la búsqueda; la interpretación jurídica sigue en manos de tus abogados.",
+      "heroDemo": "Probar la demo con una firma de ejemplo",
+      "demoNote": "En la demo, la firma de ejemplo tiene un contrato modelo y un manual interno de expedientes (documentos ficticios). Prueba la última pregunta sugerida: no está en los documentos, y verás que el asistente no se inventa una sentencia.",
+      "example": {
+        "question": "¿Cuánto dura la obligación de confidencialidad?",
+        "answer": "Durante el contrato y hasta 3 años después de su terminación [1].",
+        "sourceName": "[1] Contrato de prestación de servicios (modelo).txt",
+        "sourceQuote": "«Esta obligación se mantiene durante el contrato y hasta 3 años después de su terminación.»"
+      },
+      "data": {
+        "title": "Confidencialidad",
+        "desc": "Tus documentos se guardan en el servidor de KopTup. A OpenAI solo van la pregunta y los fragmentos relevantes, no el documento completo, y según la política vigente de su API no los usa para entrenar sus modelos. Estos proveedores pueden procesar los datos fuera de Colombia, principalmente en Estados Unidos. Si tu firma necesita un acuerdo de confidencialidad, dilo al cotizar."
+      },
+      "notFound": {
+        "title": "¿Y si cita una sentencia que no existe?",
+        "desc": "El asistente solo trabaja con los documentos que tu firma cargue y está instruido para no usar conocimiento externo. Si la norma o la sentencia no está cargada, responde «No encontré esa información en los documentos cargados». Cada respuesta trae el fragmento exacto para que lo verifiques; la verificación final es de tus abogados."
+      }
     },
     "soporte": {
       "name": "Soporte",
-      "badge": "RAG para soporte",
+      "badge": "Sistemas RAG para soporte",
       "title": "Asistente IA para manuales internos y soporte al cliente",
-      "subtitle": "Tus agentes consultan manuales, políticas y la base de conocimiento en lenguaje natural, y responden a los clientes con información correcta y con fuente.",
+      "subtitle": "Tus agentes preguntan por manuales, políticas y la base de conocimiento en lenguaje natural, y responden a los clientes con la política vigente y su fuente. A esto se le llama un sistema RAG.",
       "cardDesc": "Un asistente IA para manuales internos, políticas y la base de conocimiento de tus agentes.",
       "cardLink": "Ver RAG para soporte",
       "cases": [
@@ -624,22 +672,79 @@
           "title": "Base de conocimiento para agentes",
           "desc": "Los agentes nuevos encuentran respuestas sin interrumpir a los más antiguos, y la base de conocimiento se actualiza cuando agregas o cambias documentos."
         }
-      ]
+      ],
+      "heroDemo": "Probar la demo con una tienda de ejemplo",
+      "demoNote": "En la demo, la tienda de ejemplo tiene sus políticas de cambios y devoluciones, envíos y garantías (documentos ficticios): pregunta como lo haría un cliente, por ejemplo por el costo de un envío o por un cambio.",
+      "example": {
+        "question": "¿Cuánto dura la garantía de los muebles?",
+        "answer": "12 meses por defectos de fabricación, contados desde la entrega [1].",
+        "sourceName": "[1] Garantías.txt",
+        "sourceQuote": "«Los muebles tienen 12 meses de garantía por defectos de fabricación, contados desde la entrega.»"
+      },
+      "data": {
+        "title": "Tus datos",
+        "desc": "Tus manuales y políticas se guardan en el servidor de KopTup; para redactar cada respuesta, la pregunta y los fragmentos relevantes se envían a OpenAI, que según la política vigente de su API no los usa para entrenar. Si pones el chat en tu sitio web, cualquiera que lo visite puede preguntarle: úsalo con documentos que puedan ser públicos."
+      },
+      "notFound": {
+        "title": "Si la respuesta no está en tus documentos",
+        "desc": "El asistente responde «No encontré esa información en los documentos cargados» en lugar de inventar una política. Esas preguntas te muestran qué documento hace falta cargar."
+      }
+    },
+    "hero": {
+      "price": "Piloto de {pilotWeeks} semanas con tus documentos: {pilotPrice}, pago único, más IVA si aplica.",
+      "uploadPrefix": "¿Prefieres usar un documento tuyo?",
+      "uploadLink": "Prueba con tu documento"
+    },
+    "example": {
+      "title": "Ejemplo ilustrativo con un documento ficticio de la demo",
+      "questionLabel": "Pregunta",
+      "answerLabel": "Respuesta",
+      "sourceLabel": "Fuente",
+      "tryIt": "Hazle esta pregunta en la demo"
+    },
+    "trust": {
+      "title": "Antes de decidir",
+      "dataLink": "Cómo tratamos tus documentos"
+    },
+    "pilot": {
+      "title": "Cómo empiezas: un piloto de {pilotWeeks} semanas",
+      "subtitle": "Lo pruebas con tus propios documentos antes de contratar un plan.",
+      "steps": {
+        "call": {
+          "title": "Llamada de 30 minutos",
+          "desc": "Entendemos tu caso y definimos con qué documentos y preguntas vamos a trabajar."
+        },
+        "deliver": {
+          "title": "Nos entregas documentos y preguntas",
+          "desc": "Hasta 100 documentos de un solo origen y 50 preguntas reales de tu equipo, cada una con la respuesta que esperas."
+        },
+        "result": {
+          "title": "En {pilotWeeks} semanas, el asistente y el informe",
+          "desc": "Pruebas el asistente con tus documentos y revisamos contigo el informe de precisión: cuántas respondió bien, con qué fuente y en cuántas dijo «no encontré»."
+        }
+      },
+      "price": "{pilotPrice}, pago único, más IVA si aplica (con IVA del 19 %: {pilotPriceVat}). Si contratas un plan en los 30 días siguientes, lo que pagaste se descuenta completo de la implementación.",
+      "plansLink": "Ver todos los planes y precios"
     }
   },
   "ragPlans": {
     "badge": "Sistemas RAG",
     "title": "Planes y precios de sistemas RAG",
     "subtitle": "IA que responde con los documentos de tu empresa y cita la fuente. Empieza con un piloto de 2 semanas con tus propios documentos.",
-    "taxNote": "Precios en COP y USD, más IVA si aplica.",
+    "taxNote": "Precios en COP y USD, más IVA si aplica. Debajo de cada precio ves el total en COP con IVA.",
     "price": {
       "oneTime": "Pago único",
-      "setup": "Setup",
-      "setupFrom": "Setup desde",
+      "setup": "Implementación (pago único)",
+      "setupFrom": "Implementación desde (pago único)",
       "monthly": "Mensualidad",
       "perMonth": "/mes",
-      "monthlyBySla": "Según SLA",
-      "tax": "Más IVA si aplica"
+      "monthlyBySla": "Según el nivel de servicio (SLA) que acordemos",
+      "tax": "Más IVA si aplica",
+      "withVat": "Con IVA del 19 %: {cop}",
+      "withVatFrom": "Con IVA del 19 %: desde {cop}",
+      "withVatMonthly": "Con IVA del 19 %: {cop} al mes",
+      "firstYearLabel": "Primer año:",
+      "firstYear": "{cop} más IVA (implementación + 12 mensualidades)"
     },
     "duration": {
       "pilot": "{weeks} semanas",
@@ -652,55 +757,61 @@
         "name": "Piloto RAG",
         "tagline": "Valida la IA con tus propios documentos antes de implementarla.",
         "features": [
-          "Una fuente de documentos",
+          "Un origen de documentos (por ejemplo, los archivos que nos entregas)",
           "Hasta 100 documentos",
           "Interfaz web con respuestas citadas",
-          "Informe de precisión con 50 preguntas de prueba"
+          "Informe de precisión con 50 preguntas de prueba: cuántas respondió bien, con qué fuente y en cuántas dijo «no encontré»"
         ],
-        "note": "Si contratas un plan en los siguientes 30 días, te descontamos del setup el 100% de lo que pagaste por el piloto.",
-        "cta": "Agenda tu piloto"
+        "note": "Si contratas un plan en los 30 días siguientes, lo que pagaste por el piloto se descuenta completo de la implementación: el piloto no te suma costo.",
+        "cta": "Cotizar el piloto",
+        "needs": [
+          "Hasta 100 documentos de un solo origen.",
+          "50 preguntas reales de tu equipo, cada una con la respuesta que esperas.",
+          "Una persona de tu equipo que revise las respuestas con nosotros."
+        ]
       },
       "esencial": {
         "name": "Esencial",
         "tagline": "Un asistente con los documentos de tu empresa en tu sitio web.",
         "features": [
-          "Una fuente: carga manual, o Google Drive o SharePoint con un conector que se construye en tu proyecto",
+          "Un origen de documentos: carga manual, o Google Drive o SharePoint con un conector que se construye en tu proyecto",
           "Hasta 1.000 documentos",
-          "Widget web",
-          "Respuestas con cita de la fuente"
+          "Chat en tu sitio web",
+          "Respuestas con cita del documento"
         ],
         "monthlyIncludes": [
-          "Hosting",
+          "Alojamiento en nuestros servidores",
           "IA hasta 3.000 preguntas al mes",
           "Actualización de documentos",
-          "Soporte Lun–Vie"
+          "Soporte de lunes a viernes"
         ],
-        "cta": "Elegir Esencial"
+        "cta": "Solicitar el Esencial",
+        "accessNote": "El chat de tu sitio responde a cualquiera que visite la página donde lo pones: úsalo con documentos que puedan ser públicos. Si tus documentos son internos o confidenciales, dilo al cotizar: el control de acceso (permisos por rol) se construye en tu proyecto desde el plan Profesional."
       },
       "profesional": {
         "name": "Profesional",
         "tagline": "Varias fuentes, web y WhatsApp, con permisos por rol y métricas que se construyen en tu proyecto.",
         "features": [
-          "Hasta 3 fuentes",
+          "Hasta 3 orígenes de documentos (por ejemplo, carga manual, Drive y SharePoint)",
           "Hasta 10.000 documentos",
           "Web y WhatsApp (el canal de WhatsApp se construye en tu proyecto)",
           "Permisos por rol (se construyen en tu proyecto)",
           "Panel de métricas (se construye en tu proyecto)"
         ],
         "monthlyIncludes": [
-          "Hasta 15.000 preguntas al mes",
+          "IA hasta 15.000 preguntas al mes",
           "Soporte prioritario",
           "Revisión mensual de calidad"
         ],
-        "cta": "Elegir Profesional"
+        "cta": "Solicitar el Profesional"
       },
       "empresarial": {
         "name": "Empresarial",
-        "tagline": "Para operar en tu propia infraestructura, con SSO y auditoría que se construyen en tu proyecto.",
+        "tagline": "Para operar en tu propia infraestructura, con inicio de sesión corporativo y auditoría que se construyen en tu proyecto.",
         "features": [
-          "Fuentes ilimitadas",
-          "Despliegue en tu nube u on-premise",
-          "SSO (se construye en tu proyecto)",
+          "Orígenes de documentos ilimitados",
+          "Despliegue en tu nube o en tus propios servidores (on-premise)",
+          "Inicio de sesión con las cuentas de tu empresa (SSO, se construye en tu proyecto)",
           "Auditoría (se construye en tu proyecto)",
           "Código fuente incluido"
         ],
@@ -709,10 +820,13 @@
     },
     "notes": {
       "title": "Ten en cuenta",
-      "tax": "Los precios en COP y en USD no incluyen IVA: se suma si aplica.",
+      "tax": "Los precios en COP y en USD no incluyen IVA. Debajo de cada precio ves el total en COP con el IVA general del 19 %; en la propuesta te confirmamos si tu caso lo lleva.",
       "extraQuestion": "Cada pregunta adicional sobre el tope mensual de tu plan cuesta {cop} / {usd}.",
+      "questionsExample": "¿Cuántas preguntas necesitas? Un ejemplo: 30 personas × 5 preguntas al día × 20 días hábiles = 3.000 preguntas al mes.",
       "whatsapp": "Las tarifas de Meta por mensajes de WhatsApp se cobran aparte, al costo."
-    }
+    },
+    "needsTitle": "Qué necesitamos de ti",
+    "ctaNote": "Los botones te llevan a un formulario corto. Te respondemos en menos de 24 horas hábiles para agendar una llamada de 30 minutos. Todavía no pagas nada."
   },
   "offering_appDelivery": {
     "name": "App de delivery",

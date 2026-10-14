@@ -3,15 +3,20 @@
     "badge": "RAG systems",
     "title": "RAG system plans and pricing",
     "subtitle": "AI that answers with your company's documents and cites the source. Start with a 2-week pilot using your own documents.",
-    "taxNote": "Prices in COP and USD, plus VAT if applicable.",
+    "taxNote": "Prices in COP and USD, plus VAT if applicable. Under each price you see the COP total with VAT.",
     "price": {
       "oneTime": "One-time payment",
-      "setup": "Setup",
-      "setupFrom": "Setup from",
+      "setup": "Implementation (one-time)",
+      "setupFrom": "Implementation from (one-time)",
       "monthly": "Monthly fee",
       "perMonth": "/mo",
-      "monthlyBySla": "Based on SLA",
-      "tax": "Plus VAT if applicable"
+      "monthlyBySla": "Based on the service level (SLA) we agree on",
+      "tax": "Plus VAT if applicable",
+      "withVat": "With 19% VAT: {cop}",
+      "withVatFrom": "With 19% VAT: from {cop}",
+      "withVatMonthly": "With 19% VAT: {cop} per month",
+      "firstYearLabel": "First year:",
+      "firstYear": "{cop} plus VAT (implementation + 12 monthly fees)"
     },
     "duration": {
       "pilot": "{weeks} weeks",
@@ -24,55 +29,61 @@
         "name": "RAG Pilot",
         "tagline": "Validate the AI with your own documents before rolling it out.",
         "features": [
-          "One document source",
+          "One document origin (for example, the files you send us)",
           "Up to 100 documents",
           "Web interface with cited answers",
-          "Accuracy report with 50 test questions"
+          "Accuracy report with 50 test questions: how many it answered correctly, with which source, and how many it said “not found”"
         ],
-        "note": "If you sign up for a plan within the following 30 days, we deduct 100% of what you paid for the pilot from the setup.",
-        "cta": "Book your pilot"
+        "note": "If you sign up for a plan within the following 30 days, the full pilot fee is deducted from the implementation: the pilot adds no cost.",
+        "cta": "Get a pilot quote",
+        "needs": [
+          "Up to 100 documents from a single origin.",
+          "50 real questions from your team, each with the answer you expect.",
+          "Someone on your team to review the answers with us."
+        ]
       },
       "esencial": {
         "name": "Essential",
         "tagline": "An assistant with your company's documents on your website.",
         "features": [
-          "One source: manual upload, or Google Drive or SharePoint through a connector built in your project",
+          "One document origin: manual upload, or Google Drive or SharePoint through a connector built in your project",
           "Up to 1,000 documents",
-          "Web widget",
-          "Answers that cite the source"
+          "Chat on your website",
+          "Answers that cite the document"
         ],
         "monthlyIncludes": [
-          "Hosting",
+          "Hosting on our servers",
           "AI for up to 3,000 questions per month",
           "Document updates",
-          "Support Mon–Fri"
+          "Support Monday to Friday"
         ],
-        "cta": "Choose Essential"
+        "cta": "Request Essential",
+        "accessNote": "The chat on your site answers anyone who visits the page where you place it, so use it with documents that can be public. If your documents are internal or confidential, tell us when you request a quote: access control (role-based permissions) is built in your project from the Professional plan."
       },
       "profesional": {
         "name": "Professional",
         "tagline": "Multiple sources, web and WhatsApp, with role-based permissions and metrics built in your project.",
         "features": [
-          "Up to 3 sources",
+          "Up to 3 document origins (for example, manual upload, Drive and SharePoint)",
           "Up to 10,000 documents",
           "Web and WhatsApp (the WhatsApp channel is built in your project)",
           "Role-based permissions (built in your project)",
           "Metrics dashboard (built in your project)"
         ],
         "monthlyIncludes": [
-          "Up to 15,000 questions per month",
+          "AI for up to 15,000 questions per month",
           "Priority support",
           "Monthly quality review"
         ],
-        "cta": "Choose Professional"
+        "cta": "Request Professional"
       },
       "empresarial": {
         "name": "Enterprise",
-        "tagline": "Runs on your own infrastructure, with SSO and auditing built in your project.",
+        "tagline": "Runs on your own infrastructure, with company sign-in and auditing built in your project.",
         "features": [
-          "Unlimited sources",
-          "Deployment on your cloud or on-premise",
-          "SSO (built in your project)",
+          "Unlimited document origins",
+          "Deployment on your cloud or on your own servers (on-premise)",
+          "Sign-in with your company accounts (SSO, built in your project)",
           "Auditing (built in your project)",
           "Source code included"
         ],
@@ -81,9 +92,12 @@
     },
     "notes": {
       "title": "Good to know",
-      "tax": "COP and USD prices exclude VAT, which is added if applicable.",
+      "tax": "COP and USD prices exclude VAT. Under each price you see the COP total with Colombia's general 19% VAT; the proposal confirms whether your case carries it.",
       "extraQuestion": "Each additional question over your plan's monthly cap costs {cop} / {usd}.",
+      "questionsExample": "How many questions do you need? An example: 30 people × 5 questions a day × 20 business days = 3,000 questions a month.",
       "whatsapp": "Meta's WhatsApp messaging fees are billed separately, at cost."
-    }
+    },
+    "needsTitle": "What we need from you",
+    "ctaNote": "The buttons take you to a short form. We reply within 24 business hours to schedule a 30-minute call. You don't pay anything yet."
   }
 }

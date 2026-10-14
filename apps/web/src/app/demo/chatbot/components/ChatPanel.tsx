@@ -41,6 +41,26 @@ interface ChatPanelProps {
   onShowPipeline: () => void;
 }
 
+/** Números `[n]` que la respuesta cita en su texto. */
+export function citedIndexes(text: string): Set<number> {
+  const out = new Set<number>();
+  for (const m of text.matchAll(/\[(\d+)\]/g)) out.add(Number(m[1]));
+  return out;
+}
+
+/**
+ * Fragmentos consultados con la marca "citado": primero los que la respuesta
+ * cita con `[n]` (en su orden), después los que encontró la búsqueda pero la
+ * respuesta no usó.
+ */
+export function orderByCited<T extends { index: number }>(
+  sources: T[],
+  cited: Set<number>,
+): Array<{ source: T; cited: boolean }> {
+  const marked = sources.map((source) => ({ source, cited: cited.has(source.index) }));
+  return [...marked.filter((m) => m.cited), ...marked.filter((m) => !m.cited)];
+}
+
 /**
  * Texto del asistente con citas `[n]` clicables (abren el fragmento real) y
  * negritas `**texto**`.
@@ -254,19 +274,31 @@ export default function ChatPanel({
 
                 {!msg.pending && msg.sources && msg.sources.length > 0 ? (
                   <div className="flex flex-wrap items-center gap-1.5 px-1">
-                    <span className="text-[10px] font-semibold uppercase tracking-wide text-secondary-500 dark:text-secondary-400">
-                      {t('chat.sources')}
-                    </span>
-                    {msg.sources.map((s) => (
+                    <Tooltip content={t('chat.citedHint')} side="top" maxWidth={280}>
+                      <span className="text-[10px] font-semibold uppercase tracking-wide text-secondary-500 dark:text-secondary-400">
+                        {t('chat.sources', { count: msg.sources.length })}
+                      </span>
+                    </Tooltip>
+                    {orderByCited(msg.sources, citedIndexes(msg.content)).map(({ source: s, cited }) => (
                       <button
                         key={s.id}
                         type="button"
                         onClick={() => onCiteClick(s)}
                         aria-label={citationLabel(s.index, s.docName)}
-                        className="inline-flex max-w-full items-center gap-1 rounded-full border border-secondary-200 bg-white px-2.5 py-1 text-[10.5px] text-secondary-700 transition hover:border-primary-400 hover:bg-primary-50 hover:text-primary-700 dark:border-secondary-700 dark:bg-secondary-900 dark:text-secondary-200 dark:hover:bg-primary-950/40 dark:hover:text-primary-200"
+                        data-cited={cited ? 'true' : undefined}
+                        className={`inline-flex max-w-full items-center gap-1 rounded-full border px-2.5 py-1 text-[10.5px] transition hover:border-primary-400 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-primary-950/40 dark:hover:text-primary-200 ${
+                          cited
+                            ? 'border-primary-300 bg-primary-50 text-primary-800 dark:border-primary-800 dark:bg-primary-950/40 dark:text-primary-100'
+                            : 'border-secondary-200 bg-white text-secondary-600 dark:border-secondary-700 dark:bg-secondary-900 dark:text-secondary-300'
+                        }`}
                       >
                         <span className="font-mono">[{s.index}]</span>
                         <span className="truncate">{s.docName}</span>
+                        {cited ? (
+                          <span className="rounded bg-primary-600 px-1 text-[9px] font-semibold uppercase tracking-wide text-white">
+                            {t('chat.cited')}
+                          </span>
+                        ) : null}
                       </button>
                     ))}
                   </div>
