@@ -32,6 +32,10 @@ import {
  * Estado de la demo POS. Arranca siempre con la semilla (mismo HTML en el
  * servidor y en el navegador) y, ya montado, recupera lo guardado en
  * localStorage de este navegador. Nada se envía a un servidor.
+ *
+ * Las horas de la semilla (apertura de turnos y entradas del personal) se
+ * calculan ya montada, con la hora de Colombia, y lo guardado otro día se
+ * descarta: la consola habla de las ventas «de hoy».
  */
 const STORAGE_KEY = 'koptup-demo-pos:v2';
 
@@ -133,6 +137,8 @@ export interface KdsOrder {
   createdAt: number | null;
   ageMin: number;
   status: KdsStatus;
+  /** Comanda de ejemplo (no la envió quien usa la demo). */
+  seed?: boolean;
 }
 
 export interface StaffStatus {
@@ -166,6 +172,14 @@ export interface PresetData {
   seq: number;
 }
 
+/** Lo que ya hizo quien usa la demo, para marcar solos los primeros pasos. */
+export interface TourFlags {
+  scan?: boolean;
+  weigh?: boolean;
+  synced?: boolean;
+  kitchen?: boolean;
+}
+
 export interface PosState {
   version: 2;
   preset: PresetId;
@@ -174,17 +188,31 @@ export interface PosState {
   happyHour: boolean;
   scaleIdx: number;
   data: Record<PresetId, PresetData>;
+  /** Día (hora de Colombia, AAAA-MM-DD) de estos datos; vacío hasta montar. */
+  day?: string;
+  tour?: TourFlags;
 }
 
 export const orderKey = (sede: string, target: string) => `${sede}|${target}`;
 
-/** Hora HH:MM de Colombia (24 h). */
+/** Hora HH:MM de Colombia (24 h). Solo en el navegador, nunca en el primer render. */
 export function hhmm(d = new Date()) {
   try {
     return d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'America/Bogota' });
   } catch {
-    return d.toISOString().slice(11, 16);
+    return new Date(d.getTime() - 5 * 3_600_000).toISOString().slice(11, 16);
   }
+}
+
+/** Fecha AAAA-MM-DD en Colombia (UTC−5, sin horario de verano). */
+export function bogotaDay(ms: number) {
+  return new Date(ms - 5 * 3_600_000).toISOString().slice(0, 10);
+}
+
+/** Hora de Colombia de hace `min` minutos, redondeada hacia abajo a 5 minutos. */
+function hhmmAgo(now: number, min: number) {
+  const step = 5 * 60_000;
+  return hhmm(new Date(Math.floor((now - min * 60_000) / step) * step));
 }
 
 const round3 = (n: number) => Math.round(n * 1000) / 1000;
@@ -200,7 +228,8 @@ function seedPreset(id: PresetId): PresetData {
   p.sedes.forEach((s, i) => {
     stock[s.id] = Object.fromEntries(p.products.map((pr) => [pr.id, pr.stock[i]]));
     const cashier = p.employees.find((e) => e.sede === s.id && e.role === 'cashier');
-    shifts[s.id] = { number: 12 + i * 7, open: true, base: DEFAULT_BASE, cashierId: cashier?.id ?? '', openedAt: cashier?.since ?? '07:00', voids: 0 };
+    // La hora de apertura se calcula ya montada (stampTimes), con la hora de Colombia.
+    shifts[s.id] = { number: 12 + i * 7, open: true, base: DEFAULT_BASE, cashierId: cashier?.id ?? '', openedAt: '', voids: 0 };
     docSeq[`${s.id}|pos`] = s.nextNumber;
     docSeq[`${s.id}|fe`] = 1001 + i * 400;
     docSeq[`${s.id}|nc`] = 101;
@@ -232,7 +261,7 @@ function seedPreset(id: PresetId): PresetData {
         for (const k of SEED_KDS.filter((x) => x.table === o.table)) {
           const kl = lines.filter((l) => l.station === k.station).map((l) => `${l.qty}× ${l.name}${l.note ? ` · ${l.note}` : ''}`);
           if (kl.length === 0) continue;
-          kds.push({ id: `k-${s.id}-${kdsNumber}`, number: kdsNumber++, sede: s.id, target: `t${o.table}`, station: k.station, lines: kl, createdAt: null, ageMin: k.ageMin, status: k.status });
+          kds.push({ id: `k-${s.id}-${kdsNumber}`, number: kdsNumber++, sede: s.id, target: `t${o.table}`, station: k.station, lines: kl, createdAt: null, ageMin: k.ageMin, status: k.status, seed: true });
         }
       }
     }
@@ -247,7 +276,7 @@ function seedPreset(id: PresetId): PresetData {
     closures: [],
     orders,
     kds,
-    staff: Object.fromEntries(p.employees.map((e) => [e.id, { clockedIn: e.clockedIn, since: e.since }])),
+    staff: Object.fromEntries(p.employees.map((e) => [e.id, { clockedIn: e.sinceMin !== null, since: '' }])),
     transfers: [],
     docSeq,
     seq: 1,
@@ -263,6 +292,8 @@ export function seedState(): PosState {
     happyHour: false,
     scaleIdx: 0,
     data: { retail: seedPreset('retail'), restaurant: seedPreset('restaurant') },
+    day: '',
+    tour: {},
   };
 }
 
@@ -286,6 +317,30 @@ function stampKds(d: PresetData, now: number): PresetData {
   return { ...d, kds: d.kds.map((k) => (k.createdAt === null ? { ...k, createdAt: now - k.ageMin * 60_000 } : k)) };
 }
 
+/**
+ * Pone las horas de la semilla que faltan (apertura de turnos y entradas del
+ * personal) relativas a la hora actual de Colombia, y las comandas de ejemplo.
+ */
+export function stampTimes(s: PosState, now: number): PosState {
+  const fix = (id: PresetId, d: PresetData): PresetData => {
+    const emps = PRESETS[id].employees;
+    const sinceOf = (empId: string) => emps.find((e) => e.id === empId)?.sinceMin ?? 0;
+    const shifts = Object.fromEntries(
+      Object.entries(d.shifts).map(([k, sh]) => [k, sh.openedAt ? sh : { ...sh, openedAt: hhmmAgo(now, sinceOf(sh.cashierId)) }]),
+    );
+    const staff = Object.fromEntries(
+      Object.entries(d.staff).map(([k, st]) => [k, st.clockedIn && !st.since ? { ...st, since: hhmmAgo(now, sinceOf(k)) } : st]),
+    );
+    return stampKds({ ...d, shifts, staff }, now);
+  };
+  return {
+    ...s,
+    day: s.day || bogotaDay(now),
+    tour: s.tour ?? {},
+    data: { retail: fix('retail', s.data.retail), restaurant: fix('restaurant', s.data.restaurant) },
+  };
+}
+
 export type AddResult = { ok: true } | { ok: false; reason: 'closed' | 'stock' };
 export type CheckoutInput = { target: string; payments: Payment[]; tipPct: number; buyer: Buyer };
 
@@ -293,6 +348,8 @@ export function usePosStore() {
   const [state, setState] = useState<PosState>(seedState);
   const [hydrated, setHydrated] = useState(false);
   const [syncing, setSyncing] = useState(0);
+  /** Aviso al cargar: lo guardado era de otro día y se volvió a los datos de ejemplo. */
+  const [newDay, setNewDay] = useState(false);
   const timers = useRef<number[]>([]);
 
   const later = useCallback((fn: () => void, ms: number) => {
@@ -312,17 +369,18 @@ export function usePosStore() {
     } catch {
       loaded = null;
     }
+    // Lo guardado otro día se descarta: las ventas, turnos y comandas son «de hoy».
+    if (loaded?.day && loaded.day !== bogotaDay(now)) {
+      loaded = null;
+      setNewDay(true);
+    }
     setState((prev) => {
       const base = loaded ?? prev;
-      const fix = (d: PresetData): PresetData =>
-        stampKds(
-          {
-            ...d,
-            sales: d.sales.map((s) => (s.status === 'sending' ? { ...s, status: base.offline ? 'queued' : 'sent' } : s)),
-          },
-          now,
-        );
-      return { ...base, data: { retail: fix(base.data.retail), restaurant: fix(base.data.restaurant) } };
+      const fix = (d: PresetData): PresetData => ({
+        ...d,
+        sales: d.sales.map((s) => (s.status === 'sending' ? { ...s, status: base.offline ? 'queued' : 'sent' } : s)),
+      });
+      return stampTimes({ ...base, data: { retail: fix(base.data.retail), restaurant: fix(base.data.restaurant) } }, now);
     });
     setHydrated(true);
     const list = timers.current;
@@ -516,15 +574,30 @@ export function usePosStore() {
     [data.orders, sede, update],
   );
 
+  const markTour = useCallback((flag: keyof TourFlags) => {
+    setState((s) => (s.tour?.[flag] ? s : { ...s, tour: { ...s.tour, [flag]: true } }));
+  }, []);
+
+  /** Avanza una comanda (nueva → en preparación → lista). Avanzar una que enviaste tú cuenta para los primeros pasos. */
   const advanceKds = useCallback(
-    (id: string) =>
+    (id: string) => {
+      const k = data.kds.find((x) => x.id === id);
       update((d) => ({
         ...d,
-        kds: d.kds.map((k) => (k.id !== id ? k : { ...k, status: k.status === 'new' ? 'preparing' : 'ready' })),
-      })),
-    [update],
+        kds: d.kds.map((x) => (x.id !== id ? x : { ...x, status: x.status === 'new' ? 'preparing' : 'ready' })),
+      }));
+      if (k && !k.seed) markTour('kitchen');
+    },
+    [data.kds, markTour, update],
   );
-  const deliverKds = useCallback((id: string) => update((d) => ({ ...d, kds: d.kds.filter((k) => k.id !== id) })), [update]);
+  const deliverKds = useCallback(
+    (id: string) => {
+      const k = data.kds.find((x) => x.id === id);
+      update((d) => ({ ...d, kds: d.kds.filter((x) => x.id !== id) }));
+      if (k && !k.seed) markTour('kitchen');
+    },
+    [data.kds, markTour, update],
+  );
 
   const findCustomer = useCallback(
     (q: string) => {
@@ -579,13 +652,15 @@ export function usePosStore() {
       const consecutive = data.docSeq[seqKey];
       const number = docType === 'pos' ? `${sedeObj.prefix}-${consecutive}` : `${p.business.invoicePrefix}${sedeIdx + 1}-${consecutive}`;
       const createdAt = new Date().toISOString();
+      // Fecha y hora de Colombia (UTC−5) para el código de ejemplo, como en el documento real.
+      const localIso = new Date(Date.parse(createdAt) - 5 * 3_600_000).toISOString();
       const tier = customer ? tierOf(customer.points) : 'bronze';
       const earned = customer ? pointsEarned(totals.net, tier) : 0;
       const redeemed = customer ? order.redeemBlocks * POINTS.blockPoints : 0;
       const cudeInput = [
         number,
-        createdAt.slice(0, 10),
-        createdAt.slice(11, 19) + '-05:00',
+        localIso.slice(0, 10),
+        localIso.slice(11, 19) + '-05:00',
         totals.base.toFixed(2),
         ...totals.taxes.flatMap((t) => [t.kind, t.tax.toFixed(2)]),
         total.toFixed(2),
@@ -794,15 +869,15 @@ export function usePosStore() {
       later(() => {
         markSent(queued);
         setSyncing(0);
+        markTour('synced');
       }, 1800);
     }
-  }, [later, markSent, state.data, state.offline]);
+  }, [later, markSent, markTour, state.data, state.offline]);
 
   const reset = useCallback(() => {
-    const fresh = seedState();
-    const now = Date.now();
-    setState({ ...fresh, data: { retail: stampKds(fresh.data.retail, now), restaurant: stampKds(fresh.data.restaurant, now) } });
+    setState(stampTimes(seedState(), Date.now()));
     setSyncing(0);
+    setNewDay(false);
   }, []);
 
   const queuedCount = state.data.retail.sales.filter((s) => s.status === 'queued').length + state.data.restaurant.sales.filter((s) => s.status === 'queued').length;
@@ -810,6 +885,8 @@ export function usePosStore() {
   return {
     state,
     hydrated,
+    newDay,
+    markTour,
     preset,
     sede,
     data,

@@ -1,42 +1,77 @@
 {
   "demoPos": {
     "meta": {
-      "title": "POS para retail y restaurantes: demo interactiva",
-      "description": "Demo de punto de venta con datos de ejemplo de Colombia: vende con lector de código de barras, balanza o por mesas con comandas a cocina, cobra con pago mixto, emite un documento equivalente POS de ejemplo, sigue vendiendo sin internet y cierra caja con reporte X y Z. Incluye consola de sedes con inventario y traslados.",
+      "title": "POS para tiendas y restaurantes: demo interactiva",
+      "description": "Demo de punto de venta con datos de ejemplo de Colombia: vende con lector de código de barras y balanza o por mesas con comandas a cocina, cobra con pago mixto, emite un documento equivalente POS de ejemplo, simula la venta sin internet y cierra caja con reportes X y Z. Incluye consola de sedes con inventario y traslados. Todo corre en tu navegador.",
       "breadcrumbHome": "Inicio",
       "breadcrumbDemos": "Demos",
-      "breadcrumbName": "POS para retail y restaurantes"
+      "breadcrumbName": "POS para tiendas y restaurantes"
     },
-    "pageTitle": "POS para retail y restaurantes",
-    "pageSubtitle": "Vende con lector de código de barras y balanza, o por mesas con comandas a cocina. Cobra con pago mixto, emite el documento equivalente POS, sigue vendiendo sin internet y cierra caja con reporte Z. Todo funciona en esta página.",
+    "header": {
+      "back": "Volver al catálogo de demos",
+      "guidedDemo": "Solicitar demo guiada",
+      "quote": "Cotizar tu POS",
+      "kicker": "Demo interactiva · Para tiendas, minimercados y restaurantes",
+      "simBadge": "DIAN, pagos y periféricos simulados",
+      "localBadge": "Se guarda solo en este navegador"
+    },
+    "pageTitle": "POS para tiendas y restaurantes",
+    "pageSubtitle": "Para dueños y administradores de minimercados, tiendas y restaurantes con una o varias sedes. Vende con lector de código de barras y balanza o por mesas con comandas a cocina, cobra con pago mixto, emite el documento equivalente POS de ejemplo y cierra caja con reportes X y Z. Empieza por los primeros pasos.",
     "sampleBadge": "Datos de ejemplo",
     "sampleHint": "Los negocios (Mercado La Ceiba y Fogón Andino), sus NIT, sedes, direcciones, empleados, clientes, cédulas, celulares, códigos de barras, existencias y cifras son inventados.",
     "howItWorks": {
       "title": "Qué es real en esta demo",
       "real": "Todo se calcula en tu navegador: existencias por sede, impuestos incluidos en el precio (IVA 19 %, IVA 5 %, exentos o INC 8 %), puntos, cambio, propina, comandas, reportes X y Z, arqueo de caja, comisiones y consola de sedes. Tus ventas y cambios se guardan solo en este navegador.",
       "scanner": "El campo «Escanear» acepta un lector de código de barras real conectado como teclado (USB o Bluetooth); si no tienes uno, usa los códigos de ejemplo.",
-      "simulated": "Son simulados: la transmisión del documento a la DIAN (el CUDE se calcula aquí con SHA-384, en ambiente de pruebas, y no sale de tu navegador), el datafono, el cobro con QR, la balanza, la impresora y el cajón, y el envío del recibo por WhatsApp o correo. El botón «Sin internet» es un interruptor de la demo: no corta tu conexión.",
+      "simulated": "Son simulados: la transmisión del documento a la DIAN (el CUDE se calcula aquí con SHA-384, en ambiente de pruebas, y no sale de tu navegador), el datafono, el cobro con QR, la balanza, la impresora y el cajón, y el envío del recibo por WhatsApp o correo. El botón «Sin internet» es un interruptor de la demo: no corta tu conexión ni guarda nada en otro lugar.",
       "project": "En tu proyecto, la caja se instala como aplicación en tablet o PC, guarda las ventas en el dispositivo cuando se cae internet y las sincroniza al volver, emite el documento electrónico con tu proveedor tecnológico autorizado y se conecta a tu datafono, impresora térmica, lector, cajón monedero y balanza."
     },
-    "tour": {
-      "title": "Recorrido sugerido (3 minutos)",
+    "guide": {
+      "title": "Primeros pasos: recorrido sugerido (unos 5 minutos)",
+      "progress": "{done} de {total} hechos",
+      "intro": "Cada paso te lleva a su lugar en la demo y se marca solo cuando lo haces. Vas de la venta en el mostrador al cierre de caja.",
+      "step": "Paso {n}",
+      "done": "Hecho",
+      "hide": "Ocultar",
+      "show": "Ver pasos",
       "steps": {
-        "1": "Retail: pulsa «Escanear», usa un código de ejemplo y pesa un producto por kilo con «Leer balanza».",
-        "2": "En el ticket busca el cliente 300 123 4567, canjea 500 puntos y cobra con pago mixto: parte en efectivo y el resto con tarjeta o QR.",
-        "3": "Activa «Sin internet», haz otra venta (queda en cola) y vuelve a conectarte para ver la sincronización.",
-        "4": "Restaurante: abre una mesa en «Mesas», toma el pedido con modificadores, envíalo a cocina y avanza la comanda en «Cocina (KDS)».",
-        "5": "En «Reportes X/Z» revisa lo vendido por medio de pago y cierra el turno con arqueo; en «Sedes» traslada existencias entre sedes."
+        "s1": {
+          "title": "Escanea y pesa",
+          "text": "Minimercado: pulsa «Escanear», usa un código de ejemplo (o tu lector) y pesa un producto por kilo con «Leer balanza».",
+          "go": "Abrir el escáner"
+        },
+        "s2": {
+          "title": "Cobra con pago mixto",
+          "text": "Busca al cliente 300 123 4567, canjea puntos y cobra con dos medios de pago, por ejemplo efectivo y datafono.",
+          "go": "Ir al ticket"
+        },
+        "s3": {
+          "title": "Vende sin internet",
+          "text": "Pulsa «En línea» para simular un corte, haz una venta (queda en cola) y vuelve a conectarte para ver la sincronización.",
+          "go": "Ir al interruptor"
+        },
+        "s4": {
+          "title": "Mesas y cocina",
+          "text": "Restaurante: abre una mesa, pide un plato con modificadores, envíalo a cocina y avanza la comanda en «Cocina».",
+          "go": "Ir a Mesas"
+        },
+        "s5": {
+          "title": "Cierra la caja",
+          "text": "En «Reportes X/Z» revisa el turno por medio de pago e impuestos y ciérralo con arqueo: sale el reporte Z.",
+          "go": "Ir a Reportes"
+        }
       }
     },
     "reset": {
       "button": "Restablecer datos",
       "confirm": "¿Borrar tus ventas y cambios de esta demo?",
       "yes": "Sí, restablecer",
-      "done": "Datos de ejemplo restablecidos"
+      "done": "Datos de ejemplo restablecidos",
+      "hint": "Borra tus ventas, cierres, clientes registrados, precios y traslados de los dos negocios y vuelve a los datos de ejemplo."
     },
     "presets": {
       "label": "Tipo de negocio",
-      "retail": "Retail · minimercado",
+      "retail": "Minimercado",
       "restaurant": "Restaurante"
     },
     "toolbar": {
@@ -58,7 +93,7 @@
       "label": "Secciones del POS",
       "sale": "Venta",
       "tables": "Mesas",
-      "kds": "Cocina (KDS)",
+      "kds": "Cocina",
       "reports": "Reportes X/Z",
       "console": "Sedes",
       "staff": "Empleados"
@@ -154,7 +189,8 @@
       "bill": "Pre-cuenta",
       "billToast": "Mesa {n}: cuenta pedida",
       "pay": "Cobrar {amount}",
-      "goToTicket": "Ver ticket ({n}) · {amount}"
+      "goToTicket": "Ver ticket ({n}) · {amount}",
+      "billAgain": "Ver pre-cuenta"
     },
     "loyalty": {
       "lookupPlaceholder": "Cédula o celular del cliente",
@@ -208,7 +244,7 @@
       "methods": {
         "cash": "Efectivo",
         "card": "Tarjeta (datafono)",
-        "qr": "QR (Bre-B o billetera)",
+        "qr": "QR (transferencia o billetera)",
         "gift": "Bono de regalo"
       },
       "methodHints": {
@@ -261,6 +297,17 @@
       },
       "confirm": "Confirmar cobro",
       "processing": "Registrando…"
+    },
+    "bill": {
+      "title": "Pre-cuenta · Mesa {n}",
+      "subtitle": "Lo que lleva la mesa para revisarlo con el cliente antes de cobrar.",
+      "heading": "PRE-CUENTA",
+      "guests": "{n, plural, one {# persona} other {# personas}}",
+      "subtotal": "Total consumo",
+      "tip": "Propina sugerida ({pct} %)",
+      "totalWithTip": "Total con propina sugerida",
+      "tipNote": "La propina es voluntaria: el cliente decide si la deja y cuánto al momento de pagar.",
+      "notFiscal": "Documento informativo: no es factura ni documento equivalente."
     },
     "receipt": {
       "titlePos": "Documento equivalente POS",
@@ -334,14 +381,14 @@
       "release": "Liberar mesa sin consumo"
     },
     "kds": {
-      "title": "Cocina (KDS)",
+      "title": "Pantalla de cocina",
       "subtitle": "Comandas de esta sede por estación, con el tiempo que llevan.",
       "stations": {
         "all": "Todas",
         "kitchen": "Cocina",
         "bar": "Bar"
       },
-      "counts": "{n} nuevas · {p} en preparación · {r} listas",
+      "counts": "{n, plural, one {# nueva} other {# nuevas}} · {p} en preparación · {r, plural, one {# lista} other {# listas}}",
       "order": "Comanda #{n}",
       "elapsed": "{min} min",
       "states": {
@@ -387,7 +434,12 @@
       "refund": "Anular",
       "refundConfirm": "¿Anular con nota crédito?",
       "refundDone": "Venta {n} anulada con nota crédito",
-      "closures": "Cierres Z de esta sesión"
+      "closures": "Cierres Z de esta sesión",
+      "titleClosed": "Reporte Z · Turno {n} (cerrado)",
+      "closedAt": "cerrado a las {time}",
+      "closedHint": "Estas son las cifras del turno que cerraste. Abre la caja para empezar el turno {next}.",
+      "printSummary": "Imprimir resumen",
+      "viewZ": "Ver reporte Z"
     },
     "shift": {
       "openTitle": "Abrir caja",
@@ -416,11 +468,12 @@
     },
     "cash": {
       "title": "Caja",
-      "openSince": "Turno {n} desde las {time} · {name}"
+      "openSince": "Turno {n} desde las {time} · {name}",
+      "open": "Turno {n} · {name}"
     },
     "hardware": {
       "title": "Periféricos",
-      "subtitle": "Simulados en la demo; en tu proyecto se conectan a la caja.",
+      "subtitle": "Simulados en la demo, salvo el lector de código de barras: cualquiera que escriba como teclado funciona de verdad. En tu proyecto todos se conectan a la caja.",
       "printer": "Impresora térmica 80 mm",
       "scanner": "Lector de código de barras",
       "terminal": "Datafono",
@@ -532,6 +585,9 @@
       "yes": "Sí",
       "no": "No",
       "simulated": "simulado"
+    },
+    "toasts": {
+      "newDay": "Empezó un día nuevo: la demo volvió a los datos de ejemplo de hoy."
     }
   }
 }

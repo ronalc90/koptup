@@ -260,7 +260,8 @@ export function StaffPanel({ store, notify }: { store: PosStore; notify: (m: str
               <div className="flex-1 min-w-[10rem]">
                 <div className="font-semibold text-secondary-900 dark:text-white">{e.name}</div>
                 <div className="text-xs text-secondary-500">
-                  {t(`staff.roles.${e.role}`)} · {st.clockedIn ? t('staff.since', { time: st.since }) : st.lastOut ? t('staff.out', { time: st.lastOut }) : t('staff.notToday')}
+                  {t(`staff.roles.${e.role}`)} ·{' '}
+                  {st.clockedIn ? (st.since ? t('staff.since', { time: st.since }) : t('staff.active')) : st.lastOut ? t('staff.out', { time: st.lastOut }) : t('staff.notToday')}
                 </div>
                 <div className="text-xs text-secondary-600 dark:text-secondary-400 mt-0.5">{metric(e.id, e.role)}</div>
               </div>

@@ -39,11 +39,14 @@ export function ConsolePanel({ store, notify }: { store: PosStore; notify: (m: s
     if (state.offline) return setTrErr(t('console.transfer.errors.offline'));
     if (tr.from === tr.to) return setTrErr(t('console.transfer.errors.same'));
     if (!Number.isFinite(qty) || qty <= 0 || (!product.byWeight && !Number.isInteger(qty))) return setTrErr(t('console.transfer.errors.qty'));
-    const have = data.stock[tr.from]?.[tr.productId] ?? 0;
-    if (qty > have) return setTrErr(t('console.transfer.errors.stock', { n: f.qty(have, product.byWeight) }));
+    // Lo que está en un ticket abierto de la sede de origen no se puede trasladar.
+    const have = Math.max(0, Math.round(((data.stock[tr.from]?.[tr.productId] ?? 0) - store.reserved(tr.productId, tr.from)) * 1000) / 1000);
+    if (qty > have + 1e-9) return setTrErr(t('console.transfer.errors.stock', { n: f.qty(have, product.byWeight) }));
     if (store.transfer(tr.productId, tr.from, tr.to, qty)) {
       notify(t('console.transfer.done', { qty: f.qty(qty, product.byWeight), name: product.name }));
       setTr({ ...tr, qty: '' });
+    } else {
+      setTrErr(t('console.transfer.errors.stock', { n: f.qty(have, product.byWeight) }));
     }
   };
 

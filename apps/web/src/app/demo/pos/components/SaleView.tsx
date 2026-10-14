@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
@@ -30,8 +30,11 @@ import {
 import { HAPPY_HOUR_OFF, POINTS, PRESETS, type Product } from './data';
 import { computeTotals, lineAmount, maxRedeemBlocks, pointsEarned, tierOf, docLabel, phoneLabel, plainNumber } from './engine';
 import { orderKey, type PosStore } from './usePosStore';
-import { ModifiersModal, WeighModal } from './PosModals';
+import { BillModal, ModifiersModal, WeighModal } from './PosModals';
 import { employeeName, inputCls, selectCls, shortName, useFmt } from './ui';
+
+/** Evento que abre el campo de escaneo (lo usa «Primeros pasos»). */
+export const OPEN_SCAN_EVENT = 'koptup-pos:open-scan';
 
 export function SaleView({
   store,
@@ -72,8 +75,39 @@ export function SaleView({
   const [registering, setRegistering] = useState(false);
   const [reg, setReg] = useState({ name: '', doc: '', phone: '', consent: false });
   const [regErr, setRegErr] = useState<string | null>(null);
+  const [bill, setBill] = useState<string | null>(null);
+  /** El botón Cobrar del ticket está a la vista (si no, aparece el acceso flotante al ticket). */
+  const [payVisible, setPayVisible] = useState(true);
   const scanRef = useRef<HTMLInputElement>(null);
   const ticketRef = useRef<HTMLDivElement>(null);
+  const payRef = useRef<HTMLButtonElement>(null);
+
+  // «Primeros pasos» puede pedir que se abra el campo de escaneo; se enfoca ya pintado.
+  const [scanFocus, setScanFocus] = useState(0);
+  useEffect(() => {
+    const open = () => {
+      setScanOpen(true);
+      setScanMsg(null);
+      setScanFocus((n) => n + 1);
+    };
+    window.addEventListener(OPEN_SCAN_EVENT, open);
+    return () => window.removeEventListener(OPEN_SCAN_EVENT, open);
+  }, []);
+  useEffect(() => {
+    if (!scanFocus || !scanRef.current) return;
+    scanRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    scanRef.current.focus({ preventScroll: true });
+  }, [scanFocus]);
+
+  // Vigila si el botón Cobrar se ve en pantalla.
+  const hasLines = (order?.lines.length ?? 0) > 0;
+  useEffect(() => {
+    const el = payRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(([entry]) => setPayVisible(entry.isIntersecting), { threshold: 0.9 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [hasLines, isRestaurant]);
 
   const unitPrice = (pr: Product) => {
     const base = store.priceOf(pr);
@@ -100,19 +134,33 @@ export function SaleView({
 
   const add = (pr: Product, opts: { qty?: number; unitPrice: number; mods?: string[]; note?: string }) => {
     const r = store.addLine(target, pr, opts);
-    if (!r.ok) return errorToast(r.reason);
+    if (!r.ok) {
+      errorToast(r.reason);
+      return false;
+    }
     notify(t('catalog.added', { name: pr.name }));
+    return true;
   };
 
+  /** Toca un producto: lo agrega, o abre la balanza o los modificadores. Devuelve true si quedó en el ticket. */
   const onProduct = (pr: Product) => {
-    if (!shift.open) return errorToast('closed');
+    if (!shift.open) {
+      errorToast('closed');
+      return false;
+    }
     if (isRestaurant && target !== 'counter' && !order?.waiterId) {
       notify(t('errors.tableNotOpen'), 'error');
-      return;
+      return false;
     }
-    if (pr.byWeight) return setWeighFor(pr);
-    if (pr.mods) return setModFor(pr);
-    add(pr, { unitPrice: unitPrice(pr) });
+    if (pr.byWeight) {
+      setWeighFor(pr);
+      return false;
+    }
+    if (pr.mods) {
+      setModFor(pr);
+      return false;
+    }
+    return add(pr, { unitPrice: unitPrice(pr) });
   };
 
   const scan = (raw: string) => {
@@ -125,7 +173,7 @@ export function SaleView({
     }
     setScanMsg(null);
     setScanCode('');
-    onProduct(pr);
+    if (onProduct(pr)) store.markTour('scan');
     scanRef.current?.focus();
   };
 
@@ -407,9 +455,11 @@ export function SaleView({
           <Card variant="bordered" padding="sm">
             <h3 className="font-semibold text-secondary-900 dark:text-white text-sm">{t('cash.title')}</h3>
             <p className="text-[11px] text-secondary-500 mb-2">
-              {shift.open
-                ? t('cash.openSince', { n: shift.number, time: shift.openedAt, name: employeeName(preset, shift.cashierId) })
-                : t('shift.closedShort')}
+              {!shift.open
+                ? t('shift.closedShort')
+                : shift.openedAt
+                  ? t('cash.openSince', { n: shift.number, time: shift.openedAt, name: employeeName(preset, shift.cashierId) })
+                  : t('cash.open', { n: shift.number, name: employeeName(preset, shift.cashierId) })}
             </p>
             {shift.open && (
               <dl className="text-sm space-y-1 mb-3">
@@ -549,6 +599,7 @@ export function SaleView({
                 <div className="flex items-center gap-2">
                   <UserPlusIcon className="h-4 w-4 text-secondary-500 shrink-0" />
                   <input
+                    id="pos-customer-lookup"
                     value={loyaltyQ}
                     onChange={(e) => setLoyaltyQ(e.target.value.slice(0, 15))}
                     onKeyDown={(e) => e.key === 'Enter' && lookup()}
@@ -574,9 +625,9 @@ export function SaleView({
           </div>
 
           {/* Líneas */}
-          <div className="flex-1 overflow-y-auto p-3 space-y-2 min-h-[8rem]">
+          <div className="flex-1 overflow-y-auto p-3 space-y-2 min-h-[6rem]">
             {lines.length === 0 ? (
-              <div className="text-center py-8 text-sm text-secondary-500">
+              <div className="text-center py-5 text-sm text-secondary-500">
                 <ShoppingBagIcon className="h-10 w-10 mx-auto mb-2 opacity-50" />
                 {t(isRestaurant ? 'ticket.emptyRestaurant' : 'ticket.emptyRetail')}
               </div>
@@ -694,19 +745,22 @@ export function SaleView({
                   <Button
                     variant="outline"
                     onClick={() => {
-                      store.setOrderField(target, { billRequested: true });
-                      notify(t('ticket.billToast', { n: tableNo }));
+                      if (!order?.billRequested) {
+                        store.setOrderField(target, { billRequested: true });
+                        notify(t('ticket.billToast', { n: tableNo }));
+                      }
+                      setBill(new Date().toISOString());
                     }}
-                    disabled={lines.length === 0 || !!order?.billRequested}
+                    disabled={lines.length === 0}
                     className="gap-1"
                   >
                     <DocumentTextIcon className="h-4 w-4" />
-                    {t('ticket.bill')}
+                    {order?.billRequested ? t('ticket.billAgain') : t('ticket.bill')}
                   </Button>
                 ) : (
                   <span />
                 )}
-                <Button onClick={onCheckout} disabled={lines.length === 0 || !shift.open} size="lg" className="col-span-2">
+                <Button ref={payRef} onClick={onCheckout} disabled={lines.length === 0 || !shift.open} size="lg" className="col-span-2">
                   {t('ticket.pay', { amount: f.money(totals.net) })}
                 </Button>
                 {tableNo && lines.length === 0 && order && (
@@ -716,7 +770,7 @@ export function SaleView({
                 )}
               </div>
             ) : (
-              <Button onClick={onCheckout} disabled={lines.length === 0 || !shift.open} size="lg" fullWidth className="mt-1">
+              <Button ref={payRef} onClick={onCheckout} disabled={lines.length === 0 || !shift.open} size="lg" fullWidth className="mt-1">
                 {t('ticket.pay', { amount: f.money(totals.net) })}
               </Button>
             )}
@@ -724,12 +778,22 @@ export function SaleView({
         </Card>
       </div>
 
-      {/* Acceso rápido al ticket en pantallas angostas */}
-      {lines.length > 0 && (
+      {/* Acceso rápido al ticket cuando el botón Cobrar no se ve (celular, o arriba de la página en escritorio) */}
+      {lines.length > 0 && !payVisible && (
         <button
           type="button"
-          onClick={() => ticketRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-          className="lg:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 rounded-full bg-primary-600 text-white px-4 py-2.5 shadow-lg text-sm font-semibold"
+          onClick={() => {
+            const wide = window.matchMedia('(min-width: 1024px)').matches;
+            if (wide) {
+              // En escritorio el ticket es fijo bajo la barra de la caja: basta con bajar hasta el catálogo.
+              const main = document.getElementById('pos-main');
+              const bar = document.getElementById('pos-toolbar');
+              if (main) window.scrollTo({ top: main.getBoundingClientRect().top + window.scrollY - (bar?.offsetHeight ?? 0) - 88, behavior: 'smooth' });
+            } else {
+              ticketRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }}
+          className="fixed bottom-4 left-1/2 lg:left-auto lg:right-6 -translate-x-1/2 lg:translate-x-0 z-30 flex items-center gap-2 whitespace-nowrap rounded-full bg-primary-600 text-white px-4 py-2.5 shadow-lg text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500"
         >
           {t('ticket.goToTicket', { n: lines.length, amount: f.money(totals.net) })}
           <ArrowRightIcon className="h-4 w-4" />
@@ -756,9 +820,24 @@ export function SaleView({
           onRead={store.nextScaleReading}
           onCancel={() => setWeighFor(null)}
           onConfirm={(kg) => {
-            add(weighFor, { qty: kg, unitPrice: unitPrice(weighFor) });
+            if (add(weighFor, { qty: kg, unitPrice: unitPrice(weighFor) })) store.markTour('weigh');
             setWeighFor(null);
           }}
+        />
+      )}
+      {bill && tableNo && order && (
+        <BillModal
+          preset={preset}
+          sede={sede}
+          table={tableNo}
+          guests={order.guests ?? 0}
+          waiterId={order.waiterId}
+          lines={lines}
+          totals={totals}
+          pointsRedeemed={(order.redeemBlocks ?? 0) * POINTS.blockPoints}
+          issuedAt={bill}
+          onClose={() => setBill(null)}
+          notify={notify}
         />
       )}
     </div>

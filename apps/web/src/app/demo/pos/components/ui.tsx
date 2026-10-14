@@ -60,7 +60,16 @@ export const PRINT_CSS = `@media print {
   .pos-print-target { position: absolute !important; left: 0 !important; top: 0 !important; width: 80mm !important; max-height: none !important; overflow: visible !important; box-shadow: none !important; border: 0 !important; color: #000 !important; background: #fff !important; }
 }`;
 
-/** Contenedor de modal accesible: cierra con Escape y enfoca el diálogo al abrir. */
+/** Ventanas abiertas, de abajo hacia arriba: Escape y Tab solo actúan sobre la de arriba. */
+const modalStack: symbol[] = [];
+
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+/**
+ * Contenedor de modal accesible: Escape cierra solo la ventana de arriba, el
+ * foco entra al abrir, Tab no se sale de la ventana y, al cerrar, el foco
+ * vuelve al control que la abrió.
+ */
 export function Modal({
   title,
   subtitle,
@@ -78,27 +87,62 @@ export function Modal({
 }) {
   const t = useTranslations('demoPos');
   const ref = useRef<HTMLDivElement>(null);
+  // onClose cambia en cada render del padre: se lee de una ref para no volver a enfocar la ventana.
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
+
   useEffect(() => {
+    const id = Symbol('modal');
+    modalStack.push(id);
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    ref.current?.focus();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (modalStack[modalStack.length - 1] !== id) return;
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeRef.current();
+        return;
+      }
+      if (e.key !== 'Tab' || !ref.current) return;
+      const items = Array.from(ref.current.querySelectorAll<HTMLElement>(FOCUSABLE)).filter((el) => el.offsetParent !== null);
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement;
+      if (e.shiftKey && (active === first || active === ref.current)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     window.addEventListener('keydown', onKey);
-    ref.current?.focus();
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      const i = modalStack.indexOf(id);
+      if (i >= 0) modalStack.splice(i, 1);
+      if (opener && opener.isConnected) opener.focus();
+    };
+  }, []);
+
   const width = size === 'sm' ? 'max-w-sm' : size === 'lg' ? 'max-w-2xl' : 'max-w-lg';
   // Se monta en <body> para quedar por encima de la barra de navegación del sitio.
   return createPortal(
     <div
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby={labelId}
       className="fixed inset-0 bg-black/60 z-[200] flex items-start sm:items-center justify-center p-3 sm:p-4 overflow-y-auto"
       onMouseDown={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (e.target === e.currentTarget) closeRef.current();
       }}
     >
-      <div ref={ref} tabIndex={-1} className={`bg-white dark:bg-secondary-900 rounded-2xl w-full ${width} my-4 outline-none shadow-xl`}>
+      <div
+        ref={ref}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={labelId}
+        tabIndex={-1}
+        className={`bg-white dark:bg-secondary-900 rounded-2xl w-full ${width} my-4 outline-none shadow-xl`}
+      >
         <div className="p-4 sm:p-6">
           <div className="flex items-start justify-between gap-3 mb-4">
             <div className="min-w-0">
@@ -109,7 +153,7 @@ export function Modal({
             </div>
             <button
               type="button"
-              onClick={onClose}
+              onClick={() => closeRef.current()}
               aria-label={t('common.close')}
               className="p-2 -m-1 hover:bg-secondary-100 dark:hover:bg-secondary-800 rounded-lg text-secondary-600 dark:text-secondary-300"
             >

@@ -38,16 +38,24 @@ export function ReportsPanel({
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const closures = data.closures.filter((c) => c.sede === sede).slice().reverse();
   const isRestaurant = preset === 'restaurant';
+  // Con la caja cerrada, este reporte es el del turno que se cerró (su cierre Z).
+  const closure = shift.open ? undefined : closures.find((c) => c.shift === shift.number);
+  const title = shift.open ? t('reports.title', { n: shift.number }) : t('reports.titleClosed', { n: shift.number });
 
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 dark:text-white">{t('reports.title', { n: shift.number })}</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 dark:text-white">{title}</h2>
           <p className="text-sm text-secondary-500">
-            {sedeObj?.name} · {t('receipt.cashier', { name: employeeName(preset, shift.cashierId) })} ·{' '}
-            {shift.open ? t('reports.openSince', { time: shift.openedAt }) : t('shift.closedShort')}
+            {sedeObj?.name} · {t('receipt.cashier', { name: employeeName(preset, shift.cashierId) })}
+            {shift.open
+              ? shift.openedAt
+                ? ` · ${t('reports.openSince', { time: shift.openedAt })}`
+                : ''
+              : ` · ${closure ? t('reports.closedAt', { time: timeLabel(closure.closedAt, f.locale) }) : t('shift.closedShort')}`}
           </p>
+          {!shift.open && <p className="text-xs text-secondary-500 mt-1">{t('reports.closedHint', { next: shift.number + 1 })}</p>}
         </div>
         <div className="flex flex-wrap gap-2">
           <Button
@@ -58,21 +66,28 @@ export function ReportsPanel({
               printById('pos-x-print');
             }}
           >
-            <PrinterIcon className="h-4 w-4" /> {t('reports.printX')}
+            <PrinterIcon className="h-4 w-4" /> {shift.open ? t('reports.printX') : t('reports.printSummary')}
           </Button>
           {shift.open ? (
             <Button variant="danger" onClick={onClose} className="gap-1">
               <LockClosedIcon className="h-4 w-4" /> {t('reports.closeShift')}
             </Button>
           ) : (
-            <Button onClick={onOpen}>{t('shift.openTitle')}</Button>
+            <>
+              {closure && (
+                <Button variant="outline" onClick={() => onViewZ(closure)} className="gap-1">
+                  <EyeIcon className="h-4 w-4" /> {t('reports.viewZ')}
+                </Button>
+              )}
+              <Button onClick={onOpen}>{t('shift.openTitle')}</Button>
+            </>
           )}
         </div>
       </div>
 
       <div id="pos-x-print" className="space-y-5">
         <p className="hidden print:block font-mono text-xs">
-          {p.business.name} · {sedeObj?.name} · {t('reports.title', { n: shift.number })}
+          {p.business.name} · {sedeObj?.name} · {title}
         </p>
         {r.count === 0 && r.refundsCount === 0 ? (
           <Card variant="bordered" padding="md" className="text-sm text-secondary-600 dark:text-secondary-400">
