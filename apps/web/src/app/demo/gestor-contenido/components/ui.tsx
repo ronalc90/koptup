@@ -1,10 +1,9 @@
 'use client';
 
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, type KeyboardEvent, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslations } from 'next-intl';
 import { CheckCircleIcon, ExclamationTriangleIcon, InformationCircleIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import useModalClose from '@/hooks/useModalClose';
 import { hasUnpublishedChanges } from '../lib/models';
 import { useCms } from '../lib/store';
 import type { Entry, Status, TypeId } from '../lib/types';
@@ -95,11 +94,45 @@ export function Modal({
   labelId: string;
 }) {
   const t = useTranslations('demoCms.common');
-  useModalClose(true, onClose);
   const ref = useRef<HTMLDivElement>(null);
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
+  // El control que abrió la ventana (se lee en el primer render, antes de que el foco entre en ella).
+  const openerRef = useRef<HTMLElement | null>(typeof document === 'undefined' ? null : (document.activeElement as HTMLElement | null));
+  // Al abrir: foco en la ventana (o en su campo con autoFocus) y sin desplazamiento de fondo;
+  // al cerrar, el foco vuelve al control que la abrió.
   useEffect(() => {
-    ref.current?.focus();
+    const opener = openerRef.current;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    if (!ref.current?.contains(document.activeElement)) ref.current?.focus();
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      if (opener && document.contains(opener)) opener.focus();
+    };
   }, []);
+  // Escape cierra solo la ventana de arriba; Tab no sale de la ventana.
+  const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Escape') {
+      e.stopPropagation();
+      closeRef.current();
+      return;
+    }
+    if (e.key !== 'Tab' || !ref.current) return;
+    const items = Array.from(ref.current.querySelectorAll<HTMLElement>('a[href],button:not([disabled]),input:not([disabled]):not([type="hidden"]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"]),[contenteditable="true"]')).filter(
+      (el) => el.offsetParent !== null || el === document.activeElement,
+    );
+    if (items.length === 0) return;
+    const first = items[0];
+    const last = items[items.length - 1];
+    if (e.shiftKey && (document.activeElement === first || document.activeElement === ref.current)) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  };
   const width = size === 'sm' ? 'max-w-md' : size === 'lg' ? 'max-w-3xl' : 'max-w-xl';
   return createPortal(
     <div className="fixed inset-0 z-[210] flex items-end sm:items-center justify-center p-0 sm:p-4">
@@ -110,6 +143,7 @@ export function Modal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={labelId}
+        onKeyDown={onKeyDown}
         className={`relative w-full ${width} max-h-[92vh] flex flex-col bg-white dark:bg-slate-900 rounded-t-2xl sm:rounded-2xl shadow-2xl outline-none`}
       >
         <div className="flex items-start justify-between gap-3 px-5 py-4 border-b border-slate-200 dark:border-slate-800">
@@ -132,22 +166,27 @@ export function Modal({
 }
 
 export function Toasts() {
-  const { toasts } = useCms();
-  if (toasts.length === 0) return null;
+  const t = useTranslations('demoCms.common');
+  const { toasts, dismissToast } = useCms();
+  // La región de avisos siempre está en el DOM para que los lectores de pantalla anuncien cada aviso.
+  // Queda debajo de las ventanas (z 210): un aviso nunca tapa los botones de una ventana abierta.
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[220] flex flex-col gap-2 w-[min(92vw,26rem)]" role="status" aria-live="polite">
-      {toasts.map((t) => {
-        const Icon = t.tone === 'warn' ? ExclamationTriangleIcon : t.tone === 'info' ? InformationCircleIcon : CheckCircleIcon;
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 sm:left-auto sm:right-4 sm:translate-x-0 z-[205] flex flex-col gap-2 w-[min(92vw,24rem)]" role="status" aria-live="polite">
+      {toasts.map((item) => {
+        const Icon = item.tone === 'warn' ? ExclamationTriangleIcon : item.tone === 'info' ? InformationCircleIcon : CheckCircleIcon;
         const color =
-          t.tone === 'warn'
+          item.tone === 'warn'
             ? 'border-amber-300 bg-amber-50 text-amber-900 dark:bg-amber-950 dark:text-amber-100 dark:border-amber-800'
-            : t.tone === 'info'
+            : item.tone === 'info'
               ? 'border-sky-300 bg-sky-50 text-sky-900 dark:bg-sky-950 dark:text-sky-100 dark:border-sky-800'
               : 'border-emerald-300 bg-emerald-50 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-100 dark:border-emerald-800';
         return (
-          <div key={t.id} className={`flex items-start gap-2 px-4 py-3 rounded-xl border shadow-lg text-sm ${color}`}>
-            <Icon className="w-5 h-5 shrink-0" />
-            <span className="min-w-0 break-words">{t.text}</span>
+          <div key={item.id} className={`flex items-start gap-2 pl-4 pr-2 py-2.5 rounded-xl border shadow-lg text-sm ${color}`}>
+            <Icon className="w-5 h-5 shrink-0 mt-0.5" aria-hidden="true" />
+            <span className="min-w-0 flex-1 break-words py-0.5">{item.text}</span>
+            <button type="button" onClick={() => dismissToast(item.id)} className="shrink-0 rounded-md p-1 opacity-70 hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-current" aria-label={t('dismiss')}>
+              <XMarkIcon className="w-4 h-4" aria-hidden="true" />
+            </button>
           </div>
         );
       })}

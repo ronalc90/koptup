@@ -6,7 +6,7 @@ import { generateMetadata as metadataBase, getBreadcrumbSchema } from '@/lib/seo
  * Metadata propia: la entrada compartida de seo-config para esta ruta habla de
  * "contenido médico", "informes médicos" y "emails", que la demo no hace. Aquí
  * se describe lo que la demo muestra de verdad (CMS headless con datos de
- * ejemplo).
+ * ejemplo), también en el texto alternativo de la imagen para redes.
  */
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('demoCms.meta');
@@ -15,11 +15,16 @@ export async function generateMetadata(): Promise<Metadata> {
   const titulo = t('seoTitle');
   const descripcion = t('seoDescription');
   const tituloCompleto = plantilla.replace('%s', titulo);
+  // La imagen social conserva su archivo, pero su texto alternativo describe esta demo.
+  const imagenes = base.openGraph?.images;
+  const imagenesOg = Array.isArray(imagenes)
+    ? imagenes.map((img) => (typeof img === 'object' && img !== null && !(img instanceof URL) ? { ...img, alt: tituloCompleto } : img))
+    : imagenes;
   return {
     ...base,
     title: { default: titulo, template: plantilla },
     description: descripcion,
-    openGraph: { ...base.openGraph, title: tituloCompleto, description: descripcion },
+    openGraph: { ...base.openGraph, title: tituloCompleto, description: descripcion, images: imagenesOg },
     twitter: { ...base.twitter, title: tituloCompleto, description: descripcion },
   };
 }

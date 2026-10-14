@@ -3,12 +3,13 @@
  * flujo editorial (borrador → revisión → aprobada → programada/publicada),
  * webhooks, API de entrega, chequeos SEO y asistente del sitio.
  */
+import { classifyAiError } from '../lib/ai';
 import { entryJson, listJson } from '../lib/api';
-import { assistantDocs, searchFaqs } from '../lib/assistant';
+import { assistantDocs, publishedThisVisit, searchFaqs } from '../lib/assistant';
 import { hasUnpublishedChanges } from '../lib/models';
-import { blockingIssues, mediaUsage, reducer, type Action } from '../lib/reducer';
+import { blockingIssues, mediaUsage, reducer, wentThroughReview, type Action } from '../lib/reducer';
 import { seoChecks } from '../lib/seo';
-import { buildState } from '../lib/seed';
+import { buildState, migrate, STATE_VERSION } from '../lib/seed';
 import { slugify, stripHtml, textToHtml, toCsv } from '../lib/text';
 import { fromLocalInput, iso, toLocalInput } from '../lib/time';
 import type { AppState, Entry, EntryContent } from '../lib/types';
@@ -48,6 +49,17 @@ describe('CMS · datos de ejemplo', () => {
     }
   });
 
+  it('es coherente: seis sedes en cinco ciudades', () => {
+    const s = buildState(NOW);
+    const sedes = s.entries.filter((e) => e.type === 'location');
+    expect(sedes).toHaveLength(6);
+    expect(new Set(sedes.map((e) => e.content.fields.city)).size).toBe(5);
+    const inicio = entry(s, 'page-inicio');
+    expect(JSON.stringify(inicio)).not.toMatch(/seis ciudades|six cities/);
+    expect((inicio.content.fields.title as { es: string }).es).toBe('Tu salud, cerca de ti en cinco ciudades');
+    expect(JSON.stringify(s)).not.toMatch(/TransMilenio/);
+  });
+
   it('usa datos ficticios: teléfonos 555 y dominios .example', () => {
     const s = buildState(NOW);
     for (const e of s.entries.filter((x) => x.type === 'location')) expect(String(e.content.fields.whatsapp)).toMatch(/^\+57 300 555 01\d\d$/);
@@ -84,6 +96,9 @@ describe('CMS · permisos verificados en la lógica (no solo en botones)', () =>
     expect(entry(s, 'loc-usaquen').content.fields.parqueadero).toBe(false);
     const json = entryJson(s, entry(s, 'loc-usaquen'), 'es', true) as { fields: Record<string, unknown> };
     expect(json.fields.parqueadero).toBe(false);
+    // también en la versión publicada: cambiar el modelo no deja cambios sin publicar
+    expect(entry(s, 'loc-usaquen').live?.fields.parqueadero).toBe(false);
+    expect(s.entries.filter((e) => e.type === 'location' && e.live).every((e) => !hasUnpublishedChanges(e))).toBe(true);
   });
 });
 
@@ -226,5 +241,81 @@ describe('CMS · utilidades de texto y fechas', () => {
   it('las fechas del formulario se leen en hora de Colombia', () => {
     expect(toLocalInput(NOW)).toBe('2026-10-08T10:00');
     expect(fromLocalInput('2026-10-08T10:00')).toBe(NOW);
+  });
+});
+
+describe('CMS · recorrido: cada paso se marca solo con la acción completa', () => {
+  it('paso 4: publicar algo aprobado de antemano no cuenta; enviar, aprobar y publicar en la visita sí', () => {
+    let s = run(buildState(NOW), who(EDITOR), { type: 'entry.publish', id: 'faq-ecografia', now });
+    expect(entry(s, 'faq-ecografia').status).toBe('published');
+    expect(s.tour.publish).toBe(false);
+    const later = iso(NOW + 60_000);
+    const e = entry(s, 'loc-chapinero');
+    s = run(
+      s,
+      who(WRITER),
+      { type: 'entry.edit', id: e.id, content: withField(e, 'hours', { es: 'Lunes a sábado, 7:00 a. m. a 2:00 p. m.', en: 'Monday to Saturday, 7:00 a.m. to 2:00 p.m.' }), now: later },
+      { type: 'entry.submit', id: e.id, now: later },
+    );
+    expect(wentThroughReview(s, entry(s, e.id))).toBe(false);
+    s = run(s, who(EDITOR), { type: 'entry.approve', id: e.id, now: later });
+    expect(wentThroughReview(s, entry(s, e.id))).toBe(true);
+    s = reducer(s, { type: 'entry.publish', id: e.id, now: later });
+    expect(s.tour.publish).toBe(true);
+    expect(wentThroughReview(s, entry(s, e.id))).toBe(false);
+  });
+
+  it('aprobar una entrada que ya estaba en revisión en los datos de ejemplo no cuenta como envío de la visita', () => {
+    const s = run(buildState(NOW), who(EDITOR), { type: 'entry.approve', id: 'loc-cabecera', now: iso(NOW + 1000) });
+    expect(wentThroughReview(s, entry(s, 'loc-cabecera'))).toBe(false);
+  });
+
+  it('paso 5: el asistente cuenta solo si cita una pregunta publicada en la visita', () => {
+    const s0 = buildState(NOW);
+    const viejas = assistantDocs(s0, 'es');
+    expect(viejas.length).toBeGreaterThan(0);
+    expect(viejas.every((d) => !publishedThisVisit(d, s0.seededAt))).toBe(true);
+    const s1 = run(s0, who(EDITOR), { type: 'entry.publish', id: 'faq-ecografia', now: iso(NOW + 1000) });
+    const hit = searchFaqs('¿Cómo me preparo para una ecografía?', assistantDocs(s1, 'es'));
+    expect(hit && publishedThisVisit(hit.doc, s1.seededAt)).toBe(true);
+  });
+});
+
+describe('CMS · datos guardados por la versión anterior', () => {
+  it('migra la versión 3 sin perder cambios y corrige solo el texto de ejemplo', () => {
+    // Así guardaba la versión 3 la página de inicio (decía «seis ciudades»).
+    const v3 = buildState(NOW);
+    v3.entries = v3.entries.map((e) => (e.id === 'page-inicio' ? (JSON.parse(JSON.stringify(e).split('cinco ciudades').join('seis ciudades').split('five cities').join('six cities')) as Entry) : e));
+    expect(JSON.stringify(v3)).toMatch(/seis ciudades/);
+    v3.version = 3;
+    v3.currentUserId = EDITOR;
+    v3.tour.model = true;
+    const m = migrate(v3);
+    expect(m?.version).toBe(STATE_VERSION);
+    expect(m?.currentUserId).toBe(EDITOR);
+    expect(m?.tour.model).toBe(true);
+    expect(JSON.stringify(m)).not.toMatch(/seis ciudades|six cities/);
+    // lo que la persona cambió se conserva
+    expect(m?.entries.find((e) => e.id === 'page-nosotros')).toEqual(v3.entries.find((e) => e.id === 'page-nosotros'));
+  });
+
+  it('descarta lo irreconocible', () => {
+    expect(migrate(null)).toBeNull();
+    expect(migrate({ version: 1, entries: [] })).toBeNull();
+    expect(migrate({ foo: 1 })).toBeNull();
+  });
+});
+
+describe('CMS · errores del asistente de IA', () => {
+  it('lee el código del backend y da un motivo honesto', () => {
+    expect(classifyAiError(429, { code: 'rate_limited' })).toBe('rateLimited');
+    expect(classifyAiError(503, { code: 'budget_exhausted' })).toBe('budget');
+    expect(classifyAiError(503, { code: 'ai_unavailable', message: 'La IA no está configurada en este servidor en este momento.' })).toBe('notConfigured');
+    expect(classifyAiError(503, { code: 'ai_unavailable', message: 'La IA no está disponible en este momento.' })).toBe('unavailable');
+    expect(classifyAiError(401, { code: 'login_required' })).toBe('login');
+    expect(classifyAiError(403, { code: 'demo_access_required' })).toBe('access');
+    expect(classifyAiError(403, { code: 'demo_disabled' })).toBe('disabled');
+    expect(classifyAiError(400, { code: 'content_too_long' })).toBe('invalid');
+    expect(classifyAiError(500, null)).toBe('server');
   });
 });

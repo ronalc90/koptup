@@ -194,7 +194,7 @@ export function AiPanel({ entry, readOnly, onField, onBlockHtml }: { entry: Entr
   const t = useTranslations('demoCms.ai');
   const tBlocks = useTranslations('demoCms.blocks');
   const label = useFieldLabel();
-  const { state, act, toast, contentLocale: locale } = useCms();
+  const { state, act, toast, contentLocale: locale, aiUses, countAiUse } = useCms();
   const type = state.types.find((x) => x.id === entry.type);
   const c = entry.content;
   const targets: Target[] = [];
@@ -213,7 +213,6 @@ export function AiPanel({ entry, readOnly, onField, onBlockHtml }: { entry: Entr
   const [result, setResult] = useState<string | null>(null);
   const [options, setOptions] = useState<ai.AiVersion[] | null>(null);
   const [error, setError] = useState<ai.AiErrorCode | null>(null);
-  const [uses, setUses] = useState(0);
   const target = targets.find((x) => x.key === key) ?? targets[0];
   const source = target?.text.trim() ?? '';
   const words = wordCount(source);
@@ -228,8 +227,7 @@ export function AiPanel({ entry, readOnly, onField, onBlockHtml }: { entry: Entr
       const r = await fn();
       if (typeof r === 'string') setResult(r);
       else setOptions(r);
-      setUses((n) => n + 1);
-      act({ type: 'tour.mark', step: 'assistant' });
+      countAiUse();
     } catch (e) {
       setError(e instanceof ai.AiError ? e.code : 'server');
     } finally {
@@ -242,6 +240,8 @@ export function AiPanel({ entry, readOnly, onField, onBlockHtml }: { entry: Entr
     target.apply(s);
     setResult(null);
     setOptions(null);
+    // Paso 3 del recorrido: la propuesta de la IA quedó aplicada en el campo.
+    act({ type: 'tour.mark', step: 'assistant' });
     toast(t('applied', { field: target.label }));
   };
 
@@ -296,8 +296,13 @@ export function AiPanel({ entry, readOnly, onField, onBlockHtml }: { entry: Entr
           {busy === 'versions' ? t('working') : t('versions')}
         </button>
       </div>
+      {!!source && words < 12 && !readOnly && <p className="text-[11px] text-slate-600 dark:text-slate-400">{t('tooShort')}</p>}
       {readOnly && <Note tone="warn">{t('readOnly')}</Note>}
-      {error && <Note tone="warn">{t(`errors.${error}`)}</Note>}
+      {error && (
+        <div role="alert">
+          <Note tone="warn">{t(`errors.${error}`)}</Note>
+        </div>
+      )}
       {result !== null && (
         <div className="rounded-lg border border-pink-200 dark:border-pink-900 p-3 space-y-2">
           <p className="text-xs font-semibold text-pink-700 dark:text-pink-300">{t('result')}</p>
@@ -328,7 +333,7 @@ export function AiPanel({ entry, readOnly, onField, onBlockHtml }: { entry: Entr
           ))}
         </ul>
       )}
-      <p className="text-[11px] text-slate-500 dark:text-slate-400">{t('uses', { n: uses })}</p>
+      <p className="text-[11px] text-slate-600 dark:text-slate-400">{t('uses', { n: aiUses })}</p>
     </div>
   );
 }

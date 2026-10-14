@@ -1,14 +1,29 @@
 /**
  * Asistente de redacción con IA real: llama a los endpoints `/api/content/*`
- * del backend de KopTup, que a su vez llaman a un modelo de lenguaje. Si el
- * servidor no responde, no tiene clave del modelo o limita las solicitudes,
- * se devuelve un error tipado para mostrar un mensaje honesto.
+ * del backend de KopTup, que a su vez llaman a un modelo de lenguaje. Envía la
+ * sesión (si hay) para que la demo siga funcionando cuando el admin la pase a
+ * «Con solicitud» o «Solo por invitación», y para que el equipo de KopTup no
+ * quede sujeto al cupo por conexión. Si el servidor no responde, no tiene clave
+ * del modelo, agotó el presupuesto o limita las solicitudes, se devuelve un
+ * error tipado para mostrar un mensaje honesto.
  */
+import { authFetch } from '@/lib/auth-token';
 import { BACKEND_URL } from '@/lib/backend-url';
 
 export type AiTone = 'formal' | 'técnico' | 'persuasivo';
 export const AI_TONES: AiTone[] = ['formal', 'técnico', 'persuasivo'];
-export type AiErrorCode = 'network' | 'timeout' | 'notConfigured' | 'rateLimited' | 'invalid' | 'server';
+export type AiErrorCode =
+  | 'network'
+  | 'timeout'
+  | 'notConfigured'
+  | 'unavailable'
+  | 'budget'
+  | 'rateLimited'
+  | 'login'
+  | 'access'
+  | 'disabled'
+  | 'invalid'
+  | 'server';
 
 export class AiError extends Error {
   constructor(public code: AiErrorCode) {
@@ -24,12 +39,41 @@ const TIMEOUT_MS = 60_000;
 // es el más cercano a fichas de sedes, servicios y artículos.
 const TEMPLATE = 'product';
 
+const BY_CODE: Record<string, AiErrorCode> = {
+  rate_limited: 'rateLimited',
+  budget_exhausted: 'budget',
+  content_too_long: 'invalid',
+  login_required: 'login',
+  TOKEN_EXPIRED: 'login',
+  demo_access_required: 'access',
+  demo_disabled: 'disabled',
+};
+
+/**
+ * Motivo del error a partir del estado HTTP y del cuerpo `{ code, message }`
+ * que responde el backend (ver apps/backend/src/routes/content-manager.routes.ts
+ * y el middleware de acceso a demos).
+ */
+export function classifyAiError(status: number, body: { code?: unknown; message?: unknown } | null): AiErrorCode {
+  const code = typeof body?.code === 'string' ? body.code : '';
+  const message = typeof body?.message === 'string' ? body.message : '';
+  if (BY_CODE[code]) return BY_CODE[code];
+  if (code === 'ai_unavailable' || status === 503) {
+    return /configurad|OPENAI_API_KEY|not configured/i.test(message) ? 'notConfigured' : 'unavailable';
+  }
+  if (status === 429) return 'rateLimited';
+  if (status === 401) return 'login';
+  if (status === 403) return 'access';
+  if (status === 400) return 'invalid';
+  return 'server';
+}
+
 async function post<T>(path: string, body: Record<string, unknown>): Promise<T> {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
   let res: Response;
   try {
-    res = await fetch(`${BACKEND_URL}/api/content/${path}`, {
+    res = await authFetch(`${BACKEND_URL}/api/content/${path}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...body, template: TEMPLATE }),
@@ -40,19 +84,13 @@ async function post<T>(path: string, body: Record<string, unknown>): Promise<T> 
   } finally {
     clearTimeout(timer);
   }
-  let data: { success?: boolean; message?: string; data?: T } | null = null;
+  let data: { success?: boolean; code?: string; message?: string; data?: T } | null = null;
   try {
     data = await res.json();
   } catch {
     data = null;
   }
-  if (res.status === 429) throw new AiError('rateLimited');
-  if (!res.ok || !data?.data) {
-    const msg = data?.message ?? '';
-    if (/OPENAI_API_KEY|api key|not configured/i.test(msg)) throw new AiError('notConfigured');
-    if (res.status === 400) throw new AiError('invalid');
-    throw new AiError('server');
-  }
+  if (!res.ok || !data?.data) throw new AiError(res.ok ? 'server' : classifyAiError(res.status, data));
   return data.data;
 }
 
