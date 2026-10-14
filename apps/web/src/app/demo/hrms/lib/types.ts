@@ -155,6 +155,23 @@ export interface PayrollRun {
   novelties: Novelty[];
 }
 
+/** Quincena ya pagada en la demo: sus novedades y los totales que se pagaron. */
+export interface PaidRun {
+  periodId: string;
+  novelties: Novelty[];
+  count: number;
+  net: number;
+  cost: number;
+}
+
+/** Pasos del recorrido guiado que no se pueden deducir del resto del estado. */
+export interface GuideFlags {
+  /** Se contrató a alguien desde Selección. */
+  hired?: boolean;
+  /** El colaborador ya recibió una respuesta del asistente de políticas. */
+  assistant?: boolean;
+}
+
 export interface MonthlyFiling {
   month: string; // AAAA-MM
   einvoice: 'pending' | 'accepted';
@@ -205,9 +222,12 @@ export interface HrState {
   candidates: Candidate[];
   processes: (Onboarding | Offboarding)[];
   run: PayrollRun;
+  /** Quincenas pagadas en la demo, de la más antigua a la más reciente. */
+  paidRuns: PaidRun[];
   filing: MonthlyFiling;
   reviews: Review[];
   courses: Course[];
   surveys: Survey[];
+  guide: GuideFlags;
   seq: number;
 }

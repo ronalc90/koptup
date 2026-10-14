@@ -8,7 +8,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useState, type ReactNode } from 'react';
 import { addDays, addMonths, diffDays, localToday, type ISODate } from './dates';
 import { POSITIONS } from './catalog';
-import { buildState, STATE_VERSION } from './seed';
+import { nextPeriod, payroll, periodFromId, totals } from './payroll';
+import { buildState, COURSE_AUDIENCE, STATE_VERSION } from './seed';
 import type {
   Candidate, Competency, Employee, ExitReason, HrState, Leave, Novelty, Offboarding, OffTask, Onboarding, OnTask, RunStatus,
   Stage, Survey, TabId,
@@ -29,24 +30,27 @@ export type Action =
   | { type: 'candidate.add'; candidate: Omit<Candidate, 'id'> }
   | { type: 'candidate.move'; id: string; stage: Stage }
   | { type: 'candidate.discard'; id: string }
+  | { type: 'candidate.restore'; id: string }
   | { type: 'process.toggle'; id: string; task: OnTask | OffTask }
   | { type: 'process.close'; id: string }
   | { type: 'novelty.add'; novelty: Omit<Novelty, 'id'> }
   | { type: 'novelty.remove'; id: string }
   | { type: 'run.status'; status: RunStatus }
+  | { type: 'run.next' }
   | { type: 'filing.einvoice'; cunes: Record<string, string> }
   | { type: 'filing.pila'; status: 'generated' | 'paid' }
   | { type: 'review.submit'; employeeId: string; scores: Record<Competency, number>; comment: string }
   | { type: 'course.remind'; id: string }
   | { type: 'survey.launch'; survey: Pick<Survey, 'question' | 'audience' | 'invited'> }
-  | { type: 'survey.responses'; id: string; promoters: number; passives: number; detractors: number };
+  | { type: 'survey.responses'; id: string; promoters: number; passives: number; detractors: number }
+  | { type: 'guide.assistant' };
 
 function nextId(s: HrState, prefix: string): [string, number] {
   const seq = s.seq + 1;
   return [`${prefix}${seq}`, seq];
 }
 
-function reducer(s: HrState | null, a: Action): HrState | null {
+export function reducer(s: HrState | null, a: Action): HrState | null {
   if (a.type === 'reset') return buildState(a.base);
   if (a.type === 'load') return a.state;
   if (!s) return s;
@@ -91,6 +95,8 @@ function reducer(s: HrState | null, a: Action): HrState | null {
     }
     case 'candidate.discard':
       return { ...s, candidates: s.candidates.map((c) => (c.id === a.id ? { ...c, discarded: true } : c)) };
+    case 'candidate.restore':
+      return { ...s, candidates: s.candidates.map((c) => (c.id === a.id ? { ...c, discarded: false } : c)) };
     case 'candidate.move': {
       const c = s.candidates.find((x) => x.id === a.id);
       if (!c || c.stage === 'hired') return s;
@@ -116,6 +122,7 @@ function reducer(s: HrState | null, a: Action): HrState | null {
           seq,
           processes: [...next.processes, proc],
           vacancies: next.vacancies.map((x) => (x.id === v.id ? { ...x, hired: x.hired + 1 } : x)),
+          guide: { ...next.guide, hired: true },
         };
       }
       return next;
@@ -168,7 +175,9 @@ function reducer(s: HrState | null, a: Action): HrState | null {
           account: p.docId.slice(-10),
           status: 'active',
         };
-        return { ...s, processes, employees: [...s.employees, emp] };
+        // Quien ingresa recibe los cursos obligatorios de su cargo (inducción, acoso laboral, etc.).
+        const courses = s.courses.map((c) => (COURSE_AUDIENCE[c.id](emp) && !c.assigned.includes(emp.id) ? { ...c, assigned: [...c.assigned, emp.id] } : c));
+        return { ...s, processes, employees: [...s.employees, emp], courses };
       }
       const e = s.employees.find((x) => x.id === p.employeeId)!;
       const [xid, seq] = nextId(s, 'X');
@@ -189,6 +198,17 @@ function reducer(s: HrState | null, a: Action): HrState | null {
       return { ...s, run: { ...s.run, novelties: s.run.novelties.filter((n) => n.id !== a.id) } };
     case 'run.status':
       return { ...s, run: { ...s.run, status: a.status } };
+    case 'run.next': {
+      // Solo se abre la siguiente quincena cuando la actual ya está pagada.
+      if (s.run.status !== 'paid') return s;
+      const period = periodFromId(s.run.periodId);
+      const tot = totals(payroll(s.employees, s.run.novelties, period));
+      return {
+        ...s,
+        paidRuns: [...s.paidRuns, { periodId: s.run.periodId, novelties: s.run.novelties, count: tot.count, net: tot.net, cost: tot.cost }],
+        run: { periodId: nextPeriod(period).id, status: 'draft', novelties: [] },
+      };
+    }
     case 'filing.einvoice':
       return { ...s, filing: { ...s.filing, einvoice: 'accepted', cunes: a.cunes } };
     case 'filing.pila':
@@ -213,6 +233,8 @@ function reducer(s: HrState | null, a: Action): HrState | null {
         ...s,
         surveys: s.surveys.map((x) => (x.id === a.id ? { ...x, promoters: a.promoters, passives: a.passives, detractors: a.detractors, closed: true } : x)),
       };
+    case 'guide.assistant':
+      return s.guide.assistant ? s : { ...s, guide: { ...s.guide, assistant: true } };
     default:
       return s;
   }
@@ -239,13 +261,17 @@ interface Ctx {
   setTab: (t: TabId) => void;
   openProfile: (id: string | null) => void;
   profileId: string | null;
-  openApp: (open: boolean) => void;
+  /** Abre o cierra la app del colaborador; `screen` elige la pantalla inicial. */
+  openApp: (open: boolean, screen?: AppScreen) => void;
   appOpen: boolean;
+  appScreen: AppScreen;
   reset: () => void;
   /** Filtro del directorio fijado desde otra pestaña (p. ej. "ver equipo"). */
   peopleFilter: { managerId?: string } | null;
   setPeopleFilter: (f: { managerId?: string } | null) => void;
 }
+
+export type AppScreen = 'menu' | 'profile' | 'vacation' | 'requests' | 'payslip' | 'certificate' | 'courses' | 'assistant';
 
 const HrContext = createContext<Ctx | null>(null);
 
@@ -254,6 +280,11 @@ export function HrProvider({ children, fallback }: { children: ReactNode; fallba
   const [tab, setTabState] = useState<TabId>('home');
   const [profileId, setProfileId] = useState<string | null>(null);
   const [appOpen, setAppOpen] = useState(false);
+  const [appScreen, setAppScreen] = useState<AppScreen>('menu');
+  const openApp = useCallback((open: boolean, screen: AppScreen = 'menu') => {
+    setAppScreen(screen);
+    setAppOpen(open);
+  }, []);
   const [peopleFilter, setPeopleFilter] = useState<{ managerId?: string } | null>(null);
 
   // Los datos dependen de la fecha local y de localStorage: se cargan solo en el cliente.
@@ -298,13 +329,14 @@ export function HrProvider({ children, fallback }: { children: ReactNode; fallba
             profileId,
             openProfile: setProfileId,
             appOpen,
-            openApp: setAppOpen,
+            appScreen,
+            openApp,
             reset,
             peopleFilter,
             setPeopleFilter,
           }
         : null,
-    [state, tab, setTab, profileId, appOpen, reset, peopleFilter],
+    [state, tab, setTab, profileId, appOpen, appScreen, openApp, reset, peopleFilter],
   );
 
   if (!value) return <>{fallback}</>;

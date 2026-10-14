@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
-import { ArrowRightIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { ArrowRightIcon, ArrowUturnLeftIcon, PlusIcon } from '@heroicons/react/24/outline';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import { FEMALE, MALE, SITE_CITY } from '../lib/catalog';
@@ -43,6 +43,11 @@ export default function TalentTab() {
     }
     dispatch({ type: 'candidate.move', id: c.id, stage });
     toast.success(stage === 'hired' ? t('hiredToast', { name: c.name }) : t('movedToast', { name: c.name, stage: t(`stages.${stage}`) }));
+  };
+
+  const restore = (c: Candidate) => {
+    dispatch({ type: 'candidate.restore', id: c.id });
+    toast.success(t('restoredToast', { name: c.name, stage: t(`stages.${c.stage}`) }));
   };
 
   return (
@@ -111,6 +116,11 @@ export default function TalentTab() {
                               {t('advance')} <ArrowRightIcon className="w-3 h-3" />
                             </button>
                           )}
+                          {c.discarded && (
+                            <button type="button" className={`${btn.small} flex-1`} onClick={() => restore(c)}>
+                              <ArrowUturnLeftIcon className="w-3 h-3" /> {t('restore')}
+                            </button>
+                          )}
                         </div>
                       </div>
                     );
@@ -125,13 +135,13 @@ export default function TalentTab() {
 
       <ProcessesCard />
 
-      {current && <CandidateModal c={current} onClose={() => setViewing(null)} onMove={move} />}
+      {current && <CandidateModal c={current} onClose={() => setViewing(null)} onMove={move} onRestore={restore} />}
       {adding && <AddCandidate onClose={() => setAdding(false)} defaultVacancy={vacancy === 'all' ? state.vacancies[0].id : vacancy} />}
     </div>
   );
 }
 
-function CandidateModal({ c, onClose, onMove }: { c: Candidate; onClose: () => void; onMove: (c: Candidate, s: Stage) => void }) {
+function CandidateModal({ c, onClose, onMove, onRestore }: { c: Candidate; onClose: () => void; onMove: (c: Candidate, s: Stage) => void; onRestore: (c: Candidate) => void }) {
   const t = useTranslations('demoHrms.talent');
   const tp = useTranslations('demoHrms.positions');
   const te = useTranslations('demoHrms.education');
@@ -174,6 +184,18 @@ function CandidateModal({ c, onClose, onMove }: { c: Candidate; onClose: () => v
       <p className="text-[11px] text-secondary-500 mb-4">{t('scoreNote')}</p>
       <div className="flex flex-wrap gap-2 justify-between">
         <button type="button" className={btn.outline} onClick={() => docs.cv(c, `${tp(v.positionId)} (${SITE_CITY[v.site]})`, scoreRows)}>{t('cv.download')}</button>
+        {c.discarded && (
+          <button
+            type="button"
+            className={btn.primary}
+            onClick={() => {
+              onRestore(c);
+              onClose();
+            }}
+          >
+            {t('restore')}
+          </button>
+        )}
         {!c.discarded && c.stage !== 'hired' && (
           <div className="flex flex-wrap gap-2">
             <label className="sr-only" htmlFor="cv-stage">{t('moveTo')}</label>

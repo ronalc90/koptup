@@ -16,11 +16,11 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import Badge from '@/components/ui/Badge';
-import { addDays, lastDayOfMonth } from '../lib/dates';
 import { SITE_CITY } from '../lib/catalog';
-import { currentPeriod, liquidate, type Period } from '../lib/payroll';
+import { liquidate, periodFromId, previousPeriod, type Period } from '../lib/payroll';
 import { APP_EMPLOYEE_NAME } from '../lib/seed';
-import { useHr } from '../lib/store';
+import { useHr, type AppScreen } from '../lib/store';
+import type { HrState, Novelty } from '../lib/types';
 import { vacationBalance } from '../lib/selectors';
 import { courseState } from './LearningTab';
 import LeaveForm from './LeaveForm';
@@ -30,15 +30,18 @@ import { useDocuments } from './useDocuments';
 import Assistant from './Assistant';
 import { btn, useFmt, usePos } from './ui';
 
-type Screen = 'menu' | 'profile' | 'vacation' | 'requests' | 'payslip' | 'certificate' | 'courses' | 'assistant';
+type Screen = AppScreen;
 
-/** Quincena anterior a la actual (la última pagada si la actual no se ha pagado). */
-function previousPeriod(base: string): Period {
-  const cur = currentPeriod(base);
-  if (cur.kind === 'Q2') return { ...cur, id: `${cur.month}-Q1`, kind: 'Q1', from: `${cur.month}-01`, to: `${cur.month}-15`, payDate: `${cur.month}-15` };
-  const prevEnd = addDays(cur.from, -1);
-  const month = prevEnd.slice(0, 7);
-  return { id: `${month}-Q2`, kind: 'Q2', from: `${month}-16`, to: lastDayOfMonth(prevEnd), days: 15, payDate: lastDayOfMonth(prevEnd), month };
+/**
+ * Último desprendible pagado: la quincena en curso si ya se pagó; si no, la
+ * última pagada en la demo o, al empezar, la quincena anterior (que se da por
+ * pagada sin novedades).
+ */
+function lastPaid(state: HrState): { period: Period; novelties: Novelty[]; current: boolean } {
+  if (state.run.status === 'paid') return { period: periodFromId(state.run.periodId), novelties: state.run.novelties, current: true };
+  const last = state.paidRuns[state.paidRuns.length - 1];
+  if (last) return { period: periodFromId(last.periodId), novelties: last.novelties, current: false };
+  return { period: previousPeriod(periodFromId(state.run.periodId)), novelties: [], current: false };
 }
 
 export default function EmployeeApp() {
@@ -47,7 +50,7 @@ export default function EmployeeApp() {
   const tl = useTranslations('demoHrms.leaveTypes');
   const tc = useTranslations('demoHrms.courses');
   const tlc = useTranslations('demoHrms.learning');
-  const { state, appOpen, openApp } = useHr();
+  const { state, appOpen, appScreen, openApp } = useHr();
   const f = useFmt();
   const docs = useDocuments();
   const label = usePeriodLabel();
@@ -57,14 +60,19 @@ export default function EmployeeApp() {
 
   useEffect(() => {
     if (!appOpen) return;
-    setScreen('menu');
+    setScreen(appScreen);
+    // Al cerrar, el foco vuelve al botón que abrió la app.
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     ref.current?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') openApp(false);
     };
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [appOpen, openApp]);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      if (opener && document.contains(opener)) opener.focus();
+    };
+  }, [appOpen, appScreen, openApp]);
 
   if (!appOpen) return null;
   const me = state.employees.find((e) => e.name === APP_EMPLOYEE_NAME);
@@ -76,9 +84,7 @@ export default function EmployeeApp() {
   } else {
     const bal = vacationBalance(state, me);
     const mine = state.leaves.filter((l) => l.employeeId === me.id).sort((a, b) => (a.from < b.from ? 1 : -1));
-    const paid = state.run.status === 'paid';
-    const period = paid ? currentPeriod(state.baseDate) : previousPeriod(state.baseDate);
-    const novelties = paid ? state.run.novelties : [];
+    const { period, novelties, current: paid } = lastPaid(state);
     const slip = liquidate(me, novelties, period);
     const activeIds = new Set(state.employees.filter((e) => e.status !== 'retired').map((e) => e.id));
     const courses = state.courses.filter((c) => c.assigned.includes(me.id));

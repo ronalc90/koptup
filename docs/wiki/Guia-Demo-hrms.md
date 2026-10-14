@@ -1,26 +1,34 @@
 # Guía de la demo: Gestión Humana y Nómina
 
-> Ruta `/demo/hrms` · Modo de acceso: **Con solicitud** · Tipo: **datos de ejemplo** en el navegador, con **IA real** solo en el asistente de políticas (llama al servidor) · Plan del producto: [HRMS](Producto-hrms.md)
+> Ruta `/demo/hrms` · Modo de acceso: **Con solicitud** · Tipo: **datos de ejemplo** en el navegador, con **IA real** solo en el asistente de políticas (llama al servidor, con tope de gasto mensual) · Plan del producto: [HRMS](Producto-hrms.md)
 
-**Resumen.** Es el sistema de gestión humana de una empresa ficticia de alimentos, Alimentos Valdeora S.A.S. (planta en Funza, oficina en Bogotá y centro de distribución en Medellín, 186 colaboradores). Muestra el expediente digital, las vacaciones en días hábiles con festivos de Colombia, la selección con puntaje por reglas, los ingresos y retiros con lista de chequeo, la evaluación de desempeño, la nómina quincenal colombiana con aportes, provisiones y asiento contable, la formación obligatoria y una app del colaborador con un asistente que responde con IA a partir del reglamento. Está pensada para gerentes de gestión humana, jefes de nómina y dueños de pymes con personal operativo; se abre solo con un acceso aprobado.
+**Resumen.** Es el sistema de gestión humana de una empresa ficticia de alimentos, Alimentos Valdeora S.A.S. (planta en Funza, oficina en Bogotá y centro de distribución en Medellín, 186 colaboradores). Muestra el expediente digital, las vacaciones en días hábiles con festivos de Colombia, la selección con puntaje por reglas, los ingresos y retiros con lista de chequeo, la evaluación de desempeño, la nómina quincenal colombiana con aportes, provisiones y asiento contable, la formación obligatoria y una app del colaborador con un asistente que responde con IA a partir del reglamento. Está pensada para gerentes de gestión humana, jefes de nómina y dueños de pymes con personal operativo; se abre solo con un acceso aprobado. Al entrar, el encabezado dice qué es y para quién, y un **recorrido sugerido de 5 pasos** lleva por el ciclo completo y se marca solo a medida que lo haces.
 
 **En esta página:** [Recorrido sugerido](#recorrido-sugerido-demo-comercial-de-5-minutos) · [Pantallas y funciones](#pantallas-y-funciones) · [Qué es real y qué es simulado](#qué-es-real-y-qué-es-simulado) · [Acceso](#acceso) · [Limitaciones conocidas](#limitaciones-conocidas)
 
 ![Vista general](images/doc/demos/hrms/00-general.jpg)
 
-*Vista inicial: encabezado con la insignia «Datos de ejemplo», los botones «Ver app del colaborador» y «Restablecer datos», las siete pestañas y los seis indicadores de Inicio.*
+*Lo primero que ve una cuenta con acceso: el encabezado con qué es, para quién y las salidas, y debajo el recorrido sugerido.*
 
-> **Sobre las cifras y las capturas.** Los datos se generan con la fecha del día en que abres la demo («Datos al 9 de octubre de 2026» en esta guía), así que las fechas, los vencimientos y algunas cifras cambian según el día. El texto de la respuesta del asistente lo produjo el modelo simulado del entorno de pruebas (por eso empieza con «Respuesta simulada (mock de OpenAI)…»); con la clave real del proveedor lo redacta el modelo. La búsqueda en el reglamento y las fuentes citadas sí son el comportamiento real del servidor.
+1. **Volver al catálogo de demos** (`/demo`).
+2. **Datos de ejemplo**: al pasar el mouse dice que la empresa, las personas, el NIT, las entidades y las cifras son inventados. Debajo del título, una línea dice para quién es («gerentes de gestión humana, jefes de nómina y dueños de pymes con personal operativo») y que todo corre en el navegador salvo el asistente, que usa IA real.
+3. **Solicitar demo guiada** (`/solicitar-demo?demos=hrms`, con esta demo ya elegida) y **Cotizar este sistema** (`/contact?service=hrms`, con «HRMS» prellenado).
+4. **Ver app del colaborador** y **Restablecer datos**, con la empresa, su NIT y la fecha de los datos.
+5. **Recorrido sugerido: el ciclo completo en 5 pasos**: pedir vacaciones desde la app, aprobarlas, contratar, liquidar y pagar la quincena y preguntarle al asistente. Cada tarjeta tiene su botón (abre la app en la pantalla correcta o cambia de pestaña), se marca «Hecho» sola y arriba lleva la cuenta «n de 5 hechos». **Ocultar** lo pliega (el navegador lo recuerda). En el celular cada paso muestra solo el título y el botón.
+
+Al final de la página está el cierre común de las demos (demo guiada, cotización y planes).
+
+> **Sobre las cifras y las capturas.** Los datos se generan con la fecha del día en que abres la demo («Datos al 14 de octubre de 2026» en esta guía), así que las fechas, los vencimientos y algunas cifras cambian según el día. El texto de la respuesta del asistente lo produjo el modelo simulado del entorno de pruebas (por eso empieza con «Respuesta simulada (mock de OpenAI)…»); con la clave real del proveedor lo redacta el modelo. La búsqueda en el reglamento y las fuentes citadas sí son el comportamiento real del servidor.
 
 ---
 
 ## Recorrido sugerido (demo comercial de 5 minutos)
 
-El guion muestra el ciclo completo: el colaborador pide algo desde su celular, Gestión Humana lo aprueba, se contrata a alguien nuevo, se liquida y se paga la quincena y, al final, el colaborador consulta su desprendible y le pregunta al asistente. Empieza con los datos limpios: si alguien ya usó la demo en ese navegador, pulsa **Restablecer datos** (arriba a la derecha) y confirma.
+El guion muestra el ciclo completo: el colaborador pide algo desde su celular, Gestión Humana lo aprueba, se contrata a alguien nuevo, se liquida y se paga la quincena y, al final, el colaborador consulta su desprendible y le pregunta al asistente. Es el mismo orden del **recorrido sugerido** que la demo muestra arriba (los pasos 2 a 6 de esta guía son sus 5 tarjetas), así que el prospecto puede seguirlo solo. Empieza con los datos limpios: si alguien ya usó la demo en ese navegador, pulsa **Restablecer datos** (arriba a la derecha) y confirma; el recorrido vuelve a «0 de 5 hechos».
 
 ![Recorrido de la demo](images/doc/demos/hrms/recorrido.gif)
 
-*Recorrido completo en 10 cuadros: indicadores, solicitud desde la app, aprobación, contratación, lista de chequeo del ingreso, nómina, pago, desprendible y asistente.*
+*Recorrido completo en 11 cuadros: vista general, solicitud desde la app, aprobación, contratación, lista de chequeo del ingreso, nómina, pago, siguiente quincena, desprendible, asistente y recorrido completo.*
 
 ```mermaid
 flowchart LR
@@ -35,6 +43,7 @@ flowchart LR
     NOM --> LIQ["Liquidar, aprobar y pagar"]
     LIQ --> DES["Desprendible en la app"]
     LIQ --> ASI["Asiento contable y archivo de dispersión"]
+    LIQ --> SIG["Siguiente quincena"]
 ```
 
 *Cómo se conectan las pestañas: cada flecha es algo que la demo hace por ti al registrar la operación.*
@@ -47,7 +56,7 @@ En la pestaña **Inicio** abre el grupo **Contratos que vencen en los próximos 
 
 *Indicadores del mes y las seis personas con contrato a término fijo que vence en los próximos 30 días.*
 
-1. **Indicadores**: colaboradores activos (186: Bogotá 24, Funza 143, Medellín 19), rotación de 12 meses (11,8 %, 22 retiros), ausentismo de 30 días (2,2 %), costo de nómina del mes ($ 714,3 M), vacantes abiertas (14 en 4 procesos) y eNPS (+32 con 142 respuestas). Las tarjetas de personas, ausentismo, costo y vacantes llevan a su pestaña.
+1. **Indicadores**: colaboradores activos (186: Bogotá 24, Funza 143, Medellín 19), rotación de 12 meses (11,8 %, 22 retiros), ausentismo de 30 días (2,3 %, 88 días hábiles perdidos), costo de nómina del mes ($ 713,6 M), vacantes abiertas (14 en 4 procesos) y eNPS (+32 con 142 respuestas). Las tarjetas de personas, ausentismo, costo y vacantes llevan a su pestaña.
 2. **Alertas de cumplimiento laboral**: contratos por vencer, periodos de prueba que terminan en 15 días, personas con 30 o más días hábiles de vacaciones acumuladas y exámenes médicos ocupacionales vencidos o por vencer. Cada grupo se abre con **Ver** y muestra cuántos casos hay.
 3. **Renovar**: extiende el contrato por su mismo plazo y avisa «Contrato de … renovado por N meses más». La persona sale de la alerta.
 4. **Preaviso de no renovación**: registra el preaviso (envío simulado) y crea el proceso de retiro en **Selección › Ingresos y retiros**.
@@ -59,22 +68,22 @@ Qué decir: «El sistema le avisa a Gestión Humana lo que vence antes de que se
 
 ### Paso 2. App del colaborador: pedir vacaciones desde el celular
 
-Pulsa **Ver app del colaborador** (arriba). Se abre la app de ejemplo de **Camila Rojas Parra**, operaria de empaque en Funza. Toca **Solicitar vacaciones**.
+Pulsa **Abrir la app** en el paso 1 del recorrido (o **Ver app del colaborador** arriba y luego **Solicitar vacaciones**). Se abre la app de ejemplo de **Camila Rojas Parra**, operaria de empaque en Funza, directo en **Solicitar vacaciones**.
 
 ![Paso 2: solicitud de vacaciones en la app](images/doc/demos/hrms/03-paso2-app.jpg)
 
 *La app muestra el saldo y calcula la fecha de regreso en días hábiles.*
 
 1. **Saldo**: causados 42, tomados 30, disponibles 12 días hábiles.
-2. **Desde**: viene propuesto el primer día hábil después de dos semanas (26 de octubre en la prueba).
-3. **Días hábiles**: en la prueba, 3. La app dice «Del 26 de oct de 2026 al 28 de oct de 2026; regresa el 29 de oct de 2026» y recuerda que se cuentan días de lunes a viernes sin festivos de Colombia.
-4. **Enviar solicitud**: avisa «Solicitud de Camila Rojas Parra enviada para aprobación» y pasa a **Mis solicitudes**, donde aparece como **Pendiente**.
+2. **Desde**: viene propuesto el primer día hábil después de dos semanas (29 de octubre en la prueba).
+3. **Días hábiles**: en la prueba, 3. La app dice «Del 29 de oct de 2026 al 3 de nov de 2026; regresa el 4 de nov de 2026» (el lunes 2 de noviembre es festivo y no cuenta) y recuerda que se cuentan días de lunes a viernes sin festivos de Colombia.
+4. **Enviar solicitud**: avisa «Solicitud de Camila Rojas Parra enviada para aprobación» y pasa a **Mis solicitudes**, donde aparece como **Pendiente**. La app se cierra con la X o con Escape, y el foco vuelve al botón que la abrió.
 
 La app no deja enviar si la fecha es anterior a hoy, si los días no están entre 1 y 30 o si superan el saldo disponible (que ya descuenta las solicitudes pendientes).
 
 ### Paso 3. Gestión Humana aprueba la solicitud
 
-Cierra la app y abre **Vacaciones y ausencias**. El contador de la pestaña sube a 6.
+Cierra la app y pulsa **Ir a Vacaciones** en el paso 2 del recorrido (o la pestaña **Vacaciones y ausencias**). El contador de la pestaña sube a 6.
 
 ![Paso 3: aprobar la solicitud que llegó desde la app](images/doc/demos/hrms/04-paso3-aprobar.jpg)
 
@@ -90,7 +99,7 @@ Qué decir: «Nadie llena un formato en papel: el colaborador pide desde el celu
 
 ### Paso 4. Selección: contratar desde la oferta
 
-Abre **Selección**. Arriba están las cuatro vacantes con sus cupos; debajo, los candidatos por etapa.
+Pulsa **Ir a Selección** en el paso 3 del recorrido (o la pestaña **Selección**). Arriba están las cuatro vacantes con sus cupos; debajo, los candidatos por etapa.
 
 ![Paso 4: candidatos por etapa](images/doc/demos/hrms/05-paso4-seleccion.jpg)
 
@@ -110,28 +119,34 @@ Baja a **Ingresos y retiros**: aparece el proceso de ingreso de Diego.
 
 *El proceso de ingreso de Diego con cuatro de ocho tareas hechas.*
 
-1. **Proceso de ingreso**: «Analista de costos · Bogotá · ingresa el 23 de oct de 2026 (en 14 días)».
+1. **Proceso de ingreso**: «Analista de costos · Bogotá · ingresa el 28 de oct de 2026 (en 14 días)».
 2. **Avance**: porcentaje de tareas hechas (50 % en la captura).
 3. **Contrato firmado**: la primera tarea dice «Enviar contrato a firma electrónica»; al marcarla avisa «Contrato de … firmado electrónicamente (simulado)» y la insignia pasa a «Contrato firmado».
 4. **Tareas pendientes**: afiliaciones a ARL («obligatoria antes del primer día de trabajo»), EPS, pensión y caja, examen médico de ingreso, dotación y elementos de protección e inducción SG-SST. Cada clic marca o desmarca.
-5. **Activar colaborador**: se habilita con las 8 tareas; avisa «… ya aparece en el directorio y en la nómina». En **Personas** el total pasa a 187.
+5. **Activar colaborador**: se habilita con las 8 tareas; avisa «… ya aparece en el directorio y en la nómina». En **Personas** el total pasa a 187, y en **Formación** recibe los cursos obligatorios de su cargo (a Diego, analista de costos, le llegan inducción SG-SST, prevención del acoso laboral, SAGRILAFT y protección de datos: la inducción pasa a contar 187 personas). Entra en la nómina desde la quincena en la que ingresa.
 
 Qué decir: «Del candidato al primer día sin hojas de cálculo: el puntaje es explicable y el ingreso tiene su lista de chequeo legal».
 
 ### Paso 5. Nómina: novedades, liquidación, aprobación y pago
 
-Abre **Nómina**. La quincena en curso es la «1.ª quincena de octubre de 2026 (del 1 al 15)», con pago el 15 de octubre para 186 colaboradores (Diego no entra porque ingresa después del 15). En **Novedades de la quincena** elige a Javier García Quintero, **Hora extra diurna (+25 %)**, 6 horas, y pulsa **Agregar** («Novedad agregada a Javier García Quintero: $ 149.643»).
+Pulsa **Ir a Nómina** en el paso 4 del recorrido (o la pestaña **Nómina**). La quincena en curso es la «1.ª quincena de octubre de 2026 (del 1 al 15)», con pago el 15 de octubre para 186 colaboradores (Diego no entra porque ingresa después del 15). En **Novedades de la quincena** escribe «javier garcia» en **Buscar por nombre o cédula** (sin tildes también sirve; con un solo resultado lo elige solo), deja **Hora extra diurna (+25 %)**, 6 horas, y pulsa **Agregar** («Novedad agregada a Javier García Quintero: $ 149.643»).
 
 ![Paso 5: nómina de la quincena](images/doc/demos/hrms/07-paso5-nomina.jpg)
 
 *Encabezado de la quincena, sus cuatro estados, los seis totales y el formulario de novedades.*
 
-1. **Liquidar quincena**: avisa «Quincena liquidada: 186 colaboradores, neto a pagar $ 241.300.662». Luego aparecen **Volver a borrador** y **Aprobar nómina**; después de aprobar, **Pagar: descargar archivo de dispersión**, que descarga `dispersion-2026-10-Q1.csv` y deja la insignia **Pagada**.
+1. **Liquidar quincena**: avisa «Quincena liquidada: 186 colaboradores, neto a pagar $ 240.832.219». Luego aparecen **Volver a borrador** y **Aprobar nómina**; después de aprobar, **Pagar: descargar archivo de dispersión**, que descarga `dispersion-2026-10-Q1.csv` y deja la insignia **Pagada**.
 2. **Estados**: Novedades → Liquidada → Aprobada → Pagada.
-3. **Totales**: devengado ($ 262,7 M), deducciones ($ 21,4 M), neto ($ 241,3 M), aportes del empleador ($ 44,7 M), provisiones ($ 55,2 M) y **costo total de la quincena** ($ 362,6 M).
-4. **Novedades**: colaborador, tipo (hora extra diurna o nocturna, recargo nocturno, recargo dominical o festivo, o comisión en pesos) y cantidad. El valor usa el valor hora (salario ÷ 210). Al liquidar, el formulario se bloquea hasta volver a borrador.
+3. **Totales**: devengado ($ 262,2 M), deducciones ($ 21,3 M), neto ($ 240,8 M), aportes del empleador ($ 44,7 M), provisiones ($ 55,1 M) y **costo total de la quincena** ($ 361,9 M).
+4. **Novedades**: buscador por nombre o cédula, colaborador (solo quienes trabajan en esa quincena y no son aprendices), tipo (hora extra diurna o nocturna, recargo nocturno, recargo dominical o festivo, o comisión en pesos) y cantidad. El valor usa el valor hora (salario ÷ 210). Al liquidar, el formulario se bloquea hasta volver a borrador.
 
-Debajo están el **Resumen por concepto** (con la comprobación «devengado − deducciones = neto»), el **Detalle por colaborador** (con buscador, **Desprendible** en PDF cuando la quincena está liquidada y exportación CSV) y el **Asiento contable de la quincena** con cuentas del PUC («Débitos = créditos: el asiento cuadra»; en la prueba, sumas iguales de $ 362.623.904), que se descarga en CSV.
+Debajo están el **Resumen por concepto** (con la comprobación «devengado − deducciones = neto»), el **Detalle por colaborador** (con buscador, **Desprendible** en PDF cuando la quincena está liquidada y exportación CSV) y el **Asiento contable de la quincena** con cuentas del PUC («Débitos = créditos: el asiento cuadra»; en la prueba, sumas iguales de $ 361.929.933), que se descarga en CSV.
+
+**Siguiente quincena.** Ya pagada, la quincena muestra **Abrir la siguiente quincena** y explica cuál es. Al pulsarlo avisa «Se abrió la 2.ª quincena de octubre de 2026 (del 16 al 31): empieza sin novedades», vuelve a **Novedades** y suma la pagada a **Quincenas pagadas en la demo** («186 colaboradores · neto $ 240.832.219 · costo total $ 361.929.933»). La nueva quincena tiene 187 colaboradores: Diego entra con los días que trabaja desde su ingreso. Así el ciclo se puede repetir sin restablecer los datos; de la 2.ª quincena se pasa a la 1.ª del mes siguiente.
+
+![Siguiente quincena abierta](images/doc/demos/hrms/15-nomina-siguiente-quincena.jpg)
+
+*La 2.ª quincena de octubre recién abierta (1), el historial con la quincena pagada (2) y el ciclo que vuelve a empezar en Liquidar quincena (3).*
 
 ```mermaid
 stateDiagram-v2
@@ -144,18 +159,18 @@ stateDiagram-v2
     L --> B: Volver a borrador
     L --> A: Aprobar nómina
     A --> P: Pagar (descarga el archivo de dispersión)
-    P --> [*]
+    P --> B: Abrir la siguiente quincena (sin novedades)
 ```
 
-*Estados de la quincena. Solo en borrador se pueden agregar o quitar novedades.*
+*Estados de la quincena. Solo en borrador se pueden agregar o quitar novedades; una quincena pagada pasa al historial y se abre la siguiente.*
 
 Qué decir: «La nómina cuadra sola: cada total es la suma de las filas, y el asiento contable sale listo para el software contable».
 
 ### Paso 6. El colaborador ve su desprendible y le pregunta al asistente
 
-Vuelve a **Ver app del colaborador**. En **Mi desprendible** ya aparece la quincena actual («Quincena actual, ya pagada.»), con devengado, deducciones, neto y **Descargar PDF**. Antes de pagar, la app muestra la última quincena pagada.
+Vuelve a **Ver app del colaborador**. En **Mi desprendible** aparece la última quincena pagada: la actual («Quincena actual, ya pagada.») o, si ya abriste la siguiente, la que pagaste («1.ª quincena de octubre de 2026 (del 1 al 15)»: devengado $ 1.142.881, deducciones $ 81.466, neto $ 1.061.415 en la prueba), con **Descargar PDF**. Antes del primer pago, la app muestra la quincena anterior.
 
-Luego abre **Pregúntale a Gestión Humana** y toca la sugerencia «¿Cuántos días de licencia de luto tengo?».
+Luego abre **Pregúntale a Gestión Humana** (o pulsa **Abrir el asistente** en el paso 5 del recorrido) y toca la sugerencia «¿Cuántos días de licencia de luto tengo?». Con la respuesta, el recorrido llega a «5 de 5 hechos» y muestra el cierre «Recorriste el ciclo completo. ¿Quieres verlo con los cargos, sedes y reglas de tu empresa?» con **Solicitar demo guiada** y **Cotizar este sistema**.
 
 ![Paso 6: asistente de políticas con IA](images/doc/demos/hrms/08-paso6-asistente.jpg)
 
@@ -164,10 +179,14 @@ Luego abre **Pregúntale a Gestión Humana** y toca la sugerencia «¿Cuántos d
 1. **Tu pregunta**. También hay sugerencias: días de vacaciones, anticipación para pedirlas, licencia de luto y fechas de pago de nómina. Se puede escribir hasta 300 caracteres.
 2. **Respuesta**: el servidor busca en los cinco documentos de ejemplo (capítulos de vacaciones, permisos y licencias, y jornada y horas extra del reglamento, y las políticas de certificados y de beneficios) y responde citando la fuente. El artículo encontrado en la prueba fue el 40: «Licencia de luto: cinco (5) días hábiles remunerados… (Ley 1280 de 2009)».
 3. **Fuentes (5)**: al abrirlo muestra los fragmentos usados, con el nombre del documento.
-4. **Cómo se generó**: «Respuesta generada con IA (modelo) a partir de los documentos»; si el servidor no tiene clave del proveedor, «Modo sin IA… muestra los fragmentos encontrados»; si el proveedor falla, también lo dice.
+4. **Cómo se generó**: «Respuesta generada con IA (modelo) a partir de los documentos». Si no la redactó el modelo, dice por qué: el servidor no tiene clave del proveedor, se agotó el cupo mensual de IA de la demo, no se pudo verificar el cupo o el proveedor no respondió; en esos casos muestra los fragmentos encontrados.
 5. **Escribe tu pregunta**.
 
 Qué decir: «Las preguntas repetidas a Gestión Humana las responde el asistente, con el artículo del reglamento como respaldo».
+
+![Recorrido completo](images/doc/demos/hrms/16-recorrido-completo.jpg)
+
+*Los cinco pasos marcados (1) y el cierre con la demo guiada y la cotización (2).*
 
 ---
 
@@ -177,11 +196,15 @@ Qué decir: «Las preguntas repetidas a Gestión Humana las responde el asistent
 
 | Elemento | Qué hace |
 |---|---|
+| **Volver al catálogo de demos** | Lleva a `/demo`. |
 | **Datos de ejemplo** | Insignia; al pasar el mouse dice que la empresa, las personas, el NIT, las entidades y las cifras son inventados. |
+| **Para quién** | Línea bajo el título: gerentes de gestión humana, jefes de nómina y dueños de pymes con personal operativo; todo corre en el navegador y solo el asistente usa IA real. |
+| **Solicitar demo guiada** y **Cotizar este sistema** | Abren `/solicitar-demo?demos=hrms` y `/contact?service=hrms`. |
 | **Ver app del colaborador** | Abre la app de ejemplo de Camila Rojas Parra en un marco de celular (ver [App del colaborador](#app-del-colaborador)). |
 | **Restablecer datos** | Pide confirmación, borra los cambios de este navegador y genera los datos de nuevo con la fecha de hoy. |
 | **Empresa y fecha** | «Alimentos Valdeora S.A.S. · NIT 901.738.264-4» y «Datos al …». |
-| **Pestañas** | Inicio, Personas, Vacaciones y ausencias (con el número de pendientes), Selección, Desempeño, Nómina y Formación. Se desplazan de lado en el celular. |
+| **Recorrido sugerido** | Cinco pasos con su botón, que se marcan solos; **Ocultar** / **Mostrar pasos**. Ver la [vista general](#guía-de-la-demo-gestión-humana-y-nómina). |
+| **Pestañas** | Inicio, Personas, Vacaciones y ausencias (con el número de pendientes), Selección, Desempeño, Nómina y Formación. Se desplazan de lado en el celular y con el teclado se recorren con las flechas, Inicio y Fin. |
 
 ### Inicio
 
@@ -217,7 +240,11 @@ Ver el [paso 3](#paso-3-gestión-humana-aprueba-la-solicitud). Además de las so
 
 Ver el [paso 4](#paso-4-selección-contratar-desde-la-oferta). Además:
 
-- **Ver descartados (N)** muestra los candidatos descartados (sin botones para moverlos).
+- **Ver descartados (N)** muestra los candidatos descartados con **Devolver al proceso** (en la tarjeta y en su hoja de vida): el candidato vuelve a la etapa en la que estaba («Wilson Duarte Herrera volvió al proceso en Postulados»). **Ver activos** regresa a la vista normal.
+
+![Candidatos descartados](images/doc/demos/hrms/14-seleccion-descartados.jpg)
+
+*Vista de descartados (1): el candidato (2) y su botón para devolverlo al proceso (3).*
 - Si una vacante ya tiene todos sus cupos, no deja contratar más: «Esta vacante ya tiene todos sus cupos cubiertos».
 - **Ingresos y retiros** alterna entre **Ingresos** y **Retiros** y tiene **Ver procesos cerrados**. Un retiro trae su lista de chequeo (carta o preaviso, liquidación aprobada, paz y salvo, examen de egreso, **Generar certificado laboral (PDF)** y retiro de seguridad social) y la **Liquidación estimada**: salario y auxilio pendientes, cesantías, intereses, prima proporcional, vacaciones no disfrutadas e indemnización (solo para despido sin justa causa en contrato indefinido), con la nota «Cálculo simplificado de ejemplo». **Finalizar retiro** saca a la persona del directorio y la suma a la rotación.
 
@@ -235,15 +262,15 @@ Ver el [paso 4](#paso-4-selección-contratar-desde-la-oferta). Además:
 
 ### Nómina
 
-Ver el [paso 5](#paso-5-nómina-novedades-liquidación-aprobación-y-pago). Al final de la pestaña están las obligaciones del mes anterior y los beneficios.
+Ver el [paso 5](#paso-5-nómina-novedades-liquidación-aprobación-y-pago), con la siguiente quincena y el historial de quincenas pagadas. Al final de la pestaña están las obligaciones del mes anterior y los beneficios.
 
 ![Obligaciones del mes: nómina electrónica y planilla de aportes](images/doc/demos/hrms/11-nomina-obligaciones.jpg)
 
 *Obligaciones de septiembre de 2026 después de transmitir la nómina electrónica y generar la planilla.*
 
-1. **Nómina electrónica (DIAN)**: «185 documentos soporte de pago de nómina por $ 511.291.975 devengados» con el plazo aproximado. **Transmitir a la DIAN (simulado)** pasa a «Aceptada (simulado)» y muestra un CUNE por persona.
+1. **Nómina electrónica (DIAN)**: «184 documentos soporte de pago de nómina por $ 510.383.367 devengados» con el plazo aproximado. **Transmitir a la DIAN (simulado)** pasa a «Aceptada (simulado)» y muestra un CUNE por persona.
 2. **Descargar CUNE (CSV)**: colaborador, cédula, neto y CUNE. La pantalla aclara que «el CUNE se calcula con SHA-384 en tu navegador y no es válido ante la DIAN».
-3. **Planilla de aportes (PILA)**: salud, pensión y solidaridad, riesgos laborales, caja e ICBF y SENA (total $ 124.762.266 en la prueba). **Generar archivo de aportes** descarga `aportes-2026-09.csv`, un archivo «de EJEMPLO con estructura simplificada; no es el formato oficial».
+3. **Planilla de aportes (PILA)**: salud, pensión y solidaridad, riesgos laborales, caja e ICBF y SENA (total $ 124.550.603 en la prueba). **Generar archivo de aportes** descarga `aportes-2026-09.csv`, un archivo «de EJEMPLO con estructura simplificada; no es el formato oficial».
 4. **Marcar como pagada**: estado «Pagada (simulado)». **Descargar de nuevo** repite la descarga.
 
 **Beneficios**: auxilio de alimentación, póliza de vida colectiva, plan complementario de salud, medio día libre de cumpleaños y jornada familiar, con su costo por persona, beneficiarios y costo mensual (valores de ejemplo).
@@ -252,23 +279,24 @@ Ver el [paso 5](#paso-5-nómina-novedades-liquidación-aprobación-y-pago). Al f
 
 ![Plan de formación](images/doc/demos/hrms/12-formacion.jpg)
 
-*Cumplimiento del plan y los primeros cursos con su avance y vencimiento.*
+*Cumplimiento del plan y los primeros cursos con su avance y vencimiento, después de activar a Diego: la inducción cuenta 187 personas.*
 
-- **Indicadores**: cumplimiento del plan (59,8 %, 344 de 575 asignaciones), cursos en el plan (8), cursos vencidos (2) y horas de formación completadas (2.112).
+- **Indicadores**: cumplimiento del plan (59,8 %, 344 de 575 asignaciones al empezar; 59,4 %, 344 de 579, después de activar a Diego), cursos en el plan (8), cursos vencidos (2) y horas de formación completadas (2.112).
+- **Quien ingresa recibe sus cursos**: al activar a un colaborador nuevo se le asignan los cursos obligatorios de su cargo y área, con la misma regla que al resto (por ejemplo, todos reciben inducción SG-SST y prevención del acoso laboral; producción y calidad, manipulación de alimentos).
 - **Plan de formación**: ocho cursos obligatorios (inducción SG-SST, curso de 50 horas SG-SST, manipulación de alimentos, trabajo en alturas, seguridad vial, SAGRILAFT, protección de datos y prevención del acoso laboral), cada uno con horas, vencimiento, público, avance y estado (En curso, Vence pronto, Vencido, Completo).
 - **Ver pendientes (N)** lista quién falta; **Recordar a pendientes** avisa «Recordatorio enviado a N personas (envío simulado)» y deja la marca «Recordatorio enviado hoy (simulado)».
-- **CSV** y **Ver la demo de plataforma de formación**, que lleva a `/demo/lms` (ver su [guía](Guia-Demo-lms.md)).
+- **CSV** y **Ver la demo de plataforma de formación**, que lleva a `/demo/lms` (ver su [guía](Guia-Demo-lms.md)). Debajo del plan, la demo aclara que «La plataforma de formación es otra demo con su propio acceso: si no la tienes habilitada, allí mismo puedes solicitarla».
 
 ### App del colaborador
 
-Se abre con **Ver app del colaborador** y se cierra con la X o con Escape. Es la vista de Camila Rojas Parra.
+Se abre con **Ver app del colaborador** (o desde los pasos 1 y 5 del recorrido, que la abren directo en **Solicitar vacaciones** o en el asistente) y se cierra con la X o con Escape; el foco vuelve al botón que la abrió. Es la vista de Camila Rojas Parra.
 
 | Opción | Qué hace |
 |---|---|
 | **Solicitar vacaciones** | Saldo (causados, tomados, disponibles) y formulario en días hábiles (ver el [paso 2](#paso-2-app-del-colaborador-pedir-vacaciones-desde-el-celular)). |
 | **Mis solicitudes** | Sus solicitudes con estado Pendiente, Aprobada o Rechazada. |
-| **Mi desprendible** | Última quincena pagada (o la actual si ya se pagó) y **Descargar PDF**. |
-| **Mi certificado laboral** | Con o sin salario, en PDF. |
+| **Mi desprendible** | Última quincena pagada (la actual si ya se pagó, o la última del historial) y **Descargar PDF**. |
+| **Mi certificado laboral** | Con o sin salario, en PDF. La pantalla aclara que en la demo es un documento de ejemplo, sin validez. |
 | **Mis cursos** | Sus cursos con estado y vencimiento; «Se toma en la plataforma de formación». |
 | **Pregúntale a Gestión Humana** | Asistente con IA (ver el [paso 6](#paso-6-el-colaborador-ve-su-desprendible-y-le-pregunta-al-asistente)). |
 | **Mis datos** | Cédula, cargo, sede, ingreso, EPS, fondo y cuenta de nómina enmascarada. «Los cambios de datos se solicitan a Gestión Humana». |
@@ -278,28 +306,28 @@ sequenceDiagram
     participant C as App del colaborador
     participant B as Servidor KopTup /api/chatbot
     participant M as Modelo de IA
-    C->>B: Primera vez: crea el bot y sube los 5 documentos
-    B-->>C: Identificador del bot (se guarda en el navegador)
+    C->>B: Pide el bot de ejemplo compartido con los 5 documentos (POST /sample-bots)
+    B-->>C: Identificador del bot (el mismo para todos los visitantes; se crea e indexa una sola vez)
     C->>B: Pregunta y últimos mensajes
     B->>B: Busca los fragmentos del reglamento
-    alt Hay clave del proveedor
+    alt Hay clave del proveedor y cupo del mes
         B->>M: Fragmentos y reglas para citar y no inventar
         M-->>B: Respuesta
         B-->>C: Respuesta, fuentes y modelo
-    else Sin clave o el proveedor falla
-        B-->>C: Fragmentos encontrados (modo sin IA)
+    else Sin clave, sin cupo o el proveedor falla
+        B-->>C: Fragmentos encontrados y el motivo (modo sin IA)
     end
 ```
 
-*Cómo responde el asistente: usa las mismas rutas del chatbot RAG del sitio.*
+*Cómo responde el asistente: usa las mismas rutas del chatbot RAG del sitio. El bot de ejemplo es compartido (cada navegador no crea uno propio) y sus conversaciones no se guardan; si el servidor lo borra por inactividad, la demo lo pide de nuevo sola. Con un servidor anterior sin bots compartidos, crea uno propio como antes.*
 
 ### En el celular
 
 ![Vista móvil](images/doc/demos/hrms/13-movil.jpg)
 
-*La demo en un teléfono de 390 px: el encabezado se apila, las pestañas se desplazan de lado y la app del colaborador ocupa casi toda la pantalla.*
+*La demo en un teléfono de 390 px: el encabezado con las salidas apiladas y el recorrido sugerido (izquierda), y la app del colaborador, que ocupa casi toda la pantalla (derecha).*
 
-En el teléfono los indicadores van de dos en dos, los botones del encabezado se apilan y las tablas anchas (nómina, asiento, saldos) se desplazan horizontalmente. La página no se desborda a lo ancho.
+En el teléfono los botones del encabezado se apilan, los pasos del recorrido muestran solo título y botón, los indicadores van de dos en dos, las pestañas se desplazan de lado y las tablas anchas (nómina, asiento, saldos) se desplazan horizontalmente. La página no se desborda a lo ancho, en modo claro ni oscuro.
 
 ---
 
@@ -311,12 +339,14 @@ En el teléfono los indicadores van de dos en dos, los botones del encabezado se
 | Saldos de vacaciones, días hábiles y festivos de Colombia | **Real (en el navegador)** | 15 días hábiles por año, proporcionales; el calendario calcula los festivos. |
 | Liquidación de la quincena, aportes, provisiones, retención y asiento | **Real (en el navegador), con parámetros de ejemplo 2026** | Salario mínimo, auxilio, UVT, jornada y recargos son valores de ejemplo; retención con un procedimiento 1 simplificado. |
 | Puntaje de candidatos y alertas laborales | **Reglas, no IA** | Lo dice la propia pantalla. |
-| Asistente «Pregúntale a Gestión Humana» | **IA real** | Llama al servidor de KopTup (`/api/chatbot`); sin clave del proveedor responde con los fragmentos y lo dice. |
+| Asistente «Pregúntale a Gestión Humana» | **IA real** | Llama al servidor de KopTup (`/api/chatbot`, bot de ejemplo compartido) con el tope de gasto mensual del chatbot; sin clave, sin cupo o si el proveedor falla responde con los fragmentos y dice por qué. |
 | Nómina electrónica, CUNE y planilla de aportes | **Simulados** | El CUNE se calcula en el navegador y no es válido ante la DIAN; el archivo de aportes no es el formato oficial. |
 | Archivo de dispersión bancaria | **Ejemplo** | CSV con formato propio de la demo («cada banco define su propio formato»). |
 | Firma electrónica del contrato, encuestas, recordatorios y avisos | **Simulados** | No se envía nada. |
 | Certificados, desprendibles, hojas de vida y documentos del expediente | **PDF real de ejemplo** | Se generan en el navegador con la marca «DOCUMENTO DE EJEMPLO… Sin validez». |
-| Dónde se guardan tus cambios | **Solo en este navegador** | `localStorage` (clave `koptup.hrms.state`) durante 7 días; después se regeneran los datos. |
+| Recorrido sugerido | **Real (en el navegador)** | Cada paso se marca con lo que de verdad hiciste en la demo. |
+| Siguiente quincena e historial de quincenas pagadas | **Real (en el navegador)** | La nueva quincena se liquida con el personal activo en esas fechas. |
+| Dónde se guardan tus cambios | **Solo en este navegador** | `localStorage` (clave `koptup.hrms.state`) durante 7 días; después se regeneran los datos. **Restablecer datos** vuelve al inicio. |
 
 ---
 
@@ -353,14 +383,13 @@ flowchart LR
 
 ## Limitaciones conocidas
 
-En el recorrido no encontramos botones que no hagan nada ni errores en la consola (una prueba automática hizo clic en los 44 controles visibles de la vista inicial). Lo que sí conviene saber:
+La sonda automática hizo clic en todos los controles visibles de la vista inicial (escritorio, 390 px e inglés) y ninguno quedó sin efecto, sin errores de consola ni de hidratación. Los flujos principales (pedir y aprobar vacaciones, contratar y activar, descartar y devolver, buscar y agregar novedades, liquidar, aprobar, pagar y abrir la siguiente quincena, desprendible, asistente, teclado en las pestañas y restablecer) se recorrieron con Playwright. Lo que sí conviene saber:
 
-1. **La vista previa promete más de lo que hace la demo.** La tarjeta del hub y la pantalla de acceso usan el texto del catálogo: «ATS con scoring CV IA y screening calls automáticas», «Payroll multi-país con compliance laboral (CO, MX, AR)» y «AI: retención predicha, eNPS y salary benchmarks». La demo trabaja solo con Colombia, el puntaje de candidatos es por reglas («No es IA»), no hace llamadas de preselección y no predice retención ni compara salarios. La IA está solo en el asistente de políticas.
+1. **La vista previa todavía promete más de lo que hace la demo.** La tarjeta del hub y la pantalla de acceso usan el texto del catálogo: «ATS con scoring CV IA y screening calls automáticas», «Payroll multi-país con compliance laboral (CO, MX, AR)» y «AI: retención predicha, eNPS y salary benchmarks». La demo trabaja solo con Colombia, el puntaje de candidatos es por reglas («No es IA»), no hace llamadas de preselección y no predice retención ni compara salarios. La IA está solo en el asistente de políticas. El texto nuevo de la tarjeta (y el nombre «Gestión Humana y Nómina (HRMS)» para el catálogo del admin) está propuesto a la pista de plataforma.
 2. **Los cambios viven solo en el navegador**, por 7 días. Si el prospecto cambia de equipo o de navegador, o borra los datos del sitio, vuelve a los datos de ejemplo. No hay espacio compartido con el vendedor.
-3. **Una sola quincena.** La nómina trabaja con la quincena en curso; después de **Pagada** no se puede abrir la siguiente. Para repetir el guion hay que **Restablecer datos**.
+3. **La siguiente quincena se puede abrir antes de tiempo.** Para repetir el ciclo, la demo deja abrir la quincena siguiente apenas se paga la actual, aunque en la vida real se liquida cerca de su fecha de pago. El historial guarda los totales pagados, no el detalle por persona; el desprendible de la app se recalcula con las novedades de esa quincena. Las **obligaciones del mes** (nómina electrónica y planilla de aportes) siguen siendo las del mes anterior a la fecha de los datos.
 4. **DIAN, planilla de aportes, banco, firma electrónica y mensajes simulados**, como lo dicen las pantallas.
-5. **Las aprobaciones no dependen de roles**: quien usa la demo aprueba como jefe y como Gestión Humana a la vez. La app del colaborador es siempre la de Camila Rojas Parra.
-6. **Las personas contratadas en la demo no reciben cursos.** Al activar a un colaborador nuevo, el total de Personas sube (187), pero el plan de formación sigue contando 186 en la inducción.
-7. **Un candidato descartado no se puede recuperar**: en «Ver descartados» se ve, pero sin botones para devolverlo al proceso.
-8. **El enlace «Ver la demo de plataforma de formación»** lleva a `/demo/lms`, que tiene su propio acceso: un prospecto con acceso solo a esta demo verá ahí la pantalla «Requiere acceso».
-9. **Lista larga de colaboradores** en el formulario de novedades de nómina: es un desplegable con todas las personas (sin buscador).
+5. **Las aprobaciones no dependen de roles**: quien usa la demo aprueba como jefe y como Gestión Humana a la vez (el recorrido lo dice). La app del colaborador es siempre la de Camila Rojas Parra.
+6. **El enlace «Ver la demo de plataforma de formación»** lleva a `/demo/lms`, que tiene su propio acceso: un prospecto con acceso solo a esta demo verá ahí la pantalla «Requiere acceso» (la demo lo advierte debajo del plan de formación).
+7. **Un colaborador nuevo no entra en el ciclo de desempeño en curso** (ingresó después de que empezó) ni en las obligaciones del mes anterior.
+8. **Límites del asistente**: comparte el tope de gasto mensual y los límites del chatbot del sitio. Si el servidor está ocupado o en mantenimiento, la app lo dice y se puede volver a preguntar.

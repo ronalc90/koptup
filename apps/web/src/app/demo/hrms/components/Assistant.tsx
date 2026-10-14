@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { AssistantError, ask, ensurePolicyBot, forgetPolicyBot, type AssistantAnswer } from '../lib/assistant';
 import { policyDocs } from '../lib/policies';
+import { useHr } from '../lib/store';
 
 interface Msg {
   role: 'user' | 'assistant';
@@ -18,6 +19,7 @@ export default function Assistant() {
   const t = useTranslations('demoHrms.assistant');
   const locale = useLocale();
   const lang = locale === 'en' ? 'en' : 'es';
+  const { dispatch } = useHr();
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
@@ -41,13 +43,15 @@ export default function Assistant() {
       try {
         answer = await ask(botId, q, history);
       } catch (err) {
-        if (err instanceof AssistantError && err.kind === 'server') {
+        // El servidor borra los bots de ejemplo tras 30 días sin uso: se pide de nuevo una vez.
+        if (err instanceof AssistantError && err.status === 404) {
           forgetPolicyBot(lang);
           botId = await ensurePolicyBot(lang, docs, t('persona'), t('botName'));
           answer = await ask(botId, q, history);
         } else throw err;
       }
       setMsgs((m) => [...m, { role: 'assistant', content: answer.reply, answer }]);
+      dispatch({ type: 'guide.assistant' });
     } catch (err) {
       const kind = err instanceof AssistantError ? err.kind : 'server';
       setMsgs((m) => [...m, { role: 'assistant', content: t(`errors.${kind}`), error: true }]);
@@ -88,7 +92,7 @@ export default function Assistant() {
               )}
               {m.answer && (
                 <p className="mt-1 text-[9px] text-secondary-500">
-                  {m.answer.llm ? t('modeLlm', { model: m.answer.model }) : m.answer.providerError ? t('modeProviderError') : t('modeExtractive')}
+                  {m.answer.noAi ? t(`noAi.${m.answer.noAi}`) : t('modeLlm', { model: m.answer.model })}
                 </p>
               )}
             </div>

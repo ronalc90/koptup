@@ -67,8 +67,8 @@ export default function LearningTab() {
           action={
             <>
               <button type="button" className={btn.outline} onClick={exportCsv}><ArrowDownTrayIcon className="w-4 h-4" />CSV</button>
-              <Link href="/demo/lms" className={btn.outline}>
-                <ArrowTopRightOnSquareIcon className="w-4 h-4" />
+              <Link href="/demo/lms" className={btn.outline} title={t('lmsHint')}>
+                <ArrowTopRightOnSquareIcon className="w-4 h-4" aria-hidden="true" />
                 {t('openLms')}
               </Link>
             </>
@@ -130,6 +130,7 @@ export default function LearningTab() {
           })}
         </ul>
         <p className="text-[11px] text-secondary-500 mt-3">{t('note')}</p>
+        <p className="text-[11px] text-secondary-500 mt-1">{t('lmsHint')}</p>
       </Card>
     </div>
   );

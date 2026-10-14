@@ -180,8 +180,13 @@ export function Modal({
       if (e.key === 'Escape') closeRef.current();
     };
     window.addEventListener('keydown', onKey);
+    // Al cerrar, el foco vuelve al botón que abrió el diálogo.
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     ref.current?.focus();
-    return () => window.removeEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      if (opener && document.contains(opener)) opener.focus();
+    };
   }, []);
   const width = size === 'sm' ? 'max-w-sm' : size === 'lg' ? 'max-w-2xl' : 'max-w-lg';
   return createPortal(

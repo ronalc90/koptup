@@ -11,14 +11,33 @@ import { active } from '../lib/selectors';
 import { NOVELTY_KINDS, type NoveltyKind } from '../lib/types';
 import { Empty, SectionTitle, btn, inputCls, useFmt } from './ui';
 
+const norm = (x: string) => x.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
 /** Novedades editables de la quincena (horas extra, recargos y comisiones). */
 export function Novelties({ locked, period }: { locked: boolean; period: Period }) {
   const t = useTranslations('demoHrms.payroll.novelties');
   const { state, dispatch } = useHr();
   const f = useFmt();
-  const people = useMemo(() => [...active(state)].filter((e) => e.contract !== 'apprentice').sort((a, b) => a.name.localeCompare(b.name, 'es')), [state]);
+  // Solo quienes trabajan en la quincena (no aprendices ni personas que ingresan después).
+  const people = useMemo(
+    () => [...active(state)].filter((e) => e.contract !== 'apprentice' && e.joined <= period.to).sort((a, b) => a.name.localeCompare(b.name, 'es')),
+    [state, period.to],
+  );
   const [who, setWho] = useState('');
+  const [find, setFind] = useState('');
   const [kind, setKind] = useState<NoveltyKind>('hed');
+  // Buscador del desplegable: filtra por nombre o cédula (sin tildes) y, si queda una sola persona, la elige.
+  const options = useMemo(() => {
+    const q = norm(find.trim());
+    return q ? people.filter((p) => norm(p.name).includes(q) || p.docId.includes(q)) : people;
+  }, [people, find]);
+  const onFind = (value: string) => {
+    setFind(value);
+    const q = norm(value.trim());
+    const hits = q ? people.filter((p) => norm(p.name).includes(q) || p.docId.includes(q)) : [];
+    if (hits.length === 1) setWho(hits[0].id);
+    else if (q && who && !hits.some((p) => p.id === who)) setWho('');
+  };
   const [qty, setQty] = useState(4);
   const byId = new Map(state.employees.map((e) => [e.id, e]));
   const value = (employeeId: string, k: NoveltyKind, n: number) => {
@@ -32,17 +51,19 @@ export function Novelties({ locked, period }: { locked: boolean; period: Period 
       <SectionTitle title={t('title')} subtitle={locked ? t('locked') : t('subtitle', { divisor: weeklyHours(period.to) * 5 })} />
       {!locked && (
         <form
-          className="grid grid-cols-1 sm:grid-cols-[1fr_12rem_8rem_auto] gap-2 mb-4"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_13rem_7rem_auto] gap-2 mb-4"
           onSubmit={(e) => {
             e.preventDefault();
             if (!valid) return;
             dispatch({ type: 'novelty.add', novelty: { employeeId: who, kind, qty } });
             toast.success(t('added', { name: byId.get(who)!.name, value: f.money(value(who, kind, qty)) }));
+            setFind('');
           }}
         >
+          <input type="search" aria-label={t('find')} placeholder={t('find')} className={inputCls} value={find} onChange={(e) => onFind(e.target.value)} />
           <select aria-label={t('employee')} className={inputCls} value={who} onChange={(e) => setWho(e.target.value)}>
-            <option value="">{t('employee')}</option>
-            {people.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+            <option value="">{find.trim() ? t('matches', { n: options.length }) : t('employee')}</option>
+            {options.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
           </select>
           <select aria-label={t('kind')} className={inputCls} value={kind} onChange={(e) => { const k = e.target.value as NoveltyKind; setKind(k); setQty(k === 'commission' ? 300000 : 4); }}>
             {NOVELTY_KINDS.map((k) => <option key={k} value={k}>{t(`kinds.${k}`, { pct: Math.round((noveltyFactor(k, period.to) - (k === 'rn' || k === 'rdf' ? 0 : 1)) * 100) })}</option>)}

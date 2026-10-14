@@ -7,7 +7,7 @@ import { ArrowDownTrayIcon, CheckCircleIcon } from '@heroicons/react/24/outline'
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import { bankFile } from '../lib/files';
-import { PARAMS, csv, currentPeriod, download, journal, payroll, sundayRate, totals, weeklyHours, type Period } from '../lib/payroll';
+import { PARAMS, csv, download, journal, nextPeriod, payroll, periodFromId, sundayRate, totals, weeklyHours, type Period } from '../lib/payroll';
 import { useHr } from '../lib/store';
 import type { RunStatus } from '../lib/types';
 import FilingsCard from './FilingsCard';
@@ -33,7 +33,7 @@ export default function PayrollTab() {
   const f = useFmt();
   const docs = useDocuments();
   const label = usePeriodLabel();
-  const period = useMemo(() => currentPeriod(state.baseDate), [state.baseDate]);
+  const period = useMemo(() => periodFromId(state.run.periodId), [state.run.periodId]);
   const status = state.run.status;
   const byId = useMemo(() => new Map(state.employees.map((e) => [e.id, e])), [state.employees]);
   const lines = useMemo(() => payroll(state.employees, state.run.novelties, period), [state.employees, state.run.novelties, period]);
@@ -98,7 +98,7 @@ export default function PayrollTab() {
             <h3 className="text-lg font-bold text-secondary-900 dark:text-white">{label(period)}</h3>
             <p className="text-xs text-secondary-500">{t('payDate', { date: f.date(period.payDate, 'long'), n: lines.length })}</p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {status === 'draft' && <button type="button" className={btn.primary} onClick={() => setStatus('liquidated', t('toasts.liquidated', { n: lines.length, total: f.money(tot.net) }))}>{t('actions.liquidate')}</button>}
             {status === 'liquidated' && (
               <>
@@ -107,9 +107,26 @@ export default function PayrollTab() {
               </>
             )}
             {status === 'approved' && <button type="button" className={btn.primary} onClick={pay}><ArrowDownTrayIcon className="w-4 h-4" />{t('actions.pay')}</button>}
-            {status === 'paid' && <Badge variant="success">{t('paidBadge')}</Badge>}
+            {status === 'paid' && (
+              <>
+                <Badge variant="success">{t('paidBadge')}</Badge>
+                <button
+                  type="button"
+                  className={btn.primary}
+                  onClick={() => {
+                    const next = nextPeriod(period);
+                    dispatch({ type: 'run.next' });
+                    setQ('');
+                    toast.success(t('toasts.nextOpened', { period: label(next) }));
+                  }}
+                >
+                  {t('actions.next')}
+                </button>
+              </>
+            )}
           </div>
         </div>
+        {status === 'paid' && <p className="text-xs text-secondary-500 dark:text-secondary-400 mt-3">{t('nextHint', { period: label(nextPeriod(period)) })}</p>}
         <ol className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4" aria-label={t('stepsAria')}>
           {STEPS.map((s, i) => {
             const reached = STEPS.indexOf(status) >= i;
@@ -124,6 +141,19 @@ export default function PayrollTab() {
         <p className="text-[11px] text-secondary-500 mt-3">
           {t('params', { smmlv: f.money(PARAMS.smmlv), transport: f.money(PARAMS.transport), uvt: f.money(PARAMS.uvt), hours: weeklyHours(period.to), divisor: weeklyHours(period.to) * 5, sunday: Math.round(sundayRate(period.to) * 100) })}
         </p>
+        {state.paidRuns.length > 0 && (
+          <div className="mt-4 pt-3 border-t border-secondary-200 dark:border-secondary-700">
+            <p className="text-xs font-bold uppercase tracking-wide text-secondary-500 mb-1">{t('history.title')}</p>
+            <ul className="space-y-1 text-sm">
+              {[...state.paidRuns].reverse().map((r) => (
+                <li key={r.periodId} className="flex flex-wrap justify-between gap-x-3 text-secondary-700 dark:text-secondary-300">
+                  <span>{label(periodFromId(r.periodId))}</span>
+                  <span className="text-xs text-secondary-500">{t('history.row', { n: r.count, net: f.money(r.net), cost: f.money(r.cost) })}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </Card>
 
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
