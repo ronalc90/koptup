@@ -2,36 +2,51 @@
 
 /**
  * Agenda por especialidad: días hábiles, sábados en la mañana, sin domingos ni festivos
- * de Colombia; valor según el pagador; confirmación por WhatsApp y correo (simulada).
+ * de Colombia; valor según el pagador; confirmación por WhatsApp (simulada). Las citas de
+ * hoy se conectan con la sala de espera: el paciente hace su pre-consulta (ingreso) desde la
+ * vista del paciente y entra a la sala con la especialidad de la cita.
  */
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Card, { CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import { CheckCircleIcon, ClipboardDocumentIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { DEMO_CLOCK, DEMO_DATE, PAYERS, SPECIALTIES } from './mockData';
+import Badge from '@/components/ui/Badge';
+import { CheckCircleIcon, ClipboardDocumentIcon, TrashIcon, UserIcon } from '@heroicons/react/24/outline';
+import { PAYERS, SPECIALTIES } from './mockData';
 import { agendaDays, fmtCOP, fmtDate, payerOf, priceFor, slotsFor, specOf, tx, weekdayOf } from './logic';
 import { SimTag, useDateNames, useLoc } from './ui';
 import type { TelemedStore } from './store';
-import type { Appointment, SpecKey } from './types';
+import type { Appointment, AppointmentStatus, SpecKey } from './types';
 
 interface Props {
   store: TelemedStore;
   notify: (text: string, tone?: 'ok' | 'warn') => void;
   preset: { spec: SpecKey; n: number } | null;
+  /** Lleva a la vista del paciente con la cita de hoy elegida para hacer su pre-consulta. */
+  onPreconsult: (apptId: string) => void;
 }
 
-export default function SchedulingPanel({ store, notify, preset }: Props) {
+const STATUS_VARIANT: Record<AppointmentStatus, 'info' | 'warning' | 'success' | 'danger'> = {
+  booked: 'info',
+  checkedIn: 'warning',
+  attended: 'success',
+  referred: 'danger',
+};
+
+export default function SchedulingPanel({ store, notify, preset, onPreconsult }: Props) {
   const t = useTranslations('demoTelemed');
   const loc = useLoc();
   const names = useDateNames();
-  const { appointments } = store.state;
-  const days = useMemo(() => agendaDays(DEMO_DATE, 7), []);
+  const { appointments, day: today } = store.state;
+  const days = useMemo(() => agendaDays(today, 7), [today]);
+  const firstOpen = Math.max(
+    0,
+    days.findIndex((d) => d.status !== 'holiday' && d.status !== 'sunday'),
+  );
 
   const [spec, setSpec] = useState<SpecKey>('general');
-  const [dayIdx, setDayIdx] = useState(0);
-  const [modality, setModality] = useState<Appointment['modality']>('video');
+  const [dayPick, setDayPick] = useState<number | null>(null);
   const [slot, setSlot] = useState<string | null>(null);
   const [form, setForm] = useState({ patient: '', phone: '', payerId: 'cordillera' });
   const [confirmed, setConfirmed] = useState<Appointment | null>(null);
@@ -44,8 +59,10 @@ export default function SchedulingPanel({ store, notify, preset }: Props) {
     }
   }, [preset]);
 
+  // Hasta que elijas un día, se muestra el primero abierto (hoy, salvo domingo o festivo).
+  const dayIdx = dayPick ?? firstOpen;
   const day = days[dayIdx];
-  const slots = slotsFor(spec, day.iso);
+  const slots = slotsFor(spec, day.iso, today, store.now);
   const isMine = (time: string) => appointments.some((a) => a.spec === spec && a.date === day.iso && a.time === time);
   const price = priceFor(spec, payerOf(form.payerId).kind);
   const phoneOk = /^[0-9 +]{10,16}$/.test(form.phone.trim());
@@ -53,23 +70,22 @@ export default function SchedulingPanel({ store, notify, preset }: Props) {
 
   function confirm() {
     if (!canConfirm || !slot) return;
-    const appt: Omit<Appointment, 'id'> = {
+    const appt: Omit<Appointment, 'id' | 'status'> = {
       spec,
       date: day.iso,
       time: slot,
       patient: form.patient.trim(),
       phone: form.phone.trim(),
       payerId: form.payerId,
-      modality,
     };
     const id = store.addAppointment(appt);
-    store.log('patient', 'apptBooked', { spec: { t: `specialties.${spec}` }, date: day.iso, time: slot, patient: appt.patient });
-    setConfirmed({ ...appt, id });
+    store.log('patient', 'apptBooked', { spec: { t: `specialties.${spec}` }, date: { d: day.iso }, time: slot, patient: appt.patient, code: id }, appt.patient);
+    setConfirmed({ ...appt, id, status: 'booked' });
     setSlot(null);
   }
 
-  function messageFor(a: Appointment) {
-    return t(a.modality === 'video' ? 'scheduling.waVideo' : 'scheduling.waPhone', {
+  function messageFor(a: Pick<Appointment, 'patient' | 'spec' | 'date' | 'time' | 'id'>) {
+    return t(a.date === today ? 'scheduling.waToday' : 'scheduling.waVideo', {
       name: a.patient.split(' ')[0],
       spec: t(`specialties.${a.spec}`),
       pro: specOf(a.spec).pro,
@@ -97,7 +113,7 @@ export default function SchedulingPanel({ store, notify, preset }: Props) {
         <CardHeader>
           <CardTitle>{t('scheduling.title')}</CardTitle>
           <p className="text-sm text-secondary-500 dark:text-secondary-400 mt-1">
-            {t('scheduling.subtitle', { date: fmtDate(DEMO_DATE, loc, names, { weekday: true, year: true }), time: DEMO_CLOCK })}
+            {t('scheduling.subtitle', { date: fmtDate(today, loc, names, { weekday: true, year: true }), time: store.now })}
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -130,23 +146,9 @@ export default function SchedulingPanel({ store, notify, preset }: Props) {
             </div>
             <div>
               <p className="block text-xs font-medium text-secondary-700 dark:text-secondary-300 mb-1.5">{t('scheduling.modality')}</p>
-              <div className="flex gap-1" role="group" aria-label={t('scheduling.modality')}>
-                {(['video', 'phone'] as const).map((m) => (
-                  <button
-                    key={m}
-                    type="button"
-                    aria-pressed={modality === m}
-                    onClick={() => setModality(m)}
-                    className={`flex-1 px-2 py-2.5 rounded-lg text-xs font-medium border ${
-                      modality === m
-                        ? 'bg-primary-600 border-primary-600 text-white'
-                        : 'bg-white dark:bg-secondary-800 border-secondary-300 dark:border-secondary-600 text-secondary-700 dark:text-secondary-200'
-                    }`}
-                  >
-                    {t(`scheduling.modalities.${m}`)}
-                  </button>
-                ))}
-              </div>
+              <p className="rounded-lg border border-secondary-200 dark:border-secondary-700 bg-secondary-50 dark:bg-secondary-800/50 px-3 py-2.5 text-sm text-secondary-900 dark:text-white truncate">
+                {t('scheduling.modalityValue')}
+              </p>
             </div>
           </div>
 
@@ -158,7 +160,7 @@ export default function SchedulingPanel({ store, notify, preset }: Props) {
                   key={d.iso}
                   type="button"
                   onClick={() => {
-                    setDayIdx(i);
+                    setDayPick(i);
                     setSlot(null);
                   }}
                   disabled={closed}
@@ -173,7 +175,9 @@ export default function SchedulingPanel({ store, notify, preset }: Props) {
                 >
                   <p className="text-[10px] uppercase opacity-80">{names.weekdays[weekdayOf(d.iso)]}</p>
                   <p className="text-sm font-semibold">{fmtDate(d.iso, loc, names)}</p>
-                  <p className="text-[9px] leading-tight min-h-[11px]">{i === 0 ? t('scheduling.today') : dayLabel(d.status)}</p>
+                  <p className="text-[9px] leading-tight min-h-[11px]">
+                    {i === 0 ? `${t('scheduling.today')}${dayLabel(d.status) ? ` · ${dayLabel(d.status)}` : ''}` : dayLabel(d.status)}
+                  </p>
                 </button>
               );
             })}
@@ -225,7 +229,7 @@ export default function SchedulingPanel({ store, notify, preset }: Props) {
                   label={t('scheduling.patientName')}
                   value={form.patient}
                   onChange={(e) => setForm({ ...form, patient: e.target.value })}
-                  placeholder="Carlos Rodríguez"
+                  placeholder={t('scheduling.patientPh')}
                 />
                 <Input
                   label={t('scheduling.phone')}
@@ -282,6 +286,16 @@ export default function SchedulingPanel({ store, notify, preset }: Props) {
                 </Button>
                 <SimTag>{t('scheduling.simSend')}</SimTag>
               </div>
+              {confirmed.date === today ? (
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-white/70 dark:bg-secondary-900/60 p-2.5">
+                  <p className="text-xs flex-1">{t('scheduling.todayNext')}</p>
+                  <Button size="sm" onClick={() => onPreconsult(confirmed.id)}>
+                    <UserIcon className="w-4 h-4 mr-1" /> {t('scheduling.doPreconsult')}
+                  </Button>
+                </div>
+              ) : (
+                <p className="text-xs">{t('scheduling.laterNext')}</p>
+              )}
             </div>
           )}
         </CardContent>
@@ -305,27 +319,39 @@ export default function SchedulingPanel({ store, notify, preset }: Props) {
                       <div className="min-w-0">
                         <p className="font-semibold text-secondary-900 dark:text-white truncate">{a.patient}</p>
                         <p className="text-secondary-600 dark:text-secondary-300">
-                          {t(`specialties.${a.spec}`)} · {t(`scheduling.modalities.${a.modality}`)}
+                          {t(`specialties.${a.spec}`)} · {specOf(a.spec).pro}
                         </p>
                         <p className="text-secondary-500">
                           {fmtDate(a.date, loc, names, { weekday: true })} · {a.time} · {a.id}
                         </p>
+                        <div className="mt-1">
+                          <Badge size="sm" variant={STATUS_VARIANT[a.status]}>
+                            {t(`scheduling.status.${a.status}`)}
+                          </Badge>
+                        </div>
                       </div>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        aria-label={`${t('scheduling.cancelAppt')} ${a.id}`}
-                        title={t('scheduling.cancelAppt')}
-                        onClick={() => {
-                          store.cancelAppointment(a.id);
-                          store.log('patient', 'apptCancelled', { code: a.id });
-                          if (confirmed?.id === a.id) setConfirmed(null);
-                          notify(t('toasts.apptCancelled', { code: a.id }));
-                        }}
-                      >
-                        <TrashIcon className="w-4 h-4" />
-                      </Button>
+                      {a.status === 'booked' && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          aria-label={`${t('scheduling.cancelAppt')} ${a.id}`}
+                          title={t('scheduling.cancelAppt')}
+                          onClick={() => {
+                            store.cancelAppointment(a.id);
+                            store.log('patient', 'apptCancelled', { code: a.id }, a.patient);
+                            if (confirmed?.id === a.id) setConfirmed(null);
+                            notify(t('toasts.apptCancelled', { code: a.id }));
+                          }}
+                        >
+                          <TrashIcon className="w-4 h-4" />
+                        </Button>
+                      )}
                     </div>
+                    {a.status === 'booked' && a.date === today && (
+                      <Button size="sm" variant="outline" fullWidth className="mt-2" onClick={() => onPreconsult(a.id)}>
+                        {t('scheduling.doPreconsult')}
+                      </Button>
+                    )}
                   </li>
                 ))}
             </ul>

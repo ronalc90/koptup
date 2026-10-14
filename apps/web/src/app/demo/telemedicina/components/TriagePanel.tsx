@@ -137,9 +137,10 @@ export default function TriagePanel({ onBook, log }: { onBook: (spec: SpecKey) =
                     {t('triage.alarmTitle')}
                   </p>
                   <p>{t('triage.alarmBody')}</p>
-                  <p className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-1.5 text-sm font-semibold text-white">
-                    <PhoneIcon className="w-4 h-4" /> {t('triage.call123')}
+                  <p className="flex items-center gap-1.5 font-semibold">
+                    <PhoneIcon className="w-4 h-4 shrink-0" /> {t('triage.call123')}
                   </p>
+                  <p className="text-[11px] text-red-800/90 dark:text-red-200/90">{t('triage.call123Note')}</p>
                 </div>
               ) : (
                 <div>

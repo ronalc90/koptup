@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { useModalClose } from '@/hooks/useModalClose';
-import type { DateNames } from './logic';
+import { fmtDate, type DateNames } from './logic';
 import type { AuditEntry, Locale, Priority } from './types';
 
 export function useLoc(): Locale {
@@ -19,15 +19,20 @@ export function useDateNames(): DateNames {
 /** Texto de una entrada de auditoría en el idioma activo. */
 export function useAuditText() {
   const t = useTranslations('demoTelemed');
+  const loc = useLoc();
+  const names = useDateNames();
+  const months = names.months.join(',');
+  const weekdays = names.weekdays.join(',');
   return useCallback(
     (e: AuditEntry) => {
       const params: Record<string, string> = {};
+      const dn = { months: months.split(','), weekdays: weekdays.split(',') };
       Object.entries(e.params ?? {}).forEach(([k, v]) => {
-        params[k] = typeof v === 'string' ? v : t(v.t);
+        params[k] = typeof v === 'string' ? v : 't' in v ? t(v.t) : fmtDate(v.d, loc, dn, { weekday: true });
       });
-      return { actor: t(`audit.actors.${e.actor}`), text: t(`audit.events.${e.key}`, params) };
+      return { actor: e.who ?? t(`audit.actors.${e.actor}`), text: t(`audit.events.${e.key}`, params) };
     },
-    [t],
+    [t, loc, months, weekdays],
   );
 }
 
@@ -51,14 +56,46 @@ export function Modal({
   wide?: boolean;
 }) {
   const t = useTranslations('demoTelemed');
+  const panel = useRef<HTMLDivElement | null>(null);
   useModalClose(open, onClose);
+
+  // Al abrir, el foco entra a la ventana y queda dentro (Tab y Mayús+Tab); al cerrar, vuelve a donde estaba.
+  useEffect(() => {
+    if (!open) return;
+    const previous = document.activeElement as HTMLElement | null;
+    panel.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab' || !panel.current) return;
+      const items = [...panel.current.querySelectorAll<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')].filter(
+        (el) => !el.hasAttribute('disabled') && el.offsetParent !== null,
+      );
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && (document.activeElement === first || document.activeElement === panel.current)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      if (previous && document.contains(previous)) previous.focus();
+    };
+  }, [open]);
+
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-[100] p-3 sm:p-6" role="dialog" aria-modal="true" aria-label={typeof title === 'string' ? title : undefined}>
       <div className="absolute inset-0 bg-black/60" onClick={onClose} aria-hidden="true" />
       <div className="relative z-10 flex h-full items-center justify-center">
         <div
-          className={`relative w-full ${wide ? 'max-w-3xl' : 'max-w-lg'} max-h-full overflow-y-auto rounded-2xl bg-white dark:bg-secondary-900 border border-secondary-200 dark:border-secondary-700 shadow-2xl`}
+          ref={panel}
+          tabIndex={-1}
+          className={`relative w-full ${wide ? 'max-w-3xl' : 'max-w-lg'} max-h-full overflow-y-auto rounded-2xl bg-white dark:bg-secondary-900 border border-secondary-200 dark:border-secondary-700 shadow-2xl focus:outline-none`}
         >
           <div className="sticky top-0 z-10 flex items-start justify-between gap-3 border-b border-secondary-200 dark:border-secondary-700 bg-white/95 dark:bg-secondary-900/95 px-5 py-3">
             <h2 className="text-base font-semibold text-secondary-900 dark:text-white">{title}</h2>

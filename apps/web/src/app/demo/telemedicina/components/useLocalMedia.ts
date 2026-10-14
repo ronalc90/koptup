@@ -91,6 +91,8 @@ export function useMicLevel(stream: MediaStream | null) {
     const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
     if (!Ctx) return;
     const ctx = new Ctx();
+    // Algunos navegadores crean el contexto en pausa: sin esto el medidor se queda en cero.
+    ctx.resume().catch(() => {});
     const src = ctx.createMediaStreamSource(stream);
     const analyser = ctx.createAnalyser();
     analyser.fftSize = 512;

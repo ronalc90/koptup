@@ -2,22 +2,27 @@
   "demoTelemed": {
     "meta": {
       "title": "Telemedicine demo for healthcare providers",
-      "description": "Interactive telemedicine demo with sample data: patient pre-visit form and consents, rule-based symptom guidance, a schedule without holidays, simulated video visit with chart, prescription and orders, SOAP notes, PDF summary, and payments with simulated invoice and RIPS.",
+      "description": "Interactive telemedicine demo for healthcare providers with sample data: rule-based symptom guidance, a schedule connected to the waiting room, pre-visit form and consents, simulated video visit with chart, prescription and orders, SOAP notes, PDF summary, and payments with simulated invoice and RIPS.",
       "breadcrumbHome": "Home",
       "breadcrumbDemos": "Demos",
       "breadcrumbName": "Telemedicine"
     },
     "header": {
-      "back": "Back to demos",
+      "back": "Back to the demo catalog",
       "title": "Telemedicine for healthcare providers",
-      "subtitle": "Walk through a telehealth day at {ips}: patient, clinician and billing.",
+      "subtitle": "For clinic managers and medical directors: walk through a telehealth day at {ips}, from the patient's appointment and pre-visit form to the visit, the prescription, payment and RIPS. Start with the first steps.",
       "sampleBadge": "Sample data",
       "simBadge": "Simulated video, messages, payments and RIPS",
-      "dayBadge": "Sample day: {date}",
-      "request": "Request a proposal",
+      "dayBadge": "Today's schedule: {date} · {time}",
       "reset": "Reset",
       "resetHint": "Restore the sample data and clear what you did in this browser",
-      "tabsLabel": "Demo sections"
+      "tabsLabel": "Demo sections",
+      "kicker": "Interactive demo · for clinics and healthcare providers",
+      "sampleHint": "The provider, patients, insurers, clinicians and amounts are fictitious.",
+      "dayBadgeLoading": "Today's schedule",
+      "clockHint": "The demo clock starts at 09:30 when the day opens and moves in real time.",
+      "guidedDemo": "Request a guided demo",
+      "quote": "Get a quote"
     },
     "tabs": {
       "console": "Clinic (clinician)",
@@ -38,13 +43,19 @@
       "pendingSub": "from patients (copays and self-pay)"
     },
     "route": {
-      "title": "Suggested walkthrough (5 steps, under 5 minutes)",
+      "title": "First steps: suggested walkthrough (about 5 minutes)",
       "step": "Step {n}",
-      "s1": "As a patient, fill in the pre-visit form and accept the required consents.",
-      "s2": "Describe symptoms: red flags are referred to the ER; everything else books the suggested specialty.",
-      "s3": "As the clinician, refer the patient with chest pain and call Carlos Rodríguez.",
-      "s4": "Review the chart and labs, record the diagnosis, sign the prescription and orders, and finish.",
-      "s5": "Collect the copay with the simulated gateway and review the visit's invoice and RIPS."
+      "s1": "As a patient, describe your symptoms: if there are no red flags, it suggests the specialty to book.",
+      "s2": "Book an appointment for today with that specialty (the WhatsApp confirmation is simulated).",
+      "s3": "With today's appointment, fill in the pre-visit form and consents: the patient joins the waiting room.",
+      "s4": "As the clinician, refer María González (red flag) and call a patient, for example the one you just checked in.",
+      "s5": "Record the diagnosis, sign the prescription and orders, and finish: the summary and invoice are created.",
+      "progress": "{done} of {total} done",
+      "intro": "Each step takes you to its tab and checks itself off when you do it. This is how a telehealth visit flows end to end.",
+      "hide": "Hide",
+      "show": "Show",
+      "done": "Done",
+      "s6": "Collect the patient's share with the simulated gateway and review the visit's invoice and RIPS."
     },
     "priority": {
       "red": "Red flag",
@@ -53,7 +64,7 @@
     },
     "queue": {
       "title": "Virtual waiting room",
-      "subtitle": "Sorted by pre-visit priority and waiting time",
+      "subtitle": "Patients from every specialty, sorted by priority and arrival time. Each one is seen by the clinician of their specialty.",
       "search": "Search patient or reason...",
       "filterLabel": "Filter by priority",
       "filter": {
@@ -67,7 +78,11 @@
       "call": "Call",
       "busy": "Finish the current visit to call another patient.",
       "alarm": "Red flag: not suitable for a video visit. The patient must go to the ER or call 123 (Colombia's emergency line).",
-      "refer": "Refer to the ER"
+      "refer": "Refer to the ER",
+      "countHint": "Showing {shown} of {total} waiting patients",
+      "specFilter": "Filter by specialty",
+      "allSpecs": "All specialties",
+      "withAppt": "appointment {code}"
     },
     "refer": {
       "title": "Refer to the ER",
@@ -97,7 +112,7 @@
       "recBadge": "REC · simulated",
       "end": "End",
       "simTag": "Simulated video",
-      "note": "The patient is a sample image. If you turn on your camera, the image is shown only on your screen: it is not recorded or sent.",
+      "note": "The patient is a sample image. If you turn on your camera (with the browser's permission), the image is shown only on your screen: it is not recorded or sent.",
       "camError": "Your camera could not be used. The visit continues with simulated video.",
       "errors": {
         "unsupported": "This browser does not allow using the camera here.",
@@ -106,13 +121,14 @@
         "other": "The camera could not be started."
       },
       "selfSimulated": "Your image (simulated)",
-      "noteNoCam": "The patient and your image are samples: your camera and microphone are not used."
+      "noteNoCam": "The patient and your image are samples: your camera and microphone are not used.",
+      "inConsult": "In visit: {name}",
+      "since": "since {time}"
     },
     "chat": {
       "title": "Visit chat",
       "scripted": "Sample scripted replies",
-      "hello": "Hello, doctor. Thank you for seeing me.",
-      "generic": "All right, thank you.",
+      "hello": "Hi, {who}. Thanks for seeing me.",
       "typing": "{name} is typing...",
       "placeholder": "Write a message to the patient...",
       "send": "Send message"
@@ -198,7 +214,7 @@
         "dx": "Diagnosis",
         "meds": "Medications",
         "orders": "Lab orders",
-        "signature": "{reg} · Simulated e-signature · {time}"
+        "signature": "{reg} (sample license) · Simulated e-signature · {time}"
       }
     },
     "soap": {
@@ -230,7 +246,7 @@
           "missing": "No assessment or plan in the notes (recommended)"
         }
       },
-      "billingPreview": "The visit will be recorded for {value} ({payer}). The patient pays: {share}. The invoice and RIPS are generated (simulated).",
+      "billingPreview": "The {spec} visit will be recorded for {value} ({payer}). The patient pays: {share}. The invoice and RIPS are created (simulated).",
       "goRx": "Go to prescription and diagnosis",
       "continue": "Keep the visit open",
       "confirm": "End and create summary"
@@ -238,7 +254,7 @@
     "summary": {
       "title": "Visit summary",
       "patient": "Patient",
-      "duration": "{min} min",
+      "duration": "Duration {time}",
       "rxIncluded": "Prescription {number} with {count} medication(s)",
       "noRx": "No prescription",
       "orders": "{count} lab order(s)",
@@ -279,7 +295,7 @@
       "reset": "Start over",
       "alarmTitle": "Red flags: do not wait for a video visit",
       "alarmBody": "Go to the nearest emergency room or call the emergency line.",
-      "call123": "Emergency line 123 (Colombia)",
+      "call123": "Emergency line: 123",
       "disclaimer": "Guidance based on fixed sample rules: it does not use AI, it is not a diagnosis and it does not replace medical judgment. In your project, your medical team defines and validates the rules.",
       "rules": {
         "chest": "chest pain or shortness of breath",
@@ -306,18 +322,15 @@
         "mental": "You can book psychology. If at any time you think about harming yourself, get help right away.",
         "chronic": "Book your follow-up with internal or general medicine and have your latest blood pressure and glucose readings ready.",
         "default": "You can book a video visit with general medicine."
-      }
+      },
+      "call123Note": "The demo doesn't dial any number. In your project, this notice can include a button that calls 123 from the patient's phone."
     },
     "scheduling": {
       "title": "Schedule by specialty",
-      "subtitle": "Today is {date}, {time} (sample day). Full days Monday to Friday, Saturday mornings; no Sundays or holidays.",
+      "subtitle": "Today is {date}, {time} on the demo clock. Full days Monday to Friday, Saturday mornings; no Sundays or Colombian holidays.",
       "specialty": "Specialty",
       "professional": "Clinician",
       "modality": "Modality",
-      "modalities": {
-        "video": "Video visit",
-        "phone": "Phone call"
-      },
       "today": "Today",
       "holiday": "Holiday",
       "closed": "Closed",
@@ -341,20 +354,32 @@
       "confirm": "Confirm appointment",
       "confirmedTitle": "Appointment {code} confirmed",
       "waPreview": "WhatsApp message to {phone}",
-      "waVideo": "Hi {name}. Your {spec} video visit with {pro} is on {date} at {time}. Join 5 minutes early from the link we will send that day. Code: {code}.",
+      "waVideo": "Hi, {name}. Your {spec} telehealth visit with {pro} is on {date} at {time}. That day we'll send you the link to fill in the pre-visit form and join the waiting room. Code: {code}.",
       "waPhone": "Hi {name}. Your {spec} phone visit with {pro} is on {date} at {time}. We will call you at this number. Code: {code}.",
       "copy": "Copy message",
-      "simSend": "Simulated sending: in your project it goes out via WhatsApp Business and email",
+      "simSend": "Simulated sending: in your project it goes out via WhatsApp Business",
       "listTitle": "Appointments booked in this demo",
-      "listSubtitle": "Stored only in this browser.",
+      "listSubtitle": "Saved only in this browser. Today's appointments move to the waiting room when the patient fills in the pre-visit form.",
       "listEmpty": "You have not booked any appointments yet.",
-      "cancelAppt": "Cancel appointment"
+      "cancelAppt": "Cancel appointment",
+      "modalityValue": "Video visit",
+      "patientPh": "First and last name",
+      "waToday": "Hi, {name}. Your {spec} telehealth visit with {pro} is today at {time}. Fill in your pre-visit form with the link we sent you and join the waiting room. Code: {code}.",
+      "todayNext": "The appointment is today: fill in the pre-visit form as the patient and they'll join the waiting room with their specialty.",
+      "doPreconsult": "Fill in the pre-visit form",
+      "laterNext": "On the day of the appointment, the patient gets the link to the pre-visit form. To see the waiting-room check-in in the demo, book an appointment for today.",
+      "status": {
+        "booked": "Booked",
+        "checkedIn": "In waiting room",
+        "attended": "Seen",
+        "referred": "Referred to the ER"
+      }
     },
     "patient": {
       "title": "Patient view: pre-visit form",
-      "subtitle": "This is how the patient fills in the pre-visit form on their phone before entering the waiting room. What you send shows up in the clinic.",
+      "subtitle": "This is how the patient fills in the pre-visit form from their phone before joining the waiting room. Patients with an appointment today check in here. What you send shows up in the clinic.",
       "who": "Who is filling in the form?",
-      "newPatient": "New patient",
+      "newPatient": "New patient (no appointment)",
       "inQueue": "in waiting room",
       "name": "Full name",
       "namePh": "First and last name",
@@ -395,8 +420,7 @@
       "alarm": "Your symptoms are red flags. Do not wait for the video visit: go to the ER or call 123.",
       "goConsole": "View in the clinic",
       "waTitle": "Link the patient receives",
-      "waMessage": "Hi Carlos. {ips} is expecting you today at 10:30 for your general medicine video visit. Before joining, fill in your pre-visit form here:",
-      "waNote": "Sample message and link (they do not work outside the demo). In your project they are sent via WhatsApp Business or SMS.",
+      "waNote": "Sample message and link: they change depending on who fills in the pre-visit form and don't work outside the demo. In your project they are sent via WhatsApp Business or SMS.",
       "camTitle": "Test your camera and microphone",
       "camSubtitle": "Optional. Your browser will ask for permission.",
       "camStart": "Test camera and microphone",
@@ -405,7 +429,18 @@
       "camPreview": "Your camera preview",
       "micLevel": "Microphone level: speak to see it move",
       "noMic": "No microphone detected",
-      "camPrivacy": "Video and sound stay in your browser: they are not recorded or sent to any server."
+      "camPrivacy": "Video and sound stay in your browser: they are not recorded or sent to any server.",
+      "withAppt": "With an appointment today",
+      "inQueueGroup": "Already in the waiting room (update)",
+      "apptInfo": "Appointment {code}: {spec} with {pro} today at {time}. Complete the missing details to join the waiting room.",
+      "updateInfo": "Update the pre-visit form of a patient who is already waiting ({spec}).",
+      "newInfo": "No appointment: symptom guidance picks the specialty that will see them.",
+      "doneAlarm": "Don't wait for the telehealth visit.",
+      "doneSpec": "You'll be seen by: {spec} · {pro}.",
+      "waAppt": "Hi, {name}. {ips} expects you today at {time} for your {spec} telehealth visit with {pro}. Before joining, fill in your pre-visit form here:",
+      "waQueue": "Hi, {name}. You're in the {ips} waiting room for your {spec} telehealth visit. If anything changed, update your pre-visit form here:",
+      "waNew": "Hi, {name}. {ips} will see you today by telehealth. Before joining, fill in your pre-visit form here:",
+      "waNewNoName": "Hi. {ips} will see you today by telehealth. Before joining, fill in your pre-visit form here:"
     },
     "lab": {
       "title": "Lab results",
@@ -491,7 +526,7 @@
         "card": "Debit or credit card",
         "wallet": "Digital wallet"
       },
-      "gatewayNote": "Simulated gateway: no payment details are requested or sent. In your project it connects to Wompi or PayU.",
+      "gatewayNote": "Simulated gateway: no payment data is requested or sent. In your project it connects to the payment gateway you choose.",
       "payNow": "Pay {amount} (simulated)",
       "processing": "Processing simulated payment...",
       "approved": "Payment approved (simulated). Reference {ref}.",
@@ -503,7 +538,8 @@
       "ripsGenerated": "Generated (simulated)",
       "ripsDownload": "Download RIPS (JSON)",
       "ripsNote": "Simplified, simulated RIPS (Colombia's health service record). In your project it is generated with the current structure and validated together with the healthcare e-invoice through your authorized provider.",
-      "ripsNa": "ER referrals do not generate an invoice or RIPS in this demo."
+      "ripsNa": "ER referrals do not generate an invoice or RIPS in this demo.",
+      "duration": "duration {time}"
     },
     "audit": {
       "title": "Audit log",
@@ -520,13 +556,13 @@
       },
       "actors": {
         "system": "System",
-        "doctor": "Dr. Patricia Vargas",
+        "doctor": "Clinician",
         "patient": "Patient",
         "billing": "Billing"
       },
       "events": {
         "sessionStart": "Sample day opened",
-        "consultStart": "Started the video visit with {patient}",
+        "consultStart": "Started the {spec} telehealth visit with {patient}",
         "consultEnd": "Ended the visit with {patient} · duration {duration}",
         "referred": "Referred {patient} to the ER (told to call 123)",
         "camOn": "Turned on their camera (local only)",
@@ -549,11 +585,12 @@
         "csvExported": "Exported {count} visit(s) to CSV",
         "ripsDownloaded": "Downloaded the RIPS for invoice {invoice}",
         "labPdf": "Downloaded {patient}'s lab results",
-        "apptBooked": "{spec} appointment for {patient} on {date} at {time}",
+        "apptBooked": "Appointment {code} for {spec} for {patient} on {date} at {time}",
         "apptCancelled": "Cancelled appointment {code}",
-        "preconsultSent": "{patient} sent the pre-visit form · priority {priority}",
+        "preconsultSent": "{patient} sent the pre-visit form · {spec} · priority: {priority}",
         "camTest": "Tested their camera and microphone (local only)",
-        "triageRun": "Symptom guidance · rule: {rule}"
+        "triageRun": "Symptom guidance · rule: {rule}",
+        "preconsultAppt": "{patient} checked in for appointment {code} · {spec} · priority: {priority}"
       }
     },
     "how": {
@@ -564,18 +601,18 @@
       "items": {
         "video": {
           "title": "Video visit",
-          "demo": "the patient is a sample image; if your browser and the site allow it, you can turn on your camera and it shows only on your screen.",
+          "demo": "the patient is a sample image; you can turn on your camera and microphone (with the browser's permission) and they are shown only on your screen.",
           "project": "video between patient and clinician without installing apps, using a managed or self-hosted WebRTC service."
         },
         "whatsapp": {
           "title": "Reminders and links",
-          "demo": "WhatsApp and email messages are shown but not sent.",
+          "demo": "WhatsApp messages are shown and change with each patient, but they are not sent.",
           "project": "sending via WhatsApp Business, SMS or email with your branding."
         },
         "payments": {
           "title": "Online payments",
           "demo": "simulated gateway that marks the payment with a test reference.",
-          "project": "PSE, cards and digital wallets through Wompi or PayU."
+          "project": "PSE, cards and digital wallets with the payment gateway you choose."
         },
         "invoice": {
           "title": "Healthcare e-invoice and RIPS",
@@ -611,7 +648,7 @@
       "regulation": "The platform is designed to support the requirements of Colombia's Resolution 2654 of 2019 (telehealth and telemedicine) and Law 1581 of 2012 (personal data). Enabling the telemedicine service is the provider's responsibility; each project's regulatory checklist is validated with its advisor."
     },
     "footer": {
-      "sampleNote": "Sample data: {ips}, the patients, health insurers, prepaid plan, clinicians, documents and values are fictitious. What you do is stored only in this browser; use Reset to start over.",
+      "sampleNote": "Sample data: {ips}, the patients, insurers, prepaid plan, clinicians, documents and amounts are fictitious. The schedule is today's and what you do is saved only in this browser; use Reset to start over.",
       "cta": "I want telemedicine for my organization"
     },
     "pdf": {
@@ -624,7 +661,14 @@
       "pedia": "Pediatrics",
       "derma": "Dermatology",
       "internal": "Internal medicine",
-      "psych": "Psychology"
+      "psych": "Psychology",
+      "honorific": {
+        "general": "doctor",
+        "pedia": "doctor",
+        "derma": "doctor",
+        "internal": "doctor",
+        "psych": "Iván"
+      }
     },
     "toasts": {
       "pdf": "Downloaded {name}",
@@ -639,7 +683,9 @@
       "copyFailed": "Could not copy. Select the text and copy it.",
       "apptCancelled": "Appointment {code} cancelled; the slot is free again.",
       "camOk": "Camera and microphone working.",
-      "reset": "Sample data restored."
+      "reset": "Sample data restored.",
+      "resumed": "We picked up the ongoing visit with {name}.",
+      "newDay": "Today's schedule started: the sample data was restored."
     },
     "dates": {
       "months": "Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec",
@@ -649,6 +695,11 @@
       "cancel": "Cancel",
       "close": "Close",
       "simulated": "simulated"
+    },
+    "resetConfirm": {
+      "title": "Reset the demo?",
+      "body": "Today's sample data comes back and everything you did in this browser is cleared: appointments, pre-visit forms, visits, payments and audit log.",
+      "confirm": "Reset"
     }
   }
 }

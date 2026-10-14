@@ -1,11 +1,12 @@
 'use client';
 
 /**
- * Vista del paciente: enlace por WhatsApp (simulado), prueba de cámara y micrófono
- * (real, solo en este navegador), pre-consulta y consentimientos. Lo que el paciente
- * envía aparece en la sala de espera y en la ficha del consultorio.
+ * Vista del paciente: enlace por WhatsApp (simulado, armado según quién llena la
+ * pre-consulta), prueba de cámara y micrófono (real, solo en este navegador), pre-consulta
+ * y consentimientos. Quien tiene cita hoy hace aquí su ingreso: entra a la sala de espera
+ * con la especialidad de su cita. Lo que el paciente envía aparece en el consultorio.
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Card, { CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -13,17 +14,19 @@ import Input from '@/components/ui/Input';
 import Textarea from '@/components/ui/Textarea';
 import { CheckCircleIcon, ExclamationTriangleIcon, VideoCameraIcon } from '@heroicons/react/24/outline';
 import { GENERIC_SCRIPT, IPS, PAYERS } from './mockData';
-import { classifySymptoms, demoClock, tx } from './logic';
+import { assignSpec, classifySymptoms, queuePosition, specOf, tx } from './logic';
 import { attachStream, useCameraAllowed, useLocalMedia, useMicLevel } from './useLocalMedia';
 import { PRIORITY_STYLES, SimTag, useLoc } from './ui';
 import type { TelemedStore } from './store';
-import type { Patient, Preconsult, Priority } from './types';
+import type { Patient, Preconsult, Priority, SpecKey } from './types';
 
 interface Props {
   store: TelemedStore;
   visible: boolean;
   notify: (text: string, tone?: 'ok' | 'warn') => void;
   goConsole: () => void;
+  /** Cita de hoy que se elige al llegar desde la agenda (n cambia en cada clic). */
+  preset: { apptId: string; n: number } | null;
 }
 
 const EMPTY = {
@@ -42,13 +45,15 @@ const EMPTY_NEW = {
   payerId: 'cordillera',
 };
 
-export default function PreconsultForm({ store, visible, notify, goConsole }: Props) {
+export default function PreconsultForm({ store, visible, notify, goConsole, preset }: Props) {
   const t = useTranslations('demoTelemed');
   const loc = useLoc();
   const media = useLocalMedia();
   const level = useMicLevel(media.stream);
   const camAllowed = useCameraAllowed();
+  const { day } = store.state;
   const waiting = store.state.patients.filter((p) => p.status === 'waiting');
+  const todayAppts = store.state.appointments.filter((a) => a.date === day && a.status === 'booked').sort((a, b) => a.time.localeCompare(b.time));
 
   const [whoState, setWho] = useState<string>('new');
   const [np, setNp] = useState(EMPTY_NEW);
@@ -63,22 +68,45 @@ export default function PreconsultForm({ store, visible, notify, goConsole }: Pr
     priority: Priority;
     alarm: boolean;
     position: number;
+    spec: SpecKey;
   } | null>(null);
+
+  const doneBox = useRef<HTMLDivElement | null>(null);
+
+  // Al enviar, la confirmación queda arriba del formulario: se lleva a la vista (en el celular el botón Enviar queda lejos).
+  useEffect(() => {
+    if (done) window.setTimeout(() => doneBox.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  }, [done]);
 
   useEffect(() => {
     if (!visible) media.stop();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
-  // Si el paciente elegido ya salió de la sala de espera (lo llamaron), vuelve a "Paciente nuevo".
+  // Llegada desde la agenda: se elige la cita de hoy.
+  useEffect(() => {
+    if (preset) pick(`appt:${preset.apptId}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preset]);
+
+  // Si el paciente elegido ya salió de la sala de espera (lo llamaron) o la cita ya no está, vuelve a "Paciente nuevo".
   const existing = waiting.find((p) => p.id === whoState) ?? null;
-  const who = existing ? whoState : 'new';
-  const newOk = who !== 'new' || (np.name.trim().length >= 3 && /^[0-9.]{5,15}$/.test(np.doc.trim()) && Number(np.age) > 0 && Number(np.age) < 120);
-  const canSubmit = !!form.reason.trim() && consents.tele && consents.data && newOk;
+  const appt = whoState.startsWith('appt:') ? (todayAppts.find((a) => `appt:${a.id}` === whoState) ?? null) : null;
+  const who = existing || appt ? whoState : 'new';
+  const needsData = who === 'new' || !!appt;
+  const dataOk = !needsData || (np.name.trim().length >= 3 && /^[0-9.]{5,15}$/.test(np.doc.trim()) && Number(np.age) > 0 && Number(np.age) < 120);
+  const canSubmit = !!form.reason.trim() && consents.tele && consents.data && dataOk;
 
   function pick(id: string) {
     setWho(id);
     setDone(null);
+    if (id.startsWith('appt:')) {
+      const a = store.state.appointments.find((x) => `appt:${x.id}` === id);
+      setNp({ ...EMPTY_NEW, name: a?.patient ?? '', payerId: a?.payerId ?? EMPTY_NEW.payerId });
+      setForm(EMPTY);
+      setConsents({ tele: false, data: false, rec: false });
+      return;
+    }
     const p = waiting.find((x) => x.id === id);
     if (p?.preconsult) {
       const pre = p.preconsult;
@@ -114,7 +142,7 @@ export default function PreconsultForm({ store, visible, notify, goConsole }: Pr
       consentTele: consents.tele,
       consentData: consents.data,
       consentRec: consents.rec,
-      at: demoClock(),
+      at: store.clock(),
     };
     const tri = classifySymptoms(pre.reason as string);
     const temp = parseFloat(form.temp.replace(',', '.'));
@@ -123,9 +151,12 @@ export default function PreconsultForm({ store, visible, notify, goConsole }: Pr
       ...(/^\d{2,3}\/\d{2,3}$/.test(form.bp.trim()) ? { bp: form.bp.trim() } : {}),
     };
     let name = '';
-    if (who === 'new') {
+    let spec: SpecKey = 'general';
+    const position = queuePosition(waiting, tri.urgency, existing?.id);
+    if (needsData) {
       name = np.name.trim();
-      store.addPatient({
+      spec = appt ? appt.spec : assignSpec(tri, Number(np.age));
+      const patientId = store.addPatient({
         name,
         age: Number(np.age),
         docType: np.docType,
@@ -133,7 +164,9 @@ export default function PreconsultForm({ store, visible, notify, goConsole }: Pr
         payerId: np.payerId,
         reason: pre.reason,
         priority: tri.urgency,
-        waitMin: 0,
+        spec,
+        arrivedAt: store.clock(),
+        ...(appt ? { appointmentId: appt.id } : {}),
         status: 'waiting',
         allergies: [],
         history: [],
@@ -144,8 +177,10 @@ export default function PreconsultForm({ store, visible, notify, goConsole }: Pr
         script: GENERIC_SCRIPT,
         labs: [],
       });
+      if (appt) store.updateAppointment(appt.id, { status: 'checkedIn', patientId });
     } else if (existing) {
       name = existing.name;
+      spec = existing.spec;
       store.updatePatient(existing.id, {
         preconsult: pre,
         reason: pre.reason,
@@ -153,19 +188,36 @@ export default function PreconsultForm({ store, visible, notify, goConsole }: Pr
         vitals: { ...existing.vitals, ...vitalsPatch },
       });
     }
-    store.log('patient', 'preconsultSent', {
-      patient: name,
-      priority: { t: `priority.${tri.urgency}` },
-    });
-    const order: Record<Priority, number> = { red: 0, yellow: 1, green: 2 };
-    const position = waiting.filter((p) => p.name !== name && order[p.priority] <= order[tri.urgency]).length + 1;
-    setDone({ name, priority: tri.urgency, alarm: tri.alarm, position });
+    store.log(
+      'patient',
+      appt ? 'preconsultAppt' : 'preconsultSent',
+      { patient: name, priority: { t: `priority.${tri.urgency}` }, spec: { t: `specialties.${spec}` }, ...(appt ? { code: appt.id } : {}) },
+      name,
+    );
+    setDone({ name, priority: tri.urgency, alarm: tri.alarm, position, spec });
     notify(t('toasts.preconsult', { name }));
     setForm(EMPTY);
     setConsents({ tele: false, data: false, rec: false });
     setNp(EMPTY_NEW);
     setWho('new');
   }
+
+  // Mensaje de ejemplo con el enlace a la pre-consulta, según quién la está llenando.
+  const firstName = (full: string) => full.trim().split(/\s+/)[0] ?? '';
+  const wa = appt
+    ? {
+        text: t('patient.waAppt', { name: firstName(appt.patient), ips: IPS.name, spec: t(`specialties.${appt.spec}`), pro: specOf(appt.spec).pro, time: appt.time }),
+        link: `https://tu-ips.example/sala/${appt.id}`,
+      }
+    : existing
+      ? {
+          text: t('patient.waQueue', { name: firstName(existing.name), ips: IPS.name, spec: t(`specialties.${existing.spec}`) }),
+          link: `https://tu-ips.example/sala/${existing.id.toUpperCase()}`,
+        }
+      : {
+          text: np.name.trim() ? t('patient.waNew', { name: firstName(np.name), ips: IPS.name }) : t('patient.waNewNoName', { ips: IPS.name }),
+          link: 'https://tu-ips.example/pre-consulta',
+        };
 
   const consentItems = [
     { k: 'tele' as const, required: true },
@@ -182,17 +234,18 @@ export default function PreconsultForm({ store, visible, notify, goConsole }: Pr
         </CardHeader>
         <CardContent>
           {done && store.state.patients.some((p) => p.name === done.name) && (
-            <div className="mb-4 space-y-2">
+            <div ref={doneBox} className="mb-4 space-y-2 scroll-mt-24">
               <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-300 dark:border-emerald-700 text-emerald-900 dark:text-emerald-100 flex items-start gap-2">
                 <CheckCircleIcon className="w-5 h-5 shrink-0" />
                 <div className="text-sm">
                   <p className="font-semibold">{t('patient.doneTitle', { name: done.name })}</p>
                   <p>
-                    {t('patient.doneBody', { position: String(done.position) })}{' '}
+                    {done.alarm ? t('patient.doneAlarm') : t('patient.doneBody', { position: String(done.position) })}{' '}
                     <span className={`ml-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${PRIORITY_STYLES[done.priority].chip}`}>
                       {t(`priority.${done.priority}`)}
                     </span>
                   </p>
+                  <p className="mt-0.5">{t('patient.doneSpec', { spec: t(`specialties.${done.spec}`), pro: specOf(done.spec).pro })}</p>
                 </div>
               </div>
               {done.alarm && (
@@ -222,15 +275,35 @@ export default function PreconsultForm({ store, visible, notify, goConsole }: Pr
                 className="w-full rounded-lg border border-secondary-300 dark:border-secondary-600 bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white px-3 py-2.5 text-sm"
               >
                 <option value="new">{t('patient.newPatient')}</option>
-                {waiting.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} · {t('patient.inQueue')}
-                  </option>
-                ))}
+                {todayAppts.length > 0 && (
+                  <optgroup label={t('patient.withAppt')}>
+                    {todayAppts.map((a) => (
+                      <option key={a.id} value={`appt:${a.id}`}>
+                        {a.patient} · {t(`specialties.${a.spec}`)} {a.time} · {a.id}
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
+                {waiting.length > 0 && (
+                  <optgroup label={t('patient.inQueueGroup')}>
+                    {waiting.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name} · {t('patient.inQueue')}
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
               </select>
+              <p className="mt-1 text-[11px] text-secondary-500 dark:text-secondary-400">
+                {appt
+                  ? t('patient.apptInfo', { code: appt.id, spec: t(`specialties.${appt.spec}`), pro: specOf(appt.spec).pro, time: appt.time })
+                  : existing
+                    ? t('patient.updateInfo', { spec: t(`specialties.${existing.spec}`) })
+                    : t('patient.newInfo')}
+              </p>
             </div>
 
-            {who === 'new' && (
+            {needsData && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Input
                   label={`${t('patient.name')} *`}
@@ -363,7 +436,7 @@ export default function PreconsultForm({ store, visible, notify, goConsole }: Pr
             </fieldset>
 
             <Button type="submit" fullWidth disabled={!canSubmit}>
-              {who === 'new' ? t('patient.submit') : t('patient.update')}
+              {needsData ? t('patient.submit') : t('patient.update')}
             </Button>
             {!canSubmit && <p className="text-[11px] text-secondary-500 dark:text-secondary-400">{t('patient.submitHint')}</p>}
           </form>
@@ -380,8 +453,8 @@ export default function PreconsultForm({ store, visible, notify, goConsole }: Pr
           </CardHeader>
           <CardContent>
             <div className="rounded-2xl bg-[#e7f6e7] dark:bg-emerald-950/50 p-3 text-sm text-secondary-900 dark:text-emerald-50">
-              <p>{t('patient.waMessage', { ips: IPS.name })}</p>
-              <p className="mt-1 font-mono text-xs text-sky-700 dark:text-sky-300 break-all">https://tu-ips.example/sala/T-1046</p>
+              <p>{wa.text}</p>
+              <p className="mt-1 font-mono text-xs text-sky-700 dark:text-sky-300 break-all">{wa.link}</p>
             </div>
             <p className="mt-2 text-[11px] text-secondary-500 dark:text-secondary-400">{t('patient.waNote')}</p>
           </CardContent>

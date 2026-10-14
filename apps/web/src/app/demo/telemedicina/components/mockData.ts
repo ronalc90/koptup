@@ -1,12 +1,16 @@
 /**
- * Datos de ejemplo de la demo de telemedicina (jornada del jueves 8 de octubre de 2026).
- * La IPS, los pacientes, las EPS, la prepagada, los profesionales, los documentos y los
- * valores son ficticios. Los valores en COP son de ejemplo y no son tarifas oficiales.
+ * Datos de ejemplo de la demo de telemedicina. La IPS, los pacientes, las EPS, la prepagada,
+ * los profesionales, los documentos y los valores son ficticios. Los valores en COP son de
+ * ejemplo y no son tarifas oficiales.
+ *
+ * Las fechas están escritas para una jornada base (BASE_DATE); al abrir la demo se corren
+ * para que la jornada sea la de hoy (ver `shiftSample` en logic.ts).
  */
 import type { Attention, Cie10, L, LabOrder, MedPreset, Patient, Payer, PayerKind, Specialty } from './types';
 
-/** Fecha y hora "actual" de la jornada de ejemplo (fijas para que la demo sea determinista). */
-export const DEMO_DATE = '2026-10-08';
+/** Jornada para la que se escribieron los datos de ejemplo (jueves). */
+export const BASE_DATE = '2026-10-08';
+/** Hora en que arranca el reloj de la demo al abrir la jornada. */
 export const DEMO_CLOCK = '09:30';
 
 export const IPS = {
@@ -17,8 +21,6 @@ export const IPS = {
   city: { es: 'Bogotá D. C.', en: 'Bogotá, Colombia' },
   invoicePrefix: 'ALTV',
 };
-
-export const PROFESSIONAL = { name: 'Dra. Patricia Vargas', reg: 'RM 52-1187 (ejemplo)' };
 
 export const PAYERS: Payer[] = [
   { id: 'cordillera', name: 'EPS Cordillera', kind: 'eps' },
@@ -41,28 +43,6 @@ export const SPECIALTIES: Specialty[] = [
   { key: 'psych', pro: 'Ps. Iván Cárdenas', reg: 'TP 11-0938', tariff: { private: 90000, eps: 55000, prepaid: 75000 }, cups: '890208' },
 ];
 
-/** Festivos de Colombia 2026 (Ley 51 de 1983). */
-export const HOLIDAYS_CO_2026 = new Set([
-  '2026-01-01',
-  '2026-01-12',
-  '2026-03-23',
-  '2026-04-02',
-  '2026-04-03',
-  '2026-05-01',
-  '2026-05-18',
-  '2026-06-08',
-  '2026-06-15',
-  '2026-06-29',
-  '2026-07-20',
-  '2026-08-07',
-  '2026-08-17',
-  '2026-10-12',
-  '2026-11-02',
-  '2026-11-16',
-  '2026-12-08',
-  '2026-12-25',
-]);
-
 export const WEEKDAY_SLOTS = ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'];
 export const SATURDAY_SLOTS = ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30'];
 
@@ -81,7 +61,8 @@ export const INITIAL_PATIENTS: Patient[] = [
       en: 'Crushing chest pain for 40 minutes, with sweating',
     },
     priority: 'red',
-    waitMin: 4,
+    spec: 'general',
+    arrivedAt: '09:26',
     status: 'waiting',
     allergies: [{ label: { es: 'Penicilina', en: 'Penicillin' }, cls: 'penicillin' }],
     history: [
@@ -138,7 +119,8 @@ export const INITIAL_PATIENTS: Patient[] = [
     payerId: 'sabana',
     reason: { es: 'Tos seca y fiebre de 38,5 °C desde hace 3 días', en: 'Dry cough and 38.5 °C fever for 3 days' },
     priority: 'yellow',
-    waitMin: 9,
+    spec: 'general',
+    arrivedAt: '09:21',
     status: 'waiting',
     allergies: [],
     history: [{ es: 'Asma leve intermitente', en: 'Mild intermittent asthma' }],
@@ -197,7 +179,8 @@ export const INITIAL_PATIENTS: Patient[] = [
     payerId: 'horizonte',
     reason: { es: 'Erupción en la piel con picazón en los brazos desde hace 5 días', en: 'Itchy skin rash on the arms for 5 days' },
     priority: 'green',
-    waitMin: 16,
+    spec: 'derma',
+    arrivedAt: '09:14',
     status: 'waiting',
     allergies: [{ label: { es: 'Sulfas', en: 'Sulfa drugs' }, cls: 'sulfa' }],
     history: [{ es: 'Dermatitis atópica', en: 'Atopic dermatitis' }],
@@ -220,7 +203,7 @@ export const INITIAL_PATIENTS: Patient[] = [
       { es: 'Me salió después de cambiar de jabón.', en: 'It appeared after I changed soap.' },
       { es: 'No tengo fiebre ni hinchazón en la cara.', en: 'I have no fever or facial swelling.' },
       { es: 'Listo, ya envío la foto por aquí.', en: "Sure, I'm sending the photo here." },
-      { es: 'Gracias, doctora.', en: 'Thank you, doctor.' },
+      { es: 'Gracias, doctor.', en: 'Thank you, doctor.' },
     ],
     labs: [],
   },
@@ -238,7 +221,8 @@ export const INITIAL_PATIENTS: Patient[] = [
       en: 'Diabetes and blood pressure follow-up; mild dizziness when standing up',
     },
     priority: 'yellow',
-    waitMin: 12,
+    spec: 'internal',
+    arrivedAt: '09:18',
     status: 'waiting',
     allergies: [{ label: { es: 'Ácido acetilsalicílico', en: 'Aspirin' }, cls: 'nsaid' }],
     history: [
@@ -305,7 +289,8 @@ export const INITIAL_PATIENTS: Patient[] = [
     payerId: 'sabana',
     reason: { es: 'Dolor de oído derecho desde ayer, sin fiebre alta', en: 'Right ear pain since yesterday, no high fever' },
     priority: 'green',
-    waitMin: 22,
+    spec: 'pedia',
+    arrivedAt: '09:08',
     status: 'waiting',
     allergies: [],
     history: [{ es: 'Otitis media recurrente', en: 'Recurrent middle ear infection' }],
@@ -331,7 +316,7 @@ export const INITIAL_PATIENTS: Patient[] = [
       { es: 'Soy la mamá. Le empezó ayer en la tarde.', en: "I'm her mother. It started yesterday afternoon." },
       { es: 'Tuvo 37,4 de temperatura en la noche.', en: 'She had a temperature of 37.4 last night.' },
       { es: 'No le ha salido líquido del oído.', en: 'No fluid has come out of her ear.' },
-      { es: 'Muchas gracias, doctora.', en: 'Thank you very much, doctor.' },
+      { es: 'Muchas gracias, doctor.', en: 'Thank you very much, doctor.' },
     ],
     labs: [],
   },
@@ -456,7 +441,7 @@ export const INITIAL_ATTENTIONS: Attention[] = [
     doc: '79.554.302',
     payerId: 'cordillera',
     spec: 'general',
-    date: DEMO_DATE,
+    date: BASE_DATE,
     time: '08:00',
     durationMin: 14,
     dx: { code: 'J00', label: { es: 'Rinofaringitis aguda (resfriado común)', en: 'Acute nasopharyngitis (common cold)' } },
@@ -482,7 +467,7 @@ export const INITIAL_ATTENTIONS: Attention[] = [
     doc: '1.032.448.917',
     payerId: 'particular',
     spec: 'psych',
-    date: DEMO_DATE,
+    date: BASE_DATE,
     time: '08:10',
     durationMin: 48,
     dx: { code: 'F41.1', label: { es: 'Trastorno de ansiedad generalizada', en: 'Generalized anxiety disorder' } },
@@ -506,7 +491,7 @@ export const INITIAL_ATTENTIONS: Attention[] = [
     doc: '80.211.765',
     payerId: 'horizonte',
     spec: 'derma',
-    date: DEMO_DATE,
+    date: BASE_DATE,
     time: '08:40',
     durationMin: 18,
     dx: { code: 'L23.9', label: { es: 'Dermatitis alérgica de contacto, de causa no especificada', en: 'Allergic contact dermatitis, unspecified cause' } },
@@ -528,7 +513,7 @@ export const INITIAL_ATTENTIONS: Attention[] = [
     doc: '1.141.302.558',
     payerId: 'sabana',
     spec: 'pedia',
-    date: DEMO_DATE,
+    date: BASE_DATE,
     time: '08:50',
     durationMin: 16,
     dx: {
@@ -562,7 +547,7 @@ export const INITIAL_ATTENTIONS: Attention[] = [
     doc: '1.019.874.023',
     payerId: 'particular',
     spec: 'general',
-    date: DEMO_DATE,
+    date: BASE_DATE,
     time: '09:05',
     durationMin: 12,
     dx: { code: 'K29.7', label: { es: 'Gastritis, no especificada', en: 'Gastritis, unspecified' } },
@@ -588,3 +573,6 @@ export const GENERIC_SCRIPT = [
   { es: 'No he tenido otros síntomas.', en: "I haven't had any other symptoms." },
   { es: 'Entendido. Muchas gracias.', en: 'Understood. Thank you very much.' },
 ];
+
+/** Respuesta del paciente cuando se le acaba el guion del chat. */
+export const GENERIC_REPLY = { es: 'De acuerdo, gracias.', en: 'All right, thank you.' };
