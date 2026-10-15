@@ -105,7 +105,6 @@ function ContactPageInner() {
   const [submittedEmail, setSubmittedEmail] = useState('');
   /** Plan RAG que viajó con la solicitud (null si la persona cambió de servicio). */
   const [submittedPlan, setSubmittedPlan] = useState<string | null>(null);
-  const [isScheduling, setIsScheduling] = useState(false);
   const [error, setError] = useState('');
 
   // Pre-llenar form si vienen query params
@@ -232,22 +231,9 @@ function ContactPageInner() {
   const invalidProps = (field: string) =>
     fieldErrors[field] ? { 'aria-invalid': true as const, 'aria-describedby': `${field}-error` } : {};
 
-  const handleScheduleCall = () => {
-    setIsScheduling(true);
-
-    // Destinatario corporativo (única fuente de verdad, sin correos personales).
-    const recipients = 'ronald@koptup.com';
-    const subject = encodeURIComponent(t('schedule.emailSubject'));
-    const body = encodeURIComponent(t('schedule.emailBody'));
-
-    // Abrir cliente de email con los datos
-    window.location.href = `mailto:${recipients}?subject=${subject}&body=${body}`;
-
-    // Reset después de un momento
-    setTimeout(() => {
-      setIsScheduling(false);
-    }, 1000);
-  };
+  // Enlace mailto real (no navegación por script): si no hay cliente de correo,
+  // el correo queda escrito debajo del botón para copiarlo.
+  const scheduleMailto = `mailto:ronald@koptup.com?subject=${encodeURIComponent(t('schedule.emailSubject'))}&body=${encodeURIComponent(t('schedule.emailBody'))}`;
 
   const contactInfo = [
     {
@@ -480,7 +466,7 @@ function ContactPageInner() {
 
                         <div>
                           <label htmlFor="phone" className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                            {t('form.phone')}
+                            {t('form.phone')} <span className="font-normal text-secondary-500 dark:text-secondary-400">({t('form.optional')})</span>
                           </label>
                           <input
                             type="tel"
@@ -497,7 +483,7 @@ function ContactPageInner() {
 
                         <div>
                           <label htmlFor="company" className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                            {t('form.company')}
+                            {t('form.company')} <span className="font-normal text-secondary-500 dark:text-secondary-400">({t('form.optional')})</span>
                           </label>
                           <input
                             type="text"
@@ -539,7 +525,7 @@ function ContactPageInner() {
                         {!ragPlan ? (
                         <div>
                           <label htmlFor="budget" className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                            {t('form.budget')}
+                            {t('form.budget')} <span className="font-normal text-secondary-500 dark:text-secondary-400">({t('form.optional')})</span>
                           </label>
                           <select
                             id="budget"
@@ -563,7 +549,7 @@ function ContactPageInner() {
                       {/* Plazo: se guarda con el contacto (Contact.plazo). */}
                       <div>
                         <label htmlFor="timeline" className="block text-sm font-medium text-secondary-700 dark:text-secondary-300 mb-2">
-                          {t('form.timeline')}
+                          {t('form.timeline')} <span className="font-normal text-secondary-500 dark:text-secondary-400">({t('form.optional')})</span>
                         </label>
                         <select
                           id="timeline"
@@ -606,8 +592,9 @@ function ContactPageInner() {
                         {fieldError('message')}
                       </div>
 
-                      {/* Campo trampa: invisible para las personas; si llega lleno, el backend lo descarta. */}
-                      <div className="absolute -left-[10000px] top-auto w-px h-px overflow-hidden" aria-hidden="true">
+                      {/* Campo trampa contra bots: display:none (atributo hidden). Un campo fuera de
+                          pantalla sí lo autocompleta el navegador y un contacto real se descartaría. */}
+                      <div hidden>
                         <label htmlFor="website">{t('form.honeypot')}</label>
                         <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" value={website} onChange={(e) => setWebsite(e.target.value)} />
                       </div>
@@ -737,15 +724,10 @@ function ContactPageInner() {
                   <p className="text-sm text-secondary-700 dark:text-secondary-300 mb-4">
                     {t('schedule.subtitle')}
                   </p>
-                  <Button
-                    size="sm"
-                    fullWidth
-                    variant="primary"
-                    onClick={handleScheduleCall}
-                    disabled={isScheduling}
-                  >
-                    {isScheduling ? t('schedule.opening') : t('schedule.button')}
+                  <Button size="sm" fullWidth variant="primary" asChild>
+                    <a href={scheduleMailto}>{t('schedule.button')}</a>
                   </Button>
+                  <p className="mt-3 text-xs text-secondary-600 dark:text-secondary-400">ronald@koptup.com</p>
                 </CardContent>
               </Card>
             </div>
@@ -783,21 +765,6 @@ function ContactPageInner() {
         </div>
       </section>
 
-      {/* Map Section */}
-      <section className="h-72 sm:h-96 bg-secondary-200 dark:bg-secondary-800">
-        <div className="w-full h-full">
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3976.9146859817846!2d-74.11588!3d4.609572!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f9e8f8f8f8f8f%3A0x8f8f8f8f8f8f8f8f!2sAv.%2068%20%231-63%2C%20Bogot%C3%A1%2C%20Colombia!5e0!3m2!1ses!2sco!4v1234567890123!5m2!1ses!2sco"
-            width="100%"
-            height="100%"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            title="Ubicación de KopTup en Bogotá, Colombia"
-          />
-        </div>
-      </section>
     </>
   );
 }

@@ -17,7 +17,6 @@ import {
   ArrowRightOnRectangleIcon,
   Squares2X2Icon,
   ChevronDownIcon,
-  PaperAirplaneIcon,
   KeyIcon,
 } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
@@ -109,7 +108,6 @@ export default function Navbar() {
 
 
   const navigation = [
-    { name: t('nav.home'), href: '/' },
     { name: t('nav.rag'), href: '/rag' },
     { name: t('nav.services'), href: '/services' },
     { name: t('nav.demos'), href: '/demo' },
@@ -312,12 +310,6 @@ const toggleLanguage = () => {
               </div>
             ) : (
               <>
-                <Button size="sm" variant="ghost" asChild>
-                  <Link href="/solicitar-demo" className="flex items-center gap-1">
-                    <PaperAirplaneIcon className="h-4 w-4" />
-                    {t('nav.requestDemo')}
-                  </Link>
-                </Button>
                 <Button size="sm" variant="outline" asChild>
                   <Link href="/login">{t('nav.login')}</Link>
                 </Button>
@@ -399,11 +391,6 @@ const toggleLanguage = () => {
                 </>
               ) : (
                 <>
-                  <Button size="sm" fullWidth variant="ghost" asChild>
-                    <Link href="/solicitar-demo" onClick={() => setMobileMenuOpen(false)}>
-                      {t('nav.requestDemo')}
-                    </Link>
-                  </Button>
                   <Button size="sm" fullWidth variant="outline" asChild>
                     <Link href="/login">{t('nav.login')}</Link>
                   </Button>

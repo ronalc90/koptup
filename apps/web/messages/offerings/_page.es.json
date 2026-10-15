@@ -59,7 +59,7 @@
     },
     "banner": {
       "title": "Cómo escalamos",
-      "body": "Equipo basado en Colombia que atiende de lunes a viernes, de 8:00 a. m. a 6:00 p. m. (hora de Colombia). Si tu proyecto debe cumplir normas como ISO 27001 o SOC 2, lo diseñamos con esos requisitos; la certificación formal la tramita tu empresa. Si necesitas un alcance mayor al del nivel más alto, cotizamos personalizado en 48 horas hábiles."
+      "body": "Equipo basado en Colombia que atiende de lunes a viernes, de 8:00 a. m. a 6:00 p. m. (hora de Colombia). Si tu proyecto exige normas como ISO 27001 o SOC 2, lo definimos en la conversación de alcance; la certificación formal la tramita tu empresa. Si necesitas un alcance mayor al del nivel más alto, cotizamos personalizado en 48 horas hábiles."
     },
     "supportSLA": {
       "email-24h": "Email horario laboral · 24h hábiles",
@@ -95,6 +95,10 @@
       "title": "¿No sabes cuál elegir?",
       "body": "Habla con nosotros y te ayudamos a definir si compras el software o usas nuestro SaaS.",
       "button": "Hablar con un experto"
+    },
+    "others": {
+      "title": "Otros desarrollos ({count})",
+      "hint": "Productos con precio propio que se piden menos. Escríbenos si alguno resuelve lo que necesitas."
     }
   }
 }

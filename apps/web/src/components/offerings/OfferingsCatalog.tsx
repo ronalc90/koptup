@@ -119,11 +119,25 @@ const CATEGORY_FILTERS: (OfferingCategory | 'all')[] = [
 
 /**
  * Ofertas que /services no muestra en "Otras soluciones a medida".
- * `chatbot-rag-ia` lo reemplazan los planes RAG (`RagPlans`, arriba de la
- * página). Se filtra solo en esta vista: el sitemap y /demo/chatbot siguen
- * usando `OFFERINGS` completo.
+ * - `chatbot-rag-ia`: lo reemplazan los planes RAG (arriba de la página).
+ * - `qa-automatizado-ia` y `vpn-empresarial`: no son productos que KopTup venda hoy.
+ * Se filtra solo en esta vista: el sitemap y /demo/<slug> siguen usando `OFFERINGS` completo.
  */
-const HIDDEN_IN_CATALOG = new Set<string>(['chatbot-rag-ia']);
+const HIDDEN_IN_CATALOG = new Set<string>(['chatbot-rag-ia', 'qa-automatizado-ia', 'vpn-empresarial']);
+
+/**
+ * Productos principales del catálogo. El resto va en «Otros desarrollos», plegado.
+ * Son las soluciones con demo de vitrina o de apoyo más pertinentes para empresas en Colombia.
+ */
+const FEATURED_OFFERINGS = new Set<string>([
+  'ecommerce',
+  'bi-dashboard',
+  'gestor-documental',
+  'helpdesk-ia',
+  'crm-ia',
+  'facturacion-electronica',
+  'sistema-reservas',
+]);
 
 const CATALOG_OFFERINGS: Offering[] = OFFERINGS.filter((o) => !HIDDEN_IN_CATALOG.has(o.slug));
 
@@ -611,6 +625,10 @@ export default function OfferingsCatalog() {
   }, [query, category]);
 
   const openOffering = openSlug ? CATALOG_OFFERINGS.find((o) => o.slug === openSlug) : null;
+  const featured = filtered.filter((o) => FEATURED_OFFERINGS.has(o.slug));
+  const others = filtered.filter((o) => !FEATURED_OFFERINGS.has(o.slug));
+  // Con búsqueda o categoría activa, «Otros desarrollos» se abre para que no se oculten resultados.
+  const isFiltering = query.trim() !== '' || category !== 'all';
 
   return (
     <div id="otras-soluciones" className="scroll-mt-16 md:scroll-mt-20">
@@ -737,17 +755,38 @@ export default function OfferingsCatalog() {
             {tp('noResults')}
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.map((offering) => (
-              <OfferingCard
-                key={offering.slug}
-                offering={offering}
-                globalModality={modality}
-                currency={currency}
-                onOpen={setOpenSlug}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featured.map((offering) => (
+                <OfferingCard
+                  key={offering.slug}
+                  offering={offering}
+                  globalModality={modality}
+                  currency={currency}
+                  onOpen={setOpenSlug}
+                />
+              ))}
+            </div>
+            {others.length > 0 ? (
+              <details className="mt-10" open={isFiltering}>
+                <summary className="cursor-pointer rounded-xl border border-secondary-200 dark:border-secondary-700 bg-white dark:bg-secondary-900 px-5 py-4 font-semibold text-secondary-900 dark:text-white">
+                  {tp('others.title', { count: others.length })}
+                </summary>
+                <p className="mt-3 text-sm text-secondary-600 dark:text-secondary-400">{tp('others.hint')}</p>
+                <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {others.map((offering) => (
+                    <OfferingCard
+                      key={offering.slug}
+                      offering={offering}
+                      globalModality={modality}
+                      currency={currency}
+                      onOpen={setOpenSlug}
+                    />
+                  ))}
+                </div>
+              </details>
+            ) : null}
+          </>
         )}
       </section>
 

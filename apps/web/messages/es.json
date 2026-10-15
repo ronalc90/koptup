@@ -2252,6 +2252,7 @@
       "errorCheckFields": "Revisa los campos marcados.",
       "consent": "Autorizo a KopTup a tratar mis datos personales para responder este mensaje, según la Ley 1581 de 2012 y la <link>política de privacidad</link>.",
       "honeypot": "No llenes este campo",
+      "optional": "opcional",
       "fieldErrors": {
         "name": "Escribe tu nombre (máximo 120 caracteres).",
         "email": "Escribe un email válido.",

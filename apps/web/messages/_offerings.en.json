@@ -309,7 +309,7 @@
     },
     "banner": {
       "title": "How we scale",
-      "body": "Colombia-based team, available Monday to Friday, 8:00 a.m. to 6:00 p.m. (Colombia time). If your project must meet standards such as ISO 27001 or SOC 2, we design it with those requirements; formal certification is handled by your company. If you need more than the highest tier, we provide a custom quote within 48 business hours."
+      "body": "Colombia-based team, available Monday to Friday, 8:00 a.m. to 6:00 p.m. (Colombia time). If your project must meet standards such as ISO 27001 or SOC 2, we define it in the scope conversation; formal certification is handled by your company. If you need more than the highest tier, we provide a custom quote within 48 business hours."
     },
     "supportSLA": {
       "email-24h": "Email business hours · 24h business response",
@@ -345,6 +345,10 @@
       "title": "Not sure which to pick?",
       "body": "Talk to us and we will help you decide whether to buy the software or use our SaaS.",
       "button": "Talk to an expert"
+    },
+    "others": {
+      "title": "Other developments ({count})",
+      "hint": "Products with their own price that are requested less often. Write to us if one of them fits what you need."
     }
   },
   "ragPage": {
