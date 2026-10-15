@@ -328,8 +328,14 @@ test.describe('Contenido verificable', () => {
     expect(errors).toEqual([]);
   });
 
+  test('/soluciones-ia redirige de forma permanente a /rag', async ({ request }) => {
+    const response = await request.get('/soluciones-ia', { maxRedirects: 0 });
+    expect(response.status()).toBe(308);
+    expect(response.headers()['location']).toMatch(/\/rag$/);
+  });
+
   test('home, Product Hunt y desarrollo web sin afirmaciones falsas', async ({ page }) => {
-    for (const path of ['/', '/bienvenido-producthunt', '/desarrollo-web-colombia', '/soluciones-ia']) {
+    for (const path of ['/', '/bienvenido-producthunt', '/desarrollo-web-colombia']) {
       await page.goto(path);
       const body = await page.locator('main').innerText();
       expect(body, path).not.toMatch(/tiempo real|100% funcional|GPT-4 y Claude|Lista para usar|Claude AI|cualquier parte del mundo/i);

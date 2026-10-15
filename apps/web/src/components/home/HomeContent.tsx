@@ -6,15 +6,15 @@ import Button from '@/components/ui/Button';
 import Card, { CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import HomeHighlights from '@/components/home/HomeHighlights';
-import { DEMO_COUNT } from '@/lib/demos';
-import { MEDICAL_ACCOUNTS_DEMO_PATH, RAG_PATH, RAG_SECTORS, getRagFaqValues } from '@/lib/rag-page';
+import { RAG_PATH, RAG_SECTORS, getRagFaqValues } from '@/lib/rag-page';
 import { RAG_SECTOR_ICONS } from '@/components/rag/RagSectorLanding';
 import DemoAccessBadge from '@/components/demo/DemoAccessBadge';
 import { demoSlugFromPath, gatedInfo, useDemoCatalog } from '@/lib/use-demo-catalog';
 import {
   ShoppingCartIcon,
   ChatBubbleBottomCenterTextIcon,
-  ClipboardDocumentCheckIcon,
+  FolderIcon,
+  LifebuoyIcon,
   CodeBracketIcon,
   DevicePhoneMobileIcon,
   ShieldCheckIcon,
@@ -52,39 +52,9 @@ export default function HomeContent() {
       href: '/services#planes-rag',
     },
     {
-      icon: CubeIcon,
-      title: t('services.integrations.title'),
-      description: t('services.integrations.description'),
-      href: '/services#otras-soluciones',
-    },
-    {
       icon: CodeBracketIcon,
       title: t('services.custom.title'),
       description: t('services.custom.description'),
-      href: '/services#otras-soluciones',
-    },
-    {
-      icon: DevicePhoneMobileIcon,
-      title: t('services.mobile.title'),
-      description: t('services.mobile.description'),
-      href: '/services#otras-soluciones',
-    },
-    {
-      icon: PaintBrushIcon,
-      title: t('services.uxui.title'),
-      description: t('services.uxui.description'),
-      href: '/services#otras-soluciones',
-    },
-    {
-      icon: ShieldCheckIcon,
-      title: t('services.security.title'),
-      description: t('services.security.description'),
-      href: '/services#otras-soluciones',
-    },
-    {
-      icon: CloudIcon,
-      title: t('services.consulting.title'),
-      description: t('services.consulting.description'),
       href: '/services#otras-soluciones',
     },
   ];
@@ -102,20 +72,20 @@ export default function HomeContent() {
       color: 'from-purple-500 to-purple-700',
     },
     {
-      icon: ClipboardDocumentCheckIcon,
-      title: th('demos.medicalAudit.title'),
-      description: th('demos.medicalAudit.description'),
-      href: MEDICAL_ACCOUNTS_DEMO_PATH,
-      category: th('demos.medicalAudit.category'),
+      icon: LifebuoyIcon,
+      title: th('demos.helpdesk.title'),
+      description: th('demos.helpdesk.description'),
+      href: '/demo/helpdesk-ia',
+      category: th('demos.helpdesk.category'),
       color: 'from-blue-500 to-blue-700',
     },
     {
-      icon: ShoppingCartIcon,
-      title: th('demos.ecommerce.title'),
-      description: th('demos.ecommerce.description'),
-      href: '/demo/ecommerce',
-      category: th('demos.ecommerce.category'),
-      color: 'from-green-500 to-green-700',
+      icon: FolderIcon,
+      title: th('demos.documents.title'),
+      description: th('demos.documents.description'),
+      href: '/demo/gestor-documentos',
+      category: th('demos.documents.category'),
+      color: 'from-amber-500 to-amber-700',
     },
     {
       icon: CubeIcon,
@@ -126,36 +96,12 @@ export default function HomeContent() {
       color: 'from-indigo-500 to-indigo-700',
     },
     {
-      icon: CodeBracketIcon,
-      title: th('demos.projects.title'),
-      description: th('demos.projects.description'),
-      href: '/demo/control-proyectos',
-      category: th('demos.projects.category'),
-      color: 'from-orange-500 to-orange-700',
-    },
-    {
-      icon: CloudIcon,
-      title: th('demos.documents.title'),
-      description: th('demos.documents.description'),
-      href: '/demo/gestor-documentos',
-      category: th('demos.documents.category'),
-      color: 'from-cyan-500 to-cyan-700',
-    },
-    {
-      icon: PaintBrushIcon,
-      title: th('demos.cms.title'),
-      description: th('demos.cms.description'),
-      href: '/demo/gestor-contenido',
-      category: th('demos.cms.category'),
-      color: 'from-pink-500 to-pink-700',
-    },
-    {
-      icon: CheckCircleIcon,
-      title: th('demos.reservations.title'),
-      description: th('demos.reservations.description'),
-      href: '/demo/sistema-reservas',
-      category: th('demos.reservations.category'),
-      color: 'from-teal-500 to-teal-700',
+      icon: ShoppingCartIcon,
+      title: th('demos.ecommerce.title'),
+      description: th('demos.ecommerce.description'),
+      href: '/demo/ecommerce',
+      category: th('demos.ecommerce.category'),
+      color: 'from-green-500 to-green-700',
     },
   ];
 
@@ -248,12 +194,12 @@ export default function HomeContent() {
               {th('demos.sectionTitle')}
             </h2>
             <p className="text-xl text-secondary-600 dark:text-secondary-400 max-w-3xl mx-auto">
-              {th('demos.sectionSubtitle', { count: DEMO_COUNT })}
+              {th('demos.sectionSubtitle')}
             </p>
           </div>
 
           {/* Demos Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-20">
             {featuredDemos.map((demo, index) => {
               const Icon = demo.icon;
               const gated = gatedInfo(demoCatalog, demoSlugFromPath(demo.href));

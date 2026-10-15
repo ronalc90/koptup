@@ -45,22 +45,22 @@
       }
     },
     "telemedicina": {
-      "title": "Telemedicina HIPAA",
+      "title": "Telemedicina",
       "description": "Video consulta segura, EHR integrado, triage IA, receta electrónica y wearables Apple Health / Fitbit.",
       "badge": "HealthTech",
       "features": {
-        "0": "Video call HIPAA-compliant con WebRTC propio",
+        "0": "Videollamada con WebRTC propio",
         "1": "EHR/EMR + receta electrónica con firma digital",
         "2": "Triage IA con síntomas y derivación por especialidad",
         "3": "Integración wearables, laboratorios HL7/FHIR y farmacias"
       }
     },
     "billing": {
-      "title": "Facturación Electrónica Multi-país",
-      "description": "Emisión y recepción de facturas DIAN, SAT, AFIP, SII, SUNAT, DGI, SET, SRI con SDK y white-label.",
+      "title": "Facturación Electrónica (Colombia)",
+      "description": "Emisión y recepción de facturas electrónicas DIAN con API, SDK y plugins para ERP/POS.",
       "badge": "FinTech",
       "features": {
-        "0": "8 países LatAm: CO, MX, AR, CL, PE, UY, PY, EC",
+        "0": "Colombia (DIAN) hoy; otros países se cotizan por proyecto",
         "1": "Factura, NC, ND, POS y validación NIT en tiempo real",
         "2": "Recepción de proveedores con OCR + validación automática",
         "3": "API + SDKs + plugins ERP/POS + modo white-label"
@@ -134,10 +134,10 @@
     },
     "sign": {
       "title": "Firma Electrónica",
-      "description": "Firma simple, avanzada y cualificada (eIDAS, Ley 527 CO) con audit trail criptográfico y blockchain timestamp.",
+      "description": "Firma simple y avanzada, con registro de auditoría y estampa de tiempo.",
       "badge": "LegalTech",
       "features": {
-        "0": "Simple, avanzada y cualificada (eIDAS, Ley 527 CO)",
+        "0": "Simple y avanzada",
         "1": "KYC firmante: SMS OTP, email, ID+selfie, video, biometría",
         "2": "Audit trail criptográfico con hash chain y RFC 3161",
         "3": "Multi-firmante con orden, condicional, paralelo + bulk send"
@@ -145,12 +145,12 @@
     },
     "scraping": {
       "title": "Scraping & Data Extraction",
-      "description": "Visual scraper builder con AI extraction, proxy rotation, captcha solving y auto-fix cuando cambia el DOM.",
+      "description": "Constructor visual de extracción de datos (demo simulada).",
       "badge": "Data",
       "features": {
         "0": "Visual builder point-and-click + AI extraction con schemas",
-        "1": "Proxy rotation (datacenter, residential, mobile) + captchas",
-        "2": "Anti-bot evasion: fingerprinting, stealth, human-like",
+        "1": "Reglas de extracción y programación",
+        "2": "No evade captchas ni inicios de sesión",
         "3": "Auto-fix con LLM cuando cambia el DOM + diff detection"
       }
     },

@@ -45,22 +45,22 @@
       }
     },
     "telemedicina": {
-      "title": "HIPAA Telemedicine",
+      "title": "Telemedicine",
       "description": "Secure video consult, integrated EHR, AI triage, e-prescription and Apple Health / Fitbit wearables.",
       "badge": "HealthTech",
       "features": {
-        "0": "HIPAA-compliant video call with our own WebRTC",
+        "0": "Video call with our own WebRTC",
         "1": "EHR/EMR + e-prescription with digital signature",
         "2": "AI symptom triage and specialty referral",
         "3": "Wearables, HL7/FHIR labs and pharmacy integrations"
       }
     },
     "billing": {
-      "title": "Multi-country E-invoicing",
-      "description": "Issue and receive invoices for DIAN, SAT, AFIP, SII, SUNAT, DGI, SET, SRI with SDK and white-label.",
+      "title": "E-invoicing (Colombia)",
+      "description": "Issue and receive DIAN e-invoices with API, SDK and ERP/POS plugins.",
       "badge": "FinTech",
       "features": {
-        "0": "8 LatAm countries: CO, MX, AR, CL, PE, UY, PY, EC",
+        "0": "Colombia (DIAN) today; other countries are quoted per project",
         "1": "Invoice, CN, DN, POS and real-time NIT validation",
         "2": "Supplier inbox with OCR + automatic validation",
         "3": "API + SDKs + ERP/POS plugins + white-label mode"
@@ -134,10 +134,10 @@
     },
     "sign": {
       "title": "E-signature",
-      "description": "Simple, advanced and qualified (eIDAS, Ley 527 CO) signatures with cryptographic audit trail and blockchain timestamp.",
+      "description": "Simple and advanced signatures with an audit trail and a time stamp.",
       "badge": "LegalTech",
       "features": {
-        "0": "Simple, advanced and qualified (eIDAS, Ley 527 CO)",
+        "0": "Simple and advanced",
         "1": "Signer KYC: SMS OTP, email, ID+selfie, video, biometrics",
         "2": "Cryptographic audit trail with hash chain and RFC 3161",
         "3": "Multi-signer with order, conditional, parallel + bulk send"
@@ -145,12 +145,12 @@
     },
     "scraping": {
       "title": "Scraping & Data Extraction",
-      "description": "Visual scraper builder with AI extraction, proxy rotation, captcha solving and DOM auto-fix.",
+      "description": "Visual data-extraction builder (simulated demo).",
       "badge": "Data",
       "features": {
         "0": "Visual point-and-click builder + AI extraction with schemas",
-        "1": "Proxy rotation (datacenter, residential, mobile) + captchas",
-        "2": "Anti-bot evasion: fingerprinting, stealth, human-like",
+        "1": "Extraction rules and scheduling",
+        "2": "Does not evade captchas or logins",
         "3": "LLM auto-fix when DOM changes + diff detection"
       }
     },
@@ -8270,7 +8270,7 @@
         },
         "countries": {
           "title": "Other countries",
-          "text": "Mexico, Peru and Chile are quoted separately (Advanced plan). This simulator shows Colombia only."
+          "text": "Today the simulator and the integration cover Colombia (DIAN) only. Other countries are quoted per project."
         }
       }
     }

@@ -27,7 +27,7 @@
       "liveDemo": "Real AI demo, no sign-up",
       "citedAnswers": "Answers with cited sources",
       "pilot": "Pilot in 2 weeks",
-      "team": "Team in Colombia"
+      "team": "Studio in Bogotá"
     },
     "cta": {
       "title": "Ready to start your project?",
@@ -37,7 +37,7 @@
     "demos": {
       "sectionBadge": "Interactive Demos",
       "sectionTitle": "Solutions for Every Industry",
-      "sectionSubtitle": "Explore {count} interactive demos that show the kind of solutions we build. Some use real AI, like the RAG chatbot; most run on sample data so you can see how each solution would look before hiring us. Each demo says what is real and what is sample data. Open demos need no sign-up; the ones that require access can be requested.",
+      "sectionSubtitle": "Five examples to see how each solution works. Some use real AI (the chatbot, the help desk and the document manager); the rest use sample data. Each demo says what is real and what is sample data.",
       "exploreDemo": "Explore demo →",
       "ecommerce": {
         "title": "Full E-Commerce",
@@ -49,6 +49,11 @@
         "description": "Ask the AI questions about documents and get answers that cite the source. Real AI, no sign-up.",
         "category": "AI with your documents"
       },
+      "helpdesk": {
+      "title": "AI help desk",
+      "description": "Knowledge base and ticket desk: the assistant answers with AI from the articles and suggests replies to agents. Sample data.",
+      "category": "Customer support"
+},
       "medicalAudit": {
         "title": "Healthcare expert system",
         "description": "Audits medical claims with rules and a sample fee schedule, and flags potential denials. AI extracts the invoice data.",
@@ -962,6 +967,7 @@
     "demoDashboard": "Executive dashboard",
     "demoDocuments": "Document manager",
     "demoBookings": "Booking system",
+    "demoHelpdesk": "AI help desk",
     "allDemos": "All demos",
     "company": "Company",
     "legal": "Legal",
@@ -3708,7 +3714,8 @@
     "preview": "See details",
     "maintenance": "Under maintenance",
     "daysLeft": "{days, plural, =0 {Expires today} one {# day left} other {# days left}}",
-    "moreTitle": "More demos",
+    "mainTitle": "Main demos",
+    "moreTitle": "More examples",
     "moreSubtitle": "Demos for specific cases that are not in the main catalog. Each one shows how it opens.",
     "myDemos": "I have access: My demos"
   },
@@ -3755,7 +3762,7 @@
       "allDemos": "See all demos"
     },
     "previewTitle": "Preview",
-    "previewNote": "This is how we describe this demo in the KopTup catalog.",
+    "previewNote": "Preview of this demo.",
     "preview": {
       "cuentasMedicas": {
         "title": "Healthcare expert system",

@@ -27,7 +27,7 @@
       "liveDemo": "Demo con IA real, sin registro",
       "citedAnswers": "Respuestas con fuente citada",
       "pilot": "Piloto en 2 semanas",
-      "team": "Equipo en Colombia"
+      "team": "Estudio en Bogotá"
     },
     "cta": {
       "title": "¿Listo para iniciar tu proyecto?",
@@ -37,7 +37,7 @@
     "demos": {
       "sectionBadge": "Demos Interactivas",
       "sectionTitle": "Soluciones para Cada Industria",
-      "sectionSubtitle": "Explora {count} demos navegables que muestran el tipo de soluciones que construimos. Algunas usan IA real, como el chatbot RAG; la mayoría funcionan con datos de ejemplo para que veas cómo se vería cada solución antes de contratarnos. Cada demo indica qué es real y qué es de ejemplo. Las demos abiertas no piden registro; las que requieren acceso se solicitan.",
+      "sectionSubtitle": "Cinco ejemplos para ver cómo funciona cada solución. Algunas usan IA real (el chatbot, la mesa de ayuda y el gestor documental); las demás usan datos de ejemplo. Cada demo indica qué es real y qué es de ejemplo.",
       "exploreDemo": "Explorar demo →",
       "ecommerce": {
         "title": "E-Commerce Completo",
@@ -49,6 +49,11 @@
         "description": "Hazle preguntas a la IA sobre documentos y recibe respuestas con la fuente citada. IA real, sin registro.",
         "category": "IA con tus documentos"
       },
+      "helpdesk": {
+      "title": "Mesa de ayuda con IA",
+      "description": "Base de conocimiento y mesa de tickets: el asistente responde con IA a partir de los artículos y sugiere respuestas a los agentes. Datos de ejemplo.",
+      "category": "Soporte al cliente"
+},
       "medicalAudit": {
         "title": "Sistema experto para salud",
         "description": "Audita cuentas médicas con reglas y un tarifario de ejemplo, y señala posibles glosas. La IA extrae los datos de las facturas.",
@@ -644,7 +649,7 @@
     "intro": {
       "title": "¿Qué son las cookies?",
       "p1": "Las cookies son pequeños archivos que un sitio guarda en tu navegador. Además de cookies, este sitio usa el almacenamiento local de tu navegador (localStorage y sessionStorage) para recordar algunas cosas sin enviarlas a ningún servidor.",
-      "p2": "Aquí está la lista completa de lo que usamos, revisada en el código del sitio. Las esenciales son necesarias para que el sitio funcione. Las de analítica y publicidad son opcionales: solo se crean si las aceptas y si tenemos activa esa medición."
+      "p2": "Aquí está la lista completa de lo que usamos. Las esenciales son necesarias para que el sitio funcione. Las de analítica y publicidad son opcionales: solo se crean si las aceptas y si tenemos activa esa medición."
     },
     "types": {
       "title": "Cookies y datos del navegador que usamos",
@@ -962,6 +967,7 @@
     "demoDashboard": "Dashboard ejecutivo",
     "demoDocuments": "Gestor documental",
     "demoBookings": "Sistema de reservas",
+    "demoHelpdesk": "Mesa de ayuda con IA",
     "allDemos": "Todas las demos",
     "company": "Empresa",
     "legal": "Legal",
@@ -3708,7 +3714,8 @@
     "preview": "Ver detalles",
     "maintenance": "En mantenimiento",
     "daysLeft": "{days, plural, =0 {Vence hoy} one {Te queda # día} other {Te quedan # días}}",
-    "moreTitle": "Más demos",
+    "mainTitle": "Demos principales",
+    "moreTitle": "Más ejemplos",
     "moreSubtitle": "Demos de casos específicos que no están en el catálogo principal. Cada una indica cómo se abre.",
     "myDemos": "Ya tengo acceso: Mis demos"
   },
@@ -3755,7 +3762,7 @@
       "allDemos": "Ver todas las demos"
     },
     "previewTitle": "Vista previa",
-    "previewNote": "Así describimos esta demo en el catálogo de KopTup.",
+    "previewNote": "Vista previa de la demo.",
     "preview": {
       "cuentasMedicas": {
         "title": "Sistema experto para salud",

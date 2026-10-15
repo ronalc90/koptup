@@ -27,7 +27,7 @@ export const MAX_TITLE_LENGTH = 60;
  * `<title>` de la home. Es absoluto (no pasa por la plantilla): la marca va
  * primero solo aquí. También es el og:title / twitter:title por defecto.
  */
-export const HOME_TITLE = 'KopTup | IA que responde con los documentos de tu empresa';
+export const HOME_TITLE = 'Sistemas RAG en Colombia: IA con tus documentos | KopTup';
 
 /**
  * Imagen og/twitter con el mensaje RAG: la genera `src/app/opengraph-image.tsx`

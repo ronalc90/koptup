@@ -1,7 +1,7 @@
 {
   "offering_firmaElectronica": {
     "name": "Firma electrónica",
-    "tagline": "Firmas válidas legalmente con KYC y estampa cronológica",
+    "tagline": "Firma electrónica con evidencia de auditoría y estampa cronológica",
     "description": "Implementación a medida o suscripción SaaS mensual del producto \"Firma electrónica\". Cómprala como software (te entregamos el código) o paga mensualmente mientras lo hospedamos por ti.",
     "categoryLabel": "Seguridad",
     "tiers": {
@@ -53,7 +53,7 @@
         "incluye": [
           "Hasta 500.000+ firmas/mes",
           "PKI corporativa + HSM",
-          "eIDAS cualificada multi-país",
+          "Evidencia de auditoría por documento",
           "DocuSign/Adobe Sign migration",
           "PM + tech lead asignados",
           "Tickets en Jira/Zendesk con auditoría, 1h crítico / 4h alto / 24h medio",

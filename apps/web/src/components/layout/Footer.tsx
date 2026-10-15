@@ -14,9 +14,7 @@ export default function Footer() {
     { name: t('footer.rag'), href: '/rag' },
     { name: t('footer.webDev'), href: '/desarrollo-web-colombia' },
     { name: t('footer.chatbots'), href: '/chatbots-ia' },
-    { name: t('footer.aiSolutions'), href: '/soluciones-ia' },
     { name: t('footer.ecommerce'), href: '/services#otras-soluciones' },
-    { name: t('services.mobile.title'), href: '/services#otras-soluciones' },
   ];
 
   const company = [
@@ -30,7 +28,7 @@ export default function Footer() {
     { name: t('footer.demoChatbot'), href: '/demo/chatbot' },
     { name: t('footer.demoDashboard'), href: '/demo/dashboard-ejecutivo' },
     { name: t('footer.demoDocuments'), href: '/demo/gestor-documentos' },
-    { name: t('footer.demoBookings'), href: '/demo/sistema-reservas' },
+    { name: t('footer.demoHelpdesk'), href: '/demo/helpdesk-ia' },
     { name: t('footer.allDemos'), href: '/demo' },
   ];
 

@@ -116,7 +116,7 @@ const nextConfig = {
     const contentSecurityPolicy = (frameAncestors) => ({
       key: 'Content-Security-Policy',
       value:
-        `default-src 'self' https://www.google.com; img-src 'self' data: blob: https://koptup-uploads.s3.amazonaws.com https://images.unsplash.com https://media.licdn.com${analyticsSources('img')}; script-src 'self' 'unsafe-inline' 'unsafe-eval'${analyticsSources('script')}; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' blob: ${API_ORIGIN} http://localhost:3001 https://*.railway.app https://koptup-uploads.s3.amazonaws.com${analyticsSources('connect')}; frame-src 'self' https://www.google.com${analyticsSources('frame')}; frame-ancestors ${frameAncestors}; base-uri 'self'; form-action 'self'; media-src 'self' blob:; worker-src 'self' blob:`
+        `default-src 'self' https://www.google.com; img-src 'self' data: blob: https://koptup-uploads.s3.amazonaws.com https://images.unsplash.com https://media.licdn.com${analyticsSources('img')}; script-src 'self' 'unsafe-inline' 'unsafe-eval'${analyticsSources('script')}; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' blob: ${API_ORIGIN}${process.env.NODE_ENV === 'production' ? '' : ' http://localhost:3001'} https://*.railway.app https://koptup-uploads.s3.amazonaws.com${analyticsSources('connect')}; frame-src 'self' https://www.google.com${analyticsSources('frame')}; frame-ancestors ${frameAncestors}; base-uri 'self'; form-action 'self'; media-src 'self' blob:; worker-src 'self' blob:`
     });
     return [
       {

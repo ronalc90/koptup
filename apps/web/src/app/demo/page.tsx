@@ -6,7 +6,8 @@ import Link from 'next/link';
 import Card, { CardContent } from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import DemoAccessBadge from '@/components/demo/DemoAccessBadge';
-import { DEMO_CARDS, EXTRA_DEMOS } from '@/components/demo/demo-cards';
+import { DEMO_CARDS } from '@/components/demo/demo-cards';
+import { DEMOS_APOYO, DEMOS_VITRINA } from '@/lib/demo-showcase';
 import { DEMO_CATALOG_SLUGS } from '@/lib/demos';
 import {
   DEMO_STAFF_ROLES,
@@ -94,6 +95,16 @@ export default function DemosPage() {
     [catalog, t],
   );
 
+  // Vitrina primero, después un separador («Más ejemplos») y las demos de apoyo.
+  const porSlug = new Map(cards.map((card) => [card.slug, card]));
+  const vitrinaCards = DEMOS_VITRINA.map((slug) => porSlug.get(slug)).filter((card): card is (typeof cards)[number] => !!card);
+  const apoyoCards = DEMOS_APOYO.map((slug) => porSlug.get(slug)).filter((card): card is (typeof cards)[number] => !!card);
+  const gridItems: Array<{ key: string; card: (typeof cards)[number] | null }> = [
+    ...vitrinaCards.map((card) => ({ key: card.slug, card })),
+    { key: 'mas-ejemplos', card: null },
+    ...apoyoCards.map((card) => ({ key: card.slug, card })),
+  ];
+
   const canOpen = (slug: string, accessMode: string, activo: boolean): boolean => {
     if (viewer.staff) return true;
     if (!activo) return false;
@@ -135,8 +146,18 @@ export default function DemosPage() {
       {/* Demos Grid */}
       <section className="section-padding">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-bold text-secondary-900 dark:text-white mb-6">{th('mainTitle')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {cards.map((demo) => {
+            {gridItems.map((item) => {
+              if (!item.card) {
+                return (
+                  <div key={item.key} className="md:col-span-2 mt-6">
+                    <h2 className="text-2xl font-bold text-secondary-900 dark:text-white mb-2">{th('moreTitle')}</h2>
+                    <p className="text-secondary-600 dark:text-secondary-400">{th('moreSubtitle')}</p>
+                  </div>
+                );
+              }
+              const demo = item.card;
               const Icon = demo.icon;
               const gated = demo.accessMode !== 'publico' || !demo.activo;
               const open = canOpen(demo.slug, demo.accessMode, demo.activo);
@@ -248,98 +269,6 @@ export default function DemosPage() {
             })}
           </div>
 
-          {/* Demos sin tarjeta en el catálogo (por invitación según la semilla) */}
-          <div className="mt-16">
-            <h2 className="text-2xl font-bold text-secondary-900 dark:text-white mb-2">{th('moreTitle')}</h2>
-            <p className="text-secondary-600 dark:text-secondary-400 mb-6">{th('moreSubtitle')}</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {EXTRA_DEMOS.map((extra) => {
-                const entry = catalog.get(extra.slug);
-                const accessMode = entry?.accessMode ?? 'privado';
-                const activo = entry?.activo !== false;
-                const open = canOpen(extra.slug, accessMode, activo);
-                const Icon = extra.icon;
-                const href = `/demo/${extra.slug}`;
-                return (
-                  <Card key={extra.slug} variant="bordered" data-demo-card={extra.slug}>
-                    <CardContent className="p-6 flex flex-col gap-4 h-full">
-                      <div className="flex items-start gap-4">
-                        <div className={`p-3 rounded-xl bg-gradient-to-br ${extra.color} flex-shrink-0`}>
-                          <Icon className="h-7 w-7 text-white" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center gap-2 mb-1">
-                            <h3 className="text-lg font-bold text-secondary-900 dark:text-white">
-                              {demoName(entry, locale, extra.slug)}
-                            </h3>
-                            <DemoAccessBadge mode={accessMode} activo={activo} />
-                          </div>
-                          <p className="text-sm text-secondary-600 dark:text-secondary-400">
-                            {t(`demoAccess.preview.${extra.key}.description`)}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="mt-auto flex flex-wrap items-center gap-3">
-                        {open ? (
-                          <Link
-                            href={href}
-                            prefetch={false}
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold rounded-lg transition-colors"
-                          >
-                            {th('open')}
-                            <ArrowRightIcon className="h-4 w-4" />
-                          </Link>
-                        ) : (
-                          <Link
-                            href={requestHref(extra.slug)}
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold rounded-lg transition-colors"
-                          >
-                            <KeyIcon className="h-4 w-4" />
-                            {accessMode === 'privado' ? th('requestCustom') : th('requestAccess')}
-                          </Link>
-                        )}
-                        {!open && !viewer.loggedIn && (
-                          <Link
-                            href={`/login?redirect=${encodeURIComponent(href)}`}
-                            className="text-sm font-medium text-secondary-600 dark:text-secondary-400 hover:text-primary-600 dark:hover:text-primary-400"
-                          >
-                            {th('login')}
-                          </Link>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Info Section */}
-          <div className="mt-16 text-center">
-            <Card variant="elevated" className="max-w-3xl mx-auto">
-              <CardContent className="p-8">
-                <SparklesIcon className="h-12 w-12 text-primary-600 dark:text-primary-400 mx-auto mb-4" />
-                <h3 className="text-2xl font-bold text-secondary-900 dark:text-white mb-3">{t('demos.custom.title')}</h3>
-                <p className="text-secondary-600 dark:text-secondary-400 mb-6">{t('demos.custom.description')}</p>
-                <div className="flex flex-wrap gap-4 justify-center">
-                  <Link
-                    href="/solicitar-demo"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors"
-                  >
-                    {t('demos.custom.button')}
-                    <ArrowRightIcon className="h-4 w-4" />
-                  </Link>
-                  <Link
-                    href="/dashboard/demos"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-secondary-600 hover:bg-secondary-700 text-white font-medium rounded-lg transition-colors"
-                  >
-                    <KeyIcon className="h-4 w-4" />
-                    {th('myDemos')}
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </section>
     </div>

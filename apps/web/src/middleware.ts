@@ -1,3 +1,4 @@
+import { isDemoSinIndexar } from '@/lib/demo-showcase';
 import { NextRequest, NextResponse } from 'next/server';
 import { API_BASE } from '@/lib/backend-url';
 import { STAFF_ROLES, adminRolesFor, hasRole, homePathForRole, prospectCanAccess } from '@/lib/auth-roles';
@@ -363,7 +364,12 @@ async function demoGate(req: NextRequest): Promise<NextResponse> {
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  if (pathname.startsWith('/demo/')) return demoGate(req);
+  if (pathname.startsWith('/demo/')) {
+    const res = await demoGate(req);
+    // Demos de apoyo y ocultas: fuera de buscadores (lib/demo-showcase.ts).
+    if (isDemoSinIndexar(pathname.split('/')[2]?.toLowerCase() ?? '')) res.headers.set('X-Robots-Tag', 'noindex');
+    return res;
+  }
 
   const area = areaFor(pathname);
   const token = req.cookies.get(ACCESS_COOKIE)?.value;

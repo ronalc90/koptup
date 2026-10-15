@@ -309,7 +309,7 @@
     },
     "banner": {
       "title": "How we scale",
-      "body": "Colombia-based team, available Monday to Friday, 8:00 a.m. to 6:00 p.m. (Colombia time). If your project must meet standards such as ISO 27001, SOC 2 or HIPAA, we design it with those requirements; formal certification is handled by your company. If you need more than the highest tier, we provide a custom quote within 48 business hours."
+      "body": "Colombia-based team, available Monday to Friday, 8:00 a.m. to 6:00 p.m. (Colombia time). If your project must meet standards such as ISO 27001 or SOC 2, we design it with those requirements; formal certification is handled by your company. If you need more than the highest tier, we provide a custom quote within 48 business hours."
     },
     "supportSLA": {
       "email-24h": "Email business hours · 24h business response",
@@ -1083,7 +1083,7 @@
           "Multi-tenant for multiple brands or business units",
           "Optional private or on-prem models",
           "SSO SAML/OIDC + access audit logs",
-          "Architecture aligned with HIPAA/SOC 2/ISO 27001 (certification at customer expense)",
+          "Compliance review (ISO 27001, SOC 2) for your case, at the customer's expense",
           "PM + tech lead assigned during rollout",
           "Jira/Zendesk tickets with audit, 1h critical / 4h high / 24h medium",
           "Monthly executive reports for your committee"
@@ -1460,7 +1460,7 @@
         "idealPara": "Mid-market companies with high volumes of electronic documents",
         "incluye": [
           "Up to 50,000 invoices/month",
-          "Multi-country (CO/MX/PE/CL)",
+          "Colombia (DIAN) today; other countries per project",
           "RADIAN + electronic payroll",
           "Audit + official books",
           "EDI with B2B customers",
@@ -1490,7 +1490,7 @@
   },
   "offering_firmaElectronica": {
     "name": "E-signature",
-    "tagline": "Legally valid signatures with KYC and timestamping",
+    "tagline": "Electronic signatures with audit evidence and timestamping",
     "description": "Custom build or monthly SaaS subscription of \"E-signature\". Buy it as software (we hand over the code) or pay monthly while we host it for you.",
     "categoryLabel": "Security",
     "tiers": {
@@ -1542,7 +1542,7 @@
         "incluye": [
           "Up to 500,000+ signatures/month",
           "Corporate PKI + HSM",
-          "Multi-country qualified eIDAS",
+          "Audit evidence per document",
           "DocuSign/Adobe Sign migration",
           "Dedicated PM + tech lead",
           "Jira/Zendesk tickets with audit, 1h critical / 4h high / 24h medium",
@@ -2278,7 +2278,7 @@
         ]
       }
     },
-    "costoNote": "Proxies (~$50–$25,000 USD/mo), browser farms and captcha solvers are paid by the customer directly to the provider."
+    "costoNote": "Proxies (~$50–$25,000 USD/mo), browser farms are paid by the customer directly to the provider."
   },
   "offering_sistemaReservas": {
     "name": "Booking system",
@@ -2399,7 +2399,7 @@
         "idealPara": "Enterprises with compliance and thousands of video consultations",
         "incluye": [
           "Up to 500,000+ consultations/month",
-          "Architecture aligned with HIPAA + Resolución 2654 (certification at customer expense)",
+          "Health compliance review (Resolución 2654) for your case, at the customer's expense",
           "PACS DICOM",
           "Dedicated PM + tech lead",
           "Jira/Zendesk tickets with audit, 1h critical / 4h high / 24h medium",

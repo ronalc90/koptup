@@ -1,7 +1,7 @@
 {
   "offering_firmaElectronica": {
     "name": "E-signature",
-    "tagline": "Legally valid signatures with KYC and timestamping",
+    "tagline": "Electronic signatures with audit evidence and timestamping",
     "description": "Custom build or monthly SaaS subscription of \"E-signature\". Buy it as software (we hand over the code) or pay monthly while we host it for you.",
     "categoryLabel": "Security",
     "tiers": {
@@ -53,7 +53,7 @@
         "incluye": [
           "Up to 500,000+ signatures/month",
           "Corporate PKI + HSM",
-          "Multi-country qualified eIDAS",
+          "Audit evidence per document",
           "DocuSign/Adobe Sign migration",
           "Dedicated PM + tech lead",
           "Jira/Zendesk tickets with audit, 1h critical / 4h high / 24h medium",

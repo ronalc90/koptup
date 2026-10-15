@@ -24,7 +24,9 @@ test.describe('acceso a demos (visitante)', () => {
     await expect(page.locator('[data-demo-card="erp"] [data-access-mode="solicitud"]')).toBeVisible();
     await expect(page.locator('[data-demo-card="erp"]').getByRole('link', { name: 'Solicitar acceso' })).toBeVisible();
     await expect(page.locator('[data-demo-card="chatbot"] [data-access-mode="publico"]')).toBeVisible();
-    await expect(page.locator('[data-demo-card="cuentas-medicas"] [data-access-mode="privado"]')).toBeVisible();
+    // cuentas-medicas ya no se lista en /demo (solo se abre por su URL con noindex).
+    await expect(page.locator('[data-demo-card="cuentas-medicas"]')).toHaveCount(0);
+    await expect(page.locator('[data-demo-card="helpdesk-ia"] [data-access-mode="publico"]')).toBeVisible();
     await expect(page.getByText('Acceder con código')).toHaveCount(0);
     expect(errors).toEqual([]);
   });

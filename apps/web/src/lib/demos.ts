@@ -1,3 +1,5 @@
+import { DEMOS_VISIBLES } from './demo-showcase';
+
 /**
  * Demos que el sitio lista en el catálogo de /demo (`src/app/demo/page.tsx`),
  * en el mismo orden.
@@ -49,7 +51,7 @@ export const DEMO_CATALOG_SLUGS = [
 export const LIVE_AI_DEMO_SLUGS = ['chatbot', 'linkedin-ads'] as const;
 
 /** Número de demos navegables del catálogo de /demo. */
-export const DEMO_COUNT: number = DEMO_CATALOG_SLUGS.length;
+export const DEMO_COUNT: number = DEMOS_VISIBLES.length;
 
 /** Demos del catálogo con IA real. */
 export const LIVE_AI_DEMO_COUNT: number = LIVE_AI_DEMO_SLUGS.length;
