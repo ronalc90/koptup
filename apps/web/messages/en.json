@@ -978,6 +978,7 @@
     "allRightsReserved": "All rights reserved"
   },
   "nav": {
+    "agenda": "Book 30 minutes",
     "home": "Home",
     "rag": "RAG",
     "services": "Plans & services",
@@ -2348,7 +2349,7 @@
       "title": "Follow Us on Social Media"
     },
     "schedule": {
-      "title": "Request a call by email",
+      "title": "Book 30 minutes",
       "subtitle": "Your email app opens with a ready-made message to ronald@koptup.com; we reply with times for a free 30-minute call.",
       "button": "Open my email",
       "opening": "Opening...",
@@ -4302,5 +4303,11 @@
     "noRequests": "No demo requests yet.",
     "noContacts": "No contacts yet.",
     "note": "Figures come from the backend right now; “—” means the data could not be loaded."
+  },
+  "search": {
+    "label": "Search KopTup",
+    "placeholder": "Search demos, services…",
+    "empty": "No results. Try another word.",
+    "results": "Search results"
   }
 }

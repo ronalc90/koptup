@@ -251,8 +251,8 @@ function ContactPageInner() {
     {
       icon: MapPinIcon,
       title: t('info.location.title'),
-      content: 'Av. 68 #1-63, Bogotá, Colombia',
-      link: 'https://www.google.com/maps/search/?api=1&query=Av.+68+1-63+Bogota+Colombia',
+      content: 'Bogotá, Colombia',
+      link: null,
     },
     {
       icon: ClockIcon,
@@ -267,10 +267,6 @@ function ContactPageInner() {
     t('services.ecommerce'),
     t('services.chatbot'),
     t('services.webDev'),
-    t('services.mobileDev'),
-    t('services.apiIntegrations'),
-    t('services.uxui'),
-    t('services.consulting'),
     t('services.other'),
   ];
   // El servicio que llega por ?service= debe ser una opción del select; si no,
@@ -715,7 +711,7 @@ function ContactPageInner() {
               </Card>
 
               {/* Schedule Call */}
-              <Card variant="elevated" className="bg-primary-50 dark:bg-primary-950 border-primary-200 dark:border-primary-800">
+              <Card id="agenda" variant="elevated" className="scroll-mt-24 bg-primary-50 dark:bg-primary-950 border-primary-200 dark:border-primary-800">
                 <CardContent className="p-6 text-center">
                   <CalendarDaysIcon className="h-12 w-12 text-primary-600 dark:text-primary-400 mx-auto mb-3" />
                   <h3 className="font-semibold text-secondary-900 dark:text-white mb-2">

@@ -64,3 +64,9 @@ export const SOCIAL_LINKS = {
   linkedin: 'https://www.linkedin.com/company/koptup',
   instagram: 'https://www.instagram.com/koptup',
 } as const;
+
+/**
+ * Horario de atención (hora de Colombia). Única fuente para el JSON-LD; la
+ * página lo muestra con la misma cifra (contactPage.info.hours en messages).
+ */
+export const BUSINESS_HOURS = { opens: '08:00', closes: '18:00' } as const;

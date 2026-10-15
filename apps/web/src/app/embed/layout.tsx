@@ -6,15 +6,13 @@ import type { Metadata } from 'next';
  * next.config.js permite incrustarlas en cualquier sitio (frame-ancestors *).
  */
 export const metadata: Metadata = {
-  title: 'Chat del asistente',
+  title: 'Demo de KopTup',
   robots: { index: false, follow: false },
 };
 
 export default function EmbedLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      {/* El chat ocupa toda la ventana del iframe: sin scroll ni márgenes reservados para la barra de desplazamiento. */}
-      <style>{'html{scrollbar-gutter:auto!important}html,body{overflow:hidden!important}'}</style>
       {children}
     </>
   );

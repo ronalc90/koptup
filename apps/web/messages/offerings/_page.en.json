@@ -30,7 +30,10 @@
       "viewDemo": "Try demo",
       "fromPrice": "From",
       "perMonth": "/mo",
-      "setupOnce": "One-time setup"
+      "setupOnce": "One-time setup",
+      "setupLabel": "Setup",
+      "byScope": "Quoted by scope",
+      "setupNote": "We quote it according to your scope"
     },
     "modal": {
       "close": "Close",
@@ -59,7 +62,7 @@
     },
     "banner": {
       "title": "How we scale",
-      "body": "Colombia-based team, available Monday to Friday, 8:00 a.m. to 6:00 p.m. (Colombia time). If your project must meet standards such as ISO 27001 or SOC 2, we define it in the scope conversation; formal certification is handled by your company. If you need more than the highest tier, we provide a custom quote within 48 business hours."
+      "body": "We work Monday to Friday, 8:00 a.m. to 6:00 p.m. (Colombia time). If your project must meet standards such as ISO 27001 or SOC 2, we define it in the scope conversation; formal certification is handled by your company. If you need more than the highest tier, we provide a custom quote within 48 business hours."
     },
     "supportSLA": {
       "email-24h": "Email business hours · 24h business response",

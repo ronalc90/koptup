@@ -978,6 +978,7 @@
     "allRightsReserved": "Todos los derechos reservados"
   },
   "nav": {
+    "agenda": "Agenda 30 minutos",
     "home": "Inicio",
     "rag": "RAG",
     "services": "Planes y servicios",
@@ -2348,7 +2349,7 @@
       "title": "Síguenos en redes"
     },
     "schedule": {
-      "title": "Pide una llamada por correo",
+      "title": "Agenda 30 minutos",
       "subtitle": "Se abre tu correo con un mensaje listo para ronald@koptup.com; te respondemos con horarios para una llamada gratuita de 30 minutos.",
       "button": "Abrir mi correo",
       "opening": "Abriendo...",
@@ -4302,5 +4303,11 @@
     "noRequests": "Todavía no hay solicitudes de demo.",
     "noContacts": "Todavía no hay contactos.",
     "note": "Las cifras salen del backend en este momento; «—» significa que el dato no se pudo cargar."
+  },
+  "search": {
+    "label": "Buscar en KopTup",
+    "placeholder": "Buscar demos, servicios…",
+    "empty": "Sin resultados. Prueba con otra palabra.",
+    "results": "Resultados de búsqueda"
   }
 }

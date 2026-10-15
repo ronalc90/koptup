@@ -9,7 +9,7 @@
  */
 
 import { RAG_PLANS } from '@/lib/rag-plans';
-import { HOME_DESCRIPTION, SITE_URL, SOCIAL_LINKS, absoluteUrl } from '@/lib/site';
+import { BUSINESS_HOURS, HOME_DESCRIPTION, SITE_URL, SOCIAL_LINKS, absoluteUrl } from '@/lib/site';
 
 // Precio más bajo de los planes RAG (src/lib/rag-plans.ts) para el JSON-LD.
 const RAG_LOWEST_COP = Math.min(...RAG_PLANS.map((p) => p.setup.cop));
@@ -36,11 +36,9 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
       'KopTup es un estudio de desarrollo de software a medida en Bogotá, Colombia. Su producto principal son los sistemas RAG: IA que responde con los documentos de cada empresa y cita la fuente. También desarrolla software a medida, chatbots con IA, e-commerce y dashboards ejecutivos.',
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Av. 68 #1-63',
       addressLocality: 'Bogotá',
       addressRegion: 'Cundinamarca',
       addressCountry: 'CO',
-      postalCode: '111321',
     },
     contactPoint: [
       {
@@ -81,8 +79,6 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
         { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Soluciones de Inteligencia Artificial', url: absoluteUrl('/soluciones-ia') } },
         { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Desarrollo web a medida', url: absoluteUrl('/desarrollo-web-colombia') } },
         { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'E-commerce profesional' } },
-        { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Aplicaciones móviles iOS y Android' } },
-        { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Consultoría tecnológica' } },
       ],
     },
   });
@@ -133,20 +129,14 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
     priceRange: '$$ - $$$$',
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Av. 68 #1-63',
       addressLocality: 'Bogotá',
       addressCountry: 'CO',
-    },
-    geo: {
-      '@type': 'GeoCoordinates',
-      latitude: '4.6097',
-      longitude: '-74.0817',
     },
     openingHoursSpecification: {
       '@type': 'OpeningHoursSpecification',
       dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-      opens: '08:00',
-      closes: '17:00',
+      opens: BUSINESS_HOURS.opens,
+      closes: BUSINESS_HOURS.closes,
     },
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
@@ -176,14 +166,6 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
             description: 'Asistentes virtuales inteligentes para atención al cliente y automatización.',
           },
         },
-        {
-          '@type': 'Offer',
-          itemOffered: {
-            '@type': 'Service',
-            name: 'Aplicaciones Móviles',
-            description: 'Apps nativas y multiplataforma para iOS y Android.',
-          },
-        },
       ],
     },
   });
@@ -204,27 +186,19 @@ export default function StructuredData({ type, data }: StructuredDataProps) {
     currenciesAccepted: 'COP, USD',
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Av. 68 #1-63',
       addressLocality: 'Bogotá',
       addressRegion: 'Cundinamarca',
-      postalCode: '111321',
       addressCountry: 'CO',
-    },
-    geo: {
-      '@type': 'GeoCoordinates',
-      latitude: '4.6097',
-      longitude: '-74.0817',
     },
     openingHoursSpecification: [
       {
         '@type': 'OpeningHoursSpecification',
         dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-        opens: '08:00',
-        closes: '17:00',
+        opens: BUSINESS_HOURS.opens,
+        closes: BUSINESS_HOURS.closes,
       },
     ],
     sameAs: Object.values(SOCIAL_LINKS),
-    hasMap: 'https://maps.google.com/?q=Av.+68+%231-63,+Bogotá,+Colombia',
     areaServed: { '@type': 'Country', name: 'Colombia' },
   });
 

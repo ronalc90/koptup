@@ -243,13 +243,13 @@ function OfferingCard({ offering, globalModality, currency, onOpen }: OfferingCa
           <div className="flex items-baseline justify-between gap-4">
             <div>
               <p className="text-[11px] text-secondary-500 dark:text-secondary-400">
-                {tp('card.fromPrice')}
+                {globalModality === 'compra' ? tp('card.fromPrice') : tp('card.setupLabel')}
               </p>
               <p className="text-lg font-bold text-secondary-900 dark:text-white whitespace-nowrap">
-                {formatMoney(setupCOP, currency)}
+                {globalModality === 'compra' ? formatMoney(setupCOP, currency) : tp('card.byScope')}
               </p>
               <p className="text-[11px] text-secondary-500 dark:text-secondary-400">
-                {tp('card.setupOnce')}
+                {globalModality === 'compra' ? tp('card.setupOnce') : tp('card.setupNote')}
               </p>
             </div>
             <div className="text-right">
@@ -425,12 +425,16 @@ function OfferingModal({ offering, initialModality, currency, onClose }: Offerin
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <p className="text-[11px] uppercase tracking-wide font-semibold text-secondary-500 dark:text-secondary-400">
-                    {tp('card.setupOnce')}
+                    {modality === 'compra' ? tp('card.setupOnce') : tp('card.setupLabel')}
                   </p>
                   <p className="text-2xl font-bold text-secondary-900 dark:text-white">
-                    {formatMoney(setupCOP, currency)}
+                    {modality === 'compra' ? formatMoney(setupCOP, currency) : tp('card.byScope')}
                   </p>
-                  {currency === 'COP' ? (
+                  {modality !== 'compra' ? (
+                    <p className="text-xs text-secondary-500 dark:text-secondary-400">
+                      {tp('card.setupNote')}
+                    </p>
+                  ) : currency === 'COP' ? (
                     <p className="text-xs text-secondary-500 dark:text-secondary-400">
                       ≈ {formatUSD(copToUsd(setupCOP))}
                     </p>

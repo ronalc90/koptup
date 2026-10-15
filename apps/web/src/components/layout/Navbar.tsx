@@ -25,6 +25,8 @@ import { useAutoContrast } from '@/hooks/useAutoContrast';
 import { api } from '@/lib/api';
 import { homePathForRole } from '@/lib/auth-roles';
 
+import SiteSearch from './SiteSearch';
+
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -213,6 +215,7 @@ const toggleLanguage = () => {
 
           {/* Right side actions */}
           <div className="hidden md:flex items-center space-x-2 xl:space-x-4">
+            <SiteSearch className="hidden w-44 xl:block" />
             {/* Language Toggle */}
             <button
               onClick={toggleLanguage}
@@ -311,10 +314,10 @@ const toggleLanguage = () => {
             ) : (
               <>
                 <Button size="sm" variant="outline" asChild>
-                  <Link href="/login">{t('nav.login')}</Link>
+                  <Link href="/services#planes-rag">{t('nav.wantThis')}</Link>
                 </Button>
                 <Button size="sm" asChild>
-                  <Link href="/services#planes-rag">{t('nav.wantThis')}</Link>
+                  <Link href="/contact#agenda">{t('nav.agenda')}</Link>
                 </Button>
               </>
             )}
@@ -342,6 +345,9 @@ const toggleLanguage = () => {
       {/* Mobile menu */}
       {mobileMenuOpen && (
         <div id="mobile-menu" className="md:hidden bg-white dark:bg-secondary-900 border-t border-secondary-200 dark:border-secondary-700 backdrop-blur-lg shadow-lg">
+          <div className="px-4 pt-4">
+            <SiteSearch onNavigate={() => setMobileMenuOpen(false)} />
+          </div>
           <div className="px-4 py-4 space-y-2">
             {navigation.map((item) => (
               <Link
@@ -392,10 +398,10 @@ const toggleLanguage = () => {
               ) : (
                 <>
                   <Button size="sm" fullWidth variant="outline" asChild>
-                    <Link href="/login">{t('nav.login')}</Link>
+                    <Link href="/services#planes-rag">{t('nav.wantThis')}</Link>
                   </Button>
                   <Button size="sm" fullWidth asChild>
-                    <Link href="/services#planes-rag">{t('nav.wantThis')}</Link>
+                    <Link href="/contact#agenda">{t('nav.agenda')}</Link>
                   </Button>
                 </>
               )}
