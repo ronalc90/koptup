@@ -24,7 +24,7 @@ export const labelCls = 'mb-1 block text-xs font-semibold text-slate-600 dark:te
 
 const stack: string[] = [];
 
-function useLayer(open: boolean, onClose: () => void, panelRef: RefObject<HTMLElement>, initialFocus?: RefObject<HTMLElement>) {
+function useLayer(open: boolean, onClose: () => void, panelRef: RefObject<HTMLElement | null>, initialFocus?: RefObject<HTMLElement | null>) {
   const id = useId();
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
@@ -88,7 +88,7 @@ interface ModalProps {
   children: ReactNode;
   footer?: ReactNode;
   size?: 'sm' | 'md' | 'lg' | 'xl';
-  initialFocus?: RefObject<HTMLElement>;
+  initialFocus?: RefObject<HTMLElement | null>;
 }
 
 const SIZES = { sm: 'max-w-md', md: 'max-w-xl', lg: 'max-w-3xl', xl: 'max-w-5xl' };

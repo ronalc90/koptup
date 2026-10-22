@@ -38,10 +38,11 @@ export const metadata = {
     statusBarStyle: 'default',
     title: 'KopTup',
   },
-  // Next 14 solo emite la etiqueta de Apple (obsoleta en Chrome, que avisa en
-  // consola); la estándar va aparte.
+  // Desde Next 15, `capable` emite solo la etiqueta estándar
+  // (`mobile-web-app-capable`); la de Apple, que era la única que emitía
+  // Next 14, va aparte para que la página siga teniendo las dos.
   other: {
-    'mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-capable': 'yes',
   },
   // Description, canonical y og/twitter de la home (y valores por defecto del
   // sitio para las páginas que no definen los suyos).
@@ -125,7 +126,7 @@ async function getMessages(locale: string) {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   // Idioma: cookie `locale` (la fija el selector del menú); solo `es` o `en`,
   // español por defecto. Es la misma regla que src/i18n/request.ts.
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const locale = cookieStore.get('locale')?.value === 'en' ? 'en' : 'es';
 
   const messages = await getMessages(locale);

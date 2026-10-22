@@ -422,7 +422,7 @@ export function generateMetadata(pageKey: string): Metadata {
   const fullTitle = TITLE_TEMPLATE.replace('%s', config.title);
 
   return {
-    // Objeto con `template` (no string): en Next 14, si un layout intermedio
+    // Objeto con `template` (no string): en Next (14 y 15), si un layout intermedio
     // (p. ej. /demo) define `title` como string, sus rutas hijas pierden la
     // plantilla del layout raíz y salen sin " | KopTup". Re-declararla aquí
     // la propaga a las rutas anidadas (/demo/*, /rag/*…).

@@ -6,7 +6,7 @@ import { screen } from '@testing-library/react';
 import axios from 'axios';
 import { useTranslations } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { smokeRenderPage, smokeRenderPageAsync } from '../smoke';
 
 function NavLabel() {

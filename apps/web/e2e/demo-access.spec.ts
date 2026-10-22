@@ -21,12 +21,16 @@ test.describe('acceso a demos (visitante)', () => {
     const errors = collectBrowserErrors(page);
     await page.goto('/demo');
     await page.waitForLoadState('networkidle');
-    await expect(page.locator('[data-demo-card="erp"] [data-access-mode="solicitud"]')).toBeVisible();
-    await expect(page.locator('[data-demo-card="erp"]').getByRole('link', { name: 'Solicitar acceso' })).toBeVisible();
+    // Vitrina y apoyo (src/lib/demo-showcase.ts) son demos abiertas. La insignia
+    // «Requiere acceso» en el hub la cubre access-mode.spec.ts, que cambia el modo
+    // de una demo visible desde el panel.
     await expect(page.locator('[data-demo-card="chatbot"] [data-access-mode="publico"]')).toBeVisible();
-    // cuentas-medicas ya no se lista en /demo (solo se abre por su URL con noindex).
-    await expect(page.locator('[data-demo-card="cuentas-medicas"]')).toHaveCount(0);
     await expect(page.locator('[data-demo-card="helpdesk-ia"] [data-access-mode="publico"]')).toBeVisible();
+    await expect(page.locator('[data-demo-card="crm-ia"] [data-access-mode="publico"]')).toBeVisible();
+    // Las demos ocultas (erp, cuentas-medicas, …) no se listan en /demo: solo se
+    // abren por su URL, con noindex.
+    await expect(page.locator('[data-demo-card="erp"]')).toHaveCount(0);
+    await expect(page.locator('[data-demo-card="cuentas-medicas"]')).toHaveCount(0);
     await expect(page.getByText('Acceder con código')).toHaveCount(0);
     expect(errors).toEqual([]);
   });

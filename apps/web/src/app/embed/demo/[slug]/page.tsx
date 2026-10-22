@@ -25,7 +25,8 @@ export function generateStaticParams() {
   return DEMOS_VITRINA.filter((slug) => slug in EMBEDDABLE_DEMOS).map((slug) => ({ slug }));
 }
 
-export default function EmbedDemoPage({ params }: { params: { slug: string } }) {
+export default async function EmbedDemoPage(props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   const Demo = EMBEDDABLE_DEMOS[params.slug];
   if (!Demo || !(DEMOS_VITRINA as readonly string[]).includes(params.slug)) notFound();
   return <Demo />;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, type KeyboardEvent } from 'react';
+import { useRef, useState, type JSX, type KeyboardEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   ArrowLeftIcon,

@@ -22,7 +22,7 @@ async function loadAggregate(locale: string, name: 'demos' | 'offerings'): Promi
  * regla que usa `src/app/layout.tsx`; no hay rutas por idioma ni cabecera.
  */
 export default getRequestConfig(async () => {
-  const h = headers();
+  const h = await headers();
   const cookieLocale = getLocaleFromCookie(h.get('cookie'));
   const locale = cookieLocale === 'en' ? 'en' : 'es';
 

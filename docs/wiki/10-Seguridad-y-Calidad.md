@@ -687,7 +687,7 @@ flowchart LR
 
 | Elemento | Web (`@sentry/nextjs`) | API (`@sentry/node`, [Backend y API](09-Backend-y-API.md), tarea 11) |
 |---|---|---|
-| Inicialización | `instrumentation.ts` (en Next 14 se activa con `experimental.instrumentationHook`), configuración de cliente, servidor y edge, y `withSentryConfig` en `next.config.js` | Al inicio de `server.ts`, antes de `createApp()` |
+| Inicialización | `instrumentation.ts` (desde Next 15 es estable: ya no hace falta `experimental.instrumentationHook`), configuración de cliente, servidor y edge, y `withSentryConfig` en `next.config.js` | Al inicio de `server.ts`, antes de `createApp()` |
 | Versión y entorno | `release` = SHA del commit; `environment` = `development`, `preview`, `staging` o `production` | Igual |
 | Mapas de código | Se suben en el build con un token que solo existe en Vercel y en CI | Se suben en el build |
 | Datos personales | `sendDefaultPii: false`. `beforeSend` y `beforeBreadcrumb` quitan emails, teléfonos, tokens y cuerpos de formularios. Session Replay **apagado** (si algún día se activa, con `maskAllText`) | Sin cuerpos de petición; `requestId` y `userId` en hash |

@@ -24,3 +24,19 @@ regexTarget = "line"
 regexes = [
   '''\bSTORAGE_KEY\s*=\s*['"][\w.:-]+['"]''',
 ]
+
+# Las reglas por defecto no revisan las cadenas de conexión: una URI de
+# MongoDB con usuario y contraseña llegó a ADMIN_SETUP.md sin que CI avisara.
+[[rules]]
+id = "uri-con-credenciales"
+description = "Cadena de conexión con usuario y contraseña (MongoDB, Postgres, MySQL, Redis, AMQP)"
+regex = '''(?i)\b(?:mongodb(?:\+srv)?|postgres(?:ql)?|mysql|mariadb|rediss?|amqps?)://[^:/@\s"'<>]+:([^@/\s"'<>]{3,})@'''
+secretGroup = 1
+keywords = ["mongodb", "postgres", "mysql", "mariadb", "redis", "amqp"]
+
+[[rules.allowlists]]
+description = "Marcadores de las plantillas y la documentación"
+regexTarget = "secret"
+regexes = [
+  '''^(?i)(password|contrase[nñ]a|pass|secret|changeme|xxx+|\*+|<[^>]*>|\$\{[^}]*\}|\$[A-Z_]+|\{[^}]*\})$''',
+]

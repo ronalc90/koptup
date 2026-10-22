@@ -16,11 +16,12 @@ import { type DemoAccessReason, isDeniedReason } from '@/lib/demo-system';
 export const dynamic = 'force-dynamic';
 
 type Props = {
-  params: { slug: string };
-  searchParams: { motivo?: string; modo?: string; vence?: string; ruta?: string };
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ motivo?: string; modo?: string; vence?: string; ruta?: string }>;
 };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
   const robots = { index: false, follow: false };
   const demo = DEMO_DEFAULTS_BY_SLUG[params.slug];
   if (!demo) return { robots };
@@ -32,7 +33,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function DemoAccessPage({ params, searchParams }: Props) {
+export default async function DemoAccessPage(props: Props) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const slug = params.slug;
   if (!isKnownDemoSlug(slug)) notFound();
 

@@ -1,16 +1,5 @@
 {
   "descripcion": "Alertas altas o críticas de dependencias de producción ya revisadas. scripts/audit-check.mjs no falla por ellas, pero las muestra como aviso en cada corrida de CI. Cualquier alerta alta o crítica nueva hace fallar el job Seguridad.",
   "revisarAntesDe": "2026-12-31",
-  "advisories": {
-    "GHSA-h25m-26qc-wcjf": "next 14.2.35 ya es la última versión 14 y no trae el arreglo: requiere migrar a una versión mayor de Next (pendiente)",
-    "GHSA-q4gf-8mx6-v5v3": "next 14.2.35 ya es la última versión 14 y no trae el arreglo: requiere migrar a una versión mayor de Next (pendiente)",
-    "GHSA-8h8q-6873-q5fj": "next 14.2.35 ya es la última versión 14 y no trae el arreglo: requiere migrar a una versión mayor de Next (pendiente)",
-    "GHSA-c4j6-fc7j-m34r": "next 14.2.35 ya es la última versión 14 y no trae el arreglo: requiere migrar a una versión mayor de Next (pendiente)",
-    "GHSA-36qx-fr4f-26g5": "next 14.2.35 ya es la última versión 14 y no trae el arreglo: requiere migrar a una versión mayor de Next (pendiente)",
-    "GHSA-m99w-x7hq-7vfj": "next 14.2.35 ya es la última versión 14 y no trae el arreglo: requiere migrar a una versión mayor de Next (pendiente)",
-    "GHSA-89xv-2m56-2m9x": "next 14.2.35 ya es la última versión 14 y no trae el arreglo: requiere migrar a una versión mayor de Next (pendiente)",
-    "GHSA-p9j2-gv94-2wf4": "next 14.2.35 ya es la última versión 14 y no trae el arreglo: requiere migrar a una versión mayor de Next (pendiente)",
-    "GHSA-p293-qw3h-jr36": "next 14.2.35 ya es la última versión 14 y no trae el arreglo: requiere migrar a una versión mayor de Next (pendiente)",
-    "GHSA-2xp9-vwfh-vxw4": "next 14.2.35 ya es la última versión 14 y no trae el arreglo: requiere migrar a una versión mayor de Next (pendiente)"
-  }
+  "advisories": {}
 }
