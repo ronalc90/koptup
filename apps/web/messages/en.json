@@ -1892,11 +1892,11 @@
         "description": "The site, the admin panel and the demos you can try are built with these.",
         "items": [
           {
-            "name": "Next.js 14",
+            "name": "Next.js 15",
             "note": "App Router and server components"
           },
           {
-            "name": "React 18",
+            "name": "React 19",
             "note": "site and demo UI"
           },
           {

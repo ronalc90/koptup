@@ -4,7 +4,7 @@
 
 **Estudio de desarrollo de software a medida · Bogotá, Colombia**
 
-[![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org)
 [![Node.js](https://img.shields.io/badge/Node.js-20.9%2B-43853d?logo=node.js)](https://nodejs.org)
 [![MongoDB](https://img.shields.io/badge/MongoDB-7-47A248?logo=mongodb)](https://mongodb.com)
@@ -80,7 +80,7 @@ Cada demo tiene un modo de acceso que el administrador cambia en **Admin › Cat
 
 Tecnologías que realmente usamos en este repo:
 
-**Frontend:** Next.js 14 (App Router) · React 18 · TypeScript · TailwindCSS · next-intl (ES/EN) · next-themes · Framer Motion · React Hook Form + Zod · SWR · Axios · Recharts · date-fns
+**Frontend:** Next.js 15 (App Router) · React 19 · TypeScript · TailwindCSS · next-intl (ES/EN) · next-themes · Framer Motion · React Hook Form + Zod · SWR · Axios · Recharts · date-fns
 
 **Backend:** Node.js 20.9+ · Express · TypeScript · Mongoose (MongoDB 7) · Redis (sesiones, cupos y topes de gasto de IA) · OpenAI SDK · Zod · JWT · bcryptjs · Multer · Helmet · Resend (correo por API HTTPS; Nodemailer solo como respaldo SMTP) · WhatsApp Cloud API de Meta (avisos al dueño con plantilla) · Swagger (OpenAPI 3, solo fuera de producción)
 
