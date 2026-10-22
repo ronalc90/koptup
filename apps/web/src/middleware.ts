@@ -66,10 +66,14 @@ type MeResult =
  * Cabeceras para que el backend sepa la IP del visitante (las peticiones del
  * middleware salen desde el servidor de la web). Solo si INTERNAL_API_KEY está
  * configurada igual en la web y en el backend.
+ *
+ * Next 15 quitó `req.ip`. Con `next start` siempre venía vacío, y en Vercel
+ * traía la IP del visitante, la misma que la plataforma deja en
+ * `X-Forwarded-For` (la reescribe en cada petición) y en `X-Real-IP`.
  */
 function forwardHeaders(req: NextRequest): Record<string, string> {
   const internalKey = process.env.INTERNAL_API_KEY;
-  const ip = req.ip || req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-real-ip');
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-real-ip');
   return internalKey && ip ? { 'X-Internal-Key': internalKey, 'X-Client-IP': ip } : {};
 }
 

@@ -11,8 +11,8 @@
  *   - `export const metadata` de cada `layout.tsx` / `page.tsx`, ya sea un
  *     objeto literal o una llamada `generateMetadata('<clave de seoConfig>')`.
  *
- * Luego simula cómo Next 14 resuelve `title.template` a lo largo de la
- * jerarquía de layouts (ver next/dist/lib/metadata/resolve-metadata.js): la
+ * Luego simula cómo Next 15 (igual que la 14) resuelve `title.template` a lo
+ * largo de la jerarquía de layouts (ver next/dist/lib/metadata/resolve-metadata.js): la
  * plantilla vigente para un segmento es la que dejó el segmento padre, y un
  * layout que define `title` como string corta la plantilla para sus hijos.
  *

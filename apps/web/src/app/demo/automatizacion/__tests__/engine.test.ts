@@ -7,7 +7,7 @@ import en from '../../../../../messages/demos/automatizacion.en.json';
 import { TYPE_DEFS } from '../lib/catalog';
 import { classify, executeRun, parseNum, readInvoice, render, setPath, type JsRunner, type RunCtx } from '../lib/engine';
 import { addMinutes, fmtCop, fmtNit, nextMonthStart, nitDv } from '../lib/format';
-import { computeLayout, dropIndex, edgePath } from '../lib/layout';
+import { computeLayout, dropIndex, edgePath } from '../lib/canvas-layout';
 import { COMPANY_NIT, SUPPLIERS, buildSamples, buildSheets, invoiceXml, templateSteps, type SeedText } from '../lib/samples';
 import { buildSeed, isValidState } from '../lib/seed';
 import { monthUsage } from '../lib/store';

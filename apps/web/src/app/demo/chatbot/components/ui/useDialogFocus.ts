@@ -11,7 +11,7 @@ const FOCUSABLE =
  * dentro del diálogo, cierra con Escape y, al cerrar, devuelve el foco al
  * botón que lo abrió.
  */
-export function useDialogFocus(open: boolean, containerRef: RefObject<HTMLElement>, onClose: () => void): void {
+export function useDialogFocus(open: boolean, containerRef: RefObject<HTMLElement | null>, onClose: () => void): void {
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
 
