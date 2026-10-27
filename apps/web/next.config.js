@@ -98,6 +98,8 @@ const nextConfig = {
       { source: '/en/pricing', destination: '/en/services#planes-rag', permanent: true },
       { source: '/soluciones-ia', destination: '/rag', permanent: true },
       { source: '/en/soluciones-ia', destination: '/en/rag', permanent: true },
+      { source: '/demo/ecommerce/admin', destination: '/demo/ecommerce?view=admin', permanent: true },
+      { source: '/en/demo/ecommerce/admin', destination: '/en/demo/ecommerce?view=admin', permanent: true },
     ];
   },
 
