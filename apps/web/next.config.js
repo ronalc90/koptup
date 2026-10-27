@@ -163,7 +163,7 @@ const nextConfig = {
         // Enlaces de un solo uso y páginas de cuenta: no se indexan aunque un
         // buscador llegue por un enlace externo (además de robots.txt y del
         // meta robots de cada página).
-        source: '/:path(login|register|forgot-password|reset-password|auth/.*|activar/.*|propuesta/.*)',
+        source: '/:locale(en)?/:path(login|register|forgot-password|reset-password|auth/.*|activar/.*|propuesta/.*)',
         headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }]
       },
       // Cache static assets aggressively
