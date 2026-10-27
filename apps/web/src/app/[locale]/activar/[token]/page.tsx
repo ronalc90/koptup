@@ -17,6 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return privatePageMetadata(t('metaTitle'), null, await getLocale());
 }
 
-export default function ActivatePage({ params }: { params: { token: string } }) {
+export default async function ActivatePage(props: { params: Promise<{ token: string }> }) {
+  const params = await props.params;
   return <ActivateAccount token={decodeURIComponent(params.token ?? '')} />;
 }

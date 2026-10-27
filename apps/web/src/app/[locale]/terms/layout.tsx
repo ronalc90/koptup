@@ -6,11 +6,11 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata('terms', await getLocale());
 }
 
-export default function TermsLayout({ children }: { children: React.ReactNode }) {
+export default function TermsLayout({ children, params: { locale } }: { children: React.ReactNode; params: { locale: string } }) {
   const breadcrumbSchema = getBreadcrumbSchema([
-    { name: 'Inicio', url: '/' },
-    { name: 'Términos y Condiciones', url: '/terms' },
-  ]);
+    { name: 'Inicio', nameEn: 'Home', url: '/' },
+    { name: 'Términos y Condiciones', nameEn: 'Terms and conditions', url: '/terms' },
+  ], locale);
 
   return (
     <>

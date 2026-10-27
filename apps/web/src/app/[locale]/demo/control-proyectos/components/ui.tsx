@@ -87,7 +87,7 @@ if (typeof document !== 'undefined') {
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-export function useDialog(ref: RefObject<HTMLElement>, onClose: () => void) {
+export function useDialog(ref: RefObject<HTMLElement | null>, onClose: () => void) {
   const close = useRef(onClose);
   close.current = onClose;
   useEffect(() => {

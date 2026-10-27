@@ -6,12 +6,12 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata('demo-moderacion-contenido', await getLocale());
 }
 
-export default function ModeracionContenidoLayout({ children }: { children: React.ReactNode }) {
+export default function ModeracionContenidoLayout({ children, params: { locale } }: { children: React.ReactNode; params: { locale: string } }) {
   const breadcrumbSchema = getBreadcrumbSchema([
-    { name: 'Inicio', url: '/' },
-    { name: 'Demos', url: '/demo' },
-    { name: 'Moderación de contenido con IA', url: '/demo/moderacion-contenido' },
-  ]);
+    { name: 'Inicio', nameEn: 'Home', url: '/' },
+    { name: 'Demos', nameEn: 'Demos', url: '/demo' },
+    { name: 'Moderación de contenido con IA', nameEn: 'AI content moderation', url: '/demo/moderacion-contenido' },
+  ], locale);
 
   return (
     <>

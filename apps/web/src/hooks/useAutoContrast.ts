@@ -11,7 +11,7 @@ import { useState, useEffect, RefObject } from 'react';
  * @returns Objeto con el color sugerido para el texto y si el fondo es oscuro
  */
 export function useAutoContrast(
-  elementRef: RefObject<HTMLElement>,
+  elementRef: RefObject<HTMLElement | null>,
   options?: {
     updateInterval?: number; // Intervalo de actualización en ms (default: 100ms)
     lightColor?: string; // Color para fondos oscuros (default: '#ffffff')

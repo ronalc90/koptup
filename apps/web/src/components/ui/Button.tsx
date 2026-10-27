@@ -71,7 +71,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
       return null;
     }
     // Ensure only one React element child
-    const child = React.Children.only(children) as ReactElement;
+    const child = React.Children.only(children) as ReactElement<{ className?: string; children?: React.ReactNode }>;
     const childClass = (child.props && child.props.className) || '';
     const merged = {
       className: cn(childClass, classes),

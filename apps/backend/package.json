@@ -36,7 +36,7 @@
     "mammoth": "^1.6.0",
     "mongoose": "^8.20.0",
     "morgan": "^1.10.0",
-    "multer": "^2.4.0",
+    "multer": "^2.5.0",
     "nodemailer": "^10.0.6",
     "openai": "^4.104.0",
     "passport": "^0.7.0",

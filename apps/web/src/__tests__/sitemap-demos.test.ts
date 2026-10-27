@@ -2,8 +2,16 @@
  * El sitemap lista las demos abiertas y activas según el catálogo del
  * backend; si no responde, según la tabla de respaldo.
  */
-import { openDemoSlugs } from '@/lib/sitemap-demos';
+import { SITEMAP_REVALIDATE_SECONDS, openDemoSlugs } from '@/lib/sitemap-demos';
 import { DEMO_ACCESS_DEFAULTS } from '@/lib/demo-access-defaults';
+import { revalidate } from '@/app/sitemap';
+
+describe('revalidate de app/sitemap.ts', () => {
+  it('es el mismo intervalo que la caché del catálogo', () => {
+    // app/sitemap.ts repite el número como literal (Next 15 no acepta ahí una constante importada).
+    expect(revalidate).toBe(SITEMAP_REVALIDATE_SECONDS);
+  });
+});
 
 describe('openDemoSlugs', () => {
   it('sin catálogo usa las demos abiertas de la semilla', () => {

@@ -5,6 +5,7 @@ import DemoAccessGate from '@/components/demo/DemoAccessGate';
 import { DEMO_ACCESS_MODES, DEMO_DEFAULTS_BY_SLUG, type DemoAccessMode, isKnownDemoSlug } from '@/lib/demo-access-defaults';
 import { type DemoAccessReason, isDeniedReason } from '@/lib/demo-system';
 import { localizedPath } from '@/lib/i18n-url';
+import { MAX_TITLE_LENGTH, TITLE_TEMPLATE } from '@/lib/site';
 
 /**
  * Pantalla "Solicita acceso" de una demo (wiki 04, §9 y §10).
@@ -17,23 +18,34 @@ import { localizedPath } from '@/lib/i18n-url';
 export const dynamic = 'force-dynamic';
 
 type Props = {
-  params: { slug: string };
-  searchParams: { motivo?: string; modo?: string; vence?: string; ruta?: string };
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ motivo?: string; modo?: string; vence?: string; ruta?: string }>;
 };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
   const robots = { index: false, follow: false };
   const demo = DEMO_DEFAULTS_BY_SLUG[params.slug];
   if (!demo) return { robots };
   const [locale, t] = await Promise.all([getLocale(), getTranslations('demoAccess')]);
+  const name = locale === 'en' ? demo.nombreEn : demo.nombre;
+  // "<nombre>: acceso | KopTup" no pasa de MAX_TITLE_LENGTH (scripts/check-titles.mjs):
+  // si el nombre completo no cabe, va sin su aclaración final entre paréntesis
+  // ("Sistema experto para salud (cuentas médicas)" → "Sistema experto para salud").
+  let title = t('metaTitle', { name });
+  if ([...TITLE_TEMPLATE.replace('%s', title)].length > MAX_TITLE_LENGTH) {
+    title = t('metaTitle', { name: name.replace(/\s*\([^)]*\)$/, '') });
+  }
   return {
-    title: t('metaTitle', { name: locale === 'en' ? demo.nombreEn : demo.nombre }),
+    title,
     robots,
     alternates: { canonical: localizedPath(`/demo/${demo.slug}`, locale) },
   };
 }
 
-export default function DemoAccessPage({ params, searchParams }: Props) {
+export default async function DemoAccessPage(props: Props) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const slug = params.slug;
   if (!isKnownDemoSlug(slug)) notFound();
 

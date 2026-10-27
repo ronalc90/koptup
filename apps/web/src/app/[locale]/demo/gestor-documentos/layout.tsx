@@ -6,12 +6,12 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata('demo-gestor-documentos', await getLocale());
 }
 
-export default function GestorDocumentosLayout({ children }: { children: React.ReactNode }) {
+export default function GestorDocumentosLayout({ children, params: { locale } }: { children: React.ReactNode; params: { locale: string } }) {
   const breadcrumbSchema = getBreadcrumbSchema([
-    { name: 'Inicio', url: '/' },
-    { name: 'Demos', url: '/demo' },
-    { name: 'Gestor documental con IA', url: '/demo/gestor-documentos' },
-  ]);
+    { name: 'Inicio', nameEn: 'Home', url: '/' },
+    { name: 'Demos', nameEn: 'Demos', url: '/demo' },
+    { name: 'Gestor documental con IA', nameEn: 'AI document manager', url: '/demo/gestor-documentos' },
+  ], locale);
 
   return (
     <>

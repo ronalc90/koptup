@@ -9,8 +9,9 @@ import { HOME_TITLE, HOME_TITLE_EN } from '@/lib/site';
  * del layout raíz (src/app/layout.tsx), y la imagen og/twitter sale de
  * src/app/opengraph-image.tsx.
  */
-export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
-  return { title: { absolute: params.locale === 'en' ? HOME_TITLE_EN : HOME_TITLE } };
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  return { title: { absolute: locale === 'en' ? HOME_TITLE_EN : HOME_TITLE } };
 }
 
 export default function HomePage() {

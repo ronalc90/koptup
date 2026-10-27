@@ -7,7 +7,7 @@
       "sampleData": "Sample data",
       "sampleDataHint": "Brand, stores, customers, couriers, orders and figures are fictitious. Payments, WhatsApp messages, calls, GPS and the map are simulated.",
       "footer": "Demo with sample data from a fictitious brand (Fogón Demo) with 3 stores in Bogotá. Payments with Nequi, Daviplata, PSE or card, the WhatsApp message, the masked call, the courier position and the map are simulated: in your project they connect to the payment gateway, WhatsApp Business, a telephony provider, the courier's phone GPS and a map service (e.g. Google Maps or Mapbox). What you do is saved only in this browser.",
-      "seoTitle": "Delivery app: customer, store, operations and courier",
+      "seoTitle": "Delivery app: customer, store and courier",
       "seoDescription": "Interactive demo of your own delivery channel with sample data: order with simulated payment, store acceptance, assignment of the nearest courier, delivery with a code and calculated timing reports. Simulated map and tracking.",
       "breadcrumbHome": "Home",
       "breadcrumbDemos": "Demos"

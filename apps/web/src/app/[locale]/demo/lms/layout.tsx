@@ -25,7 +25,8 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function LmsLayout({ children, params: { locale } }: { children: React.ReactNode; params: { locale: string } }) {
+export default async function LmsLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   // Sin esto, getTranslations leería el idioma de las cabeceras y la ruta sería dinámica.
   setRequestLocale(locale);
   const t = await getTranslations('demoLms.meta');
@@ -33,7 +34,7 @@ export default async function LmsLayout({ children, params: { locale } }: { chil
     { name: t('breadcrumbHome'), url: '/' },
     { name: t('breadcrumbDemos'), url: '/demo' },
     { name: t('breadcrumbTitle'), url: '/demo/lms' },
-  ]);
+  ], locale);
 
   return (
     <>

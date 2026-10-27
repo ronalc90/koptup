@@ -151,7 +151,7 @@ function MarcoDemo({
   onLoad,
 }: {
   demo: KoptupDemo;
-  iframeRef?: React.RefObject<HTMLIFrameElement>;
+  iframeRef?: React.RefObject<HTMLIFrameElement | null>;
   onLoad?: () => void;
 }) {
   const t = useTranslations('demoLinkedinAds.capture');

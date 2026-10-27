@@ -7,13 +7,13 @@ import { KNOWN_CONSOLE_ISSUES, KNOWN_VISIBLE_ISSUES, STRICT } from './support/kn
 /**
  * Humo de todas las demos en un navegador real (locale es-CO, ver
  * playwright.config.ts): el catálogo /demo y cada /demo/<slug> (la lista sale
- * de las carpetas de src/app/demo).
+ * de las carpetas de src/app/[locale]/demo).
  *
  * 1. Responde 200, tiene título y no muestra textos de error.
  * 2. No registra errores en la consola (incluidos los de hidratación de React
  *    #418/#423/#425) ni excepciones sin capturar.
  */
-const DEMO_DIR = path.join(__dirname, '..', 'src', 'app', 'demo');
+const DEMO_DIR = path.join(__dirname, '..', 'src', 'app', '[locale]', 'demo');
 
 const slugs = fs
   .readdirSync(DEMO_DIR, { withFileTypes: true })

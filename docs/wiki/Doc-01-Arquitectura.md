@@ -1,6 +1,6 @@
 # Arquitectura
 
-> **Resumen.** KopTup es un monorepo con dos aplicaciones: la **web** (Next.js 14, desplegada en **Vercel**) y la **API** (Express, desplegada en **Railway**). La API guarda los datos en **MongoDB**, usa **Redis** para sesiones, cupos y topes de gasto de IA, y habla con **OpenAI**, con un servidor de **correo (SMTP)** y con **WhatsApp**. Un middleware de Next verifica la sesión y el acceso a las demos **antes** de mostrar una página, y la API vuelve a verificar cada petición.
+> **Resumen.** KopTup es un monorepo con dos aplicaciones: la **web** (Next.js 15, desplegada en **Vercel**) y la **API** (Express, desplegada en **Railway**). La API guarda los datos en **MongoDB**, usa **Redis** para sesiones, cupos y topes de gasto de IA, y habla con **OpenAI**, con un servidor de **correo (SMTP)** y con **WhatsApp**. Un middleware de Next verifica la sesión y el acceso a las demos **antes** de mostrar una página, y la API vuelve a verificar cada petición.
 >
 > **Para quién:** sobre todo para un desarrollador. El dueño puede quedarse con el [diagrama general](#1-el-sistema-en-una-imagen) y la tabla [qué hace cada pieza](#2-qué-hace-cada-pieza).
 
@@ -36,7 +36,7 @@ flowchart LR
         LS["localStorage y cookies: sesión, idioma, consentimiento y datos de las demos"]:::visitante
     end
 
-    subgraph VERCEL["Vercel: web Next.js 14"]
+    subgraph VERCEL["Vercel: web Next.js 15"]
         MW["Middleware: /admin, /dashboard, /liquidacion y /demo/slug"]:::sistema
         SSR["Render en el servidor: App Router, metadatos SEO, sitemap"]:::sistema
         NAPI["Rutas API de Next: /api/linkedin-ads/generate y proxies /api/chatbot"]:::sistema
@@ -124,7 +124,7 @@ El repositorio usa **npm workspaces** (`apps/*`, `packages/*`) y **Turborepo** p
 ```text
 koptup/
 ├── apps/
-│   ├── web/                         ← Web Next.js 14 (Vercel)
+│   ├── web/                         ← Web Next.js 15 (Vercel)
 │   │   ├── src/
 │   │   │   ├── app/                 ← Rutas (App Router): páginas, layouts, rutas API, sitemap, OG
 │   │   │   │   ├── demo/<slug>/     ← Las 28 demos (cada una con su layout de SEO)
@@ -487,12 +487,12 @@ Versión declarada en `package.json` y versión instalada según `package-lock.j
 |---|---|---|---|---|
 | Plataforma | Node.js | `>=22.11.0` | 22 en CI | Web y API |
 | Monorepo | Turborepo | `^1.10.16` | 1.13.4 | Tareas de `apps/*` |
-| Web | Next.js | `14.2.35` | 14.2.35 | App Router, middleware, metadatos, imágenes |
-| Web | React | `^18.2.0` | 18.3.1 | Interfaz |
-| Web | next-intl | `^3.4.0` | 3.26.5 | Español e inglés |
+| Web | Next.js | `15.5.28` | 15.5.28 | App Router, middleware, metadatos, imágenes |
+| Web | React | `^19.2.0` | 19.3.1 | Interfaz |
+| Web | next-intl | `^3.26.5` | 3.26.5 | Español e inglés |
 | Web | Tailwind CSS | `^3.3.5` | 3.4.19 | Estilos |
 | Web | TypeScript | `^5.3.2` | 5.9.3 | Tipos (web y API) |
-| Web | axios · SWR · framer-motion | `^1.6.2` · `^2.2.4` · `^10.16.5` | 1.20.0 · 2.3.6 · 10.18.0 | Llamadas a la API, caché de datos, animaciones |
+| Web | axios · SWR · framer-motion | `^1.6.2` · `^2.2.4` · `^11.18.2` | 1.20.0 · 2.3.6 · 11.18.2 | Llamadas a la API, caché de datos, animaciones |
 | Web | react-hook-form + zod · jsPDF · next-themes | `^7.48.2` · `^4.2.1` · `^0.2.1` | — | Formularios, PDF de las demos, tema claro u oscuro |
 | API | Express | `^4.18.2` | 4.22.3 | Servidor HTTP |
 | API | Mongoose | `^8.20.0` | 8.24.5 | MongoDB |

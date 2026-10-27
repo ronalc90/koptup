@@ -33,13 +33,14 @@ function errorResponse(status: number, code: string, message: string, extra: Rec
   return NextResponse.json({ ...extra, success: false, code, message, error: message.replace(/[.\s]+$/, '') }, { status });
 }
 
+/** IP del visitante. Next 15 quitó `req.ip`, que en esta ruta (Node.js) no traía nada aparte de estas cabeceras. */
 function clientIp(req: NextRequest): string | null {
   const forwarded = req.headers.get('x-forwarded-for');
   if (forwarded) {
     const first = forwarded.split(',')[0]?.trim();
     if (first) return first;
   }
-  return req.headers.get('x-real-ip') || req.ip || null;
+  return req.headers.get('x-real-ip') || null;
 }
 
 async function refreshAccessToken(refreshToken: string, baseHeaders: Record<string, string>): Promise<string | null> {

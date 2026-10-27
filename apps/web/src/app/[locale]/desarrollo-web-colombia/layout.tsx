@@ -111,11 +111,11 @@ const faqSchema = {
   ],
 };
 
-export default function DesarrolloWebColombiaLayout({ children }: { children: React.ReactNode }) {
+export default function DesarrolloWebColombiaLayout({ children, params: { locale } }: { children: React.ReactNode; params: { locale: string } }) {
   const breadcrumbSchema = getBreadcrumbSchema([
-    { name: 'Inicio', url: '/' },
-    { name: 'Desarrollo Web Colombia', url: '/desarrollo-web-colombia' },
-  ]);
+    { name: 'Inicio', nameEn: 'Home', url: '/' },
+    { name: 'Desarrollo Web Colombia', nameEn: 'Web development in Colombia', url: '/desarrollo-web-colombia' },
+  ], locale);
 
   return (
     <>

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState, type DragEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import { ArrowPathIcon, CheckCircleIcon, ExclamationTriangleIcon, MinusCircleIcon, NoSymbolIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import { TYPE_DEFS, isTrigger, typeKey } from '../lib/catalog';
-import { BRANCH_H, BRANCH_W, NODE_H, branchPos, computeLayout, dropIndex, edgePath } from '../lib/layout';
+import { BRANCH_H, BRANCH_W, NODE_H, branchPos, computeLayout, dropIndex, edgePath } from '../lib/canvas-layout';
 import type { Live, NodeVisual } from '../lib/store';
 import type { Step, StepType } from '../lib/types';
 import { CATEGORY_COLORS, TYPE_ICONS } from './icons';

@@ -6,12 +6,12 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata('demo-linkedin-ads', await getLocale());
 }
 
-export default function LinkedInAdsLayout({ children }: { children: React.ReactNode }) {
+export default function LinkedInAdsLayout({ children, params: { locale } }: { children: React.ReactNode; params: { locale: string } }) {
   const breadcrumbSchema = getBreadcrumbSchema([
-    { name: 'Inicio', url: '/' },
-    { name: 'Demos', url: '/demo' },
-    { name: 'Generador de contenido para LinkedIn con IA', url: '/demo/linkedin-ads' },
-  ]);
+    { name: 'Inicio', nameEn: 'Home', url: '/' },
+    { name: 'Demos', nameEn: 'Demos', url: '/demo' },
+    { name: 'Generador de contenido para LinkedIn con IA', nameEn: 'AI content generator for LinkedIn', url: '/demo/linkedin-ads' },
+  ], locale);
 
   return (
     <>

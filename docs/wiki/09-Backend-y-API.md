@@ -91,7 +91,7 @@ El backend tiene que sostener el negocio que describen [Visión de producto](02-
 ```mermaid
 flowchart LR
   U["Navegador"]
-  subgraph VC["Vercel: web Next.js 14"]
+  subgraph VC["Vercel: web Next.js 15"]
     WP["Páginas, demos, portal y panel"]
     WR["Route handlers: proxy del chatbot heredado, LinkedIn Ads con OpenAI, TRM"]
   end

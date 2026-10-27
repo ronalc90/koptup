@@ -16,7 +16,7 @@ import { clampDescription } from '@/lib/meta-text';
 import { seoConfigEn } from '@/lib/seo-config.en';
 import { DEMO_COUNT } from './demos';
 import { formatRagCOP, getRagPlan } from './rag-plans';
-import { localeAlternates, localizedUrl } from '@/lib/i18n-url';
+import { localeAlternates, localizedPath, localizedUrl } from '@/lib/i18n-url';
 import { HOME_DESCRIPTION, RAG_OG_IMAGE, SITE_NAME, SITE_URL, TITLE_TEMPLATE } from './site';
 
 const baseUrl = SITE_URL;
@@ -420,7 +420,7 @@ export function pageMetadata(pageKey: string, locale: string): Metadata {
   const path = (config.canonical ?? baseUrl).slice(baseUrl.length) || '/';
 
   return {
-    // Objeto con `template` (no string): en Next 14, si un layout intermedio
+    // Objeto con `template` (no string): en Next (14 y 15), si un layout intermedio
     // (p. ej. /demo) define `title` como string, sus rutas hijas pierden la
     // plantilla del layout raíz y salen sin " | KopTup". Re-declararla aquí
     // la propaga a las rutas anidadas (/demo/*, /rag/*…).
@@ -486,18 +486,31 @@ export function privatePageMetadata(title: string, path: string | null, locale: 
   };
 }
 
+/** Elemento de un BreadcrumbList. `url` es la ruta en español (`/contact`). */
+export interface BreadcrumbItem {
+  /** Nombre en español (o el que se muestra por defecto). */
+  name: string;
+  /** Nombre en inglés, que se usa con locale 'en'. Si falta, sale `name`. */
+  nameEn?: string;
+  url: string;
+}
+
 /**
  * Get breadcrumb structured data
+ *
+ * Sin `locale` (o con 'es') sale igual que antes: nombres tal cual y URLs del
+ * español. Con 'en' usa `nameEn` y las rutas de /en (localizedPath).
  */
-export function getBreadcrumbSchema(items: { name: string; url: string }[]) {
+export function getBreadcrumbSchema(items: BreadcrumbItem[], locale?: string) {
+  const en = locale === 'en';
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: items.map((item, index) => ({
       '@type': 'ListItem',
       position: index + 1,
-      name: item.name,
-      item: `${baseUrl}${item.url}`,
+      name: en ? (item.nameEn ?? item.name) : item.name,
+      item: `${baseUrl}${en ? localizedPath(item.url, 'en') : item.url}`,
     })),
   };
 }

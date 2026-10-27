@@ -7,7 +7,7 @@
       "sampleData": "Datos de ejemplo",
       "sampleDataHint": "Marca, sedes, clientes, repartidores, pedidos y cifras son ficticios. Pagos, mensajes de WhatsApp, llamadas, GPS y mapa son simulados.",
       "footer": "Demo con datos de ejemplo de una marca ficticia (Fogón Demo) con 3 sedes en Bogotá. Los pagos con Nequi, Daviplata, PSE o tarjeta, el mensaje de WhatsApp, la llamada enmascarada, la posición del repartidor y el mapa son simulados: en tu proyecto se conectan con la pasarela de pagos, WhatsApp Business, un proveedor de telefonía, el GPS del celular del repartidor y un servicio de mapas (p. ej. Google Maps o Mapbox). Lo que haces se guarda solo en este navegador.",
-      "seoTitle": "App de domicilios: cliente, sede, operaciones y repartidor",
+      "seoTitle": "App de domicilios: cliente, sede y repartidor",
       "seoDescription": "Demo interactiva de un canal propio de domicilios con datos de ejemplo: pedido con pago simulado, aceptación en la sede, asignación del repartidor más cercano, entrega con código y reportes de tiempos calculados. Mapa y seguimiento simulados.",
       "breadcrumbHome": "Inicio",
       "breadcrumbDemos": "Demos"

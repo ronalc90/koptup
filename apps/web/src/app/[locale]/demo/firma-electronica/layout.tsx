@@ -6,12 +6,12 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata('demo-firma-electronica', await getLocale());
 }
 
-export default function FirmaElectronicaLayout({ children }: { children: React.ReactNode }) {
+export default function FirmaElectronicaLayout({ children, params: { locale } }: { children: React.ReactNode; params: { locale: string } }) {
   const breadcrumbSchema = getBreadcrumbSchema([
-    { name: 'Inicio', url: '/' },
-    { name: 'Demos', url: '/demo' },
-    { name: 'Firma Electrónica', url: '/demo/firma-electronica' },
-  ]);
+    { name: 'Inicio', nameEn: 'Home', url: '/' },
+    { name: 'Demos', nameEn: 'Demos', url: '/demo' },
+    { name: 'Firma Electrónica', nameEn: 'Electronic signature', url: '/demo/firma-electronica' },
+  ], locale);
 
   return (
     <>

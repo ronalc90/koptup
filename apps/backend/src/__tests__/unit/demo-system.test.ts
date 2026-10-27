@@ -30,8 +30,9 @@ describe('semilla del catálogo de demos', () => {
     }
   });
 
-  it('cada demo de la semilla es una carpeta real de apps/web/src/app/demo (y viceversa)', () => {
-    const demoDir = path.resolve(__dirname, '../../../../web/src/app/demo');
+  it('cada demo de la semilla es una carpeta real de apps/web/src/app/[locale]/demo (y viceversa)', () => {
+    // Las páginas de la web cuelgan del segmento de idioma (/demo y /en/demo).
+    const demoDir = path.resolve(__dirname, '../../../../web/src/app/[locale]/demo');
     const folders = fs
       .readdirSync(demoDir, { withFileTypes: true })
       .filter((e) => e.isDirectory() && fs.existsSync(path.join(demoDir, e.name, 'page.tsx')))

@@ -49,7 +49,7 @@ interface Props {
   device: Device;
   selecting: boolean;
   user?: boolean;
-  rootRef: RefObject<HTMLDivElement>;
+  rootRef: RefObject<HTMLDivElement | null>;
   onPick: (el: Element) => void;
   label: string;
 }

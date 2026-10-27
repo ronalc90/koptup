@@ -134,7 +134,7 @@ const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), selec
  * Foco de una ventana: al abrir lo lleva adentro, Tab y Mayús+Tab no salen de
  * ella mientras sea la de arriba, y al cerrar vuelve al control que la abrió.
  */
-export function useDialogFocus(ref: RefObject<HTMLElement>, active = true) {
+export function useDialogFocus(ref: RefObject<HTMLElement | null>, active = true) {
   useEffect(() => {
     if (!active) return;
     const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;

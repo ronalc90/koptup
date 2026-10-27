@@ -30,7 +30,8 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function GestorContenidoLayout({ children, params: { locale } }: { children: React.ReactNode; params: { locale: string } }) {
+export default async function GestorContenidoLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   // Sin esto, getTranslations leería el idioma de las cabeceras y la ruta sería dinámica.
   setRequestLocale(locale);
   const t = await getTranslations('demoCms.meta');
@@ -38,7 +39,7 @@ export default async function GestorContenidoLayout({ children, params: { locale
     { name: t('breadcrumbHome'), url: '/' },
     { name: t('breadcrumbDemos'), url: '/demo' },
     { name: t('breadcrumb'), url: '/demo/gestor-contenido' },
-  ]);
+  ], locale);
 
   return (
     <>

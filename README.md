@@ -4,24 +4,37 @@
 
 **Estudio de desarrollo de software a medida · Bogotá, Colombia**
 
-[![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org)
 [![Node.js](https://img.shields.io/badge/Node.js-22.11%2B-43853d?logo=node.js)](https://nodejs.org)
 [![MongoDB](https://img.shields.io/badge/MongoDB-7-47A248?logo=mongodb)](https://mongodb.com)
 [![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o-412991?logo=openai)](https://openai.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![CI](https://github.com/ronalc90/koptup/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ronalc90/koptup/actions/workflows/ci.yml)
 
 [**www.koptup.com**](https://www.koptup.com) · [Catálogo de prototipos](https://www.koptup.com/demo) · [Planes y servicios](https://www.koptup.com/services) · [Contacto](https://www.koptup.com/contact)
+
+<img src="docs/capturas/inicio.webp" alt="Portada de koptup.com: IA que responde con los documentos de tu empresa" width="900" />
 
 </div>
 
 ---
 
+## Capturas
+
+| Demo RAG: responde con los documentos y cita la fuente | Catálogo de demos |
+|---|---|
+| <img src="docs/capturas/demo-rag-respuesta-citada.webp" alt="Demo RAG respondiendo con la fuente citada, los fragmentos consultados y los pasos internos" width="440" /> | <img src="docs/capturas/catalogo-de-demos.webp" alt="Catálogo de demos con su modo de acceso" width="440" /> |
+| **Planes y precios de los sistemas RAG** | **Versión móvil** |
+| <img src="docs/capturas/planes-y-precios.webp" alt="Planes y precios de los sistemas RAG en COP y USD" width="440" /> | <img src="docs/capturas/inicio-movil.webp" alt="Portada en el celular" width="200" /> |
+
+La demo RAG ([`/demo/chatbot`](https://www.koptup.com/demo/chatbot)) se prueba sin registro: elige una empresa de ejemplo, haz una pregunta y el asistente responde con la cita `[1]` al documento, muestra los fragmentos consultados y, a la derecha, cómo respondió: fragmentos, búsqueda BM25, instrucciones al modelo, modelo y citas, con el tiempo, los tokens y el costo de la consulta.
+
 ## Qué es
 
 Koptup es el portafolio comercial de un estudio de desarrollo a medida. Construimos software para empresas en LATAM — web, mobile, integraciones, IA aplicada. Este repo contiene:
 
-- **28 demos** en [`/demo`](https://www.koptup.com/demo):
+- **28 demos.** [`/demo`](https://www.koptup.com/demo) lista 14: 5 principales y 9 de apoyo, definidas en [`apps/web/src/lib/demo-showcase.ts`](apps/web/src/lib/demo-showcase.ts). Las otras se abren por su URL, sin indexar.
   - **9 con IA o backend reales:** el chatbot RAG (producto principal), el sistema experto de cuentas médicas, el motor de reglas del auditor, el generador de contenido para LinkedIn, el gestor documental y una función con IA real en las demos de mesa de ayuda, gestión humana, LMS y gestor de contenido.
   - **19 con datos de ejemplo:** corren en el navegador, muestran el flujo completo y lo dicen en pantalla.
   - Qué es real y qué es simulado en cada una, y su estado de revisión: [Guía de demos](docs/wiki/Doc-07-Guia-de-Demos.md).
@@ -67,7 +80,7 @@ Cada demo tiene un modo de acceso que el administrador cambia en **Admin › Cat
 
 Tecnologías que realmente usamos en este repo:
 
-**Frontend:** Next.js 14 (App Router) · React 18 · TypeScript · TailwindCSS · next-intl (ES/EN) · next-themes · Framer Motion · React Hook Form + Zod · SWR · Axios · Recharts · date-fns
+**Frontend:** Next.js 15 (App Router) · React 19 · TypeScript · TailwindCSS · next-intl (ES/EN) · next-themes · Framer Motion · React Hook Form + Zod · SWR · Axios · Recharts · date-fns
 
 **Backend:** Node.js 22.11+ · Express · TypeScript · Mongoose (MongoDB 7) · Redis (sesiones, cupos y topes de gasto de IA) · OpenAI SDK · Zod · JWT · bcryptjs · Multer · Helmet · Resend (correo por API HTTPS; Nodemailer solo como respaldo SMTP) · WhatsApp Cloud API de Meta (avisos al dueño con plantilla) · Swagger (OpenAPI 3, solo fuera de producción)
 
