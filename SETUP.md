@@ -4,7 +4,7 @@ Cómo levantar el backend (Express) y la web (Next.js) en tu computador. La vers
 
 ## Requisitos
 
-- **Node.js 20.9 o superior** y npm 9 o superior.
+- **Node.js 22.11 o superior** (22 LTS) y npm 9 o superior.
 - **MongoDB 7** y **Redis 7**, instalados o con Docker (paso 2).
 - Opcional: una clave de OpenAI. Sin ella el chatbot responde en modo extractivo y las demás funciones con IA se apagan; para no gastar, usa el mock de OpenAI del repositorio (paso 3).
 

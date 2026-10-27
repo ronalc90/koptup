@@ -19,7 +19,8 @@ export async function generateMetadata(): Promise<Metadata> {
 const serviceSchema = getChatbotsServiceJsonLd();
 const faqSchema = getChatbotsFaqJsonLd();
 
-export default function ChatbotsIALayout({ children, params: { locale } }: { children: React.ReactNode; params: { locale: string } }) {
+export default async function ChatbotsIALayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const breadcrumbSchema = getBreadcrumbSchema([
     { name: 'Inicio', nameEn: 'Home', url: '/' },
     { name: 'Chatbots RAG para WhatsApp y web', nameEn: 'RAG chatbots for WhatsApp and web', url: CHATBOTS_PATH },

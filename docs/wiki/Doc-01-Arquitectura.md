@@ -161,7 +161,7 @@ koptup/
 ├── .github/workflows/               ← ci.yml (lint, tipos, pruebas, build, e2e, seguridad), monitor.yml y wiki-sync.yml
 ├── scripts/                         ← audit-check.mjs (npm audit) y uptime-check.sh (monitoreo)
 ├── docker-compose.dev.yml           ← MongoDB 7 y Redis 7 para desarrollo local
-└── turbo.json, package.json         ← Workspaces y tareas de Turborepo (Node ≥ 20.9)
+└── turbo.json, package.json         ← Workspaces y tareas de Turborepo (Node ≥ 22.11)
 ```
 
 ---
@@ -485,7 +485,7 @@ Versión declarada en `package.json` y versión instalada según `package-lock.j
 
 | Área | Tecnología | Declarada | Instalada | Para qué |
 |---|---|---|---|---|
-| Plataforma | Node.js | `>=20.9.0` | 20 en CI | Web y API |
+| Plataforma | Node.js | `>=22.11.0` | 22 en CI | Web y API |
 | Monorepo | Turborepo | `^1.10.16` | 1.13.4 | Tareas de `apps/*` |
 | Web | Next.js | `15.5.28` | 15.5.28 | App Router, middleware, metadatos, imágenes |
 | Web | React | `^19.2.0` | 19.3.1 | Interfaz |

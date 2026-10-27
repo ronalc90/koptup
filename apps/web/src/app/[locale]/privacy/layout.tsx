@@ -6,7 +6,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata('privacy', await getLocale());
 }
 
-export default function PrivacyLayout({ children, params: { locale } }: { children: React.ReactNode; params: { locale: string } }) {
+export default async function PrivacyLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const breadcrumbSchema = getBreadcrumbSchema([
     { name: 'Inicio', nameEn: 'Home', url: '/' },
     { name: 'Política de Privacidad', nameEn: 'Privacy policy', url: '/privacy' },

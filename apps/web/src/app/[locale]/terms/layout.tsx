@@ -6,7 +6,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata('terms', await getLocale());
 }
 
-export default function TermsLayout({ children, params: { locale } }: { children: React.ReactNode; params: { locale: string } }) {
+export default async function TermsLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const breadcrumbSchema = getBreadcrumbSchema([
     { name: 'Inicio', nameEn: 'Home', url: '/' },
     { name: 'Términos y Condiciones', nameEn: 'Terms and conditions', url: '/terms' },
