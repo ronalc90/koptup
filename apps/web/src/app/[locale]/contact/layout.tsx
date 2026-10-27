@@ -6,7 +6,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata('contact', await getLocale());
 }
 
-export default function ContactLayout({ children, params: { locale } }: { children: React.ReactNode; params: { locale: string } }) {
+export default async function ContactLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const breadcrumbSchema = getBreadcrumbSchema([
     { name: 'Inicio', nameEn: 'Home', url: '/' },
     { name: 'Contacto', nameEn: 'Contact', url: '/contact' },

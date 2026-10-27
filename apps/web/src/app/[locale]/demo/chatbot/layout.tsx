@@ -6,7 +6,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata('demo-chatbot', await getLocale());
 }
 
-export default function ChatbotLayout({ children, params: { locale } }: { children: React.ReactNode; params: { locale: string } }) {
+export default async function ChatbotLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const breadcrumbSchema = getBreadcrumbSchema([
     { name: 'Inicio', nameEn: 'Home', url: '/' },
     { name: 'Demos', nameEn: 'Demos', url: '/demo' },

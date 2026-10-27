@@ -6,7 +6,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata('demo-firma-electronica', await getLocale());
 }
 
-export default function FirmaElectronicaLayout({ children, params: { locale } }: { children: React.ReactNode; params: { locale: string } }) {
+export default async function FirmaElectronicaLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const breadcrumbSchema = getBreadcrumbSchema([
     { name: 'Inicio', nameEn: 'Home', url: '/' },
     { name: 'Demos', nameEn: 'Demos', url: '/demo' },
