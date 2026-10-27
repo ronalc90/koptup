@@ -2,7 +2,7 @@
   "demoEcommerce2": {
     "meta": {
       "title": "Online store",
-      "seoTitle": "Online store demo: catalog, cart, simulated checkout and reports",
+      "seoTitle": "Online store demo with simulated checkout",
       "seoDescription": "Try a sample online store for Colombia: catalog with search and favorites, cart with pricing rules and coupons, simulated payment by card, PSE, Nequi, Daviplata, cash on delivery or installments, order and inventory panel, simulated shipping labels, returns and sales reports in COP exportable to CSV. Runs on sample data.",
       "breadcrumbHome": "Home",
       "breadcrumbDemos": "Demos"

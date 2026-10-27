@@ -12,6 +12,7 @@
  */
 
 import { Metadata } from 'next';
+import { clampDescription } from '@/lib/meta-text';
 import { DEMO_COUNT } from './demos';
 import { formatRagCOP, getRagPlan } from './rag-plans';
 import { HOME_DESCRIPTION, RAG_OG_IMAGE, SITE_NAME, SITE_URL, TITLE_TEMPLATE } from './site';
@@ -427,13 +428,13 @@ export function generateMetadata(pageKey: string): Metadata {
     // plantilla del layout raíz y salen sin " | KopTup". Re-declararla aquí
     // la propaga a las rutas anidadas (/demo/*, /rag/*…).
     title: { default: config.title, template: TITLE_TEMPLATE },
-    description: config.description,
+    description: clampDescription(config.description),
     alternates: {
       canonical: config.canonical || baseUrl,
     },
     openGraph: {
       title: fullTitle,
-      description: config.description,
+      description: clampDescription(config.description),
       url: config.canonical || baseUrl,
       siteName: SITE_NAME,
       images: [
@@ -450,7 +451,7 @@ export function generateMetadata(pageKey: string): Metadata {
     twitter: {
       card: 'summary_large_image',
       title: fullTitle,
-      description: config.description,
+      description: clampDescription(config.description),
       images: [config.ogImage || '/og-image.png'],
     },
     robots: {

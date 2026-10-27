@@ -119,10 +119,6 @@
       "title": "Software a Medida",
       "description": "Soluciones personalizadas para tus procesos de negocio"
     },
-    "mobile": {
-      "title": "Aplicaciones Móviles",
-      "description": "Apps nativas y multiplataforma para iOS y Android"
-    },
     "uxui": {
       "title": "UX/UI",
       "description": "Interfaces modernas orientadas a conversión"
@@ -204,21 +200,6 @@
         ],
         "price": "Desde $5,000",
         "deliveryTime": "6-12 semanas"
-      },
-      "mobile": {
-        "title": "Aplicaciones Móviles",
-        "shortDescription": "Apps nativas y multiplataforma",
-        "description": "Creamos aplicaciones móviles nativas para iOS y Android, o multiplataforma con React Native y Flutter.",
-        "features": [
-          "Diseño nativo o multiplataforma",
-          "Notificaciones push",
-          "Geolocalización",
-          "Pagos in-app",
-          "Sincronización offline",
-          "Publicación en tiendas"
-        ],
-        "price": "Desde $6,000",
-        "deliveryTime": "8-12 semanas"
       },
       "uxui": {
         "title": "Diseño UX/UI",
@@ -2289,10 +2270,6 @@
       "ecommerce": "E-Commerce",
       "chatbot": "Otro tipo de chatbot",
       "webDev": "Desarrollo Web",
-      "mobileDev": "Desarrollo Móvil",
-      "apiIntegrations": "Integraciones API",
-      "uxui": "Diseño UX/UI",
-      "consulting": "Consultoría",
       "other": "Otro"
     },
     "quote": {
@@ -3288,8 +3265,8 @@
     "sv2d": "Chatbots RAG para WhatsApp y tu sitio web que responden con los documentos de tu empresa, citan la fuente y atienden a cualquier hora. Desde {essentialFrom}, o piloto de {pilotFrom} (más IVA si aplica).",
     "sv3t": "Tiendas Online (E-commerce)",
     "sv3d": "Tiendas en línea con carrito, gestión de inventario e integración con la pasarela de pago que elijas.",
-    "sv4t": "Aplicaciones Móviles",
-    "sv4d": "Apps para Android e iOS integradas con tus sistemas existentes. Las cotizamos según el alcance.",
+    "sv4t": "Tableros de indicadores",
+    "sv4d": "Indicadores de tu negocio conectados a tus datos, con la cifra y su fuente. Te cotizamos según el alcance.",
     "sv5t": "Dashboards y Business Intelligence",
     "sv5d": "Paneles ejecutivos con KPIs, métricas de negocio, gráficos y reportes conectados a tus datos.",
     "sv6t": "Automatización con IA",

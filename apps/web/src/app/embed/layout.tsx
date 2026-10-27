@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
  * next.config.js permite incrustarlas en cualquier sitio (frame-ancestors *).
  */
 export const metadata: Metadata = {
-  title: 'Demo interactiva',
+  title: { default: 'Demo interactiva', template: '%s | KopTup' },
   robots: { index: false, follow: false },
 };
 

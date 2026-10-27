@@ -3,6 +3,7 @@ import { RAG_PATH, RAG_SECTORS } from '@/lib/rag-page';
 import { SITE_URL } from '@/lib/site';
 import { fetchSitemapCatalog, openDemoSlugs } from '@/lib/sitemap-demos';
 import { isDemoVitrina } from '@/lib/demo-showcase';
+import LAST_MODIFIED from '@/lib/sitemap-lastmod.json';
 
 // Se regenera cada hora: así sigue al catálogo de demos que edita el admin.
 // Next 15 lee esta opción sin ejecutar el módulo y solo acepta un literal
@@ -15,11 +16,15 @@ export const revalidate = 3600;
 const baseUrl = SITE_URL;
 
 /**
- * Fecha de última modificación estable. Usamos una constante (no `new Date()`)
- * para no marcar TODO el sitio como "modificado hoy" en cada deploy, lo que
- * envía una señal de frescura falsa a Google.
+ * Fecha de última modificación de cada URL: la del último commit que tocó sus
+ * archivos (lib/sitemap-lastmod.json, generado por scripts/gen-lastmod.mjs).
+ * Sin `new Date()` por deploy: no marcamos todo el sitio como "modificado hoy".
+ * Una URL sin fecha en ese archivo sale sin `lastmod` en vez de con una inventada.
  */
-const lastModified = new Date('2026-06-29');
+const lastModifiedFor = (route: string): Date | undefined => {
+  const date = (LAST_MODIFIED as Record<string, string>)[route];
+  return date ? new Date(date) : undefined;
+};
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Páginas estáticas indexables. `/pricing` se omite a propósito: redirige a
@@ -55,14 +60,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticEntries: MetadataRoute.Sitemap = staticPages.map((p) => ({
     url: `${baseUrl}${p.path}`,
-    lastModified,
+    lastModified: lastModifiedFor(p.path || '/'),
     changeFrequency: p.changeFrequency,
     priority: p.priority,
   }));
 
   const demoEntries: MetadataRoute.Sitemap = demoSlugs.map((slug) => ({
     url: `${baseUrl}/demo/${slug}`,
-    lastModified,
+    lastModified: lastModifiedFor(`/demo/${slug}`),
     changeFrequency: 'weekly',
     priority: 0.8,
   }));

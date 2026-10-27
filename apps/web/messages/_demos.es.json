@@ -4232,7 +4232,7 @@
   "demoBiDashboard": {
     "meta": {
       "title": "Tablero ejecutivo",
-      "seoTitle": "Demo de tablero ejecutivo: ventas, finanzas y cartera",
+      "seoTitle": "Demo de tablero ejecutivo: ventas y cartera",
       "seoDescription": "Demo interactiva con datos de ejemplo de una empresa colombiana (o con tu propio CSV): ventas frente a la meta, margen, cartera por edades, flujo de caja a 13 semanas, proyección estadística, alertas por reglas, preguntas guiadas e informe en PDF. Todo se calcula en tu navegador.",
       "breadcrumbHome": "Inicio",
       "breadcrumbDemos": "Demos"
@@ -5946,7 +5946,7 @@
   "demoEcommerce2": {
     "meta": {
       "title": "Tienda en línea",
-      "seoTitle": "Demo de tienda en línea: catálogo, carrito, pago simulado y reportes",
+      "seoTitle": "Demo de tienda en línea con pago simulado",
       "seoDescription": "Prueba una tienda en línea de ejemplo para Colombia: catálogo con búsqueda y favoritos, carrito con reglas de precio y cupones, pago simulado con tarjeta, PSE, Nequi, Daviplata, contraentrega o a cuotas, panel de pedidos e inventario, guías de envío simuladas, devoluciones y reportes de ventas en COP exportables a CSV. Funciona con datos de ejemplo.",
       "breadcrumbHome": "Inicio",
       "breadcrumbDemos": "Demos"

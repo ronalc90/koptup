@@ -2,7 +2,7 @@
   "demoBiDashboard": {
     "meta": {
       "title": "Executive dashboard",
-      "seoTitle": "Executive dashboard demo: sales, finance and receivables",
+      "seoTitle": "Executive dashboard demo: sales and receivables",
       "seoDescription": "Interactive demo with sample data from a Colombian company (or your own CSV): sales vs. target, margin, receivables aging, 13-week cash flow, statistical projection, rule-based alerts, guided questions and a PDF report. Everything is calculated in your browser.",
       "breadcrumbHome": "Home",
       "breadcrumbDemos": "Demos"

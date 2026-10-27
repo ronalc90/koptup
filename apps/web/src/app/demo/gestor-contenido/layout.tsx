@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { clampDescription } from '@/lib/meta-text';
 import { getTranslations } from 'next-intl/server';
 import { generateMetadata as metadataBase, getBreadcrumbSchema } from '@/lib/seo-config';
 
@@ -13,7 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const base = metadataBase('demo-gestor-contenido');
   const plantilla = base.title && typeof base.title === 'object' && 'template' in base.title && base.title.template ? base.title.template : '%s';
   const titulo = t('seoTitle');
-  const descripcion = t('seoDescription');
+  const descripcion = clampDescription(t('seoDescription'));
   const tituloCompleto = plantilla.replace('%s', titulo);
   // La imagen social conserva su archivo, pero su texto alternativo describe esta demo.
   const imagenes = base.openGraph?.images;
