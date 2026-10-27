@@ -1,5 +1,7 @@
 {
   "descripcion": "Alertas altas o críticas de dependencias de producción ya revisadas. scripts/audit-check.mjs no falla por ellas, pero las muestra como aviso en cada corrida de CI. Cualquier alerta alta o crítica nueva hace fallar el job Seguridad.",
   "revisarAntesDe": "2026-12-31",
-  "advisories": {}
+  "advisories": {
+    "GHSA-mrhx-c7xc-m3w5": "zod 3.25.76 es la última 3.x y no trae el arreglo: requiere zod 4 (mayor, y los SDK de OpenAI y Anthropic piden zod 3). No aplica hoy: ninguna ruta anónima valida arreglos con zod; los z.array están en rutas de staff autenticadas (aprobar demos, permisos, propuestas, LinkedIn) o validan respuestas del LLM, y el body JSON está limitado a 2 MB. Se cierra al migrar a zod 4"
+  }
 }
