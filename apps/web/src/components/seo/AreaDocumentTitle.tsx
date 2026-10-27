@@ -27,8 +27,18 @@ export default function AreaDocumentTitle({ area }: { area: Area }) {
   useEffect(() => {
     const key = areaTitleKey(area, pathname);
     const section = key !== 'default' && t.has(key) ? t(key) : null;
-    const title = section ? `${section} · ${t('suffix')}` : t('default');
-    document.title = TITLE_TEMPLATE.replace('%s', title);
+    const title = TITLE_TEMPLATE.replace('%s', section ? `${section} · ${t('suffix')}` : t('default'));
+    const apply = () => {
+      if (document.title !== title) document.title = title;
+    };
+    apply();
+    // React puede volver a escribir el <title> de la metadata del layout (el
+    // del área) después de este efecto: pasa desde que las páginas del área se
+    // prerenderizan con el idioma en la URL (Next 15). Si lo cambia, se vuelve
+    // a poner el de la sección; cuando ya coincide no se toca (sin bucle).
+    const observer = new MutationObserver(apply);
+    observer.observe(document.head, { childList: true, subtree: true, characterData: true });
+    return () => observer.disconnect();
   }, [area, pathname, t]);
 
   return null;
