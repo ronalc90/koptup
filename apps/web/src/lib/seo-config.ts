@@ -51,15 +51,6 @@ export const seoConfig: Record<string, PageSEO> = {
     ogImage: RAG_OG_IMAGE,
   },
 
-  // Pricing page
-  pricing: {
-    title: 'Planes y Precios',
-    description:
-      'Planes de sistemas RAG con precios en COP y USD, más IVA si aplica, y otras soluciones de software a medida.',
-    // `/pricing` redirige a `/services#planes-rag`: el canónico es /services.
-    canonical: `${baseUrl}/services`,
-  },
-
   // Contact page
   contact: {
     title: 'Contacto: Solicita tu Cotización Gratis',
