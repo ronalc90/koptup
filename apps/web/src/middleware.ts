@@ -178,6 +178,7 @@ function redirectToLogin(req: NextRequest): NextResponse {
   url.searchParams.set('redirect', `${req.nextUrl.pathname}${req.nextUrl.search}`);
   const res = NextResponse.redirect(url);
   res.cookies.delete(ACCESS_COOKIE);
+  res.headers.set('Cache-Control', 'no-store');
   return res;
 }
 
@@ -185,7 +186,9 @@ function redirectTo(req: NextRequest, path: string): NextResponse {
   const url = req.nextUrl.clone();
   url.pathname = localizedTarget(req, path);
   url.search = '';
-  return NextResponse.redirect(url);
+  const res = NextResponse.redirect(url);
+  res.headers.set('Cache-Control', 'no-store');
+  return res;
 }
 
 function unavailable(): NextResponse {

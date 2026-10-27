@@ -11,15 +11,20 @@ const chatbotPrice = getChatbotsPageValues('es');
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
+  const en = locale === 'en';
   return {
-    title: 'Desarrollo Web y Software a Medida en Colombia',
+    title: en ? 'Web Development and Custom Software in Colombia' : 'Desarrollo Web y Software a Medida en Colombia',
     description: clampDescription(
-      'Contrata a KopTup para desarrollar tu aplicación web, chatbot con IA, e-commerce o sistema empresarial. Estudio de software a medida en Bogotá, Colombia. Precios publicados y cotización gratis.',
+      en
+        ? 'Hire KopTup to build your web app, AI chatbot, e-commerce or business system. Custom software studio in Bogotá, Colombia. Published prices and a free quote.'
+        : 'Contrata a KopTup para desarrollar tu aplicación web, chatbot con IA, e-commerce o sistema empresarial. Estudio de software a medida en Bogotá, Colombia. Precios publicados y cotización gratis.',
     ),
     alternates: localeAlternates('/desarrollo-web-colombia', locale),
     openGraph: {
-      title: 'Empresa de Desarrollo Web a Medida | KopTup',
-      description: 'Aplicaciones web, chatbots con IA, e-commerce y dashboards a medida, desde Bogotá. Cotización gratis.',
+      title: en ? 'Custom Web Development Company | KopTup' : 'Empresa de Desarrollo Web a Medida | KopTup',
+      description: en
+        ? 'Custom web apps, AI chatbots, e-commerce and dashboards from Bogotá. Free quote.'
+        : 'Aplicaciones web, chatbots con IA, e-commerce y dashboards a medida, desde Bogotá. Cotización gratis.',
       url: localizedUrl('/desarrollo-web-colombia', locale),
       siteName: 'KopTup',
       images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Desarrollo Web Colombia - KopTup' }],
@@ -28,8 +33,10 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Empresa de Desarrollo de Software Colombia | KopTup',
-      description: 'Desarrollo web, chatbots con IA, e-commerce y dashboards a medida, desde Bogotá. Cotización gratis.',
+      title: en ? 'Custom Software Company in Colombia | KopTup' : 'Empresa de Desarrollo de Software Colombia | KopTup',
+      description: en
+        ? 'Web development, AI chatbots, e-commerce and dashboards from Bogotá. Free quote.'
+        : 'Desarrollo web, chatbots con IA, e-commerce y dashboards a medida, desde Bogotá. Cotización gratis.',
       images: ['/og-image.png'],
     },
   };

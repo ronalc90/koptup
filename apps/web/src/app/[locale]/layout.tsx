@@ -11,7 +11,7 @@ import Analytics from '@/components/analytics/Analytics';
 import CookieBanner from '@/components/consent/CookieBanner';
 import { routing } from '@/i18n/routing';
 import { localeAlternates, localizedUrl } from '@/lib/i18n-url';
-import { HOME_DESCRIPTION, HOME_TITLE, SITE_NAME, SITE_URL, TITLE_TEMPLATE } from '@/lib/site';
+import { HOME_DESCRIPTION, HOME_DESCRIPTION_EN, HOME_TITLE, HOME_TITLE_EN, SITE_NAME, SITE_URL, TITLE_TEMPLATE } from '@/lib/site';
 import '../globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
@@ -26,6 +26,7 @@ const poppins = Poppins({
 // Ya trae el sufijo porque el `default` del layout raíz no pasa por la
 // plantilla. La home lo reemplaza por HOME_TITLE (title.absolute en page.tsx).
 const DEFAULT_TITLE = 'IA que responde con los documentos de tu empresa | KopTup';
+const DEFAULT_TITLE_EN = 'AI that answers from your company documents | KopTup';
 
 // Un segmento de idioma distinto de es/en responde 404 sin renderizar nada.
 export const dynamicParams = false;
@@ -36,12 +37,15 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
   const { locale } = params;
+  const en = locale === 'en';
+  const homeTitle = en ? HOME_TITLE_EN : HOME_TITLE;
+  const homeDescription = en ? HOME_DESCRIPTION_EN : HOME_DESCRIPTION;
   return {
     metadataBase: new URL(SITE_URL),
     // Formato final: "<título> | KopTup", ≤ 60 caracteres
     // (verificar con `node scripts/check-titles.mjs`).
     title: {
-      default: DEFAULT_TITLE,
+      default: en ? DEFAULT_TITLE_EN : DEFAULT_TITLE,
       template: TITLE_TEMPLATE,
     },
     manifest: '/manifest.json',
@@ -57,7 +61,7 @@ export async function generateMetadata({ params }: { params: { locale: string } 
     },
     // Description, canonical y og/twitter de la home (y valores por defecto del
     // sitio para las páginas que no definen los suyos).
-    description: HOME_DESCRIPTION,
+    description: homeDescription,
     authors: [{ name: 'KopTup' }],
     creator: 'KopTup',
     publisher: 'KopTup',
@@ -74,13 +78,13 @@ export async function generateMetadata({ params }: { params: { locale: string } 
       locale: locale === 'en' ? 'en_US' : 'es_CO',
       url: localizedUrl('/', locale),
       siteName: SITE_NAME,
-      title: HOME_TITLE,
-      description: HOME_DESCRIPTION,
+      title: homeTitle,
+      description: homeDescription,
     },
     twitter: {
       card: 'summary_large_image',
-      title: HOME_TITLE,
-      description: HOME_DESCRIPTION,
+      title: homeTitle,
+      description: homeDescription,
     },
     robots: {
       index: true,

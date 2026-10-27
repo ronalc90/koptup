@@ -29,6 +29,9 @@ export const MAX_TITLE_LENGTH = 60;
  */
 export const HOME_TITLE = 'Sistemas RAG en Colombia: IA con tus documentos | KopTup';
 
+/** Versión en inglés de HOME_TITLE (/en). */
+export const HOME_TITLE_EN = 'RAG systems in Colombia: AI that uses your documents | KopTup';
+
 /**
  * Imagen og/twitter con el mensaje RAG: la genera `src/app/opengraph-image.tsx`
  * (la de la home) y se sirve en esta ruta. La usan también las páginas de
@@ -39,6 +42,10 @@ export const HOME_TITLE = 'Sistemas RAG en Colombia: IA con tus documentos | Kop
 export const RAG_OG_IMAGE = '/opengraph-image';
 
 /** Meta description de la home; también es la descripción por defecto del sitio. */
+/** Versión en inglés de HOME_DESCRIPTION (/en). */
+export const HOME_DESCRIPTION_EN =
+  'RAG systems for companies in Colombia: AI that answers from your manuals, contracts and policies, cites its source and protects your data. Try the free demo.';
+
 export const HOME_DESCRIPTION =
   'Sistemas RAG para empresas en Colombia: IA que responde con tus manuales, contratos y políticas, cita la fuente y protege tus datos. Prueba la demo gratis.';
 

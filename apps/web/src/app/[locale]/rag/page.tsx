@@ -15,9 +15,10 @@ import { absoluteUrl } from '@/lib/site';
  * og/twitter salen de `seoConfig.rag`.
  */
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
   return {
-    ...pageMetadata('rag', await getLocale()),
-    title: { absolute: 'Sistemas RAG para empresas en Colombia | KopTup' },
+    ...pageMetadata('rag', locale),
+    title: { absolute: locale === 'en' ? 'RAG Systems for Companies in Colombia | KopTup' : 'Sistemas RAG para empresas en Colombia | KopTup' },
   };
 }
 

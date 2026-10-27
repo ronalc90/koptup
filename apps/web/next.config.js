@@ -156,7 +156,7 @@ const nextConfig = {
         // micrófono del visitante (con su permiso): solo esa ruta y solo para el
         // propio sitio. Va después de la regla general, así que la reemplaza
         // (`:path*` incluye la propia /demo/telemedicina).
-        source: '/demo/telemedicina/:path*',
+        source: '/:locale(en)?/demo/telemedicina/:path*',
         headers: [{ key: 'Permissions-Policy', value: TELEMEDICINE_PERMISSIONS_POLICY }]
       },
       {
