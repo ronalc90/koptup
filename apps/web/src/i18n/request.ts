@@ -1,11 +1,5 @@
-import { headers } from 'next/headers';
 import { getRequestConfig } from 'next-intl/server';
-
-function getLocaleFromCookie(cookieHeader?: string | null) {
-  if (!cookieHeader) return undefined;
-  const match = cookieHeader.match(/(?:^|; )locale=([^;]+)/);
-  return match ? match[1] : undefined;
-}
+import { isLocale, routing } from './routing';
 
 async function loadAggregate(locale: string, name: 'demos' | 'offerings'): Promise<Record<string, any>> {
   try {
@@ -18,13 +12,13 @@ async function loadAggregate(locale: string, name: 'demos' | 'offerings'): Promi
 }
 
 /**
- * Idioma de la petición: la cookie `locale` (`es` por defecto). Es la misma
- * regla que usa `src/app/layout.tsx`; no hay rutas por idioma ni cabecera.
+ * Idioma de la petición: el segmento `[locale]` de la URL (lo fija el
+ * middleware y `setRequestLocale` en el layout). Sin cookies ni cabeceras, así
+ * las páginas públicas se generan una vez y quedan en caché.
  */
-export default getRequestConfig(async () => {
-  const h = await headers();
-  const cookieLocale = getLocaleFromCookie(h.get('cookie'));
-  const locale = cookieLocale === 'en' ? 'en' : 'es';
+export default getRequestConfig(async ({ requestLocale }) => {
+  const requested = await requestLocale;
+  const locale = requested && isLocale(requested) ? requested : routing.defaultLocale;
 
   let messages: Record<string, any>;
   try {

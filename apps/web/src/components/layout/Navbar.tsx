@@ -1,9 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
-import { usePathname,useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { Link, usePathname, useRouter } from '@/i18n/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 import { useTheme } from 'next-themes';
 import {
   Bars3Icon,
@@ -24,6 +23,7 @@ import Button from '@/components/ui/Button';
 import { useAutoContrast } from '@/hooks/useAutoContrast';
 import { api } from '@/lib/api';
 import { homePathForRole } from '@/lib/auth-roles';
+import { localizedPath } from '@/lib/i18n-url';
 
 import SiteSearch from './SiteSearch';
 
@@ -31,7 +31,7 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const [currentLocale, setCurrentLocale] = useState('es');
+  const currentLocale = useLocale();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
@@ -71,12 +71,6 @@ export default function Navbar() {
     localStorage.removeItem('user');
     setUser(null);
   }
-
-  const locale = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('locale='))
-    ?.split('=')[1] || 'es';
-  setCurrentLocale(locale);
 
   return () => window.removeEventListener('scroll', handleScroll);
 }, []);
@@ -145,18 +139,12 @@ export default function Navbar() {
           ];
 
 const toggleLanguage = () => {
-  const current = document.cookie.split('; ').find(r => r.startsWith('locale='))?.split('=')[1] || 'es';
-  const next = current === 'es' ? 'en' : 'es';
-
-  // El idioma va en una cookie que lee el servidor (app/layout.tsx).
-  document.cookie = `locale=${next}; path=/; max-age=31536000; SameSite=Lax`;
-  setCurrentLocale(next);
-
-  // Recarga completa para que el servidor arme la página en el otro idioma.
-  // `reload()` conserva la URL entera (ruta, parámetros y ancla): la demo
-  // elegida en /solicitar-demo, el plan en /contact o ?mode=upload. Navegar a
-  // la misma URL con ancla sería un salto dentro de la página, sin recargar.
-  window.location.reload();
+  // El idioma va en la URL (/about ↔ /en/about). Se carga la misma página en el
+  // otro idioma y se conservan la query y el ancla: la demo elegida en
+  // /solicitar-demo, el plan en /contact o ?mode=upload.
+  const next = currentLocale === 'es' ? 'en' : 'es';
+  const path = window.location.pathname.replace(/^\/en(?=\/|$)/, '') || '/';
+  window.location.assign(`${localizedPath(path, next)}${window.location.search}${window.location.hash}`);
 };
 
 

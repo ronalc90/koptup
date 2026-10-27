@@ -13,8 +13,10 @@
 
 import { Metadata } from 'next';
 import { clampDescription } from '@/lib/meta-text';
+import { seoConfigEn } from '@/lib/seo-config.en';
 import { DEMO_COUNT } from './demos';
 import { formatRagCOP, getRagPlan } from './rag-plans';
+import { localeAlternates, localizedUrl } from '@/lib/i18n-url';
 import { HOME_DESCRIPTION, RAG_OG_IMAGE, SITE_NAME, SITE_URL, TITLE_TEMPLATE } from './site';
 
 const baseUrl = SITE_URL;
@@ -412,8 +414,10 @@ export const seoConfig: Record<string, PageSEO> = {
 /**
  * Genera metadata completa para una página
  */
-export function generateMetadata(pageKey: string): Metadata {
-  const config = seoConfig[pageKey];
+export function pageMetadata(pageKey: string, locale: string): Metadata {
+  // En /en, título y descripción salen de seoConfigEn (canonical e imágenes, comunes).
+  const base = seoConfig[pageKey];
+  const config = base && locale === 'en' ? { ...base, ...seoConfigEn[pageKey] } : base;
   if (!config) {
     console.warn(`No SEO config found for page: ${pageKey}`);
     return {};
@@ -421,6 +425,8 @@ export function generateMetadata(pageKey: string): Metadata {
 
   // Título completo para og:title / twitter:title (no pasan por la plantilla).
   const fullTitle = TITLE_TEMPLATE.replace('%s', config.title);
+  // Ruta de la versión en español; el idioma la convierte en /en/… cuando toca.
+  const path = (config.canonical ?? baseUrl).slice(baseUrl.length) || '/';
 
   return {
     // Objeto con `template` (no string): en Next (14 y 15), si un layout intermedio
@@ -429,13 +435,11 @@ export function generateMetadata(pageKey: string): Metadata {
     // la propaga a las rutas anidadas (/demo/*, /rag/*…).
     title: { default: config.title, template: TITLE_TEMPLATE },
     description: clampDescription(config.description),
-    alternates: {
-      canonical: config.canonical || baseUrl,
-    },
+    alternates: localeAlternates(path, locale),
     openGraph: {
       title: fullTitle,
       description: clampDescription(config.description),
-      url: config.canonical || baseUrl,
+      url: localizedUrl(path, locale),
       siteName: SITE_NAME,
       images: [
         {
@@ -445,7 +449,7 @@ export function generateMetadata(pageKey: string): Metadata {
           alt: fullTitle,
         },
       ],
-      locale: 'es_CO',
+      locale: locale === 'en' ? 'en_US' : 'es_CO',
       type: 'website',
     },
     twitter: {
@@ -479,8 +483,8 @@ export function generateMetadata(pageKey: string): Metadata {
  *    `/propuesta/<token>`): sin canonical, para no repetir el token en el HTML.
  * `title` ya viene traducido; la plantilla agrega " | KopTup".
  */
-export function privatePageMetadata(title: string, path: string | null): Metadata {
-  const url = path ? `${baseUrl}${path}` : null;
+export function privatePageMetadata(title: string, path: string | null, locale: string): Metadata {
+  const url = path ? localizedUrl(path, locale) : null;
   const fullTitle = TITLE_TEMPLATE.replace('%s', title);
   return {
     title,

@@ -15,7 +15,7 @@ const WEB = path.join(__dirname, '..', '..');
 const BACKEND = path.join(WEB, '..', 'backend', 'src');
 
 function demoFolders(): string[] {
-  const dir = path.join(WEB, 'src', 'app', 'demo');
+  const dir = path.join(WEB, 'src', 'app', '[locale]', 'demo');
   return fs
     .readdirSync(dir, { withFileTypes: true })
     .filter((e) => e.isDirectory() && fs.existsSync(path.join(dir, e.name, 'page.tsx')))

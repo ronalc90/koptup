@@ -5,12 +5,12 @@
  * sesión, el backend responde «sin_sesion» y recargarlas creaba un ciclo de
  * recargas sin fin.
  */
-import { render } from '@testing-library/react';
+import { renderWithProviders as render } from '@/test-utils/render';
 import DemoAccessWatcher from '@/components/demo/DemoAccessWatcher';
 import { isPublicDemoSubpath } from '@/lib/demo-access-defaults';
 
 let mockPath = '/demo/lms';
-jest.mock('next/navigation', () => ({ usePathname: () => mockPath }));
+jest.mock('next/navigation', () => ({ usePathname: () => mockPath, useParams: () => ({}), useRouter: () => ({ push: jest.fn(), replace: jest.fn(), prefetch: jest.fn() }) }));
 
 const mockApiRequest = jest.fn();
 jest.mock('@/lib/demo-system', () => ({

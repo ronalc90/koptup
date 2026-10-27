@@ -1,6 +1,6 @@
 import type { Page, TestInfo } from '@playwright/test';
 import { SITE_URL } from '../src/lib/site';
-import { encodeCert } from '../src/app/demo/lms/lib/engine';
+import { encodeCert } from '../src/app/[locale]/demo/lms/lib/engine';
 import { adminSession, HAS_API, NEEDS_API, Api, uniqueEmail } from './support/backend';
 import { collectBrowserErrors } from './support/browser-errors';
 import { expect, test } from './support/fixtures';
@@ -346,24 +346,23 @@ test.describe('Contenido verificable', () => {
     await expect(page.locator('a[href="/services#planes-rag"]', { hasText: /cotizaci/i })).toHaveCount(0);
   });
 
-  test('en inglés: Nosotros, Product Hunt, pie y recuperación de contraseña', async ({ page, baseURL }) => {
-    await page.context().addCookies([{ name: 'locale', value: 'en', url: baseURL! }]);
-    await page.goto('/about');
+  test('en inglés: Nosotros, Product Hunt, pie y recuperación de contraseña', async ({ page }) => {
+    await page.goto('/en/about');
     await expect(page.getByText('What you can check today')).toBeVisible();
     await expect(page.locator('footer')).toContainText('Custom web development');
     await expect(page.locator('footer')).toContainText('All demos');
-    await page.goto('/bienvenido-producthunt');
+    await page.goto('/en/bienvenido-producthunt');
     await expect(page.getByText('Try our demos now')).toBeVisible();
-    await page.goto('/forgot-password');
+    await page.goto('/en/forgot-password');
     await expect(page.getByRole('heading', { level: 1, name: 'Recover password' })).toBeVisible();
-    await page.goto('/reset-password');
+    await page.goto('/en/reset-password');
     await expect(page.getByRole('heading', { level: 1, name: 'New password' })).toBeVisible();
     await expect(page).toHaveTitle('New password | KopTup');
-    await page.goto('/login');
+    await page.goto('/en/login');
     await expect(page.getByRole('link', { name: 'Continue as a guest and see the demos' })).toBeVisible();
-    await page.goto('/register?plan=sistema-rag&tier=esencial');
+    await page.goto('/en/register?plan=sistema-rag&tier=esencial');
     await expect(page.getByText('Your chosen plan')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Request a quote for this plan' })).toHaveAttribute('href', '/contact?service=sistema-rag&plan=esencial');
+    await expect(page.getByRole('link', { name: 'Request a quote for this plan' })).toHaveAttribute('href', '/en/contact?service=sistema-rag&plan=esencial');
   });
 
   test('/register no muestra planes ni precios que no están publicados', async ({ page }) => {

@@ -21,6 +21,18 @@ Disallow: /liquidacion
 Disallow: /activar/
 Disallow: /propuesta/
 Disallow: /demo-acceso/
+Disallow: /en/dashboard
+Disallow: /en/admin
+Disallow: /en/login
+Disallow: /en/register
+Disallow: /en/forgot-password
+Disallow: /en/reset-password
+Disallow: /en/auth/
+Disallow: /en/liquidacion
+Disallow: /en/activar/
+Disallow: /en/propuesta/
+Disallow: /en/demo-acceso/
+Disallow: /en/test
 Disallow: /*?*sessionId=*
 Disallow: /*?*token=*
 
@@ -39,6 +51,18 @@ Disallow: /liquidacion
 Disallow: /activar/
 Disallow: /propuesta/
 Disallow: /demo-acceso/
+Disallow: /en/dashboard
+Disallow: /en/admin
+Disallow: /en/login
+Disallow: /en/register
+Disallow: /en/forgot-password
+Disallow: /en/reset-password
+Disallow: /en/auth/
+Disallow: /en/liquidacion
+Disallow: /en/activar/
+Disallow: /en/propuesta/
+Disallow: /en/demo-acceso/
+Disallow: /en/test
 Disallow: /*?*sessionId=*
 Disallow: /*?*token=*
 Crawl-delay: 5

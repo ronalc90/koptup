@@ -25,6 +25,18 @@ async function loadMiddleware() {
 
 const request = (path: string) => new NextRequest(`http://localhost:3300${path}`);
 
+function rewriteOf(res: Response): URL | null {
+  const value = res.headers.get('x-middleware-rewrite');
+  return value ? new URL(value) : null;
+}
+
+/** Sin bloqueo: next-intl solo reescribe la ruta a su idioma (/es/…, /en/…). */
+function passed(res: Response): boolean {
+  if (res.headers.get('x-middleware-next') === '1') return true;
+  const target = rewriteOf(res);
+  return !!target && /^\/(es|en)\/(?!demo-acceso\/)/.test(target.pathname);
+}
+
 describe('middleware: páginas públicas dentro de una demo con acceso', () => {
   const realFetch = global.fetch;
   beforeEach(() => {
@@ -42,8 +54,8 @@ describe('middleware: páginas públicas dentro de una demo con acceso', () => {
     const middleware = await loadMiddleware();
     for (const path of ['/demo/lms/verificar', '/demo/lms/verificar/', '/demo/lms/verificar?d=abc']) {
       const res = await middleware(request(path));
-      expect(res.headers.get('x-middleware-next')).toBe('1');
-      expect(res.headers.get('x-middleware-rewrite')).toBeNull();
+      expect(passed(res)).toBe(true);
+      expect(rewriteOf(res)?.pathname).toBe('/es/demo/lms/verificar');
       expect(res.headers.get('x-robots-tag')).toBe('noindex');
     }
     expect(calls.some((c) => c.includes('/demo-access/'))).toBe(false);
@@ -53,7 +65,7 @@ describe('middleware: páginas públicas dentro de una demo con acceso', () => {
     const middleware = await loadMiddleware();
     for (const path of ['/demo/lms', '/demo/lms/verificar-otra', '/demo/lms/curso/verificar']) {
       const target = new URL((await middleware(request(path))).headers.get('x-middleware-rewrite')!);
-      expect(target.pathname).toBe('/demo-acceso/lms');
+      expect(target.pathname).toBe('/es/demo-acceso/lms');
       expect(target.searchParams.get('motivo')).toBe('sin_sesion');
     }
   });

@@ -95,6 +95,19 @@ const nextConfig = {
   },
 
   // Security & SEO headers
+  // Páginas retiradas: la redirección vive en la configuración (no en una página
+  // que se renderiza), así la respuesta se cachea. Vale para /en también.
+  async redirects() {
+    return [
+      { source: '/pricing', destination: '/services#planes-rag', permanent: true },
+      { source: '/en/pricing', destination: '/en/services#planes-rag', permanent: true },
+      { source: '/soluciones-ia', destination: '/rag', permanent: true },
+      { source: '/en/soluciones-ia', destination: '/en/rag', permanent: true },
+      { source: '/demo/ecommerce/admin', destination: '/demo/ecommerce?view=admin', permanent: true },
+      { source: '/en/demo/ecommerce/admin', destination: '/en/demo/ecommerce?view=admin', permanent: true },
+    ];
+  },
+
   async headers() {
     const securityHeaders = [
       {
@@ -125,8 +138,8 @@ const nextConfig = {
     });
     return [
       {
-        // Todo el sitio menos /embed/*: solo se puede incrustar en el propio dominio.
-        source: '/:path((?!embed(?:/|$)).*)',
+        // Todo el sitio menos /embed/* (con o sin /en): solo se puede incrustar en el propio dominio.
+        source: '/:path((?!(?:en/)?embed(?:/|$)).*)',
         headers: [
           ...securityHeaders,
           {
@@ -140,7 +153,7 @@ const nextConfig = {
         // /embed/* (chat del widget, apps/web/public/widget.js): se incrusta en el
         // sitio de cada cliente, así que no lleva X-Frame-Options y permite
         // cualquier frame-ancestor.
-        source: '/embed/:path*',
+        source: '/:locale(en)?/embed/:path*',
         headers: [...securityHeaders, contentSecurityPolicy('*')]
       },
       {
@@ -148,14 +161,14 @@ const nextConfig = {
         // micrófono del visitante (con su permiso): solo esa ruta y solo para el
         // propio sitio. Va después de la regla general, así que la reemplaza
         // (`:path*` incluye la propia /demo/telemedicina).
-        source: '/demo/telemedicina/:path*',
+        source: '/:locale(en)?/demo/telemedicina/:path*',
         headers: [{ key: 'Permissions-Policy', value: TELEMEDICINE_PERMISSIONS_POLICY }]
       },
       {
         // Enlaces de un solo uso y páginas de cuenta: no se indexan aunque un
         // buscador llegue por un enlace externo (además de robots.txt y del
         // meta robots de cada página).
-        source: '/:path(login|register|forgot-password|reset-password|auth/.*|activar/.*|propuesta/.*)',
+        source: '/:locale(en)?/:path(login|register|forgot-password|reset-password|auth/.*|activar/.*|propuesta/.*)',
         headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }]
       },
       // Cache static assets aggressively

@@ -3,6 +3,7 @@ import { RAG_PATH, RAG_SECTORS } from '@/lib/rag-page';
 import { SITE_URL } from '@/lib/site';
 import { fetchSitemapCatalog, openDemoSlugs } from '@/lib/sitemap-demos';
 import { isDemoVitrina } from '@/lib/demo-showcase';
+import { localeAlternates, localizedUrl } from '@/lib/i18n-url';
 import LAST_MODIFIED from '@/lib/sitemap-lastmod.json';
 
 // Se regenera cada hora: así sigue al catálogo de demos que edita el admin.
@@ -14,6 +15,18 @@ export const revalidate = 3600;
 
 // Dominio canónico (con www).
 const baseUrl = SITE_URL;
+
+type SitemapEntry = Omit<MetadataRoute.Sitemap[number], 'url' | 'alternates'>;
+
+/**
+ * Cada página en sus dos idiomas (/about y /en/about), con hreflang entre ellas.
+ */
+const bothLocales = (path: string, entry: SitemapEntry): MetadataRoute.Sitemap =>
+  (['es', 'en'] as const).map((locale) => ({
+    ...entry,
+    url: localizedUrl(path, locale),
+    alternates: { languages: localeAlternates(path, locale).languages },
+  }));
 
 /**
  * Fecha de última modificación de cada URL: la del último commit que tocó sus
@@ -58,19 +71,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Solo las demos de vitrina se indexan (lib/demo-showcase.ts).
   const demoSlugs = openDemoSlugs(await fetchSitemapCatalog()).filter(isDemoVitrina);
 
-  const staticEntries: MetadataRoute.Sitemap = staticPages.map((p) => ({
-    url: `${baseUrl}${p.path}`,
-    lastModified: lastModifiedFor(p.path || '/'),
-    changeFrequency: p.changeFrequency,
-    priority: p.priority,
-  }));
+  const staticEntries: MetadataRoute.Sitemap = staticPages.flatMap((p) =>
+    bothLocales(p.path, {
+      lastModified: lastModifiedFor(p.path || '/'),
+      changeFrequency: p.changeFrequency,
+      priority: p.priority,
+    }),
+  );
 
-  const demoEntries: MetadataRoute.Sitemap = demoSlugs.map((slug) => ({
-    url: `${baseUrl}/demo/${slug}`,
-    lastModified: lastModifiedFor(`/demo/${slug}`),
-    changeFrequency: 'weekly',
-    priority: 0.8,
-  }));
+  const demoEntries: MetadataRoute.Sitemap = demoSlugs.flatMap((slug) =>
+    bothLocales(`/demo/${slug}`, {
+      lastModified: lastModifiedFor(`/demo/${slug}`),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    }),
+  );
 
   return [...staticEntries, ...demoEntries];
 }

@@ -1,4 +1,6 @@
+import createIntlMiddleware from 'next-intl/middleware';
 import { isDemoSinIndexar } from '@/lib/demo-showcase';
+import { routing } from '@/i18n/routing';
 import { NextRequest, NextResponse } from 'next/server';
 import { API_BASE } from '@/lib/backend-url';
 import { STAFF_ROLES, adminRolesFor, hasRole, homePathForRole, prospectCanAccess } from '@/lib/auth-roles';
@@ -31,19 +33,21 @@ import { DEMO_DEFAULTS_BY_SLUG, type DemoAccessMode, isKnownDemoSlug, isPublicDe
  * a la del backend, que vuelve a autorizar cada endpoint.
  */
 
+// Toda página pasa por next-intl, que reescribe `/about` a `/es/about`. Quedan
+// fuera la API, los archivos de metadata de la raíz (opengraph-image, icon) y
+// los archivos con extensión (public/).
 export const config = {
-  matcher: [
-    '/admin',
-    '/admin/:path*',
-    '/dashboard',
-    '/dashboard/:path*',
-    '/liquidacion',
-    '/liquidacion/:path*',
-    '/demo/:path+',
-  ],
+  matcher: ['/((?!api|_next|_vercel|opengraph-image|icon|.*\\..*).*)'],
 };
 
+const intlMiddleware = createIntlMiddleware(routing);
+
 type Area = { roles: readonly string[] | 'any' };
+
+/** /admin, /dashboard y /liquidacion: las únicas rutas con sesión obligatoria. */
+function isPrivateArea(pathname: string): boolean {
+  return ['/admin', '/dashboard', '/liquidacion'].some((root) => pathname === root || pathname.startsWith(`${root}/`));
+}
 
 function areaFor(pathname: string): Area {
   if (pathname === '/admin' || pathname.startsWith('/admin/')) return { roles: adminRolesFor(pathname) };
@@ -154,21 +158,41 @@ function setRenewedToken(req: NextRequest, res: NextResponse, token: string | nu
   });
 }
 
+/** Idioma de la URL y la ruta sin su prefijo: `/en/admin` → { locale: 'en', path: '/admin' }. */
+function splitLocale(pathname: string): { locale: 'es' | 'en'; path: string } {
+  if (pathname === '/en' || pathname.startsWith('/en/')) {
+    return { locale: 'en', path: pathname.slice(3) || '/' };
+  }
+  return { locale: 'es', path: pathname };
+}
+
+/**
+ * Ruta del mismo idioma que la petición. El español no lleva prefijo; el
+ * inglés, `/en`.
+ */
+function localizedTarget(req: NextRequest, path: string): string {
+  const prefix = splitLocale(req.nextUrl.pathname).locale === 'en' ? '/en' : '';
+  return path === '/' ? prefix || '/' : `${prefix}${path}`;
+}
+
 function redirectToLogin(req: NextRequest): NextResponse {
   const url = req.nextUrl.clone();
-  url.pathname = '/login';
+  url.pathname = localizedTarget(req, '/login');
   url.search = '';
   url.searchParams.set('redirect', `${req.nextUrl.pathname}${req.nextUrl.search}`);
   const res = NextResponse.redirect(url);
   res.cookies.delete(ACCESS_COOKIE);
+  res.headers.set('Cache-Control', 'no-store');
   return res;
 }
 
-function redirectTo(req: NextRequest, pathname: string): NextResponse {
+function redirectTo(req: NextRequest, path: string): NextResponse {
   const url = req.nextUrl.clone();
-  url.pathname = pathname;
+  url.pathname = localizedTarget(req, path);
   url.search = '';
-  return NextResponse.redirect(url);
+  const res = NextResponse.redirect(url);
+  res.headers.set('Cache-Control', 'no-store');
+  return res;
 }
 
 function unavailable(): NextResponse {
@@ -286,7 +310,8 @@ function accessScreen(
   renewedToken: string | null,
 ): NextResponse {
   const url = req.nextUrl.clone();
-  url.pathname = `/demo-acceso/${slug}`;
+  // Una reescritura apunta a una ruta interna, que siempre lleva el idioma.
+  url.pathname = `/${splitLocale(req.nextUrl.pathname).locale}/demo-acceso/${slug}`;
   url.search = '';
   url.searchParams.set('motivo', DENIED.has(info.motivo) ? info.motivo : 'sin_acceso');
   if (info.modo) url.searchParams.set('modo', String(info.modo));
@@ -304,10 +329,11 @@ function accessScreen(
 // lib/demo-access-defaults: DemoAccessWatcher usa la misma lista.
 
 async function demoGate(req: NextRequest): Promise<NextResponse> {
-  const slug = req.nextUrl.pathname.split('/')[2]?.toLowerCase() ?? '';
+  const path = splitLocale(req.nextUrl.pathname).path;
+  const slug = path.split('/')[2]?.toLowerCase() ?? '';
   // Rutas que no son una demo conocida: las resuelve Next (404 si no existen).
   if (!isKnownDemoSlug(slug)) return NextResponse.next();
-  if (isPublicDemoSubpath(req.nextUrl.pathname)) {
+  if (isPublicDemoSubpath(path)) {
     const res = NextResponse.next();
     res.headers.set('X-Robots-Tag', 'noindex');
     return res;
@@ -366,16 +392,23 @@ async function demoGate(req: NextRequest): Promise<NextResponse> {
 
 // ---------------------------------------------------------------------------
 
-export async function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
-  if (pathname.startsWith('/demo/')) {
+/**
+ * Guardia de /admin, /dashboard, /liquidacion y /demo/*. Devuelve la respuesta
+ * final (bloqueo, redirección o reescritura) o `NextResponse.next()` si la
+ * petición puede seguir.
+ */
+async function guardPath(req: NextRequest, path: string): Promise<NextResponse> {
+  if (path.startsWith('/demo/')) {
     const res = await demoGate(req);
     // Demos de apoyo y ocultas: fuera de buscadores (lib/demo-showcase.ts).
-    if (isDemoSinIndexar(pathname.split('/')[2]?.toLowerCase() ?? '')) res.headers.set('X-Robots-Tag', 'noindex');
+    if (isDemoSinIndexar(path.split('/')[2]?.toLowerCase() ?? '')) res.headers.set('X-Robots-Tag', 'noindex');
     return res;
   }
 
-  const area = areaFor(pathname);
+  // Solo las áreas privadas pasan por la sesión; el resto de páginas sigue.
+  if (!isPrivateArea(path)) return NextResponse.next();
+
+  const area = areaFor(path);
   const token = req.cookies.get(ACCESS_COOKIE)?.value;
   const refreshToken = req.cookies.get(REFRESH_COOKIE)?.value;
 
@@ -393,12 +426,12 @@ export async function middleware(req: NextRequest) {
   const role = me.user.role;
   if (area.roles !== 'any' && !hasRole(role, area.roles)) {
     const home = homePathForRole(role);
-    const res = redirectTo(req, home === pathname ? '/' : home);
+    const res = redirectTo(req, home === path ? '/' : home);
     setRenewedToken(req, res, renewedToken);
     return res;
   }
   // Un prospecto (cuenta creada al aprobar una demo) solo ve Mis demos y su perfil.
-  if (role === 'prospect' && (pathname === '/dashboard' || pathname.startsWith('/dashboard/')) && !prospectCanAccess(pathname)) {
+  if (role === 'prospect' && (path === '/dashboard' || path.startsWith('/dashboard/')) && !prospectCanAccess(path)) {
     const res = redirectTo(req, '/dashboard/demos');
     setRenewedToken(req, res, renewedToken);
     return res;
@@ -408,5 +441,24 @@ export async function middleware(req: NextRequest) {
   res.headers.set('Cache-Control', 'no-store');
   res.headers.set('X-Robots-Tag', 'noindex');
   setRenewedToken(req, res, renewedToken);
+  return res;
+}
+
+/** Cabeceras y cookies del guardia que deben llegar a la respuesta de next-intl. */
+function carryGuardHeaders(from: NextResponse, to: NextResponse): void {
+  for (const name of ['cache-control', 'x-robots-tag']) {
+    const value = from.headers.get(name);
+    if (value) to.headers.set(name, value);
+  }
+  for (const cookie of from.cookies.getAll()) to.cookies.set(cookie);
+}
+
+export async function middleware(req: NextRequest) {
+  const guard = await guardPath(req, splitLocale(req.nextUrl.pathname).path);
+  if (guard.headers.get('x-middleware-next') !== '1') return guard;
+
+  // Sin bloqueo: next-intl resuelve el idioma de la URL y reescribe la ruta.
+  const res = intlMiddleware(req);
+  carryGuardHeaders(guard, res);
   return res;
 }

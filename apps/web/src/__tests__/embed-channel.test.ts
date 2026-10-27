@@ -2,8 +2,8 @@
  * Canal del chat embebido: solo el widget real guarda historial; la vista
  * previa del Builder (el chat dentro de /demo/chatbot) envía `preview`.
  */
-import { chatFromEmbed, detectEmbedChannel, embedErrorKey } from '@/app/embed/chatbot/[botId]/embedChannel';
-import { BotApiError } from '@/app/demo/chatbot/components/builder/api';
+import { chatFromEmbed, detectEmbedChannel, embedErrorKey } from '@/app/[locale]/embed/chatbot/[botId]/embedChannel';
+import { BotApiError } from '@/app/[locale]/demo/chatbot/components/builder/api';
 
 function fakeWindow(top: unknown, origin = 'https://www.koptup.com'): Window {
   const win: { location: { origin: string; pathname: string }; top?: unknown } = { location: { origin, pathname: '/embed/chatbot/kbot_x' } };
