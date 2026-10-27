@@ -13,6 +13,7 @@
 
 import { Metadata } from 'next';
 import { clampDescription } from '@/lib/meta-text';
+import { seoConfigEn } from '@/lib/seo-config.en';
 import { DEMO_COUNT } from './demos';
 import { formatRagCOP, getRagPlan } from './rag-plans';
 import { localeAlternates, localizedUrl } from '@/lib/i18n-url';
@@ -414,7 +415,9 @@ export const seoConfig: Record<string, PageSEO> = {
  * Genera metadata completa para una página
  */
 export function pageMetadata(pageKey: string, locale: string): Metadata {
-  const config = seoConfig[pageKey];
+  // En /en, título y descripción salen de seoConfigEn (canonical e imágenes, comunes).
+  const base = seoConfig[pageKey];
+  const config = base && locale === 'en' ? { ...base, ...seoConfigEn[pageKey] } : base;
   if (!config) {
     console.warn(`No SEO config found for page: ${pageKey}`);
     return {};
