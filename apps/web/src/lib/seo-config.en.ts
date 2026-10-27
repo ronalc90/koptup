@@ -51,10 +51,6 @@ export const seoConfigEn: Record<string, { title: string; description: string }>
     title: 'RAG Systems and Custom Software Pricing',
     description: `RAG systems: ${RAG_PILOT.weeks.max}-week pilot for ${formatRagCOP(RAG_PILOT.setup.cop)} and plans from ${formatRagCOP(RAG_ESSENTIAL.setup.cop)} (prices in COP and USD, plus IVA where applicable). And other custom solutions.`,
   },
-  pricing: {
-    title: 'Plans and Pricing',
-    description: 'RAG system plans with prices in COP and USD, plus IVA where applicable, and other custom software solutions.',
-  },
   contact: {
     title: 'Contact: Request Your Free Quote',
     description: 'Contact KopTup for a no-obligation software development quote. We reply within 24 hours. WhatsApp, email and phone calls available. Bogotá, Colombia.',
