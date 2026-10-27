@@ -34,7 +34,7 @@ export default async function LoyaltyLayout({ children, params: { locale } }: { 
     { name: t('breadcrumbHome'), url: '/' },
     { name: t('breadcrumbDemos'), url: '/demo' },
     { name: t('breadcrumbName'), url: '/demo/loyalty' },
-  ]);
+  ], locale);
 
   return (
     <>

@@ -33,7 +33,7 @@ export default async function SistemaReservasLayout({ children, params: { locale
     { name: t('breadcrumbHome'), url: '/' },
     { name: t('breadcrumbDemos'), url: '/demo' },
     { name: t('breadcrumbName'), url: '/demo/sistema-reservas' },
-  ]);
+  ], locale);
 
   return (
     <>

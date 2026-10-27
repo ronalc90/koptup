@@ -36,7 +36,7 @@ export default async function CrmIaLayout({ children, params: { locale } }: { ch
     { name: t('breadcrumbHome'), url: '/' },
     { name: t('breadcrumbDemos'), url: '/demo' },
     { name: t('breadcrumbName'), url: '/demo/crm-ia' },
-  ]);
+  ], locale);
 
   return (
     <>

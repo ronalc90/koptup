@@ -10,12 +10,12 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function CuentasMedicasLayout({ children }: { children: React.ReactNode }) {
+export default function CuentasMedicasLayout({ children, params: { locale } }: { children: React.ReactNode; params: { locale: string } }) {
   const breadcrumbSchema = getBreadcrumbSchema([
-    { name: 'Inicio', url: '/' },
-    { name: 'Demos', url: '/demo' },
-    { name: 'Sistema experto para salud', url: '/demo/cuentas-medicas' },
-  ]);
+    { name: 'Inicio', nameEn: 'Home', url: '/' },
+    { name: 'Demos', nameEn: 'Demos', url: '/demo' },
+    { name: 'Sistema experto para salud', nameEn: 'Healthcare expert system', url: '/demo/cuentas-medicas' },
+  ], locale);
 
   return (
     <>

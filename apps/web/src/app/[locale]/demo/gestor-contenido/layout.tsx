@@ -38,7 +38,7 @@ export default async function GestorContenidoLayout({ children, params: { locale
     { name: t('breadcrumbHome'), url: '/' },
     { name: t('breadcrumbDemos'), url: '/demo' },
     { name: t('breadcrumb'), url: '/demo/gestor-contenido' },
-  ]);
+  ], locale);
 
   return (
     <>

@@ -9,13 +9,13 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata('rag-legal', await getLocale());
 }
 
-const breadcrumbSchema = getBreadcrumbSchema([
-  { name: 'Inicio', url: '/' },
-  { name: 'Sistemas RAG', url: RAG_PATH },
-  { name: 'Legal', url: getRagSector('legal').path },
-]);
+export default function RagLegalPage({ params: { locale } }: { params: { locale: string } }) {
+  const breadcrumbSchema = getBreadcrumbSchema([
+    { name: 'Inicio', nameEn: 'Home', url: '/' },
+    { name: 'Sistemas RAG', nameEn: 'RAG systems', url: RAG_PATH },
+    { name: 'Legal', nameEn: 'Legal', url: getRagSector('legal').path },
+  ], locale);
 
-export default function RagLegalPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />

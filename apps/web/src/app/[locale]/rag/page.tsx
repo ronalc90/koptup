@@ -5,7 +5,7 @@ import { pageMetadata, getBreadcrumbSchema } from '@/lib/seo-config';
 import { getRagServiceJsonLd } from '@/lib/rag-plans-jsonld';
 import { getRagFaqJsonLd } from '@/lib/rag-page-jsonld';
 import { RAG_PAGE_PLANS_ANCHOR, RAG_PATH } from '@/lib/rag-page';
-import { absoluteUrl } from '@/lib/site';
+import { localizedPath, localizedUrl } from '@/lib/i18n-url';
 
 /**
  * /rag — página principal de sistemas RAG.
@@ -22,20 +22,25 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-// JSON-LD (se renderiza en el servidor): Service con cada plan como Offer
-// (misma tabla visible en #planes-rag), FAQPage con las 8 preguntas de la
-// página y breadcrumb.
-const serviceSchema = getRagServiceJsonLd(
-  absoluteUrl(RAG_PATH),
-  absoluteUrl(`${RAG_PATH}#${RAG_PAGE_PLANS_ANCHOR}`),
-);
-const faqSchema = getRagFaqJsonLd();
-const breadcrumbSchema = getBreadcrumbSchema([
-  { name: 'Inicio', url: '/' },
-  { name: 'Sistemas RAG', url: RAG_PATH },
-]);
+/**
+ * JSON-LD (se renderiza en el servidor) en el idioma de la página: Service con
+ * cada plan como Offer (misma tabla visible en #planes-rag), FAQPage con las 8
+ * preguntas de la página y breadcrumb.
+ */
+export default async function RagPage() {
+  const locale = await getLocale();
+  const en = locale === 'en';
+  const serviceSchema = getRagServiceJsonLd(
+    localizedUrl(RAG_PATH, locale),
+    locale,
+    localizedUrl(`${RAG_PATH}#${RAG_PAGE_PLANS_ANCHOR}`, locale),
+  );
+  const faqSchema = getRagFaqJsonLd(locale);
+  const breadcrumbSchema = getBreadcrumbSchema([
+    { name: en ? 'Home' : 'Inicio', url: localizedPath('/', locale) },
+    { name: en ? 'RAG systems' : 'Sistemas RAG', url: localizedPath(RAG_PATH, locale) },
+  ]);
 
-export default function RagPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />

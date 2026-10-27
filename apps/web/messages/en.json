@@ -1197,7 +1197,7 @@
         "pilotValue": "{weeks} weeks",
         "pilot": "RAG pilot with your documents",
         "baseValue": "Bogotá",
-        "base": "team in Colombia"
+        "base": "city"
       }
     },
     "facts": {

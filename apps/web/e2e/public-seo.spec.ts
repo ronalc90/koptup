@@ -34,10 +34,10 @@ function metas(html: string) {
  */
 async function toggleLanguage(page: Page, testInfo: TestInfo, label: RegExp) {
   await page.waitForLoadState('networkidle');
-  let button = page.getByRole('navigation').getByRole('button', { name: label }).first();
+  let button = page.getByRole('navigation').getByRole('link', { name: label }).first();
   if (isMobile(testInfo)) {
     await page.getByRole('button', { name: /Abrir menú|Open menu/ }).click();
-    button = page.locator('#mobile-menu').getByRole('button', { name: label });
+    button = page.locator('#mobile-menu').getByRole('link', { name: label });
   }
   await Promise.all([page.waitForEvent('load'), button.click()]);
 }

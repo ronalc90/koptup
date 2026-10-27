@@ -49,6 +49,13 @@ export const HOME_DESCRIPTION_EN =
 export const HOME_DESCRIPTION =
   'Sistemas RAG para empresas en Colombia: IA que responde con tus manuales, contratos y políticas, cita la fuente y protege tus datos. Prueba la demo gratis.';
 
+/** `Organization.description` del JSON-LD, en español (/) y en inglés (/en). */
+export const ORGANIZATION_DESCRIPTION =
+  'KopTup es un estudio de desarrollo de software a medida en Bogotá, Colombia. Su producto principal son los sistemas RAG: IA que responde con los documentos de cada empresa y cita la fuente. También desarrolla software a medida, chatbots con IA, e-commerce y dashboards ejecutivos.';
+
+export const ORGANIZATION_DESCRIPTION_EN =
+  "KopTup is a custom software development studio in Bogotá, Colombia. Its main product is RAG systems: AI that answers with each company's documents and cites the source. It also builds custom software, AI chatbots, e-commerce and executive dashboards.";
+
 /** Convierte una ruta del sitio (`/services`) en URL absoluta canónica. */
 export function absoluteUrl(path = ''): string {
   if (!path || path === '/') return SITE_URL;

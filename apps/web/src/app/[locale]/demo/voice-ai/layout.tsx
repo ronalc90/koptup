@@ -34,7 +34,7 @@ export default async function VoiceAiLayout({ children, params: { locale } }: { 
     { name: t('breadcrumbHome'), url: '/' },
     { name: t('breadcrumbDemos'), url: '/demo' },
     { name: t('breadcrumbName'), url: '/demo/voice-ai' },
-  ]);
+  ], locale);
 
   return (
     <>

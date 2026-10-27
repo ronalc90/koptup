@@ -33,7 +33,7 @@ export default async function LmsLayout({ children, params: { locale } }: { chil
     { name: t('breadcrumbHome'), url: '/' },
     { name: t('breadcrumbDemos'), url: '/demo' },
     { name: t('breadcrumbTitle'), url: '/demo/lms' },
-  ]);
+  ], locale);
 
   return (
     <>

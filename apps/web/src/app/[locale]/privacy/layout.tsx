@@ -6,11 +6,11 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata('privacy', await getLocale());
 }
 
-export default function PrivacyLayout({ children }: { children: React.ReactNode }) {
+export default function PrivacyLayout({ children, params: { locale } }: { children: React.ReactNode; params: { locale: string } }) {
   const breadcrumbSchema = getBreadcrumbSchema([
-    { name: 'Inicio', url: '/' },
-    { name: 'Política de Privacidad', url: '/privacy' },
-  ]);
+    { name: 'Inicio', nameEn: 'Home', url: '/' },
+    { name: 'Política de Privacidad', nameEn: 'Privacy policy', url: '/privacy' },
+  ], locale);
 
   return (
     <>

@@ -36,7 +36,7 @@ export default async function HelpdeskIaLayout({ children, params: { locale } }:
     { name: t('breadcrumbHome'), url: '/' },
     { name: t('breadcrumbDemos'), url: '/demo' },
     { name: t('breadcrumbName'), url: '/demo/helpdesk-ia' },
-  ]);
+  ], locale);
 
   return (
     <>

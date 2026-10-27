@@ -41,7 +41,7 @@ export default async function DashboardEjecutivoLayout({ children, params: { loc
     { name: t('breadcrumbHome'), url: '/' },
     { name: t('breadcrumbDemos'), url: '/demo' },
     { name: t('title'), url: '/demo/dashboard-ejecutivo' },
-  ]);
+  ], locale);
 
   return (
     <>

@@ -18,12 +18,13 @@ export async function generateMetadata(): Promise<Metadata> {
 // AggregateOffer, FAQPage con las mismas preguntas de la página y breadcrumb.
 const serviceSchema = getChatbotsServiceJsonLd();
 const faqSchema = getChatbotsFaqJsonLd();
-const breadcrumbSchema = getBreadcrumbSchema([
-  { name: 'Inicio', url: '/' },
-  { name: 'Chatbots RAG para WhatsApp y web', url: CHATBOTS_PATH },
-]);
 
-export default function ChatbotsIALayout({ children }: { children: React.ReactNode }) {
+export default function ChatbotsIALayout({ children, params: { locale } }: { children: React.ReactNode; params: { locale: string } }) {
+  const breadcrumbSchema = getBreadcrumbSchema([
+    { name: 'Inicio', nameEn: 'Home', url: '/' },
+    { name: 'Chatbots RAG para WhatsApp y web', nameEn: 'RAG chatbots for WhatsApp and web', url: CHATBOTS_PATH },
+  ], locale);
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />

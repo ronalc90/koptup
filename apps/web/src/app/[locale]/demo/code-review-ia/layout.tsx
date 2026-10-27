@@ -42,7 +42,7 @@ export default async function CodeReviewIaLayout({ children, params: { locale } 
     { name: t('breadcrumbHome'), url: '/' },
     { name: t('breadcrumbDemos'), url: '/demo' },
     { name: t('breadcrumbName'), url: '/demo/code-review-ia' },
-  ]);
+  ], locale);
 
   return (
     <>

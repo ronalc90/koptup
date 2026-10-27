@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense, type CSSProperties, type MouseEvent as ReactMouseEvent } from 'react';
 import { Link, usePathname, useRouter } from '@/i18n/navigation';
 import { useLocale, useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import {
   Bars3Icon,
@@ -27,11 +28,62 @@ import { localizedPath } from '@/lib/i18n-url';
 
 import SiteSearch from './SiteSearch';
 
+interface LanguageLinkProps {
+  className: string;
+  style?: CSSProperties;
+}
+
+/**
+ * Cambio de idioma: un <a href> real a la misma página en el otro idioma
+ * (/about ↔ /en/about), con su query. Así funciona sin JavaScript y los
+ * buscadores lo siguen. El ancla no llega al servidor, así que se toma del
+ * navegador al hacer clic. Se carga la página completa en el otro idioma.
+ */
+function LanguageLinkView({ className, style, query }: LanguageLinkProps & { query: string }) {
+  const currentLocale = useLocale();
+  const pathname = usePathname();
+  const t = useTranslations();
+  const otherLocale = currentLocale === 'es' ? 'en' : 'es';
+  const href = `${localizedPath(pathname, otherLocale)}${query ? `?${query}` : ''}`;
+
+  const keepHash = (event: ReactMouseEvent<HTMLAnchorElement>) => {
+    if (window.location.hash) event.currentTarget.href = `${href}${window.location.hash}`;
+  };
+
+  return (
+    <a
+      href={href}
+      onClick={keepHash}
+      className={className}
+      style={style}
+      aria-label={t('nav.switchLanguage')}
+      title={t('nav.switchLanguage')}
+    >
+      <GlobeAltIcon className="h-5 w-5" />
+      <span className="text-xs font-semibold uppercase">{currentLocale}</span>
+    </a>
+  );
+}
+
+/** useSearchParams necesita Suspense: sin él la página estática no se genera. */
+function LanguageLinkWithQuery(props: LanguageLinkProps) {
+  const query = useSearchParams().toString();
+  return <LanguageLinkView {...props} query={query} />;
+}
+
+/** En el HTML inicial el enlace va sin query; en el navegador ya lleva la de la página. */
+function LanguageLink(props: LanguageLinkProps) {
+  return (
+    <Suspense fallback={<LanguageLinkView {...props} query="" />}>
+      <LanguageLinkWithQuery {...props} />
+    </Suspense>
+  );
+}
+
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const currentLocale = useLocale();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
@@ -138,18 +190,6 @@ export default function Navbar() {
             { href: '/contact', label: t('nav.support'), icon: LifebuoyIcon },
           ];
 
-const toggleLanguage = () => {
-  // El idioma va en la URL (/about ↔ /en/about). Se carga la misma página en el
-  // otro idioma y se conservan la query y el ancla: la demo elegida en
-  // /solicitar-demo, el plan en /contact o ?mode=upload.
-  const next = currentLocale === 'es' ? 'en' : 'es';
-  const path = window.location.pathname.replace(/^\/en(?=\/|$)/, '') || '/';
-  window.location.assign(`${localizedPath(path, next)}${window.location.search}${window.location.hash}`);
-};
-
-
-
-
   return (
     <nav
       ref={navRef}
@@ -187,7 +227,7 @@ const toggleLanguage = () => {
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  'px-3 xl:px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+                  'px-3 lg:px-2 xl:px-4 py-2 rounded-lg text-sm font-medium transition-colors',
                   isActive(item.href)
                     ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-950'
                     : 'hover:text-primary-600 dark:hover:text-primary-400 hover:bg-secondary-100 dark:hover:bg-secondary-800'
@@ -203,18 +243,12 @@ const toggleLanguage = () => {
 
           {/* Right side actions */}
           <div className="hidden md:flex items-center space-x-2 xl:space-x-4">
-            <SiteSearch className="hidden w-44 xl:block" />
+            <SiteSearch className="hidden w-32 lg:block xl:w-44" />
             {/* Language Toggle */}
-            <button
-              onClick={toggleLanguage}
+            <LanguageLink
               className="flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-secondary-100 dark:hover:bg-secondary-800 transition-colors"
               style={{ color: textColor }}
-              aria-label={t('nav.switchLanguage')}
-              title={t('nav.switchLanguage')}
-            >
-              <GlobeAltIcon className="h-5 w-5" />
-              <span className="text-xs font-semibold uppercase">{currentLocale}</span>
-            </button>
+            />
 
             {/* Theme Toggle */}
             {mounted && (
@@ -301,7 +335,8 @@ const toggleLanguage = () => {
               </div>
             ) : (
               <>
-                <Button size="sm" variant="outline" asChild>
+                {/* Entre 1024 y 1279 px no cabe con el buscador; su destino ya está en el menú «Planes y servicios». */}
+                <Button size="sm" variant="outline" className="lg:hidden xl:inline-flex" asChild>
                   <Link href="/services#planes-rag">{t('nav.wantThis')}</Link>
                 </Button>
                 <Button size="sm" asChild>
@@ -398,15 +433,7 @@ const toggleLanguage = () => {
                 <Button size="sm" fullWidth variant="outline" asChild>
                   <Link href="/contact">{t('common.contactUs')}</Link>
                 </Button>
-                <button
-                  onClick={toggleLanguage}
-                  className="flex items-center justify-center gap-1 p-2 rounded-lg text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800"
-                  aria-label={t('nav.switchLanguage')}
-                  title={t('nav.switchLanguage')}
-                >
-                  <GlobeAltIcon className="h-5 w-5" />
-                  <span className="text-xs font-semibold uppercase">{currentLocale}</span>
-                </button>
+                <LanguageLink className="flex items-center justify-center gap-1 p-2 rounded-lg text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800" />
                 {mounted && (
                   <button
                     onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}

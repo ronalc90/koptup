@@ -13,7 +13,7 @@ export default async function AboutLayout({ children, params: { locale } }: { ch
   const breadcrumbSchema = getBreadcrumbSchema([
     { name: t('breadcrumbHome'), url: '/' },
     { name: t('breadcrumbAbout'), url: '/about' },
-  ]);
+  ], locale);
 
   return (
     <>

@@ -34,7 +34,7 @@ export default async function EcommerceLayout({ children, params: { locale } }: 
     { name: t('breadcrumbHome'), url: '/' },
     { name: t('breadcrumbDemos'), url: '/demo' },
     { name: t('title'), url: '/demo/ecommerce' },
-  ]);
+  ], locale);
 
   return (
     <>

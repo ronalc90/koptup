@@ -33,7 +33,7 @@ export default async function HrmsLayout({ children, params: { locale } }: { chi
     { name: t('breadcrumbHome'), url: '/' },
     { name: t('breadcrumbDemos'), url: '/demo' },
     { name: t('title'), url: '/demo/hrms' },
-  ]);
+  ], locale);
 
   return (
     <>

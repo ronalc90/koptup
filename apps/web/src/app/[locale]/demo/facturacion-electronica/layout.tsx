@@ -33,7 +33,7 @@ export default async function FacturacionElectronicaLayout({ children, params: {
     { name: t('breadcrumbHome'), url: '/' },
     { name: t('breadcrumbDemos'), url: '/demo' },
     { name: t('breadcrumbName'), url: '/demo/facturacion-electronica' },
-  ]);
+  ], locale);
 
   return (
     <>

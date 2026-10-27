@@ -37,7 +37,7 @@ export default async function SistemaExpertoLayout({ children, params: { locale 
     { name: t('breadcrumbHome'), url: '/' },
     { name: t('breadcrumbDemos'), url: '/demo' },
     { name: t('breadcrumbName'), url: '/demo/sistema-experto' },
-  ]);
+  ], locale);
 
   return (
     <>

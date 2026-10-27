@@ -6,11 +6,11 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata('cookies', await getLocale());
 }
 
-export default function CookiesLayout({ children }: { children: React.ReactNode }) {
+export default function CookiesLayout({ children, params: { locale } }: { children: React.ReactNode; params: { locale: string } }) {
   const breadcrumbSchema = getBreadcrumbSchema([
-    { name: 'Inicio', url: '/' },
-    { name: 'Política de Cookies', url: '/cookies' },
-  ]);
+    { name: 'Inicio', nameEn: 'Home', url: '/' },
+    { name: 'Política de Cookies', nameEn: 'Cookie policy', url: '/cookies' },
+  ], locale);
 
   return (
     <>
