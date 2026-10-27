@@ -50,7 +50,6 @@ const serviceSchema = {
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Desarrollo de Aplicaciones Web a Medida' } },
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Chatbots con Inteligencia Artificial' } },
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Desarrollo E-commerce' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Aplicaciones Móviles iOS y Android' } },
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Dashboards y Business Intelligence' } },
       { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Automatización con IA' } },
     ],

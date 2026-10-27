@@ -2289,10 +2289,6 @@
       "ecommerce": "E-Commerce",
       "chatbot": "Other kind of chatbot",
       "webDev": "Web Development",
-      "mobileDev": "Mobile Development",
-      "apiIntegrations": "API Integrations",
-      "uxui": "UX/UI Design",
-      "consulting": "Consulting",
       "other": "Other"
     },
     "quote": {
@@ -3288,8 +3284,8 @@
     "sv2d": "RAG chatbots for WhatsApp and your website that answer with your company's documents, cite the source and are available at any hour. From {essentialFrom}, or a {pilotFrom} pilot (plus VAT if applicable).",
     "sv3t": "E-commerce Stores",
     "sv3d": "Online stores with shopping cart, inventory management and integration with the payment gateway you choose.",
-    "sv4t": "Mobile Applications",
-    "sv4d": "Android and iOS apps integrated with your existing systems. We quote them based on scope.",
+    "sv4t": "Indicator dashboards",
+    "sv4d": "Your business indicators connected to your data, with each figure and its source. We quote based on scope.",
     "sv5t": "Dashboards & Business Intelligence",
     "sv5d": "Executive dashboards with KPIs, business metrics, charts and reports connected to your data.",
     "sv6t": "AI Automation",

@@ -2,7 +2,7 @@
   "demoEcommerce2": {
     "meta": {
       "title": "Tienda en línea",
-      "seoTitle": "Demo de tienda en línea: catálogo, carrito, pago simulado y reportes",
+      "seoTitle": "Demo de tienda en línea con pago simulado",
       "seoDescription": "Prueba una tienda en línea de ejemplo para Colombia: catálogo con búsqueda y favoritos, carrito con reglas de precio y cupones, pago simulado con tarjeta, PSE, Nequi, Daviplata, contraentrega o a cuotas, panel de pedidos e inventario, guías de envío simuladas, devoluciones y reportes de ventas en COP exportables a CSV. Funciona con datos de ejemplo.",
       "breadcrumbHome": "Inicio",
       "breadcrumbDemos": "Demos"
