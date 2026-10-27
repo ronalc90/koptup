@@ -335,8 +335,8 @@ export default function Navbar() {
               </div>
             ) : (
               <>
-                {/* Entre 1024 y 1279 px no cabe con el buscador; su destino ya está en el menú «Planes y servicios». */}
-                <Button size="sm" variant="outline" className="lg:hidden xl:inline-flex" asChild>
+                {/* Solo desde 1280 px: por debajo no caben el CTA de agenda y este botón (la barra se sale de la pantalla a 768 px). Su destino también está en el menú «Planes y servicios». */}
+                <Button size="sm" variant="outline" className="hidden xl:inline-flex" asChild>
                   <Link href="/services#planes-rag">{t('nav.wantThis')}</Link>
                 </Button>
                 <Button size="sm" asChild>
