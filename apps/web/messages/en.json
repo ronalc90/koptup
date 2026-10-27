@@ -119,10 +119,6 @@
       "title": "Custom Software",
       "description": "Tailored solutions for your business processes"
     },
-    "mobile": {
-      "title": "Mobile Applications",
-      "description": "Native and cross-platform apps for iOS and Android"
-    },
     "uxui": {
       "title": "UX/UI",
       "description": "Modern interfaces focused on conversion"
@@ -204,21 +200,6 @@
         ],
         "price": "From $5,000",
         "deliveryTime": "6-12 weeks"
-      },
-      "mobile": {
-        "title": "Mobile Applications",
-        "shortDescription": "Native and cross-platform apps",
-        "description": "We create native mobile applications for iOS and Android, or cross-platform with React Native and Flutter.",
-        "features": [
-          "Native or cross-platform design",
-          "Push notifications",
-          "Geolocation",
-          "In-app payments",
-          "Offline sync",
-          "Store publishing"
-        ],
-        "price": "From $6,000",
-        "deliveryTime": "8-12 weeks"
       },
       "uxui": {
         "title": "UX/UI Design",

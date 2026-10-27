@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { getBreadcrumbSchema } from '@/lib/seo-config';
 import { SITE_URL, absoluteUrl } from '@/lib/site';
+import { clampDescription } from '@/lib/meta-text';
 import { getChatbotsPageValues } from '@/lib/chatbots-page';
 
 // Precios del FAQ (chatbots y piloto RAG): los mismos de /chatbots-ia, desde rag-plans.ts.
@@ -8,12 +9,13 @@ const chatbotPrice = getChatbotsPageValues('es');
 
 export const metadata: Metadata = {
   title: 'Desarrollo Web y Software a Medida en Colombia',
-  description:
+  description: clampDescription(
     'Contrata a KopTup para desarrollar tu aplicación web, chatbot con IA, e-commerce o sistema empresarial. Estudio de software a medida en Bogotá, Colombia. Precios publicados y cotización gratis.',
+  ),
   alternates: { canonical: absoluteUrl('/desarrollo-web-colombia') },
   openGraph: {
     title: 'Empresa de Desarrollo Web a Medida | KopTup',
-    description: 'Aplicaciones web, chatbots con IA, e-commerce y apps móviles a medida, desde Bogotá. Cotización gratis.',
+    description: 'Aplicaciones web, chatbots con IA, e-commerce y dashboards a medida, desde Bogotá. Cotización gratis.',
     url: absoluteUrl('/desarrollo-web-colombia'),
     siteName: 'KopTup',
     images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Desarrollo Web Colombia - KopTup' }],
@@ -23,7 +25,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Empresa de Desarrollo de Software Colombia | KopTup',
-    description: 'Desarrollo web, chatbots con IA, e-commerce y apps móviles a medida, desde Bogotá. Cotización gratis.',
+    description: 'Desarrollo web, chatbots con IA, e-commerce y dashboards a medida, desde Bogotá. Cotización gratis.',
     images: ['/og-image.png'],
   },
 };
@@ -33,7 +35,7 @@ const serviceSchema = {
   '@type': 'ProfessionalService',
   name: 'KopTup - Desarrollo de Software a Medida',
   description:
-    'Estudio de desarrollo de software a medida con sede en Bogotá, Colombia. Desarrollamos aplicaciones web, chatbots con IA, e-commerce, apps móviles, dashboards y sistemas empresariales.',
+    'Estudio de desarrollo de software a medida con sede en Bogotá, Colombia. Desarrollamos aplicaciones web, chatbots con IA, e-commerce, dashboards y sistemas empresariales.',
   url: SITE_URL,
   telephone: '+57-302-479-4842',
   address: {

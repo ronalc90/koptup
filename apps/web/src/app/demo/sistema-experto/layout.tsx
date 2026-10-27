@@ -1,3 +1,4 @@
+import { clampDescription } from '@/lib/meta-text';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { generateMetadata as metadataBase, getBreadcrumbSchema } from '@/lib/seo-config';
@@ -15,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
       ? base.title.template
       : '%s';
   const titulo = t('title');
-  const descripcion = t('description');
+  const descripcion = clampDescription(t('description'));
   const tituloCompleto = plantilla.replace('%s', titulo);
 
   return {

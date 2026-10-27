@@ -119,10 +119,6 @@
       "title": "Software a Medida",
       "description": "Soluciones personalizadas para tus procesos de negocio"
     },
-    "mobile": {
-      "title": "Aplicaciones Móviles",
-      "description": "Apps nativas y multiplataforma para iOS y Android"
-    },
     "uxui": {
       "title": "UX/UI",
       "description": "Interfaces modernas orientadas a conversión"
@@ -204,21 +200,6 @@
         ],
         "price": "Desde $5,000",
         "deliveryTime": "6-12 semanas"
-      },
-      "mobile": {
-        "title": "Aplicaciones Móviles",
-        "shortDescription": "Apps nativas y multiplataforma",
-        "description": "Creamos aplicaciones móviles nativas para iOS y Android, o multiplataforma con React Native y Flutter.",
-        "features": [
-          "Diseño nativo o multiplataforma",
-          "Notificaciones push",
-          "Geolocalización",
-          "Pagos in-app",
-          "Sincronización offline",
-          "Publicación en tiendas"
-        ],
-        "price": "Desde $6,000",
-        "deliveryTime": "8-12 semanas"
       },
       "uxui": {
         "title": "Diseño UX/UI",
