@@ -15,8 +15,8 @@ export const SITE_NAME = 'KopTup';
 
 /**
  * Plantilla del `<title>`: "<título de la página> | KopTup".
- * Se mantiene como literal (no derivada de SITE_NAME) para que
- * `scripts/check-titles.mjs` pueda leerla sin ejecutar TypeScript.
+ * Se mantiene como literal (no derivada de SITE_NAME) para que se lea tal
+ * cual; `scripts/check-titles.mjs` la usa para revisar cada título.
  */
 export const TITLE_TEMPLATE = '%s | KopTup';
 
@@ -30,7 +30,7 @@ export const MAX_TITLE_LENGTH = 60;
 export const HOME_TITLE = 'Sistemas RAG en Colombia: IA con tus documentos | KopTup';
 
 /** Versión en inglés de HOME_TITLE (/en). */
-export const HOME_TITLE_EN = 'RAG systems in Colombia: AI that uses your documents | KopTup';
+export const HOME_TITLE_EN = 'RAG systems in Colombia: AI with your documents | KopTup';
 
 /**
  * Imagen og/twitter con el mensaje RAG: la genera `src/app/opengraph-image.tsx`

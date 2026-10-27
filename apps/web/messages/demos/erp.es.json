@@ -5,7 +5,7 @@
       "subtitle": "Ventas, inventario en tres bodegas, compras con aprobaciones, producción, contabilidad, cartera y nómina de una empresa ficticia. Lo que haces en un módulo se refleja en los demás.",
       "sampleBadge": "Datos de ejemplo",
       "sampleHint": "Empresa y cifras ficticias generadas para la demo: van desde enero hasta el cierre del mes pasado. La DIAN, los bancos y WhatsApp están simulados.",
-      "seoTitle": "Demo ERP: ventas, inventario, compras y contabilidad",
+      "seoTitle": "Demo ERP: ventas, inventario y contabilidad",
       "seoDescription": "Prueba un ERP modular con datos de ejemplo: cotización, pedido y factura que descuentan inventario y generan el asiento contable, compras con aprobación, conciliación bancaria, cartera por edades, nómina y producción. La validación DIAN está simulada.",
       "breadcrumbHome": "Inicio",
       "breadcrumbDemos": "Demos"

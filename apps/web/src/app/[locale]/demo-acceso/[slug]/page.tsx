@@ -5,6 +5,7 @@ import DemoAccessGate from '@/components/demo/DemoAccessGate';
 import { DEMO_ACCESS_MODES, DEMO_DEFAULTS_BY_SLUG, type DemoAccessMode, isKnownDemoSlug } from '@/lib/demo-access-defaults';
 import { type DemoAccessReason, isDeniedReason } from '@/lib/demo-system';
 import { localizedPath } from '@/lib/i18n-url';
+import { MAX_TITLE_LENGTH, TITLE_TEMPLATE } from '@/lib/site';
 
 /**
  * Pantalla "Solicita acceso" de una demo (wiki 04, §9 y §10).
@@ -27,8 +28,16 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   const demo = DEMO_DEFAULTS_BY_SLUG[params.slug];
   if (!demo) return { robots };
   const [locale, t] = await Promise.all([getLocale(), getTranslations('demoAccess')]);
+  const name = locale === 'en' ? demo.nombreEn : demo.nombre;
+  // "<nombre>: acceso | KopTup" no pasa de MAX_TITLE_LENGTH (scripts/check-titles.mjs):
+  // si el nombre completo no cabe, va sin su aclaración final entre paréntesis
+  // ("Sistema experto para salud (cuentas médicas)" → "Sistema experto para salud").
+  let title = t('metaTitle', { name });
+  if ([...TITLE_TEMPLATE.replace('%s', title)].length > MAX_TITLE_LENGTH) {
+    title = t('metaTitle', { name: name.replace(/\s*\([^)]*\)$/, '') });
+  }
   return {
-    title: t('metaTitle', { name: locale === 'en' ? demo.nombreEn : demo.nombre }),
+    title,
     robots,
     alternates: { canonical: localizedPath(`/demo/${demo.slug}`, locale) },
   };

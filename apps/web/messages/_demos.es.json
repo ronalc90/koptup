@@ -1653,7 +1653,7 @@
   },
   "demoCodeReview": {
     "meta": {
-      "title": "Demo de revisión de código con IA (code review) en pull requests",
+      "title": "Demo de revisión de código con IA en pull requests",
       "description": "Demo interactiva con datos de ejemplo de revisión de código (code review) con IA: seis pull requests de una fintech ficticia con comentarios de IA escritos de antemano, hallazgos de seguridad, pruebas sugeridas y una simulación de cómo llegan a GitHub, GitLab, Bitbucket o Azure DevOps. Incluye un analizador de reglas que revisa tu diff en el navegador, sin IA.",
       "breadcrumbHome": "Inicio",
       "breadcrumbDemos": "Demos",
@@ -5076,7 +5076,7 @@
       "sampleData": "Datos de ejemplo",
       "sampleDataHint": "Marca, sedes, clientes, repartidores, pedidos y cifras son ficticios. Pagos, mensajes de WhatsApp, llamadas, GPS y mapa son simulados.",
       "footer": "Demo con datos de ejemplo de una marca ficticia (Fogón Demo) con 3 sedes en Bogotá. Los pagos con Nequi, Daviplata, PSE o tarjeta, el mensaje de WhatsApp, la llamada enmascarada, la posición del repartidor y el mapa son simulados: en tu proyecto se conectan con la pasarela de pagos, WhatsApp Business, un proveedor de telefonía, el GPS del celular del repartidor y un servicio de mapas (p. ej. Google Maps o Mapbox). Lo que haces se guarda solo en este navegador.",
-      "seoTitle": "App de domicilios: cliente, sede, operaciones y repartidor",
+      "seoTitle": "App de domicilios: cliente, sede y repartidor",
       "seoDescription": "Demo interactiva de un canal propio de domicilios con datos de ejemplo: pedido con pago simulado, aceptación en la sede, asignación del repartidor más cercano, entrega con código y reportes de tiempos calculados. Mapa y seguimiento simulados.",
       "breadcrumbHome": "Inicio",
       "breadcrumbDemos": "Demos"
@@ -6695,7 +6695,7 @@
       "subtitle": "Ventas, inventario en tres bodegas, compras con aprobaciones, producción, contabilidad, cartera y nómina de una empresa ficticia. Lo que haces en un módulo se refleja en los demás.",
       "sampleBadge": "Datos de ejemplo",
       "sampleHint": "Empresa y cifras ficticias generadas para la demo: van desde enero hasta el cierre del mes pasado. La DIAN, los bancos y WhatsApp están simulados.",
-      "seoTitle": "Demo ERP: ventas, inventario, compras y contabilidad",
+      "seoTitle": "Demo ERP: ventas, inventario y contabilidad",
       "seoDescription": "Prueba un ERP modular con datos de ejemplo: cotización, pedido y factura que descuentan inventario y generan el asiento contable, compras con aprobación, conciliación bancaria, cartera por edades, nómina y producción. La validación DIAN está simulada.",
       "breadcrumbHome": "Inicio",
       "breadcrumbDemos": "Demos"
@@ -13334,7 +13334,7 @@
   "demoLms": {
     "meta": {
       "title": "Plataforma de cursos virtuales (LMS)",
-      "seoTitle": "Demo LMS: plataforma de cursos virtuales con tutor IA",
+      "seoTitle": "Demo LMS: plataforma de cursos con tutor IA",
       "seoDescription": "Demo interactiva de una plataforma de cursos para una academia de ejemplo en Colombia: catálogo con precios en COP, compra simulada con PSE, tarjeta o Nequi, lecciones con subtítulos, tutor con IA que cita la lección y el minuto, evaluación, ruta adaptativa, certificados con QR verificable y paneles de instructor y administrador.",
       "breadcrumbHome": "Inicio",
       "breadcrumbDemos": "Demos",
@@ -17143,7 +17143,7 @@
   "demoScraping": {
     "meta": {
       "title": "Extracción y monitoreo de datos",
-      "seoTitle": "Demo: extracción y monitoreo de datos de la web y de documentos",
+      "seoTitle": "Demo: extracción y monitoreo de datos web",
       "seoDescription": "Prueba un extractor de datos con fuentes de ejemplo: radar de contratación pública, precios de tiendas ficticias con constructor de campos por clic, normativa y documentos de proveedores. Detecta cambios, configura alertas, descarga CSV y revisa la ficha legal de cada fuente. Datos de ejemplo.",
       "breadcrumbHome": "Inicio",
       "breadcrumbDemos": "Demos",
@@ -20394,7 +20394,7 @@
       "title": "WMS y logística de bodegas",
       "breadcrumbHome": "Inicio",
       "breadcrumbDemos": "Demos",
-      "seoTitle": "Demo WMS: recibo, inventario por lote, alistamiento y despacho",
+      "seoTitle": "Demo WMS: recibo, lotes, alistamiento y despacho",
       "seoDescription": "Demo interactiva de un WMS con datos de ejemplo: recibo con escaneo, ubicación por reglas, inventario por lote y vencimiento (FEFO), olas de alistamiento, empaque con guía simulada, ruteo de flota propia, devoluciones y prefactura 3PL en pesos. Se adapta a tu bodega en la implementación."
     },
     "shell": {

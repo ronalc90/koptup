@@ -7,7 +7,7 @@
       "title": "WMS and warehouse logistics",
       "breadcrumbHome": "Home",
       "breadcrumbDemos": "Demos",
-      "seoTitle": "WMS demo: receiving, lot inventory, picking and shipping",
+      "seoTitle": "WMS demo: receiving, lots, picking and shipping",
       "seoDescription": "Interactive WMS demo with sample data: receiving with scanning, rule-based putaway, inventory by lot and expiry (FEFO), picking waves, packing with a simulated shipping label, own-fleet routing, returns and 3PL pre-invoicing in Colombian pesos. Tailored to your warehouse during implementation."
     },
     "shell": {

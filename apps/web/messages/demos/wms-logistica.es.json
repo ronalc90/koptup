@@ -7,7 +7,7 @@
       "title": "WMS y logística de bodegas",
       "breadcrumbHome": "Inicio",
       "breadcrumbDemos": "Demos",
-      "seoTitle": "Demo WMS: recibo, inventario por lote, alistamiento y despacho",
+      "seoTitle": "Demo WMS: recibo, lotes, alistamiento y despacho",
       "seoDescription": "Demo interactiva de un WMS con datos de ejemplo: recibo con escaneo, ubicación por reglas, inventario por lote y vencimiento (FEFO), olas de alistamiento, empaque con guía simulada, ruteo de flota propia, devoluciones y prefactura 3PL en pesos. Se adapta a tu bodega en la implementación."
     },
     "shell": {

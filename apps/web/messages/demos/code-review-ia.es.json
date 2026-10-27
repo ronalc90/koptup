@@ -1,7 +1,7 @@
 {
   "demoCodeReview": {
     "meta": {
-      "title": "Demo de revisión de código con IA (code review) en pull requests",
+      "title": "Demo de revisión de código con IA en pull requests",
       "description": "Demo interactiva con datos de ejemplo de revisión de código (code review) con IA: seis pull requests de una fintech ficticia con comentarios de IA escritos de antemano, hallazgos de seguridad, pruebas sugeridas y una simulación de cómo llegan a GitHub, GitLab, Bitbucket o Azure DevOps. Incluye un analizador de reglas que revisa tu diff en el navegador, sin IA.",
       "breadcrumbHome": "Inicio",
       "breadcrumbDemos": "Demos",

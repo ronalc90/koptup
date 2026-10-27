@@ -1,7 +1,7 @@
 {
   "demoCms": {
     "meta": {
-      "seoTitle": "Headless CMS demo: content models, visual editor and API",
+      "seoTitle": "Headless CMS demo: models, visual editor and API",
       "seoDescription": "Try a headless CMS with sample data: content models, visual block editor, web and app preview, SEO checks, roles, approvals, scheduled publishing, webhooks and a JSON API. AI writing assistant included.",
       "breadcrumbHome": "Home",
       "breadcrumbDemos": "Demos",
