@@ -1,6 +1,6 @@
 import { clampDescription } from '@/lib/meta-text';
 import type { Metadata } from 'next';
-import { getTranslations, getLocale } from 'next-intl/server';
+import { getTranslations, getLocale, setRequestLocale } from 'next-intl/server';
 import { pageMetadata as metadataBase, getBreadcrumbSchema } from '@/lib/seo-config';
 
 /**
@@ -34,7 +34,9 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function CodeReviewIaLayout({ children }: { children: React.ReactNode }) {
+export default async function CodeReviewIaLayout({ children, params: { locale } }: { children: React.ReactNode; params: { locale: string } }) {
+  // Sin esto, getTranslations leería el idioma de las cabeceras y la ruta sería dinámica.
+  setRequestLocale(locale);
   const t = await getTranslations('demoCodeReview.meta');
   const breadcrumbSchema = getBreadcrumbSchema([
     { name: t('breadcrumbHome'), url: '/' },

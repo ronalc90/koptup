@@ -90,6 +90,17 @@ const nextConfig = {
   },
 
   // Security & SEO headers
+  // Páginas retiradas: la redirección vive en la configuración (no en una página
+  // que se renderiza), así la respuesta se cachea. Vale para /en también.
+  async redirects() {
+    return [
+      { source: '/pricing', destination: '/services#planes-rag', permanent: true },
+      { source: '/en/pricing', destination: '/en/services#planes-rag', permanent: true },
+      { source: '/soluciones-ia', destination: '/rag', permanent: true },
+      { source: '/en/soluciones-ia', destination: '/en/rag', permanent: true },
+    ];
+  },
+
   async headers() {
     const securityHeaders = [
       {

@@ -11,7 +11,6 @@ jest.mock('next/navigation', () => ({
   usePathname: () => '/demo/scraping',
   useSearchParams: () => new URLSearchParams(),
   useParams: () => ({}),
-  useParams: () => ({}),
 }));
 
 describe('Demo scraping', () => {
