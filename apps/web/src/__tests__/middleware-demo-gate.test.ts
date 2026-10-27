@@ -59,6 +59,13 @@ function rewriteOf(res: Response): URL | null {
   return value ? new URL(value) : null;
 }
 
+/** Sin bloqueo: next-intl solo reescribe la ruta a su idioma (/es/…, /en/…). */
+function passed(res: Response): boolean {
+  if (res.headers.get('x-middleware-next') === '1') return true;
+  const target = rewriteOf(res);
+  return !!target && /^\/(es|en)\/(?!demo-acceso\/)/.test(target.pathname);
+}
+
 describe('middleware: acceso a /demo/<slug>', () => {
   const realFetch = global.fetch;
   afterEach(() => {
@@ -69,8 +76,8 @@ describe('middleware: acceso a /demo/<slug>', () => {
     mockBackend((url) => (url.endsWith('/demo-catalog') ? json(CATALOG) : json({}, 500)));
     const middleware = await loadMiddleware();
     const res = await middleware(request('/demo/ecommerce'));
-    expect(res.headers.get('x-middleware-next')).toBe('1');
-    expect(rewriteOf(res)).toBeNull();
+    expect(passed(res)).toBe(true);
+    expect(rewriteOf(res)?.pathname).toBe('/es/demo/ecommerce');
     expect(calls.some((c) => c.includes('/demo-access/'))).toBe(false);
   });
 
@@ -79,7 +86,7 @@ describe('middleware: acceso a /demo/<slug>', () => {
     const middleware = await loadMiddleware();
     const res = await middleware(request('/demo/erp?tab=finanzas'));
     const target = rewriteOf(res)!;
-    expect(target.pathname).toBe('/demo-acceso/erp');
+    expect(target.pathname).toBe('/es/demo-acceso/erp');
     expect(target.searchParams.get('motivo')).toBe('sin_sesion');
     expect(target.searchParams.get('modo')).toBe('solicitud');
     expect(target.searchParams.get('ruta')).toBe('/demo/erp?tab=finanzas');
@@ -95,7 +102,7 @@ describe('middleware: acceso a /demo/<slug>', () => {
     });
     const middleware = await loadMiddleware();
     const res = await middleware(request('/demo/erp', { accessToken: 'tok-1' }));
-    expect(res.headers.get('x-middleware-next')).toBe('1');
+    expect(passed(res)).toBe(true);
     expect(res.headers.get('cache-control')).toBe('private, no-store');
     expect(res.headers.get('x-robots-tag')).toBe('noindex');
     expect(calls.some((c) => c.includes('/api/demo-access/erp ') && c.endsWith('Bearer tok-1'))).toBe(true);
@@ -113,7 +120,7 @@ describe('middleware: acceso a /demo/<slug>', () => {
     expect(expired.searchParams.get('motivo')).toBe('expirado');
     expect(expired.searchParams.get('vence')).toBe('2026-10-01T00:00:00.000Z');
     const revoked = rewriteOf(await middleware(request('/demo/cuentas-medicas', { accessToken: 't' })))!;
-    expect(revoked.pathname).toBe('/demo-acceso/cuentas-medicas');
+    expect(revoked.pathname).toBe('/es/demo-acceso/cuentas-medicas');
     expect(revoked.searchParams.get('motivo')).toBe('revocado');
     expect(revoked.searchParams.get('modo')).toBe('privado');
   });
@@ -130,7 +137,7 @@ describe('middleware: acceso a /demo/<slug>', () => {
       throw new Error('ECONNREFUSED');
     });
     const middleware = await loadMiddleware();
-    expect((await middleware(request('/demo/chatbot'))).headers.get('x-middleware-next')).toBe('1');
+    expect(passed((await middleware(request('/demo/chatbot'))))).toBe(true);
     const anon = rewriteOf(await middleware(request('/demo/erp')))!;
     expect(anon.searchParams.get('motivo')).toBe('no_disponible');
     const withSession = rewriteOf(await middleware(request('/demo/erp', { accessToken: 't' })))!;
@@ -151,7 +158,7 @@ describe('middleware: acceso a /demo/<slug>', () => {
     });
     const middleware = await loadMiddleware();
     const res = await middleware(request('/demo/erp', { accessToken: 'tok-viejo', refreshToken: 'r1' }));
-    expect(res.headers.get('x-middleware-next')).toBe('1');
+    expect(passed(res)).toBe(true);
     expect(res.headers.get('set-cookie')).toContain('accessToken=tok-nuevo');
   });
 
@@ -184,7 +191,7 @@ describe('middleware: acceso a /demo/<slug>', () => {
     const res = await middleware(request('/demo/erp', { accessToken: 't' }));
     expect(res.headers.get('x-middleware-next')).toBeNull();
     const target = rewriteOf(res)!;
-    expect(target.pathname).toBe('/demo-acceso/erp');
+    expect(target.pathname).toBe('/es/demo-acceso/erp');
     expect(target.searchParams.get('motivo')).toBe('desactivada');
     expect(res.headers.get('cache-control')).toBe('private, no-store');
     expect(res.headers.get('x-robots-tag')).toBe('noindex');
@@ -194,7 +201,7 @@ describe('middleware: acceso a /demo/<slug>', () => {
     mockBackend(() => json({}, 500));
     const middleware = await loadMiddleware();
     const res = await middleware(request('/demo/no-existe'));
-    expect(res.headers.get('x-middleware-next')).toBe('1');
+    expect(passed(res)).toBe(true);
     expect(calls).toHaveLength(0);
   });
 });
@@ -216,15 +223,15 @@ describe('middleware: portal y panel por rol', () => {
     expect(billing.headers.get('location')).toBe('http://localhost:3300/dashboard/demos');
     const home = await middleware(request('/dashboard', { accessToken: 'b' }));
     expect(home.headers.get('location')).toBe('http://localhost:3300/dashboard/demos');
-    expect((await middleware(request('/dashboard/demos', { accessToken: 'c' }))).headers.get('x-middleware-next')).toBe('1');
-    expect((await middleware(request('/dashboard/profile', { accessToken: 'd' }))).headers.get('x-middleware-next')).toBe('1');
+    expect(passed((await middleware(request('/dashboard/demos', { accessToken: 'c' }))))).toBe(true);
+    expect(passed((await middleware(request('/dashboard/profile', { accessToken: 'd' }))))).toBe(true);
   });
 
   it('sales entra a las secciones comerciales del panel, no al resto', async () => {
     meAs('sales');
     const middleware = await loadMiddleware();
-    expect((await middleware(request('/admin/solicitudes', { accessToken: 'e' }))).headers.get('x-middleware-next')).toBe('1');
-    expect((await middleware(request('/admin/accesos', { accessToken: 'f' }))).headers.get('x-middleware-next')).toBe('1');
+    expect(passed((await middleware(request('/admin/solicitudes', { accessToken: 'e' }))))).toBe(true);
+    expect(passed((await middleware(request('/admin/accesos', { accessToken: 'f' }))))).toBe(true);
     const users = await middleware(request('/admin/users', { accessToken: 'g' }));
     expect(users.headers.get('location')).toBe('http://localhost:3300/admin/solicitudes');
   });

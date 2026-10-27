@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Script from 'next/script';
-import { usePathname } from 'next/navigation';
+import { usePathname } from '@/i18n/navigation';
 import { GA_ID, GOOGLE_ADS_ID, HAS_TRACKING_TAGS, LINKEDIN_PARTNER_ID } from '@/lib/analytics';
 import { onCookiePreferencesChange, readCookiePreferences } from '@/lib/cookie-consent';
 

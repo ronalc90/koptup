@@ -1,8 +1,7 @@
 'use client';
 
 import { useId, useMemo, useState, type FormEvent } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { searchSite } from '@/lib/site-search';

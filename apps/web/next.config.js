@@ -120,8 +120,8 @@ const nextConfig = {
     });
     return [
       {
-        // Todo el sitio menos /embed/*: solo se puede incrustar en el propio dominio.
-        source: '/:path((?!embed(?:/|$)).*)',
+        // Todo el sitio menos /embed/* (con o sin /en): solo se puede incrustar en el propio dominio.
+        source: '/:path((?!(?:en/)?embed(?:/|$)).*)',
         headers: [
           ...securityHeaders,
           {
@@ -135,7 +135,7 @@ const nextConfig = {
         // /embed/* (chat del widget, apps/web/public/widget.js): se incrusta en el
         // sitio de cada cliente, así que no lleva X-Frame-Options y permite
         // cualquier frame-ancestor.
-        source: '/embed/:path*',
+        source: '/:locale(en)?/embed/:path*',
         headers: [...securityHeaders, contentSecurityPolicy('*')]
       },
       {

@@ -1,0 +1,52 @@
+import { Metadata } from 'next';
+import { pageMetadata, getBreadcrumbSchema } from '@/lib/seo-config';
+import { getLocale } from 'next-intl/server';
+import { SITE_URL, absoluteUrl } from '@/lib/site';
+import { getRagServiceJsonLd } from '@/lib/rag-plans-jsonld';
+
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata('services', await getLocale());
+}
+
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  name: 'KopTup - Servicios de Desarrollo de Software',
+  url: absoluteUrl('/services'),
+  description:
+    'Desarrollo de software a medida: e-commerce, chatbots con IA, apps móviles, dashboards, automatización e integración de sistemas.',
+  provider: {
+    '@type': 'Organization',
+    name: 'KopTup',
+    url: SITE_URL,
+  },
+  areaServed: 'Colombia',
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Servicios Tecnológicos',
+    itemListElement: [
+      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'E-Commerce', description: 'Tiendas online completas con pasarela de pago.' } },
+      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Chatbots con IA', description: 'Asistentes virtuales inteligentes.' } },
+      { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Dashboards Ejecutivos', description: 'Indicadores y reportes conectados a tus datos.' } },
+    ],
+  },
+};
+
+// Planes RAG de la sección #planes-rag (precios visibles en la página).
+const ragServiceSchema = getRagServiceJsonLd(absoluteUrl('/services'));
+
+export default function ServicesLayout({ children }: { children: React.ReactNode }) {
+  const breadcrumbSchema = getBreadcrumbSchema([
+    { name: 'Inicio', url: '/' },
+    { name: 'Servicios', url: '/services' },
+  ]);
+
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ragServiceSchema) }} />
+      {children}
+    </>
+  );
+}

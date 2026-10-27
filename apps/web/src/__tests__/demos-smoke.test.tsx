@@ -8,7 +8,7 @@ import path from 'node:path';
 import { smokeRenderPageAsync } from '@/test-utils/smoke';
 import type { TestLocale } from '@/test-utils/messages';
 
-const DEMO_DIR = path.join(__dirname, '..', 'app', 'demo');
+const DEMO_DIR = path.join(__dirname, '..', 'app', '[locale]', 'demo');
 
 const slugs = fs
   .readdirSync(DEMO_DIR, { withFileTypes: true })

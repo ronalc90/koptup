@@ -17,8 +17,8 @@ import {
   getSampleCompany,
   isSampleCompanyKey,
   type SampleLocale,
-} from '@/app/demo/chatbot/components/sampleKnowledge';
-import { citedIndexes, orderByCited } from '@/app/demo/chatbot/components/ChatPanel';
+} from '@/app/[locale]/demo/chatbot/components/sampleKnowledge';
+import { citedIndexes, orderByCited } from '@/app/[locale]/demo/chatbot/components/ChatPanel';
 
 /** Mismo criterio que el backend (services/rag-pipeline.ts › tokenize). */
 function tokens(text: string): string[] {
