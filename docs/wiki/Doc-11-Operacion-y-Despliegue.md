@@ -96,7 +96,7 @@ La arquitectura completa, con lo que hace cada pieza, está en [Arquitectura](Do
 
 ## 3. Integración continua (CI)
 
-El workflow **CI** (`.github/workflows/ci.yml`) corre en cada pull request, en cada push a `main` y a mano (`workflow_dispatch`), con Node 20. Si haces push otra vez a la misma rama, la corrida anterior se cancela (`concurrency`).
+El workflow **CI** (`.github/workflows/ci.yml`) corre en cada pull request, en cada push a `main` y a mano (`workflow_dispatch`), con Node 22 (LTS). Si haces push otra vez a la misma rama, la corrida anterior se cancela (`concurrency`).
 
 ```mermaid
 flowchart TD
@@ -550,7 +550,7 @@ flowchart LR
 
 *El navegador habla con la web y también directamente con el backend; por eso la web debe saber la URL local del backend.*
 
-**Requisitos:** Node.js 20.9 o superior, npm 9 o superior y Docker (o MongoDB y Redis instalados).
+**Requisitos:** Node.js 22.11 o superior (22 LTS), npm 9 o superior y Docker (o MongoDB y Redis instalados).
 
 1. **Clona e instala** (desde la raíz; instala la web y el backend juntos):
 

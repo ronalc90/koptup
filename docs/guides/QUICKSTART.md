@@ -5,7 +5,7 @@ La guía de instalación vigente está en [`SETUP.md`](../../SETUP.md) (paso a p
 Resumen:
 
 ```bash
-NODE_ENV=development npm install                  # Node.js 20.9 o superior
+NODE_ENV=development npm install                  # Node.js 22.11 o superior
 npm run docker:up                                  # MongoDB 7 y Redis 7 locales (docker-compose.dev.yml)
 cp apps/backend/.env.example apps/backend/.env     # cambia JWT_SECRET y JWT_REFRESH_SECRET
 cp apps/web/.env.example apps/web/.env.local       # apunta a http://localhost:3001
