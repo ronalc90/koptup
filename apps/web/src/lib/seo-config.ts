@@ -420,7 +420,7 @@ export function pageMetadata(pageKey: string, locale: string): Metadata {
   const path = (config.canonical ?? baseUrl).slice(baseUrl.length) || '/';
 
   return {
-    // Objeto con `template` (no string): en Next 14, si un layout intermedio
+    // Objeto con `template` (no string): en Next (14 y 15), si un layout intermedio
     // (p. ej. /demo) define `title` como string, sus rutas hijas pierden la
     // plantilla del layout raíz y salen sin " | KopTup". Re-declararla aquí
     // la propaga a las rutas anidadas (/demo/*, /rag/*…).

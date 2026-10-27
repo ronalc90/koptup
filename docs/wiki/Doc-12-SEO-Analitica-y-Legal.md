@@ -66,7 +66,7 @@ flowchart LR
 - **Plantilla:** `"<título de la página> | KopTup"`, con un máximo de **60 caracteres** contando el sufijo. La única excepción es el inicio, que pone la marca primero: **«KopTup | IA que responde con los documentos de tu empresa»**.
 - **Dónde se definen:** `apps/web/src/lib/seo-config.ts` tiene el título, la descripción, la canonical y la imagen de cada página; cada `layout.tsx` o `page.tsx` las aplica con `generateMetadata('<clave>')`. Las páginas privadas (cuenta, activación) usan `privatePageMetadata(título, ruta)`: título propio, `noindex, nofollow` y canonical a su propia ruta, o ninguna si la URL lleva un token.
 - **Panel y portal:** `/admin` y `/dashboard` entregan en el HTML el título del área («Panel de administración \| KopTup», «Mi portal \| KopTup»); en el navegador cada sección lo afina, por ejemplo «Solicitudes de demo · Panel \| KopTup» o «Mis demos · Mi portal \| KopTup» (`components/seo/AreaDocumentTitle.tsx`, textos en `pageTitles`).
-- **Control automático:** `node apps/web/scripts/check-titles.mjs` simula cómo Next arma cada título y falla si alguno pasa de 60 caracteres o repite la marca. Corre en CI ([Operación y despliegue › 3](Doc-11-Operacion-y-Despliegue.md#3-integración-continua-ci)).
+- **Control automático:** `node apps/web/scripts/check-titles.mjs` ejecuta el `generateMetadata` de cada layout y page en español (`/…`) y en inglés (`/en/…`), simula cómo Next arma cada título (también el de la página 404) y falla si alguno pasa de 60 caracteres o repite la marca. Corre en CI ([Operación y despliegue › 3](Doc-11-Operacion-y-Despliegue.md#3-integración-continua-ci)).
 - No se usa la meta `keywords` (Google la ignora).
 
 Títulos reales de las páginas principales (leídos del HTML que entrega el sitio):

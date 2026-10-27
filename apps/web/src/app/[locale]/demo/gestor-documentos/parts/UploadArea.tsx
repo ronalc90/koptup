@@ -53,7 +53,7 @@ export function AccessCard() {
 }
 
 interface UploadAreaProps {
-  inputRef: RefObject<HTMLInputElement>;
+  inputRef: RefObject<HTMLInputElement | null>;
   targetFolder: string;
 }
 

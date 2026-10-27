@@ -2,7 +2,7 @@
   "demoScraping": {
     "meta": {
       "title": "Data extraction and monitoring",
-      "seoTitle": "Demo: data extraction and monitoring from websites and documents",
+      "seoTitle": "Demo: web data extraction and monitoring",
       "seoDescription": "Try a data extractor with sample sources: public procurement radar, prices from fictional stores with a click-to-field builder, regulations and supplier documents. Detect changes, set up alerts, download CSV and review each source's legal sheet. Sample data.",
       "breadcrumbHome": "Home",
       "breadcrumbDemos": "Demos",

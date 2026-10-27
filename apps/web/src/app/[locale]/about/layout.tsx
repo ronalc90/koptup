@@ -6,7 +6,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata('about', await getLocale());
 }
 
-export default async function AboutLayout({ children, params: { locale } }: { children: React.ReactNode; params: { locale: string } }) {
+export default async function AboutLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   // Sin esto, getTranslations leería el idioma de las cabeceras y la ruta sería dinámica.
   setRequestLocale(locale);
   const t = await getTranslations('aboutPage');

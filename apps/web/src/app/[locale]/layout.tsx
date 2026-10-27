@@ -35,8 +35,8 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
-  const { locale } = params;
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
   const en = locale === 'en';
   const homeTitle = en ? HOME_TITLE_EN : HOME_TITLE;
   const homeDescription = en ? HOME_DESCRIPTION_EN : HOME_DESCRIPTION;
@@ -54,10 +54,11 @@ export async function generateMetadata({ params }: { params: { locale: string } 
       statusBarStyle: 'default',
       title: 'KopTup',
     },
-    // Next 14 solo emite la etiqueta de Apple (obsoleta en Chrome, que avisa en
-    // consola); la estándar va aparte.
+    // Desde Next 15, `capable` emite solo la etiqueta estándar
+    // (`mobile-web-app-capable`); la de Apple, que era la única que emitía
+    // Next 14, va aparte para que la página siga teniendo las dos.
     other: {
-      'mobile-web-app-capable': 'yes',
+      'apple-mobile-web-app-capable': 'yes',
     },
     // Description, canonical y og/twitter de la home (y valores por defecto del
     // sitio para las páginas que no definen los suyos).
@@ -106,11 +107,12 @@ export async function generateMetadata({ params }: { params: { locale: string } 
 
 export default async function LocaleLayout({
   children,
-  params: { locale },
+  params,
 }: {
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
   // Sin esta llamada, next-intl leería el idioma de las cabeceras y la página
   // dejaría de ser estática.
   setRequestLocale(locale);

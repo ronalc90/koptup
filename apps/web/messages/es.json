@@ -1272,11 +1272,11 @@
         "description": "Con esto están hechos el sitio, el panel de administración y las demos que puedes probar.",
         "items": [
           {
-            "name": "Next.js 14",
+            "name": "Next.js 15",
             "note": "App Router y componentes de servidor"
           },
           {
-            "name": "React 18",
+            "name": "React 19",
             "note": "interfaz del sitio y de las demos"
           },
           {

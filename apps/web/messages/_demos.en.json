@@ -5076,7 +5076,7 @@
       "sampleData": "Sample data",
       "sampleDataHint": "Brand, stores, customers, couriers, orders and figures are fictitious. Payments, WhatsApp messages, calls, GPS and the map are simulated.",
       "footer": "Demo with sample data from a fictitious brand (Fogón Demo) with 3 stores in Bogotá. Payments with Nequi, Daviplata, PSE or card, the WhatsApp message, the masked call, the courier position and the map are simulated: in your project they connect to the payment gateway, WhatsApp Business, a telephony provider, the courier's phone GPS and a map service (e.g. Google Maps or Mapbox). What you do is saved only in this browser.",
-      "seoTitle": "Delivery app: customer, store, operations and courier",
+      "seoTitle": "Delivery app: customer, store and courier",
       "seoDescription": "Interactive demo of your own delivery channel with sample data: order with simulated payment, store acceptance, assignment of the nearest courier, delivery with a code and calculated timing reports. Simulated map and tracking.",
       "breadcrumbHome": "Home",
       "breadcrumbDemos": "Demos"
@@ -6695,7 +6695,7 @@
       "subtitle": "Sales, inventory across three warehouses, purchasing with approvals, production, accounting, receivables and payroll for a fictitious company. What you do in one module shows up in the others.",
       "sampleBadge": "Sample data",
       "sampleHint": "Fictitious company and figures generated for the demo: they run from January to the close of last month. DIAN, banks and WhatsApp are simulated.",
-      "seoTitle": "ERP demo: sales, inventory, purchasing and accounting",
+      "seoTitle": "ERP demo: sales, inventory and accounting",
       "seoDescription": "Try a modular ERP with sample data: quote, order and invoice that reduce stock and post the journal entry, purchase orders with approvals, bank reconciliation, receivables aging, payroll and production. DIAN validation is simulated.",
       "breadcrumbHome": "Home",
       "breadcrumbDemos": "Demos"
@@ -9111,7 +9111,7 @@
   },
   "demoCms": {
     "meta": {
-      "seoTitle": "Headless CMS demo: content models, visual editor and API",
+      "seoTitle": "Headless CMS demo: models, visual editor and API",
       "seoDescription": "Try a headless CMS with sample data: content models, visual block editor, web and app preview, SEO checks, roles, approvals, scheduled publishing, webhooks and a JSON API. AI writing assistant included.",
       "breadcrumbHome": "Home",
       "breadcrumbDemos": "Demos",
@@ -17143,7 +17143,7 @@
   "demoScraping": {
     "meta": {
       "title": "Data extraction and monitoring",
-      "seoTitle": "Demo: data extraction and monitoring from websites and documents",
+      "seoTitle": "Demo: web data extraction and monitoring",
       "seoDescription": "Try a data extractor with sample sources: public procurement radar, prices from fictional stores with a click-to-field builder, regulations and supplier documents. Detect changes, set up alerts, download CSV and review each source's legal sheet. Sample data.",
       "breadcrumbHome": "Home",
       "breadcrumbDemos": "Demos",
@@ -20394,7 +20394,7 @@
       "title": "WMS and warehouse logistics",
       "breadcrumbHome": "Home",
       "breadcrumbDemos": "Demos",
-      "seoTitle": "WMS demo: receiving, lot inventory, picking and shipping",
+      "seoTitle": "WMS demo: receiving, lots, picking and shipping",
       "seoDescription": "Interactive WMS demo with sample data: receiving with scanning, rule-based putaway, inventory by lot and expiry (FEFO), picking waves, packing with a simulated shipping label, own-fleet routing, returns and 3PL pre-invoicing in Colombian pesos. Tailored to your warehouse during implementation."
     },
     "shell": {

@@ -1,13 +1,17 @@
 import { MetadataRoute } from 'next';
 import { RAG_PATH, RAG_SECTORS } from '@/lib/rag-page';
 import { SITE_URL } from '@/lib/site';
-import { SITEMAP_REVALIDATE_SECONDS, fetchSitemapCatalog, openDemoSlugs } from '@/lib/sitemap-demos';
+import { fetchSitemapCatalog, openDemoSlugs } from '@/lib/sitemap-demos';
 import { isDemoVitrina } from '@/lib/demo-showcase';
 import { localeAlternates, localizedUrl } from '@/lib/i18n-url';
 import LAST_MODIFIED from '@/lib/sitemap-lastmod.json';
 
 // Se regenera cada hora: así sigue al catálogo de demos que edita el admin.
-export const revalidate = SITEMAP_REVALIDATE_SECONDS;
+// Next 15 lee esta opción sin ejecutar el módulo y solo acepta un literal
+// (con la constante importada falla el build): es SITEMAP_REVALIDATE_SECONDS
+// de lib/sitemap-demos.ts, y src/__tests__/sitemap-demos.test.ts comprueba
+// que coincidan.
+export const revalidate = 3600;
 
 // Dominio canónico (con www).
 const baseUrl = SITE_URL;

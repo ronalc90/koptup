@@ -51,7 +51,6 @@ const TELEMEDICINE_PERMISSIONS_POLICY = 'camera=(self), microphone=(self), geolo
 
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   poweredByHeader: false,
 
   env: {
@@ -59,14 +58,19 @@ const nextConfig = {
   },
   trailingSlash: false,
 
+  // Metadatos (título, description, canonical, robots, og) siempre en el
+  // <head> del HTML, para todos los visitantes y buscadores, como con Next 14.
+  // Desde Next 15.2 se envían al final del HTML en streaming salvo a los bots
+  // de la lista por defecto, que no incluye a Googlebot. `/.*/` lo desactiva.
+  htmlLimitedBots: /.*/,
+
   // En producción Next no traza accesos fs.readdirSync dinámicos. Sin esto,
   // `messages/{demos,offerings}/*.json` queda fuera del bundle serverless
   // y vemos claves crudas como `offeringsCatalog.hero.title` en koptup.com.
-  // Solo afecta `next build`, no influye en `next dev`.
-  experimental: {
-    outputFileTracingIncludes: {
-      '/**/*': ['./messages/**/*.json'],
-    },
+  // Solo afecta `next build`, no influye en `next dev`. (Desde Next 15 va en
+  // la raíz de la configuración, ya no dentro de `experimental`.)
+  outputFileTracingIncludes: {
+    '/**/*': ['./messages/**/*.json'],
   },
 
 
@@ -76,9 +80,10 @@ const nextConfig = {
   // permiten `localhost` (evita que /_next/image pida recursos internos) ni el
   // bucket de uploads (guarda archivos que suben los usuarios; los avatares e
   // íconos se muestran con `unoptimized`).
-  // Sin AVIF: la rama 14 de Next no tiene parche para GHSA-2xp9-vwfh-vxw4
-  // (ejecución remota vía libheif al optimizar AVIF, solo si se autoaloja con
-  // `next start`; corregido en 15.5.24). WebP basta para estas fotos.
+  // Solo WebP, sin AVIF: se quitó mientras la web estuvo en Next 14, que no
+  // tenía parche para GHSA-2xp9-vwfh-vxw4 (ejecución remota vía libheif al
+  // optimizar AVIF; corregido en 15.5.24, ya incluido). Se mantiene porque
+  // WebP basta para estas fotos y así no cambia lo que sirve el optimizador.
   images: {
     remotePatterns: [{ protocol: 'https', hostname: 'images.unsplash.com', pathname: '/photo-**' }],
     formats: ['image/webp'],
