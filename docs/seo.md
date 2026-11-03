@@ -67,12 +67,8 @@ producción local. Las cabeceras y la estructura de las páginas se leyeron con 
 
 ## Pendiente (depende del dueño o de una decisión)
 
-1. **Dominio:** los registros DNS de `koptup.com` y `www.koptup.com` no apuntan a Vercel.
-   Vercel marca el dominio como `misconfigured` y los nameservers apuntan a un servicio de
-   parking. Hoy el sitio público responde con 503 desde el exterior, y mientras eso no se
-   corrija no hay indexación nueva posible. Es el punto más urgente. La corrección es
-   apuntar `@` a `76.76.21.21` y `www` a `cname.vercel-dns.com`, o cambiar los nameservers
-   a los de Vercel.
+1. **Dominio (resuelto):** `www.koptup.com` resuelve a Vercel y responde 200. El apex
+   `koptup.com` redirige con 308. Comprobado el 3 de noviembre de 2026.
 2. **Google Analytics 4:** falta el ID de medición (`NEXT_PUBLIC_GA_ID`). Sin ese ID no
    hay analítica ni banner de cookies. No se debe inventar el ID.
 3. **Search Console:** confirmar que la propiedad está verificada y enviar
