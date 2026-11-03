@@ -10,7 +10,8 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function CuentasMedicasLayout({ children, params: { locale } }: { children: React.ReactNode; params: { locale: string } }) {
+export default async function CuentasMedicasLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const breadcrumbSchema = getBreadcrumbSchema([
     { name: 'Inicio', nameEn: 'Home', url: '/' },
     { name: 'Demos', nameEn: 'Demos', url: '/demo' },

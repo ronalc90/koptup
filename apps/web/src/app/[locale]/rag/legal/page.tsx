@@ -9,7 +9,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata('rag-legal', await getLocale());
 }
 
-export default function RagLegalPage({ params: { locale } }: { params: { locale: string } }) {
+export default async function RagLegalPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const breadcrumbSchema = getBreadcrumbSchema([
     { name: 'Inicio', nameEn: 'Home', url: '/' },
     { name: 'Sistemas RAG', nameEn: 'RAG systems', url: RAG_PATH },

@@ -6,7 +6,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata('cookies', await getLocale());
 }
 
-export default function CookiesLayout({ children, params: { locale } }: { children: React.ReactNode; params: { locale: string } }) {
+export default async function CookiesLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const breadcrumbSchema = getBreadcrumbSchema([
     { name: 'Inicio', nameEn: 'Home', url: '/' },
     { name: 'Política de Cookies', nameEn: 'Cookie policy', url: '/cookies' },

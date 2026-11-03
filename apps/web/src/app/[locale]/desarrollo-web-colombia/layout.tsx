@@ -111,7 +111,8 @@ const faqSchema = {
   ],
 };
 
-export default function DesarrolloWebColombiaLayout({ children, params: { locale } }: { children: React.ReactNode; params: { locale: string } }) {
+export default async function DesarrolloWebColombiaLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const breadcrumbSchema = getBreadcrumbSchema([
     { name: 'Inicio', nameEn: 'Home', url: '/' },
     { name: 'Desarrollo Web Colombia', nameEn: 'Web development in Colombia', url: '/desarrollo-web-colombia' },

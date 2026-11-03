@@ -6,7 +6,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata('solicitar-demo', await getLocale());
 }
 
-export default function SolicitarDemoLayout({ children, params: { locale } }: { children: React.ReactNode; params: { locale: string } }) {
+export default async function SolicitarDemoLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const breadcrumbSchema = getBreadcrumbSchema([
     { name: 'Inicio', nameEn: 'Home', url: '/' },
     { name: 'Solicitar demo', nameEn: 'Request a demo', url: '/solicitar-demo' },
