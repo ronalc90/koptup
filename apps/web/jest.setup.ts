@@ -104,6 +104,35 @@ if (typeof globalThis.TextEncoder === 'undefined') {
   Object.assign(globalThis, { TextEncoder, TextDecoder });
 }
 
+// MessageChannel tampoco existe en jsdom. react-dom/server (build del
+// navegador, React 19.3) crea un canal al cargar el módulo, así que cualquier
+// prueba que lo importe fallaba con "MessageChannel is not defined". Este canal
+// entrega los mensajes en una tarea aparte (como el real) sin recursos del
+// sistema que mantengan vivo el proceso de Jest.
+if (typeof globalThis.MessageChannel === 'undefined') {
+  class TimerMessagePort {
+    onmessage: ((event: { data: unknown }) => void) | null = null;
+    peer: TimerMessagePort | null = null;
+
+    postMessage(data: unknown) {
+      const target = this.peer;
+      setTimeout(() => target?.onmessage?.({ data }), 0);
+    }
+  }
+
+  class TimerMessageChannel {
+    port1 = new TimerMessagePort();
+    port2 = new TimerMessagePort();
+
+    constructor() {
+      this.port1.peer = this.port2;
+      this.port2.peer = this.port1;
+    }
+  }
+
+  Object.assign(globalThis, { MessageChannel: TimerMessageChannel });
+}
+
 // URL de objetos (descargas y vistas previas de archivos).
 if (!URL.createObjectURL) {
   URL.createObjectURL = jest.fn(() => 'blob:mock');
