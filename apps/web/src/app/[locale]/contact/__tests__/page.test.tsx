@@ -4,7 +4,9 @@
  * encabezado del plan RAG y el formulario leen useSearchParams, y cada uno va
  * en su propio Suspense.
  */
-import { renderToString } from 'react-dom/server';
+// La versión de Node: en jsdom, 'react-dom/server' resuelve a la de navegador,
+// que en React 19 crea un MessageChannel al cargarse (jsdom no lo tiene).
+import { renderToString } from 'react-dom/server.node';
 import { screen, waitFor } from '@testing-library/react';
 import { useSearchParams } from 'next/navigation';
 import ContactPage from '../page';

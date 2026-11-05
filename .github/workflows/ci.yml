@@ -40,7 +40,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: '22'
   NEXT_TELEMETRY_DISABLED: '1'
   TURBO_TELEMETRY_DISABLED: '1'
 
@@ -50,9 +50,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -82,19 +82,19 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # Historia completa: gitleaks revisa los commits nuevos del push o del PR.
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Dependencias de producción (npm audit, umbral alto)
         run: node scripts/audit-check.mjs
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v7
         with:
           go-version: '1.24'
           cache: false
@@ -161,9 +161,9 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -186,9 +186,9 @@ jobs:
       # apps/web/.env.production apuntaría a la API de producción.
       NEXT_PUBLIC_API_URL: http://localhost:3001
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -197,7 +197,7 @@ jobs:
         run: npm ci
 
       - name: Caché de Next.js
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: apps/web/.next/cache
           key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles('apps/web/src/**', 'apps/web/messages/**') }}
@@ -211,7 +211,7 @@ jobs:
         run: npm run build --workspace=apps/web
 
       - name: Guardar builds para e2e
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: builds
           include-hidden-files: true
@@ -259,9 +259,9 @@ jobs:
       E2E_NOTIFY_EMAIL: dueno@e2e.koptup.test
       E2E_ADMIN_WHATSAPP_NUMBER: '573000000000'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -270,13 +270,13 @@ jobs:
         run: npm ci
 
       - name: Descargar builds
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: builds
           path: apps
 
       - name: Caché de navegadores de Playwright
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -370,7 +370,7 @@ jobs:
 
       - name: Reporte de Playwright
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report
           retention-days: 7
