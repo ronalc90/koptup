@@ -139,4 +139,4 @@ Usa los templates de issues en [`.github/ISSUE_TEMPLATE`](.github/ISSUE_TEMPLATE
 
 ## Contacto
 
-¿Dudas antes de abrir un PR grande? Escribe a **dirox7@gmail.com** o abre un issue.
+¿Dudas antes de abrir un PR grande? Escribe a **ronald@koptup.com** o abre un issue.
