@@ -402,9 +402,9 @@ El plan para convertir Koptup en un producto vendible (flujo del cliente, sistem
 
 Construimos a medida lo que viste en los prototipos — o lo que necesites que no esté acá. Tarifas en COP y USD, propuesta en 48h hábiles.
 
-- **Email:** [dirox7@gmail.com](mailto:dirox7@gmail.com)
+- **Email:** [ronald@koptup.com](mailto:ronald@koptup.com)
 - **Sitio:** [www.koptup.com/contact](https://www.koptup.com/contact)
-- **LinkedIn:** [/in/ronalc90](https://www.linkedin.com/in/ronalc90)
+- **LinkedIn:** [/in/ronald-cipagauta](https://www.linkedin.com/in/ronald-cipagauta/)
 
 ## Licencia
 
