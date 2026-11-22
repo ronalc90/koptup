@@ -224,7 +224,10 @@ jobs:
   e2e:
     name: E2E (Playwright)
     needs: build
-    runs-on: ubuntu-latest
+    # ubuntu-latest ya es Ubuntu 26.04 y Playwright 1.56 no instala Chromium ahí
+    # ("does not support chromium on ubuntu26.04-x64"). Volver a ubuntu-latest
+    # cuando se actualice Playwright a una versión que lo soporte.
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     services:
       mongo:
